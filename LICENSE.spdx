@@ -1,0 +1,7 @@
+SPDXVersion: SPDX-2.0
+DataLicense: CC0-1.0
+Creator: Goldman Sachs
+PackageName: Legend
+PackageOriginator: Goldman Sachs
+PackageHomePage: https://github.com/finos/legend-engine
+PackageLicenseDeclared: Apache-2.0
