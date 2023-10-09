@@ -45,4 +45,4 @@ jobs:
 
       - name: Test + Package
         run: |
-          vsce package
+          vsce package .
