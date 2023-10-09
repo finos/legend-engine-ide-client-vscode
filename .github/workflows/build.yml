@@ -45,4 +45,4 @@ jobs:
 
       - name: Test + Package
         run: |
-          vsce package legend-engine-ide-client-vscode.vsix --no-git-tag-version
+          vsce package legend-engine-ide-client-vscode-0.0.1.vsix
