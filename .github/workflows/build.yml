@@ -31,8 +31,8 @@ jobs:
 
       - name: Build + Test
         run: |
-          pwd
-          ls
+          echo pwd
+          echo ls
           yarn
           yarn build
           yarn test          
