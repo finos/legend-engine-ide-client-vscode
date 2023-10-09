@@ -32,11 +32,17 @@ jobs:
       - name: Debug 1
         run: |
           ls
+          pwd
 
       - name: Debug 2
         run: |
           cd ..
-  
+
+      - name: Debug 3
+          run: |
+          ls
+          pwd
+          
       - name: Build + Test
         run: |
           yarn
