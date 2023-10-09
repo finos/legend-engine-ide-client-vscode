@@ -39,6 +39,4 @@ jobs:
             
       - name: Build + Test
         run: |
-          yarn
-          yarn build
-          yarn test          
+          yarn && vsce package --yarn

@@ -1,10 +1,9 @@
 {
     "scripts": {
         "test": "jest",
-        "build": "build:ts"
+        "build": "tsc"
       },
     "dependencies": {
-        "vscode-languageclient": "9.0.1",
-        "vscode-languageserver": "9.0.1"
+        "vscode-languageclient": "9.0.1"
     }
 }
