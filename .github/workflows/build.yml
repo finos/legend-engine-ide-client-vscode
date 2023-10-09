@@ -41,9 +41,8 @@ jobs:
         run: |
           yarn
           npm install -g @vscode/vsce
-          vsce --version
           touch language-server.jar
 
       - name: Test + Package
         run: |
-          vsce package
+          vsce package legend-engine-ide-client-vscode.vsix
