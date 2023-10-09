@@ -29,10 +29,16 @@ jobs:
           git config --global author.email "${GITHUB_ACTOR}@users.noreply.github.com"
           git config --global author.name "${GITHUB_ACTOR}"
 
+      - name: Debug 1
+        run: |
+          ls
+
+      - name: Debug 1
+        run: |
+          pwd
+  
       - name: Build + Test
         run: |
-          echo pwd
-          echo ls
           yarn
           yarn build
           yarn test          
