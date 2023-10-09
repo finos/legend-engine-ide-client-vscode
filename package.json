@@ -1,7 +1,7 @@
 {
     "scripts": {
         "test": "jest",
-        "build": "tsc ."
+        "build": "yarn clean && npm-run-all build:ts build:sass"
       },
     "dependencies": {
         "vscode-languageclient": "9.0.1",
