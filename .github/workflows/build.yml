@@ -39,4 +39,5 @@ jobs:
             
       - name: Build + Test
         run: |
-          yarn && vsce package --yarn
+          yarn
+          npm install -g @vscode/vsce
