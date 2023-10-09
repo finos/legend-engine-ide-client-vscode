@@ -39,7 +39,7 @@ jobs:
           cd ..
 
       - name: Debug 3
-          run: |
+        run: |
           ls
           pwd
           
