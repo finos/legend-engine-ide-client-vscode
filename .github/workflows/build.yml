@@ -31,8 +31,6 @@ concurrency:
 jobs:
   build:
     name: Build
-    # Skip this build for release commits
-    if: "!contains(github.event.head_commit.message, '[maven-release-plugin]')"
 
     steps:
       - name: Configure git
