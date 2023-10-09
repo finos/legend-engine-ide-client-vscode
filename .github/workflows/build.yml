@@ -35,7 +35,7 @@ jobs:
 
       - name: Debug 2
         run: |
-          pwd
+          cd ..
   
       - name: Build + Test
         run: |
