@@ -37,7 +37,12 @@ jobs:
         with:
           node-version: 16
             
-      - name: Build + Test
+      - name: Install dependencies
         run: |
           yarn
           npm install -g @vscode/vsce
+          vsce --v
+
+      - name: Test + Package
+        run: |
+          vsce package
