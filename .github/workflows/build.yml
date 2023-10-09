@@ -19,7 +19,8 @@ on: [push, pull_request]
 jobs:
   build:
     name: Build
-
+    runs-on: ubuntu-latest
+    
     steps:
       - name: Configure git
         run: |
