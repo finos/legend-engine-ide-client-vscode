@@ -41,7 +41,8 @@ jobs:
         run: |
           yarn
           npm install -g @vscode/vsce
-          vsce --v
+          vsce --version
+          touch language-server.jar
 
       - name: Test + Package
         run: |
