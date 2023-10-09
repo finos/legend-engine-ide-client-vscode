@@ -33,7 +33,7 @@ jobs:
         run: |
           ls
 
-      - name: Debug 1
+      - name: Debug 2
         run: |
           pwd
   
