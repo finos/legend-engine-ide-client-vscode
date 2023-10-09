@@ -35,32 +35,6 @@ jobs:
     if: "!contains(github.event.head_commit.message, '[maven-release-plugin]')"
 
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v3
-
-      - name: Cache Maven dependencies
-        uses: actions/cache@v2
-        env:
-          cache-name: cache-mvn-deps
-        with:
-          path: ~/.m2/repository
-          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/pom.xml') }}
-          restore-keys: |
-            ${{ runner.os }}-build-${{ env.cache-name }}-
-            ${{ runner.os }}-build-
-            ${{ runner.os }}-
-
-      - name: Set up JDK
-        uses: actions/setup-java@v1
-        with:
-          java-version: 11
-          server-id: ossrh
-          server-username: CI_DEPLOY_USERNAME
-          server-password: CI_DEPLOY_PASSWORD
-
-      - name: Check Java version
-        run: java -version
-
       - name: Configure git
         run: |
           git config --global committer.email "infra@finos.org"
@@ -68,45 +42,9 @@ jobs:
           git config --global author.email "${GITHUB_ACTOR}@users.noreply.github.com"
           git config --global author.name "${GITHUB_ACTOR}"
 
-      - name: Download deps and plugins
-        run: mvn de.qaware.maven:go-offline-maven-plugin:resolve-dependencies
-
-      - name: Collect Workflow Telemetry
-        uses: runforesight/workflow-telemetry-action@v1
-        with:
-          theme: dark
-
       - name: Build + Test
-        if: github.ref != 'refs/heads/master'
         run: |
-          mvn -B -e -DXss4m -DXX:MaxRAMPercentage=90.0 -DskipTests=true install
-          mvn -B -e -DXss4m -DXX:MaxRAMPercentage=10.0 surefire:test -DargLine="-XX:MaxRAMPercentage=70.0" -Dsurefire.reports.directory=${GITHUB_WORKSPACE}/surefire-reports-aggregate
+          yarn
+          yarn build
+          yarn test          
 
-      - name: Build + Test + Maven Deploy + Sonar + Docker Snapshot
-        if: github.ref == 'refs/heads/master'
-        env:
-          DOCKER_USERNAME: finos
-          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
-        # NOTE: here we publish snapshot to a staging Maven registry
-        # some registry like Maven Central requires javadoc, but for now we
-        # don't need to, if we do, call javadoc:jar goal instead of javadoc:javadoc
-        # as the latter binds to generate-sources which runs before compile phase
-        # and can cause problem with some code generators
-        # See https://github.com/finos/legend-engine/pull/924
-        run: |
-          mvn -B -e -DXss4m -DXX:MaxRAMPercentage=90.0 -DskipTests=true deploy -P docker-snapshot,sonar
-          mvn -B -e -DXss4m -DXX:MaxRAMPercentage=10.0 surefire:test -DargLine="-XX:MaxRAMPercentage=70.0" -Dsurefire.reports.directory=${GITHUB_WORKSPACE}/surefire-reports-aggregate
-
-      - name: Upload Test Results
-        if: always()
-        uses: actions/upload-artifact@v3
-        with:
-          name: test-results
-          path: ${{ github.workspace }}/surefire-reports-aggregate/*.xml
-
-      - name: Upload CI Event
-        if: always()
-        uses: actions/upload-artifact@v3
-        with:
-          name: event-file
-          path: ${{ github.event_path }}
