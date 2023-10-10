@@ -6,7 +6,7 @@
         "url": "https://github.com/renuccif/legend-engine-ide-client-vscode/"
     },
     "engines": {
-        "vscode" : "1.83.0"
+        "vscode" : "^1.75.0"
     },
     "scripts": {
         "test": "jest",
