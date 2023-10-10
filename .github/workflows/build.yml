@@ -37,6 +37,11 @@ jobs:
         with:
           node-version: 16
             
+
+      - name: Debug
+        run: |
+          ls ../legend-engine-ide-lsp/legend-engine-ide-lsp-server-shaded/target/
+
       - name: Install dependencies
         run: |
           yarn
