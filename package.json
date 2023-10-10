@@ -1,6 +1,6 @@
 {
     "name": "legend-engine-ide-client-vscode",
-    "version": "0.0.1-SNAPSHOT",
+    "version": "0.0.1-SNAPSHOT-shaded",
     "engines": {
         "vscode" : "1.75.0"
     },
