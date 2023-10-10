@@ -54,6 +54,6 @@ jobs:
 
       - name: Test + Package
         run: |
-          vsce package legend-engine-ide-lsp-server-shaded-0.0.1-SNAPSHOT.jar --no-git-tag-version
+          vsce package legend-engine-ide-lsp-server-shaded-0.0.1.jar --no-git-tag-version
 #         vsce package ../../legend-engine-ide-lsp/legend-engine-ide-lsp-server-shaded/target/original-legend-engine-ide-lsp-server-shaded-0.0.1-SNAPSHOT.jar
         
