@@ -1,6 +1,10 @@
 {
     "name": "legend-engine-ide-client-vscode",
     "version": "0.0.1",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/renuccif/legend-engine-ide-client-vscode/"
+    },
     "engines": {
         "vscode" : "1.75.0"
     },
