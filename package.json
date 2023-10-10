@@ -1,5 +1,6 @@
 {
     "name": "legend-engine-ide-client-vscode",
+    "version": "0.0.1",
     "scripts": {
         "test": "jest",
         "build": "tsc"
