@@ -1,4 +1,3 @@
-[![FINOS - Incubating]](https://finosfoundation.atlassian.net/wiki/display/FINOS/Incubating)
 
 # legend-engine-{extension}
 
