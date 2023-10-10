@@ -42,8 +42,9 @@ jobs:
         run: |
           pwd
           ls ..
-          ls ../
-          ls ../../legend-engine-ide-lsp/legend-engine-ide-lsp-server-shaded/target/
+          ls ../..
+          ls ../../..
+#          ls ../../legend-engine-ide-lsp/legend-engine-ide-lsp-server-shaded/target/
 
       - name: Install dependencies
         run: |
