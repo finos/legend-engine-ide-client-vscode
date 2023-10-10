@@ -41,7 +41,7 @@ jobs:
         run: |
           yarn
           npm install -g @vscode/vsce
-          touch language-server.jar
+          vsce package ../legend-engine-ide-lsp/legend-engine-ide-lsp-server-shaded/target/original-legend-engine-ide-lsp-server-shaded-0.0.1-SNAPSHOT.jar
 
       - name: Test + Package
         run: |
