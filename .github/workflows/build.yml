@@ -40,14 +40,18 @@ jobs:
 
       - name: Debug
         run: |
-          ls ../legend-engine-ide-lsp/legend-engine-ide-lsp-server-shaded/target/
+          pwd
+          ls ..
+          ls ../
+          ls ../../legend-engine-ide-lsp/legend-engine-ide-lsp-server-shaded/target/
 
       - name: Install dependencies
         run: |
           yarn
           npm install -g @vscode/vsce
-          vsce package ../legend-engine-ide-lsp/legend-engine-ide-lsp-server-shaded/target/original-legend-engine-ide-lsp-server-shaded-0.0.1-SNAPSHOT.jar
 
       - name: Test + Package
         run: |
-          vsce package .
+          vsce package legend-engine-ide-lsp-server-shaded-0.0.1-SNAPSHOT-shaded.jar
+#         vsce package ../../legend-engine-ide-lsp/legend-engine-ide-lsp-server-shaded/target/original-legend-engine-ide-lsp-server-shaded-0.0.1-SNAPSHOT.jar
+        
