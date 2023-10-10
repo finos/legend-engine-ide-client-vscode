@@ -36,16 +36,6 @@ jobs:
         uses: actions/setup-node@v3.8.1
         with:
           node-version: 16
-            
-
-      - name: Debug
-        run: |
-          pwd
-          ls
-          ls ..
-          ls ../..
-          ls ../../..
-#          ls ../../legend-engine-ide-lsp/legend-engine-ide-lsp-server-shaded/target/
 
       - name: Install dependencies
         run: |
