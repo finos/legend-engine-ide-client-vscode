@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+    <dict>
+        <key>comment</key>
+        <string>Legend Syntax: version 1</string>
+
+        <key>fileTypes</key>
+        <array>
+            <string>pure</string>
+        </array>
+
+        <key>name</key>
+        <string>legend</string>
+
+        <key>foldingStartMarker</key>
+        <string>^\{.*$</string>
+
+        <key>foldingStopMarker</key>
+        <string>^.*}$</string>
+    
+        <key>patterns</key>
+        <array>
+            <dict>
+                <key>name</key>
+                <string>comment.line.double-slash.legend</string>
+                <key>captures</key>
+                <dict>
+                    <key>1</key>
+                    <dict>
+                        <key>name</key>
+                        <string>comment.line.double-slash</string>
+                    </dict>
+                </dict>
+                <key>match</key>
+                <string>(//.*)</string>
+            </dict>                
+
+            <dict>
+                <key>name</key>
+                <string>comment.block.legend</string>
+                <key>begin</key>
+                <string>/\*</string>
+                <key>beginCaptures</key>
+                <dict>
+                    <key>0</key>
+                    <dict>
+                        <key>name</key>
+                        <string>comment.line.double-slash</string>
+                    </dict>
+                </dict>
+                <key>end</key>
+                <string>\*/</string>
+                <key>endCaptures</key>
+                <dict>
+                    <key>0</key>
+                    <dict>
+                        <key>name</key>
+                        <string>comment.line.double-slash</string>
+                    </dict>
+                </dict>
+            </dict>
+        
+            <dict>
+                <key>name</key>
+                <string>string.quoted.double.legend</string>
+                <key>begin</key>
+                <string>'</string>
+                <key>beginCaptures</key>
+                <dict>
+                    <key>0</key>
+                    <dict>
+                        <key>name</key>
+                        <string>string.quoted.double</string>
+                    </dict>
+                </dict>
+                <key>end</key>
+                <string>'</string>
+                <key>endCaptures</key>
+                <dict>
+                    <key>0</key>
+                    <dict>
+                        <key>name</key>
+                        <string>string.quoted.double</string>
+                    </dict>
+                </dict>
+                <key>patterns</key>
+                <array>
+                    <dict>
+                        <key>match</key>
+                        <string>\\.</string>
+                        <key>name</key>
+                        <string>string.quoted.double</string>
+                    </dict>
+                </array>
+            </dict>
+
+            <dict>
+                <key>name</key>
+                <string>constant.numeric.legend</string>
+                <key>captures</key>
+                <dict>
+                    <key>1</key>
+                    <dict>
+                        <key>name</key>
+                        <string>constant.numeric</string>
+                    </dict>
+                </dict>
+                <key>match</key>
+                <string>\b((([0-9](\.)[0-9]+)|([0-9]+e[\-]?[0-9]+)|(0x[0-9A]-Fa-f]+)|([0-9]+)))\b</string>
+            </dict>
+
+            <dict>
+                <key>name</key>
+                <string>constant.numeric.date.legend</string>
+                <key>captures</key>
+                <dict>
+                    <key>1</key>
+                    <dict>
+                        <key>name</key>
+                        <string>constant.numeric</string>
+                    </dict>
+                </dict>
+                <key>match</key>
+                <string>\%[^\s]+\b</string>
+            </dict>
+
+            <dict>
+                <key>match</key>
+                <string>\b(?i:(\d+e[\-\+]?\d+))</string>
+                <key>name</key>
+                <string>constant.numeric.float.e.legend</string>
+            </dict>
+
+            <dict>
+                <key>name</key>
+                <string>markup.heading.legend</string>
+                <key>captures</key>
+                <dict>
+                    <key>1</key>
+                    <dict>
+                        <key>name</key>
+                        <string>markup.heading</string>
+                    </dict>
+                </dict>
+                <key>match</key>
+                <string>(\#\#\#[A-Za-z_][A-Za-z0-9_]*)\b</string>
+            </dict>
+
+            <dict>
+                <key>name</key>
+                <string>entity.other.attribute.legend</string>
+                <key>captures</key>
+                <dict>
+                    <key>1</key>
+                    <dict>
+                        <key>name</key>
+                        <string>entity.other.attribute</string>
+                    </dict>
+                </dict>
+                <key>match</key>
+                <string>\.([A-Za-z_][A-Za-z0-9_]*)\b</string>
+            </dict>
+            
+            <dict>
+                <key>name</key>
+                <string>punctuation.definition.tag.legend</string>
+                <key>captures</key>
+                <dict>
+                    <key>1</key>
+                    <dict>
+                        <key>name</key>
+                        <string>punctuation.definition.tag</string>
+                    </dict>
+                </dict>
+                <key>match</key>
+                <string>\b([A-Za-z_][A-Za-z0-9_]*)\:\:</string>
+            </dict>
+
+            <dict>
+                <key>name</key>
+                <string>variable.legend</string>
+                <key>captures</key>
+                <dict>
+                    <key>1</key>
+                    <dict>
+                        <key>name</key>
+                        <string>variable</string>
+                    </dict>
+                </dict>
+                <key>match</key>
+                <string>(\$[A-Za-z_][A-Za-z0-9_]*)\b</string>
+            </dict>
+
+            <dict>
+                <key>name</key>
+                <string>entity.name.function.legend</string>
+                <key>captures</key>
+                <dict>
+                    <key>1</key>
+                    <dict>
+                        <key>name</key>
+                        <string>entity.name.function</string>
+                    </dict>
+                </dict>
+                <key>match</key>
+                <string>\b(?<!\:\:)([A-Za-z_][A-Za-z0-9_]*)\s*\:(?!\:)</string>
+            </dict>
+
+        </array>
+        <key>scopeName</key>
+        <string>source.legend</string>
+    </dict>
+</plist>
