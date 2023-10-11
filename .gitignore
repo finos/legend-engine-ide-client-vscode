@@ -26,4 +26,6 @@
 /legend-engine-core/legend-engine-core-shared/legend-engine-shared-core/src/main/resources/legendExecutionVersion.json
 temp
 node_modules/*
+out/*
 legend-engine-ide-client-vscode-0.0.1.vsix
+package-lock.json
