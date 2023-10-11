@@ -14,5 +14,10 @@
       },
     "dependencies": {
         "vscode-languageclient": "9.0.1"
-    }
+    },
+    "grammars":[{
+        "language": "legend",
+        "scopeName": "source.legend",
+        "path": "./legend.tmlanguage"
+    }]
 }
