@@ -39,11 +39,12 @@ jobs:
 
       - name: Install dependencies
         run: |
-          yarn
+          npm install
           npm install -g @vscode/vsce
 
       - name: Package
         run: |
+          tsc
           vsce package -o legend-engine-ide-client-vscode-0.0.1.vsix
           mkdir artifacts
           cp legend-engine-ide-client-vscode-0.0.1.vsix artifacts/legend-engine-ide-client-vscode-0.0.1.vsix
