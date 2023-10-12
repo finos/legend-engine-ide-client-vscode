@@ -8,25 +8,43 @@
     "engines": {
         "vscode": "^1.75.0"
     },
+    "contributes": {
+        "configuration": {
+            "type": "object",
+            "title": "Legend Language Config",
+            "properties": {}
+        },
+        "languages": [
+            {
+                "id": "legend",
+                "extensions": [
+                    ".pure"
+                ]
+            }
+        ],
+        "grammars": [
+            {
+                "language": "legend",
+                "scopeName": "source.legend",
+                "path": "./legend.tmlanguage"
+            }
+        ]
+},
     "scripts": {
         "test": "jest",
         "compile": "tsc -b"
     },
     "dependencies": {
-        "vscode-languageclient": "9.0.1",
-        "@types/vscode": "1.83.0",
         "@types/node": "20.8.4",
+        "@types/vscode": "1.83.0",
         "path": "0.12.7",
-        "typescript": "5.2.2"
+        "typescript": "5.2.2",
+        "vscode-languageclient": "9.0.1",
+        "yo": "^4.3.1"
     },
-
-    "grammars": [
-        {
-            "language": "legend",
-            "scopeName": "source.legend",
-            "path": "./legend.tmlanguage"
-        }
-    ],
     "main": "out/extension",
-    "activationEvents": ["onLanguage:plaintext"]
+    "activationEvents": [
+        "onLanguage:legend",
+        "workspaceContains:**/*.pure"
+    ]
 }

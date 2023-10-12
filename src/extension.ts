@@ -1,31 +1,41 @@
 
 
 import * as path from 'path';
-import { workspace, ExtensionContext } from 'vscode';
-
+import { workspace, ExtensionContext, languages } from 'vscode';
 
 import {
 	LanguageClient,
 	LanguageClientOptions,
 	ServerOptions,
-	TransportKind
+	TransportKind,
+	Executable
 } from 'vscode-languageclient/node';
 
 let client: LanguageClient;
 
 export function activate(context: ExtensionContext) {
 
-    const serverModule = context.asAbsolutePath(path.join('server', 'out', 'server.js')
-	);
+	languages.setLanguageConfiguration('legend', {
+		wordPattern: /(-?\d*\.\d\w*)|([^`~!@#%^$&*()\-=+[{\]}\\|;:'",.<>/?\s][^`~!@#%^&*()\-=+[{\]}\\|;:'",.<>/?\s]*)/,
+		comments: {
+			lineComment: '//',
+			blockComment: ['/*', '*/']
+		}
+	});
 
-	const serverOptions: ServerOptions = {
-		run:   { module: serverModule, transport: TransportKind.ipc },
-		debug: { module: serverModule, transport: TransportKind.ipc }
+	const serverOptions: Executable = {
+		command: 'java', 
+		args: [ '-jar', context.asAbsolutePath(path.join('jars','language-server.jar'))]
 	};
 
+/*	const serverOptions: ServerOptions = {
+		run:   { module: serverModule, transport: TransportKind.ipc },
+		debug: { module: serverModule, transport: TransportKind.ipc }
+	};*/
+
 	const clientOptions: LanguageClientOptions = {
-		documentSelector: [{ scheme: 'file', language: 'plaintext' }],
-		synchronize: { fileEvents: workspace.createFileSystemWatcher('**/.clientrc')
+		documentSelector: [{ scheme: 'file', language: 'legend' }],
+		synchronize: { fileEvents: workspace.createFileSystemWatcher('**/*.pure')
 		}
 	};
 
