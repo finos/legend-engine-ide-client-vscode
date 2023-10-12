@@ -39,7 +39,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          yarn
+          npm install
           npm install -g @vscode/vsce
 
       - name: Package
