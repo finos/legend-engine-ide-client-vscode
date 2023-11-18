@@ -42,7 +42,7 @@
         "vscode-languageclient": "9.0.1",
         "yo": "^4.3.1"
     },
-    "main": "out/extension",
+    "main": "lib/extension",
     "activationEvents": [
         "onLanguage:legend",
         "workspaceContains:**/*.pure"
