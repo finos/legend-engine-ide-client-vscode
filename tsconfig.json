@@ -1,20 +1,11 @@
 {
-	// See https://www.typescriptlang.org/docs/handbook/compiler-options.html
 	"compilerOptions": {
-    // Module settings
-    "target": "esnext",
-    "module": "NodeNext",
-    "lib": ["esnext"],
+		"module": "CommonJS",
+		"target": "es2020",
+		"lib": ["es2020"],
 		"outDir": "lib",
 		"rootDir": "src",
-    "composite": true,
-    "declaration": true,
-    "declarationMap": true,
-    "sourceMap": true,
-    "skipLibCheck": true, // skip type checking of all declaration files (*.d.ts)
-    "resolveJsonModule": true, // include JSON files module and auto-interpret types
-    "verbatimModuleSyntax": true,
-    // Other settings
+		"sourceMap": true,
     "strict": true,
     "noImplicitOverride": true,
     "noUncheckedIndexedAccess": true,
@@ -25,7 +16,13 @@
     // the properties are not present.
     // See https://github.com/microsoft/TypeScript/pull/43947
     "exactOptionalPropertyTypes": true,
-    "forceConsistentCasingInFileNames": true
+    "forceConsistentCasingInFileNames": true,
 	},
-	"include": ["src/**/*.ts", "src/**/*.json"],
+	"include": [
+		"src"
+	],
+	"exclude": [
+		"node_modules",
+		".vscode-test"
+	]
 }

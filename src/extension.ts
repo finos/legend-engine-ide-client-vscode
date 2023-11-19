@@ -15,13 +15,11 @@
  */
 
 import * as path from 'path';
-import { workspace, ExtensionContext, languages } from 'vscode';
+import { workspace, type ExtensionContext, languages } from 'vscode';
 
 import {
 	LanguageClient,
-	LanguageClientOptions,
-	ServerOptions,
-	TransportKind,
+ LanguageClientOptions,
 	Executable
 } from 'vscode-languageclient/node';
 
