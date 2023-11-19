@@ -21,7 +21,7 @@ import { fileURLToPath } from 'url';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
 export default {
-  extensions: ['js', 'ts',],
+  extensions: ['js', 'ts'],
   excludePatterns: [],
   copyrightText: readFileSync(resolve(__dirname, './COPYRIGHT_HEADER.txt'), {
     encoding: 'utf-8',

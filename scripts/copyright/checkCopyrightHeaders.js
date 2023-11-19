@@ -26,14 +26,14 @@ const getIncludedPatterns = ({ extensions }) => [
   ...extensions.map((extension) => createRegExp(`\\.${extension}$`)),
 ];
 
-  const GENERIC_INCLUDE_PATTERNS = [
-    /\.[^/]+$/, // files with extension
-  ];
-  
-  const GENERIC_EXCLUDE_PATTERNS = [
-    // nothing
-  ];
-  
+const GENERIC_INCLUDE_PATTERNS = [
+  /\.[^/]+$/, // files with extension
+];
+
+const GENERIC_EXCLUDE_PATTERNS = [
+  // nothing
+];
+
 const createRegExp = (pattern) => new RegExp(pattern);
 
 const exit = (msg, code) => {
@@ -42,8 +42,7 @@ const exit = (msg, code) => {
 };
 const exitWithError = (msg) => exit(msg, 1);
 
-const getFileContent = (file) =>
-  readFileSync(file, { encoding: 'utf-8' });
+const getFileContent = (file) => readFileSync(file, { encoding: 'utf-8' });
 
 const needsCopyrightHeader = (copyrightText, file) => {
   const fileContent = getFileContent(file);
@@ -57,7 +56,6 @@ const needsCopyrightHeader = (copyrightText, file) => {
   });
   return fileContent.trim().length > 0 && !fileContent.includes(text);
 };
-
 
 export const generateCopyrightComment = ({
   text,
@@ -156,8 +154,7 @@ export const checkCopyrightHeaders = ({
   }
 };
 
-  checkCopyrightHeaders({
-    ...config,
-    helpMessage: `Please include the header or exclude the files in 'scripts/copyright/copyright.config.js'`,
-  });
-
+checkCopyrightHeaders({
+  ...config,
+  helpMessage: `Please include the header or exclude the files in 'scripts/copyright/copyright.config.js'`,
+});

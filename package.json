@@ -34,7 +34,9 @@
     "scripts": {
         "test": "jest",
         "compile": "tsc -b",
-        "check:copyright": "node ./scripts/copyright/checkCopyrightHeaders.js"
+        "check:copyright": "node ./scripts/copyright/checkCopyrightHeaders.js",
+        "check:format": "prettier --list-different \"(scripts|docs)/**/*.{md,json,mjs,cjs,js,ts,tsx,html,scss,css}\" \"src/**/*.{md,json,mjs,cjs,js,ts,tsx,html,scss,css}\"",
+        "fix:format": "prettier --write --loglevel=warn \"(scripts|docs)/**/*.{md,json,mjs,cjs,js,ts,tsx,html,scss,css}\" \"src/**/*.{md,json,mjs,cjs,js,ts,tsx,html,scss,css}\""
     },
     "dependencies": {
         "@types/node": "20.8.4",
