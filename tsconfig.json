@@ -19,7 +19,8 @@
     "forceConsistentCasingInFileNames": true,
 	},
 	"include": [
-		"src"
+		"src",
+		// "./.eslintrc.cjs",
 	],
 	"exclude": [
 		"node_modules",

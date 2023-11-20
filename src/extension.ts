@@ -16,18 +16,18 @@
 
 import * as path from 'path';
 import { workspace, type ExtensionContext, languages } from 'vscode';
-
 import {
   LanguageClient,
-  LanguageClientOptions,
-  Executable,
+  type LanguageClientOptions,
+  type Executable,
 } from 'vscode-languageclient/node';
 
 let client: LanguageClient;
 
-export function activate(context: ExtensionContext) {
+export function activate(context: ExtensionContext): void {
   languages.setLanguageConfiguration('legend', {
     wordPattern:
+      // eslint-disable-next-line prefer-named-capture-group
       /(-?\d*\.\d\w*)|([^`~!@#%^$&*()\-=+[{\]}\\|;:'",.<>/?\s][^`~!@#%^&*()\-=+[{\]}\\|;:'",.<>/?\s]*)/,
     comments: {
       lineComment: '//',
