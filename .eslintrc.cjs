@@ -183,8 +183,6 @@ module.exports = {
     ...IMPORT_RULES,
     '@typescript-eslint/no-unsafe-argument': OFF,
     '@typescript-eslint/no-unsafe-member-access': OFF,
-    '@typescript-eslint/no-unsafe-enum-comparison': OFF, // we compare enum with strings a lot for valid reasons so this rule should be disabled
-    '@typescript-eslint/no-unsafe-return': OFF, // we use `any` return type a lot for valid reasons so this rule should be disabled
   },
   root: true,
 };
