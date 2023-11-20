@@ -1,56 +1,63 @@
 {
-    "name": "legend-engine-ide-client-vscode",
-    "version": "0.0.1",
-    "type": "module",
-    "repository": {
-        "type": "git",
-        "url": "https://github.com/finos/legend-engine-ide-client-vscode/"
+  "name": "legend-engine-ide-client-vscode",
+  "version": "0.0.1",
+  "type": "commonjs",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/finos/legend-engine-ide-client-vscode/"
+  },
+  "engines": {
+    "vscode": "^1.75.0"
+  },
+  "contributes": {
+    "configuration": {
+      "type": "object",
+      "title": "Legend Language Config",
+      "properties": {}
     },
-    "engines": {
-        "vscode": "^1.75.0"
-    },
-    "contributes": {
-        "configuration": {
-            "type": "object",
-            "title": "Legend Language Config",
-            "properties": {}
-        },
-        "languages": [
-            {
-                "id": "legend",
-                "extensions": [
-                    ".pure"
-                ]
-            }
-        ],
-        "grammars": [
-            {
-                "language": "legend",
-                "scopeName": "source.legend",
-                "path": "./legend.tmlanguage"
-            }
+    "languages": [
+      {
+        "id": "legend",
+        "extensions": [
+          ".pure"
         ]
-},
-    "scripts": {
-        "test": "jest",
-        "compile": "tsc -b",
-        "check:copyright": "node ./scripts/copyright/checkCopyrightHeaders.js",
-        "check:format": "prettier --list-different \"(scripts|docs)/**/*.{md,json,mjs,cjs,js,ts,tsx,html,scss,css}\" \"src/**/*.{md,json,mjs,cjs,js,ts,tsx,html,scss,css}\"",
-        "fix:format": "prettier --write --loglevel=warn \"(scripts|docs)/**/*.{md,json,mjs,cjs,js,ts,tsx,html,scss,css}\" \"src/**/*.{md,json,mjs,cjs,js,ts,tsx,html,scss,css}\""
-    },
-    "dependencies": {
-        "@types/node": "20.8.4",
-        "@types/vscode": "1.83.0",
-        "path": "0.12.7",
-        "typescript": "5.2.2",
-        "vscode-languageclient": "9.0.1",
-        "yo": "^4.3.1",
-        "eslint": "8.52.0",
-        "prettier": "3.0.3"
-    },
-    "main": "lib/extension",
-    "activationEvents": [
-        "onLanguage:legend",
-        "workspaceContains:**/*.pure"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "legend",
+        "scopeName": "source.legend",
+        "path": "./legend.tmlanguage"
+      }
     ]
+  },
+  "scripts": {
+    "test": "jest",
+    "compile": "tsc -b",
+    "check:copyright": "node ./scripts/copyright/checkCopyrightHeaders.js",
+    "check:format": "prettier --list-different \"(scripts|docs)/**/*.{md,json,mjs,cjs,js,ts,tsx,html,scss,css}\" \"src/**/*.{md,json,mjs,cjs,js,ts,tsx,html,scss,css}\"",
+    "check:ci": "npm run check:format && npm run check:copyright",
+    "lint:style": "stylelint --cache --cache-location ./build/.stylelintcache \"style/**/*.{scss,css}\" \"style/scss/**/*.scss\"",
+    "fix:format": "prettier --write --loglevel=warn \"(scripts|docs)/**/*.{md,json,mjs,cjs,js,ts,tsx,html,scss,css}\" \"src/**/*.{md,json,mjs,cjs,js,ts,tsx,html,scss,css}\""
+  },
+  "dependencies": {
+    "@types/node": "20.8.4",
+    "@types/vscode": "1.83.0",
+    "path": "0.12.7",
+    "typescript": "5.2.2",
+    "vscode-languageclient": "9.0.1",
+    "yo": "^4.3.1",
+    "eslint": "8.52.0",
+    "prettier": "3.0.3",
+    "stylelint": "15.11.0",
+    "postcss": "8.4.31",
+    "postcss-scss": "4.0.9",
+    "stylelint-config-standard": "34.0.0",
+    "stylelint-scss": "5.2.1"
+  },
+  "main": "lib/extension",
+  "activationEvents": [
+    "onLanguage:legend",
+    "workspaceContains:**/*.pure"
+  ]
 }
