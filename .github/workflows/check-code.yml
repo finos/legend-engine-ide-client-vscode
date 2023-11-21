@@ -3,7 +3,7 @@ name: Check Code
 on:
   push:
     branches:
-      - master
+      - main
       - 'release/**'
   pull_request:
     branches:
@@ -13,7 +13,7 @@ on:
 # NOTE: we don't want this behavior on default branch
 # See https://stackoverflow.com/a/68422069
 concurrency:
-  group: ${{ github.ref == 'refs/heads/master' && format('ci-default-branch-{0}-{1}', github.sha, github.workflow) || format('ci-pr-{0}-{1}', github.ref, github.workflow) }}
+  group: ${{ github.ref == 'refs/heads/main' && format('ci-default-branch-{0}-{1}', github.sha, github.workflow) || format('ci-pr-{0}-{1}', github.ref, github.workflow) }}
   cancel-in-progress: true
 
 jobs:
@@ -21,7 +21,7 @@ jobs:
     name: Run Code Checks
     # Disable usage of large runner on default branch of forks
     # NOTE: temporarily disable large runner
-    # runs-on: ${{ (github.repository != 'finos/legend-studio' && github.ref == 'refs/heads/master') && 'ubuntu-latest' || 'ubuntu-latest-4-cores' }}
+    # runs-on: ${{ (github.repository != 'finos/legend-studio' && github.ref == 'refs/heads/main') && 'ubuntu-latest' || 'ubuntu-latest-4-cores' }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -44,7 +44,7 @@ jobs:
     name: Run Codebase Maintenance Checks
     # Disable usage of large runner on default branch of forks
     # NOTE: temporarily disable large runners
-    # runs-on: ${{ (github.repository != 'finos/legend-studio' && github.ref == 'refs/heads/master') && 'ubuntu-latest' || 'ubuntu-latest-4-cores' }}
+    # runs-on: ${{ (github.repository != 'finos/legend-studio' && github.ref == 'refs/heads/main') && 'ubuntu-latest' || 'ubuntu-latest-4-cores' }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
