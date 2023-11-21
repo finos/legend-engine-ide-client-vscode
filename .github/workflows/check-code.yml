@@ -28,7 +28,7 @@ jobs:
         uses: actions/checkout@v4.1.0
 
       - name: Setup Node
-      uses: actions/setup-node@v4.0.0
+        uses: actions/setup-node@v3.8.1
         with:
           node-version: 16
 
@@ -36,6 +36,7 @@ jobs:
         run: |
           npm install
           npm install -g @vscode/vsce
+
       - name: Run lint
         run: npm run lint:ci
 
@@ -46,11 +47,11 @@ jobs:
     # runs-on: ${{ (github.repository != 'finos/legend-studio' && github.ref == 'refs/heads/master') && 'ubuntu-latest' || 'ubuntu-latest-4-cores' }}
     runs-on: ubuntu-latest
     steps:
-       - name: Checkout code
+      - name: Checkout code
         uses: actions/checkout@v4.1.0
 
       - name: Setup Node
-      uses: actions/setup-node@v4.0.0
+        uses: actions/setup-node@v3.8.1
         with:
           node-version: 16
 
@@ -58,7 +59,9 @@ jobs:
         run: |
           npm install
           npm install -g @vscode/vsce
+
       - name: Check code formatting
         run: npm run check:format
+
       - name: Check copyright headers
         run: npm run check:copyright
