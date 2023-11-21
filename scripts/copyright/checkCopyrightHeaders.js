@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-import config from './copyright.config.js';
-import { execSync } from 'child_process';
-import { existsSync, lstatSync, readFileSync } from 'fs';
-import { EOL } from 'os';
-import micromatch from 'micromatch';
-import { isBinaryFileSync } from 'isbinaryfile';
-import chalk from 'chalk';
+const { execSync } = require('child_process');
+const { existsSync, lstatSync, readFileSync } = require('fs');
+const { EOL } = require('os');
+const micromatch = require('micromatch');
+const { isBinaryFileSync } = require('isbinaryfile');
+const chalk = require('chalk');
+const { resolve } = require('path');
 
 const getIncludedPatterns = ({ extensions }) => [
   ...extensions.map((extension) => createRegExp(`\\.${extension}$`)),
@@ -57,7 +57,7 @@ const needsCopyrightHeader = (copyrightText, file) => {
   return fileContent.trim().length > 0 && !fileContent.includes(text);
 };
 
-export const generateCopyrightComment = ({
+const generateCopyrightComment = ({
   text,
   /**
    * Optional. This text will be added prior to the copyright content.
@@ -129,7 +129,15 @@ const getInvalidFiles = ({
   );
 };
 
-export const checkCopyrightHeaders = ({
+const config = {
+  extensions: ['js', 'ts'],
+  excludePatterns: [],
+  copyrightText: readFileSync(resolve(__dirname, './COPYRIGHT_HEADER.txt'), {
+    encoding: 'utf-8',
+  }),
+};
+
+const checkCopyrightHeaders = ({
   extensions = [],
   /* micromatch glob patterns */
   excludePatterns = [],
