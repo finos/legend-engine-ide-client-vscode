@@ -15,12 +15,34 @@
  */
 
 import * as path from 'path';
-import { workspace, type ExtensionContext, languages } from 'vscode';
+import {
+  workspace,
+  type ExtensionContext,
+  languages,
+  window,
+  commands,
+} from 'vscode';
 import {
   LanguageClient,
   type LanguageClientOptions,
   type Executable,
 } from 'vscode-languageclient/node';
+import { LegendTreeDataProvider } from './utils/LegendTreeProvider';
+import { LanguageClientProgressResult } from './results/LanguageClientProgressResult';
+import type { PlainObject } from './utils/SerializationUtils';
+import {
+  PROGRESS_NOTIFICATION_ID,
+  RESULTS_WEB_VIEW,
+  SHOW_RESULTS_COMMAND_ID,
+  EXECUTION_TREE_VIEW,
+} from './utils/Const';
+import { LegendWebViewProvider } from './utils/LegendWebViewProvider';
+import {
+  renderTestResults,
+  resetExecutionTab,
+} from './results/ExecutionResultHelper';
+import { error } from 'console';
+import { isPlainObject } from './utils/AssertionUtils';
 
 let client: LanguageClient;
 
@@ -53,9 +75,56 @@ export function activate(context: ExtensionContext): void {
     synchronize: { fileEvents: workspace.createFileSystemWatcher('**/*.pure') },
   };
 
-  client = new LanguageClient('Legend', 'Legend', serverOptions, clientOptions);
+  // Register views
+  const resultsTreeDataProvider = new LegendTreeDataProvider();
+  window.registerTreeDataProvider(EXECUTION_TREE_VIEW, resultsTreeDataProvider);
 
+  const resultsViewprovider = new LegendWebViewProvider();
+  const resultsView = window.registerWebviewViewProvider(
+    RESULTS_WEB_VIEW,
+    resultsViewprovider,
+  );
+  context.subscriptions.push(resultsView);
+
+  // Create views
+  window.createTreeView(EXECUTION_TREE_VIEW, {
+    treeDataProvider: resultsTreeDataProvider,
+  });
+
+  // Register commands
+  const showResultsCommand = commands.registerCommand(
+    SHOW_RESULTS_COMMAND_ID,
+    (errorMssg: string) => {
+      resultsViewprovider.updateView(errorMssg);
+    },
+  );
+  context.subscriptions.push(showResultsCommand);
+
+  // Initialize client
+  client = new LanguageClient('Legend', 'Legend', serverOptions, clientOptions);
   client.start();
+
+  // Listen to progress notifications
+  client.onNotification(
+    PROGRESS_NOTIFICATION_ID,
+    (objectResult: PlainObject<LanguageClientProgressResult>) => {
+      try {
+        if (
+          isPlainObject(objectResult.value) &&
+          objectResult.value.kind !== 'end'
+        ) {
+          resetExecutionTab(resultsTreeDataProvider, resultsViewprovider);
+        }
+        const result =
+          LanguageClientProgressResult.serialization.fromJson(objectResult);
+        renderTestResults(result, resultsTreeDataProvider);
+      } catch (e) {
+        if (error instanceof Error) {
+          window.showErrorMessage(error.message);
+        }
+      }
+    },
+  );
 }
 
 export function deactivate(): Thenable<void> | undefined {

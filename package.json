@@ -10,10 +10,61 @@
     "vscode": "^1.75.0"
   },
   "contributes": {
+    "viewsContainers": {
+      "panel": [
+        {
+          "id": "resultsViewContainer",
+          "title": "Results",
+          "icon": ""
+        }
+      ]
+    },
+    "views": {
+      "resultsViewContainer": [
+        {
+          "id": "executionView",
+          "name": "Execution"
+        },
+        {
+          "type": "webview",
+          "id": "resultsView",
+          "name": "Results"
+        }
+      ]
+    },
+    "viewsWelcome": [
+      {
+        "view": "executionView",
+        "contents": "No executions",
+        "when": "!showExecutionResults"
+      },
+      {
+        "view": "executionView",
+        "contents": "Execution in progress...",
+        "when": "isExecutionHappening"
+      }
+    ],
+    "commands": [
+      {
+        "command": "showResults",
+        "title": "Results"
+      }
+    ],
     "configuration": {
       "type": "object",
       "title": "Legend Language Config",
-      "properties": {}
+      "properties": {
+        "showExecutionResults": {
+          "type": "boolean",
+          "default": false,
+          "description": "Indicates if we have to show execution results in panel"
+        },
+        "isExecutionHappening": {
+          "type": "boolean",
+          "default": false,
+          "description": "Indicates if we have to show execution is happening"
+        }
+      }
     },
     "languages": [
       {
@@ -62,7 +113,8 @@
     "eslint-config-prettier": "9.0.0",
     "eslint-plugin-import": "2.29.0",
     "eslint-plugin-prettier": "5.0.1",
-    "cross-env": "7.0.3"
+    "cross-env": "7.0.3",
+    "serializr": "3.0.2"
   },
   "main": "lib/extension",
   "activationEvents": [
