@@ -40,7 +40,7 @@
       },
       {
         "view": "executionView",
-        "contents": "Test/query is getting executed...",
+        "contents": "Execution in progress...",
         "when": "isExecutionHappening"
       }
     ],
