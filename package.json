@@ -35,7 +35,7 @@
     "viewsWelcome": [
       {
         "view": "executionView",
-        "contents": "No tests/queries has been executed",
+        "contents": "No executions",
         "when": "!showExecutionResults"
       },
       {
