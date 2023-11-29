@@ -14,19 +14,14 @@
  * limitations under the License.
  */
 
-import { createModelSchema, custom, optional, primitive } from 'serializr';
+import { createModelSchema, list, optional, primitive } from 'serializr';
 import { SerializationFactory } from '../utils/SerializationUtils';
-import type { LegendExecutionSource } from './LegendExecutionResultSource';
 import type { LegendExecutionResultType } from './LegendExecutionResultType';
-import {
-  deserializeLegendLanguageSource,
-  serializeegendLanguageSource,
-} from './LegendExecutionSourceSerializer';
 
 export class LegendExecutionResult {
   message!: string;
   type!: LegendExecutionResultType;
-  source!: LegendExecutionSource;
+  sourceIds!: string[];
   logMessage?: string | undefined;
 
   static readonly serialization = new SerializationFactory(
@@ -34,10 +29,7 @@ export class LegendExecutionResult {
       message: primitive(),
       type: primitive(),
       logMessage: optional(primitive()),
-      source: custom(
-        (val) => serializeegendLanguageSource(val),
-        (val) => deserializeLegendLanguageSource(val),
-      ),
+      sourceIds: list(primitive()),
     }),
   );
 }
