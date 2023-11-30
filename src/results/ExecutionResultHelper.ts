@@ -35,8 +35,6 @@ import {
   TreeRootNodeData,
   buildTreeNodeId,
 } from '../utils/LegendTreeProvider';
-import { LegendExecutionLegacyTestSource } from './LegendExecutionLegacyTestSource';
-import { LegendExecutionTestableSource } from './LegendExecutionTestableSource';
 import { LegendExecutionResultType } from './LegendExecutionResultType';
 import { guaranteeNonNullable } from '../utils/AssertionUtils';
 import type { LegendWebViewProvider } from '../utils/LegendWebViewProvider';
@@ -110,26 +108,25 @@ export const renderTestResults = (
       command: SHOW_RESULTS_COMMAND_ID,
       arguments: [renderResultMessage(r.message)],
     };
-    if (r.source instanceof LegendExecutionLegacyTestSource) {
+    if (r.sourceIds.length === 2) {
+      const testId = guaranteeNonNullable(r.sourceIds[1]);
       resultsTreeDataProvider.addRootNode(
-        new TreeRootNodeData(
-          r.source.testId,
-          r.source.testId,
-          themeIcon,
-          viewResultCommand,
-        ),
+        new TreeRootNodeData(testId, testId, themeIcon, viewResultCommand),
       );
-    } else if (r.source instanceof LegendExecutionTestableSource) {
+    } else if (r.sourceIds.length > 2) {
+      const testSuiteId = guaranteeNonNullable(r.sourceIds[1]);
+      const testId = guaranteeNonNullable(r.sourceIds[2]);
+      const assertionId = r.sourceIds[3];
       const rootNode = new TreeRootNodeData(
-        r.source.testSuiteId,
-        r.source.testSuiteId,
+        testSuiteId,
+        testSuiteId,
         themeIcon,
       );
       resultsTreeDataProvider.addRootNode(rootNode);
       const testIdNode = new TreeChildNodeData(
         guaranteeNonNullable(rootNode.id),
-        buildTreeNodeId([r.source.testSuiteId, r.source.testId]),
-        r.source.testId,
+        buildTreeNodeId([testSuiteId, testId]),
+        testId,
         themeIcon,
       );
       resultsTreeDataProvider.addChildNode(
@@ -147,15 +144,11 @@ export const renderTestResults = (
           themeIcon,
         );
       }
-      if (r.source.assertionId) {
+      if (assertionId) {
         const assertionNode = new TreeChildNodeData(
           guaranteeNonNullable(rootNode.id),
-          buildTreeNodeId([
-            r.source.testSuiteId,
-            r.source.testId,
-            r.source.assertionId,
-          ]),
-          r.source.assertionId,
+          buildTreeNodeId([testSuiteId, testId, assertionId]),
+          assertionId,
           themeIcon,
           viewResultCommand,
         );
@@ -165,10 +158,11 @@ export const renderTestResults = (
         );
       }
     } else {
+      const entityPath = guaranteeNonNullable(r.sourceIds[0]);
       resultsTreeDataProvider.addRootNode(
         new TreeRootNodeData(
-          r.source.entityPath,
-          r.source.entityPath,
+          entityPath,
+          entityPath,
           themeIcon,
           viewResultCommand,
         ),
