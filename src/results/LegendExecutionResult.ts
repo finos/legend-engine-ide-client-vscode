@@ -19,17 +19,17 @@ import { SerializationFactory } from '../utils/SerializationUtils';
 import type { LegendExecutionResultType } from './LegendExecutionResultType';
 
 export class LegendExecutionResult {
-  message!: string;
+  ids!: string[];
   type!: LegendExecutionResultType;
-  sourceIds!: string[];
+  message!: string;
   logMessage?: string | undefined;
 
   static readonly serialization = new SerializationFactory(
     createModelSchema(LegendExecutionResult, {
-      message: primitive(),
+      ids: list(primitive()),
       type: primitive(),
+      message: primitive(),
       logMessage: optional(primitive()),
-      sourceIds: list(primitive()),
     }),
   );
 }

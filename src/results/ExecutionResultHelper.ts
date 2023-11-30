@@ -108,15 +108,15 @@ export const renderTestResults = (
       command: SHOW_RESULTS_COMMAND_ID,
       arguments: [renderResultMessage(r.message)],
     };
-    if (r.sourceIds.length === 2) {
-      const testId = guaranteeNonNullable(r.sourceIds[1]);
+    if (r.ids.length === 2) {
+      const testId = guaranteeNonNullable(r.ids[1]);
       resultsTreeDataProvider.addRootNode(
         new TreeRootNodeData(testId, testId, themeIcon, viewResultCommand),
       );
-    } else if (r.sourceIds.length > 2) {
-      const testSuiteId = guaranteeNonNullable(r.sourceIds[1]);
-      const testId = guaranteeNonNullable(r.sourceIds[2]);
-      const assertionId = r.sourceIds[3];
+    } else if (r.ids.length > 2) {
+      const testSuiteId = guaranteeNonNullable(r.ids[1]);
+      const testId = guaranteeNonNullable(r.ids[2]);
+      const assertionId = r.ids[3];
       const rootNode = new TreeRootNodeData(
         testSuiteId,
         testSuiteId,
@@ -158,7 +158,7 @@ export const renderTestResults = (
         );
       }
     } else {
-      const entityPath = guaranteeNonNullable(r.sourceIds[0]);
+      const entityPath = guaranteeNonNullable(r.ids[0]);
       resultsTreeDataProvider.addRootNode(
         new TreeRootNodeData(
           entityPath,
