@@ -1,5 +1,6 @@
+[![FINOS - Incubating](https://cdn.jsdelivr.net/gh/finos/contrib-toolbox@master/images/badge-incubating.svg)](https://finosfoundation.atlassian.net/wiki/display/FINOS/Incubating)
 
-# legend-engine-{extension}
+# legend-engine-ide-client-vscode
 
 ## Roadmap
 
