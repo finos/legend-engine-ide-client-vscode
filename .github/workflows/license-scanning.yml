@@ -1,4 +1,4 @@
-name: License Scanning for Node.js
+name: License Scanning
 
 on:
   schedule:
