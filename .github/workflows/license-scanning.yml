@@ -9,7 +9,7 @@ on:
     paths:
       - 'package-json.lock'
       - 'package.json'
-      - '.github/workflows/license-scanning-node.yml'
+      - '.github/workflows/license-scanning.yml'
 
 jobs:
   scan:
