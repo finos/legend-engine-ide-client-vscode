@@ -26,5 +26,5 @@ jobs:
         working-directory: .
       - run: npm install -g node-license-validator
         working-directory: .
-      - run: node-license-validator . --allow-licenses Apache-2.0 MIT BSD-2-Clause BSD BSD-3-Clause Unlicense
+      - run: node-license-validator . --allow-licenses Apache Apache-2.0 MIT BSD-2-Clause BSD BSD-3-Clause Unlicense
         working-directory: .
