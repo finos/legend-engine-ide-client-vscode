@@ -46,7 +46,7 @@ import { isPlainObject } from './utils/AssertionUtils';
 
 let client: LanguageClient;
 
-export function activate(context: ExtensionContext): void {
+export function createClient(context: ExtensionContext): LanguageClient {
   languages.setLanguageConfiguration('legend', {
     wordPattern:
       // eslint-disable-next-line prefer-named-capture-group
@@ -74,7 +74,13 @@ export function activate(context: ExtensionContext): void {
     documentSelector: [{ scheme: 'file', language: 'legend' }],
     synchronize: { fileEvents: workspace.createFileSystemWatcher('**/*.pure') },
   };
+  client = new LanguageClient('Legend', 'Legend', serverOptions, clientOptions);
+  // Initialize client
+  client.start();
+  return client;
+}
 
+export function registerClientViews(context: ExtensionContext): void {
   // Register views
   const resultsTreeDataProvider = new LegendTreeDataProvider();
   window.registerTreeDataProvider(EXECUTION_TREE_VIEW, resultsTreeDataProvider);
@@ -100,10 +106,6 @@ export function activate(context: ExtensionContext): void {
   );
   context.subscriptions.push(showResultsCommand);
 
-  // Initialize client
-  client = new LanguageClient('Legend', 'Legend', serverOptions, clientOptions);
-  client.start();
-
   // Listen to progress notifications
   client.onNotification(
     PROGRESS_NOTIFICATION_ID,
@@ -125,6 +127,11 @@ export function activate(context: ExtensionContext): void {
       }
     },
   );
+}
+
+export function activate(context: ExtensionContext): void {
+  createClient(context);
+  registerClientViews(context);
 }
 
 export function deactivate(): Thenable<void> | undefined {
