@@ -1,0 +1,29 @@
+name: (Manual) Release
+
+on: workflow_dispatch
+
+jobs:
+  release:
+    name: Release
+    runs-on: ubuntu-latest-4-cores
+    if: github.repository == 'finos/legend-engine-ide-client-vscode' # prevent running this action in forks
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4.1.1
+      - name: Setup Node
+        uses: actions/setup-node@v3.8.1
+        with:
+          node-version: 16
+          # The registry URL and `NODE_AUTH_TOKEN` are needed for `npm publish` to work properly
+          # See https://github.com/actions/setup-node/blob/main/docs/advanced-usage.md#publish-to-npmjs-and-gpr-with-npm
+          registry-url: 'https://registry.npmjs.org'
+      - name: Install dependencies
+        run: |
+          npm install
+          npm install -g @vscode/vsce
+      - name: Publish to NPM
+        run: npm run release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          
