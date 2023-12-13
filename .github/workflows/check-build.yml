@@ -45,9 +45,9 @@ jobs:
       - name: Package
         run: |
           tsc
-          vsce package -o legend-engine-ide-client-vscode-0.0.1.vsix
-          mkdir artifacts
-          cp legend-engine-ide-client-vscode-0.0.1.vsix artifacts/legend-engine-ide-client-vscode-0.0.1.vsix
+          # vsce package -o legend-engine-ide-client-vscode-0.0.1.vsix
+          # mkdir artifacts
+          # cp legend-engine-ide-client-vscode-0.0.1.vsix artifacts/legend-engine-ide-client-vscode-0.0.1.vsix
 
       - name: Upload artifact
         uses: actions/upload-artifact@v3

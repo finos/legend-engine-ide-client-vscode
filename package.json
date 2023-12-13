@@ -1,5 +1,5 @@
 {
-  "name": "legend-engine-ide-client-vscode",
+  "name": "@finos/legend-engine-ide-client-vscode",
   "version": "0.0.1",
   "type": "commonjs",
   "repository": {
