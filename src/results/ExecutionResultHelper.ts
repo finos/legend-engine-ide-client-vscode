@@ -14,7 +14,15 @@
  * limitations under the License.
  */
 
-import { ThemeColor, ThemeIcon, Uri, type Webview, commands } from 'vscode';
+import {
+  ThemeColor,
+  ThemeIcon,
+  Uri,
+  type Webview,
+  commands,
+  window,
+  ColorThemeKind,
+} from 'vscode';
 import {
   SET_CONTEXT_COMMAND_ID,
   SHOW_RESULTS_COMMAND_ID,
@@ -34,7 +42,7 @@ import {
   DIST_MODULE,
   LIB_MODULE,
   AG_GRID_STYLE_PATH,
-  AG_GRID_ALPHINE_THEME,
+  AG_GRID_BALHAM_THEME,
   AG_GRID_COMMUNITY_SCRIPT_PATH,
   AG_GRID_REACT_MAIN_PATH,
 } from '../utils/Const';
@@ -77,12 +85,12 @@ const renderTDSResultMessage = (
     STYLES_MODULE,
     AG_GRID_STYLE_PATH,
   );
-  const agGridAlphineThemePath = Uri.joinPath(
+  const agGridBalhamThemePath = Uri.joinPath(
     link,
     NODE_MODULES,
     AG_GRID_COMMUNITY,
     STYLES_MODULE,
-    AG_GRID_ALPHINE_THEME,
+    AG_GRID_BALHAM_THEME,
   );
   const agGridScriptPath = Uri.joinPath(
     link,
@@ -111,6 +119,7 @@ const renderTDSResultMessage = (
     row.rowNumber = rowIdx;
     return row;
   });
+  const isDarkTheme = window.activeColorTheme.kind === ColorThemeKind.Dark;
   const htmlString = `
     <!DOCTYPE html>
     <html lang="en">
@@ -119,11 +128,13 @@ const renderTDSResultMessage = (
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
       <link rel="stylesheet" href="${webview.asWebviewUri(agGridStylePath)}">
       <link rel="stylesheet" href="${webview.asWebviewUri(
-        agGridAlphineThemePath,
+        agGridBalhamThemePath,
       )}">
     </head>
     <body>
-      <div id="agGrid" style="height: 500px; width: 100%;" class="ag-theme-alpine"></div>
+      <div id="agGrid" style="height: 500px; width: 100%;" class=${
+        isDarkTheme ? 'ag-theme-balham-dark' : 'ag-theme-balham'
+      }></div>
       <script src="${webview.asWebviewUri(agGridScriptPath)}"></script>
       <script src="${webview.asWebviewUri(agGridReactPath)}"></script>
       <script>

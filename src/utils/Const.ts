@@ -48,6 +48,6 @@ export const LIB_MODULE = 'lib';
 export const STYLES_MODULE = 'styles';
 export const DIST_MODULE = 'dist';
 export const AG_GRID_STYLE_PATH = 'ag-grid.css';
-export const AG_GRID_ALPHINE_THEME = 'ag-theme-alpine.css';
+export const AG_GRID_BALHAM_THEME = 'ag-theme-balham.min.css';
 export const AG_GRID_COMMUNITY_SCRIPT_PATH = 'ag-grid-community.min.noStyle.js';
 export const AG_GRID_REACT_MAIN_PATH = 'main.js';
