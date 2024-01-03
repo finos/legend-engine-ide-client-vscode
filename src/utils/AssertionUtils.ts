@@ -33,6 +33,9 @@ export const guaranteeNonNullable = <T>(
   return value;
 };
 
+export const isBoolean = (val: unknown): val is boolean =>
+  typeof val === 'boolean';
+
 export const isObject = (val: unknown): val is object =>
   typeof val === 'object' && val !== null;
 

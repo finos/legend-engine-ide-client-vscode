@@ -119,7 +119,12 @@ export function registerClientViews(context: ExtensionContext): void {
         }
         const result =
           LanguageClientProgressResult.serialization.fromJson(objectResult);
-        renderTestResults(result, resultsTreeDataProvider);
+        renderTestResults(
+          result,
+          resultsTreeDataProvider,
+          context.extensionUri,
+          resultsViewprovider.getWebView(),
+        );
       } catch (e) {
         if (error instanceof Error) {
           window.showErrorMessage(error.message);

@@ -16,6 +16,7 @@
 
 import type {
   CancellationToken,
+  Webview,
   WebviewView,
   WebviewViewProvider,
   WebviewViewResolveContext,
@@ -32,12 +33,17 @@ export class LegendWebViewProvider implements WebviewViewProvider {
     token: CancellationToken,
   ): void | Thenable<void> {
     this.view = webviewView;
+    this.view.webview.options = { enableScripts: true };
     this.context = context;
     this.token = token;
   }
 
   updateView(html: string): void {
     this.view.webview.html = html;
+  }
+
+  getWebView(): Webview {
+    return this.view.webview;
   }
 
   getContext(): WebviewViewResolveContext<unknown> {
