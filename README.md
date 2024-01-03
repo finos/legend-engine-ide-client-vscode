@@ -1,5 +1,6 @@
+[FINOS Incubating](https://community.finos.org/docs/governance/Software-Projects/stages/incubating)
 
-# legend-engine-{extension}
+# legend-engine-ide-client-vscode
 
 ## Roadmap
 
