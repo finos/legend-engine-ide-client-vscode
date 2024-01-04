@@ -63,7 +63,17 @@
           "type": "boolean",
           "default": false,
           "description": "Indicates if we have to show execution is happening"
-        }
+        },
+        "legend.extensions.dependencies.pom": {
+          "type": "string",
+          "default": "",
+          "description": "Override the defaut pom to use to discover dependencies"
+        },
+        "legend.engine.server.url": {
+          "type": "string",
+          "default": "",
+          "description": "Set the engine server url to eneable some features that required the remote server"
+        }                  
       }
     },
     "languages": [
