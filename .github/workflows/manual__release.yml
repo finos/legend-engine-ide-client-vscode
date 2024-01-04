@@ -1,6 +1,12 @@
 name: (Manual) Release
 
-on: workflow_dispatch
+on:
+  workflow_dispatch:
+    inputs:
+      bump_type:
+        description: 'Version Bump Type (major/minor/patch)'
+        required: true
+        default: 'minor'
 
 jobs:
   release:
@@ -10,6 +16,12 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4.1.1
+        with:
+          token: ${{ secrets.FINOS_GITHUB_TOKEN }}
+      - name: Configure git
+        run: |
+            git config --global user.email "37706051+finos-admin@users.noreply.github.com"
+            git config --global user.name "FINOS Administrator"          
       - name: Setup Node
         uses: actions/setup-node@v3.8.1
         with:
@@ -17,14 +29,23 @@ jobs:
           # The registry URL and `NODE_AUTH_TOKEN` are needed for `npm publish` to work properly
           # See https://github.com/actions/setup-node/blob/main/docs/advanced-usage.md#publish-to-npmjs-and-gpr-with-npm
           registry-url: 'https://registry.npmjs.org'
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: 21
+          java-package: jdk
+      - name: Prepare for new release
+        run: |
+            npm version ${{ github.event.inputs.bump_type }} -m "bump version to %s"
+            git push origin main                 
       - name: Install dependencies and build project
         run: |
           npm install
           npm install -g @vscode/vsce
-          tsc
-      - name: Publish to NPM
-        run: npm publish --access=public
+          npm run release:prepare          
+      - name: Publish to VS Code Marketplace        
+        run: npm run release
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          VSCE_PAT: ${{ secrets.VSCE_PAT }}          
           

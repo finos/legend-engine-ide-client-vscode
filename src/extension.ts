@@ -62,14 +62,17 @@ export function createClient(context: ExtensionContext): LanguageClient {
     command: 'java',
     args: [
       '-jar',
-      context.asAbsolutePath(path.join('jars', 'language-server.jar')),
+      context.asAbsolutePath(
+        path.join('server', 'legend-engine-ide-lsp-server-shaded.jar'),
+      ),
+      context.asAbsolutePath(path.join('server', 'pom.xml')),
     ],
   };
 
   const serverOptionsDebug: Executable = {
     command: 'java',
     args: [
-      '-agentlib:jdwp=transport=dt_socket,server=y,quiet=y,suspend=y,address=*:11285',
+      // '-agentlib:jdwp=transport=dt_socket,server=y,quiet=y,suspend=y,address=*:11285',      
       '-jar',
       context.asAbsolutePath(
         path.join('server', 'legend-engine-ide-lsp-server-shaded.jar'),

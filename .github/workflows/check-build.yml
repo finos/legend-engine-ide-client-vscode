@@ -37,6 +37,13 @@ jobs:
         with:
           node-version: 16
 
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: 21
+          java-package: jdk
+
       - name: Install dependencies
         run: |
           npm install
@@ -44,15 +51,15 @@ jobs:
 
       - name: Package
         run: |
-          tsc
-          # vsce package -o legend-engine-ide-client-vscode-0.0.1.vsix
-          # mkdir artifacts
-          # cp legend-engine-ide-client-vscode-0.0.1.vsix artifacts/legend-engine-ide-client-vscode-0.0.1.vsix
+          npm run release:prepare   
+          vsce package -o legend-engine-ide-client-vscode.vsix
+          mkdir artifacts
+          cp legend-engine-ide-client-vscode.vsix artifacts/legend-engine-ide-client-vscode.vsix
 
       - name: Upload artifact
         uses: actions/upload-artifact@v3
         with:
-          name: legend-engine-ide-client-vscode-0.0.1.vsix
-          path: artifacts/legend-engine-ide-client-vscode-0.0.1.vsix
+          name: legend-engine-ide-client-vscode.vsix
+          path: artifacts/legend-engine-ide-client-vscode.vsix
           
             
