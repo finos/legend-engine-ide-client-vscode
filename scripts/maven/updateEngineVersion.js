@@ -14,12 +14,14 @@
  * limitations under the License.
  */
 const mvn = require('maven').create({
-  cwd: 'server'
+  cwd: 'server',
 });
 
-mvn.execute('versions:use-latest-releases', { 
-  generateBackupPoms: false,
-  includes: 'org.finos.legend.engine:*',
-}).then(() => {  
-  // todo what we should do here?
-});
+mvn
+  .execute('versions:use-latest-releases', {
+    generateBackupPoms: false,
+    includes: 'org.finos.legend.engine:*',
+  })
+  .then(() => {
+    // todo what we should do here?
+  });

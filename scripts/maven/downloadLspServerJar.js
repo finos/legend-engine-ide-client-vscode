@@ -15,14 +15,17 @@
  */
 
 const mvn = require('maven').create({
-  cwd: 'server'
+  cwd: 'server',
 });
 
-mvn.execute('dependency:copy', { 
-  artifact: 'org.finos.legend.engine.ide.lsp:legend-engine-ide-lsp-server-shaded:${ide.lsp.version}',
-  'mdep.stripVersion': true, 
-  'mdep.stripClassifier': true, 
-  outputDirectory: './' 
-}).then(() => {  
-  // todo what we should do here?
-});
+mvn
+  .execute('dependency:copy', {
+    artifact:
+      'org.finos.legend.engine.ide.lsp:legend-engine-ide-lsp-server-shaded:${ide.lsp.version}',
+    'mdep.stripVersion': true,
+    'mdep.stripClassifier': true,
+    outputDirectory: './',
+  })
+  .then(() => {
+    // todo what we should do here?
+  });
