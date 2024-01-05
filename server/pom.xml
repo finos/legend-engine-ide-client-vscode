@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>org.finos.legend.ide.lsp</groupId>
+  <artifactId>default-pom</artifactId>
+  <version>0.0.1-SNAPSHOT</version>
+  
+  <name>Default provided depdencies for the LSP Server</name>
+
+  <properties>
+    <!-- this version is also used to download the lsp shaded server jar -->
+    <ide.lsp.version>0.0.4</ide.lsp.version>
+  </properties>
+
+  <dependencies>
+
+    <dependency>
+      <groupId>org.finos.legend.engine.ide.lsp</groupId>
+      <artifactId>legend-engine-ide-lsp-default-extensions</artifactId>
+      <version>${ide.lsp.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.finos.legend.engine</groupId>
+      <artifactId>legend-engine-extensions-collection-execution</artifactId>
+      <version>4.37.0</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.finos.legend.engine</groupId>
+      <artifactId>legend-engine-extensions-collection-generation</artifactId>
+      <version>4.37.0</version>
+    </dependency>
+  </dependencies>
+
+</project>

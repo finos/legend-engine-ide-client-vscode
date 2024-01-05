@@ -26,6 +26,7 @@ import {
   LanguageClient,
   type LanguageClientOptions,
   type Executable,
+  type ServerOptions,
 } from 'vscode-languageclient/node';
 import { LegendTreeDataProvider } from './utils/LegendTreeProvider';
 import { LanguageClientProgressResult } from './results/LanguageClientProgressResult';
@@ -57,18 +58,33 @@ export function createClient(context: ExtensionContext): LanguageClient {
     },
   });
 
-  const serverOptions: Executable = {
+  const serverOptionsRun: Executable = {
     command: 'java',
     args: [
       '-jar',
-      context.asAbsolutePath(path.join('jars', 'language-server.jar')),
+      context.asAbsolutePath(
+        path.join('server', 'legend-engine-ide-lsp-server-shaded.jar'),
+      ),
+      context.asAbsolutePath(path.join('server', 'pom.xml')),
     ],
   };
 
-  /*	const serverOptions: ServerOptions = {
-		run:   { module: serverModule, transport: TransportKind.ipc },
-		debug: { module: serverModule, transport: TransportKind.ipc }
-	};*/
+  const serverOptionsDebug: Executable = {
+    command: 'java',
+    args: [
+      // '-agentlib:jdwp=transport=dt_socket,server=y,quiet=y,suspend=y,address=*:11285',
+      '-jar',
+      context.asAbsolutePath(
+        path.join('server', 'legend-engine-ide-lsp-server-shaded.jar'),
+      ),
+      context.asAbsolutePath(path.join('server', 'pom.xml')),
+    ],
+  };
+
+  const serverOptions: ServerOptions = {
+    run: serverOptionsRun,
+    debug: serverOptionsDebug,
+  };
 
   const clientOptions: LanguageClientOptions = {
     documentSelector: [{ scheme: 'file', language: 'legend' }],

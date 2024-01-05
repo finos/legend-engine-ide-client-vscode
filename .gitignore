@@ -25,4 +25,5 @@ npm-debug.log*
 
 # Development
 /temp
-legend-engine-ide-client-vscode-0.0.1.vsix
+*.vsix
+/server/*.jar

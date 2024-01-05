@@ -1,6 +1,7 @@
 {
-  "name": "@finos/legend-engine-ide-client-vscode",
-  "version": "0.0.2",
+  "name": "legend-engine-ide-client-vscode",
+  "publisher": "FINOS",
+  "version": "0.0.1",
   "type": "commonjs",
   "repository": {
     "type": "git",
@@ -63,7 +64,17 @@
           "type": "boolean",
           "default": false,
           "description": "Indicates if we have to show execution is happening"
-        }
+        },
+        "legend.extensions.dependencies.pom": {
+          "type": "string",
+          "default": "",
+          "description": "Override the defaut pom to use to discover dependencies"
+        },
+        "legend.engine.server.url": {
+          "type": "string",
+          "default": "",
+          "description": "Set the engine server url to eneable some features that required the remote server"
+        }                  
       }
     },
     "languages": [
@@ -93,7 +104,10 @@
     "lint:js": "cross-env eslint --cache --cache-location ./build/.eslintcache --report-unused-disable-directives --parser-options=project:\"./tsconfig.json\" \"./src/**/*.{js,ts,tsx}\"",
     "lint:style": "stylelint --cache --cache-location ./build/.stylelintcache \"style/**/*.{scss,css}\" \"style/scss/**/*.scss\"",
     "fix:format": "prettier --write \"(scripts|docs)/**/*.{md,json,mjs,cjs,js,ts,tsx,html,scss,css}\" \"src/**/*.{md,json,mjs,cjs,js,ts,tsx,html,scss,css}\"",
-    "release": "npm publish"
+    "mvn:downloadServerJar": "node ./scripts/maven/downloadLspServerJar.js",
+    "mvn:updateEngineVersion": "node ./scripts/maven/updateEngineVersion.js",
+    "release:prepare": "npm run mvn:downloadServerJar && npm run mvn:updateEngineVersion && npm run compile",
+    "release": "vsce publish"
   },
   "dependencies": {
     "@types/node": "20.8.4",
@@ -118,6 +132,9 @@
     "stylelint-scss": "5.2.1",
     "vscode-languageclient": "9.0.1",
     "yo": "^4.3.1"
+  },
+  "devDependencies": {
+    "maven": "5.0.0"
   },
   "main": "lib/extension",
   "activationEvents": [
