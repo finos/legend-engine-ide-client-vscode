@@ -96,6 +96,10 @@
   "scripts": {
     "test": "jest",
     "compile": "tsc -b",
+    "webpack": "webpack --mode development",
+    "webpack:package": "webpack --mode production --devtool hidden-source-map",
+    "build": "npm run compile && npm run webpack",
+    "bundle": "npm run compile && npm run webpack:package",
     "check:copyright": "node ./scripts/copyright/checkCopyrightHeaders.js",
     "check:format": "prettier --list-different \"(scripts|docs)/**/*.{md,json,mjs,cjs,js,ts,tsx,html,scss,css}\" \"src/**/*.{md,json,mjs,cjs,js,ts,tsx,html,scss,css}\"",
     "check:ci": "npm run check:format && npm run check:copyright",
@@ -106,7 +110,7 @@
     "fix:format": "prettier --write \"(scripts|docs)/**/*.{md,json,mjs,cjs,js,ts,tsx,html,scss,css}\" \"src/**/*.{md,json,mjs,cjs,js,ts,tsx,html,scss,css}\"",
     "mvn:downloadServerJar": "node ./scripts/maven/downloadLspServerJar.js",
     "mvn:updateEngineVersion": "node ./scripts/maven/updateEngineVersion.js",
-    "release:prepare": "npm run mvn:downloadServerJar && npm run mvn:updateEngineVersion && npm run compile",
+    "release:prepare": "npm run mvn:downloadServerJar && npm run mvn:updateEngineVersion && npm run bundle",
     "release": "vsce publish"
   },
   "dependencies": {
@@ -114,13 +118,18 @@
     "@types/vscode": "1.83.0",
     "@typescript-eslint/eslint-plugin": "6.9.0",
     "@typescript-eslint/parser": "6.9.0",
-    "ag-grid-community": "31.0.1",
-    "ag-grid-react": "31.0.1",
+    "@ag-grid-community/styles": "30.2.0",
+    "@ag-grid-community/core": "30.2.0",
+    "@ag-grid-community/react": "30.2.0",
+    "@ag-grid-community/client-side-row-model": "30.2.0",
+    "@ag-grid-community/csv-export": "30.2.0",
     "cross-env": "7.0.3",
     "eslint": "8.52.0",
     "eslint-config-prettier": "9.0.0",
     "eslint-plugin-import": "2.29.0",
     "eslint-plugin-prettier": "5.0.1",
+    "eslint-plugin-react": "7.33.2",
+    "eslint-plugin-react-hooks": "4.6.0",
     "path": "0.12.7",
     "typescript": "5.2.2",
     "postcss": "8.4.31",
@@ -131,10 +140,17 @@
     "stylelint-config-standard": "34.0.0",
     "stylelint-scss": "5.2.1",
     "vscode-languageclient": "9.0.1",
-    "yo": "^4.3.1"
+    "yo": "^4.3.1",
+    "@types/react": "18.2.31",
+    "@types/react-dom": "18.2.14",
+    "react": "18.2.0",
+    "react-dom": "18.2.0"
   },
   "devDependencies": {
-    "maven": "5.0.0"
+    "maven": "5.0.0",
+    "ts-loader": "9.5.1",
+    "css-loader": "4.2.0",
+    "style-loader": "1.2.1"
   },
   "main": "lib/extension",
   "activationEvents": [

@@ -139,6 +139,7 @@ export function registerClientViews(context: ExtensionContext): void {
           result,
           resultsTreeDataProvider,
           context.extensionUri,
+          context.extensionPath,
           resultsViewprovider.getWebView(),
         );
       } catch (e) {

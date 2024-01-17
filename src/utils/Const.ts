@@ -42,12 +42,7 @@ export const PROGRESS_NOTIFICATION_ID = '$/progress';
 
 // Ag-grid script paths
 export const NODE_MODULES = 'node_modules';
-export const AG_GRID_COMMUNITY = 'ag-grid-community';
-export const AG_GRID_REACT = 'ag-grid-react';
-export const LIB_MODULE = 'lib';
+export const AG_GRID_COMMUNITY = '@ag-grid-community';
 export const STYLES_MODULE = 'styles';
-export const DIST_MODULE = 'dist';
 export const AG_GRID_STYLE_PATH = 'ag-grid.css';
 export const AG_GRID_BALHAM_THEME = 'ag-theme-balham.min.css';
-export const AG_GRID_COMMUNITY_SCRIPT_PATH = 'ag-grid-community.min.noStyle.js';
-export const AG_GRID_REACT_MAIN_PATH = 'main.js';

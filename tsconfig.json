@@ -1,9 +1,9 @@
 {
   "compilerOptions": {
-    "jsx": "react",
+    "jsx": "react-jsx",
     "module": "CommonJS",
     "target": "es2020",
-    "lib": ["es2020",],
+    "lib": ["es2020", "dom"],
     "outDir": "lib",
     "rootDir": "src",
     "sourceMap": true,
@@ -19,6 +19,7 @@
     // the properties are not present.
     // See https://github.com/microsoft/TypeScript/pull/43947
     "exactOptionalPropertyTypes": true,
+    "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true
   },
   "include": [
