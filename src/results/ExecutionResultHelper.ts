@@ -37,14 +37,9 @@ import {
   IS_EXECUTION_HAPPENNG,
   NODE_MODULES,
   AG_GRID_COMMUNITY,
-  AG_GRID_REACT,
   STYLES_MODULE,
-  DIST_MODULE,
-  LIB_MODULE,
   AG_GRID_STYLE_PATH,
   AG_GRID_BALHAM_THEME,
-  AG_GRID_COMMUNITY_SCRIPT_PATH,
-  AG_GRID_REACT_MAIN_PATH,
 } from '../utils/Const';
 import type { LanguageClientProgressResult } from './LanguageClientProgressResult';
 import {
@@ -61,6 +56,7 @@ import {
   TDSLegendExecutionResult,
   type TabularDataSet,
 } from './TDSLegendExecutionResult';
+import * as path from 'path';
 
 export type TDSResultCellDataType =
   | string
@@ -76,6 +72,7 @@ export interface TDSRowDataType {
 const renderTDSResultMessage = (
   tds: TabularDataSet,
   link: Uri,
+  extensionPath: string,
   webview: Webview,
 ): string => {
   const agGridStylePath = Uri.joinPath(
@@ -92,20 +89,6 @@ const renderTDSResultMessage = (
     STYLES_MODULE,
     AG_GRID_BALHAM_THEME,
   );
-  const agGridScriptPath = Uri.joinPath(
-    link,
-    NODE_MODULES,
-    AG_GRID_COMMUNITY,
-    DIST_MODULE,
-    AG_GRID_COMMUNITY_SCRIPT_PATH,
-  );
-  const agGridReactPath = Uri.joinPath(
-    link,
-    NODE_MODULES,
-    AG_GRID_REACT,
-    LIB_MODULE,
-    AG_GRID_REACT_MAIN_PATH,
-  );
   const colDefs = tds.columns.map((c) => ({ field: c, headerName: c }));
   const rowData = tds.rows.map((_row, rowIdx) => {
     const row: TDSRowDataType = {};
@@ -119,40 +102,36 @@ const renderTDSResultMessage = (
     row.rowNumber = rowIdx;
     return row;
   });
+  const webviewScriptPath = Uri.file(
+    path.join(extensionPath, 'lib', 'components', 'AgGridRenderer.js'),
+  );
+
+  const webviewScript = webview.asWebviewUri(webviewScriptPath);
   const isDarkTheme = window.activeColorTheme.kind === ColorThemeKind.Dark;
   const htmlString = `
-    <!DOCTYPE html>
-    <html lang="en">
-    <head>
-      <meta charset="UTF-8">
-      <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <link rel="stylesheet" href="${webview.asWebviewUri(agGridStylePath)}">
+  <!DOCTYPE html>
+  <html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="${webview.asWebviewUri(agGridStylePath)}">
       <link rel="stylesheet" href="${webview.asWebviewUri(
         agGridBalhamThemePath,
       )}">
-    </head>
-    <body>
-      <div id="agGrid" style="height: 500px; width: 100%;" class=${
-        isDarkTheme ? 'ag-theme-balham-dark' : 'ag-theme-balham'
-      }></div>
-      <script src="${webview.asWebviewUri(agGridScriptPath)}"></script>
-      <script src="${webview.asWebviewUri(agGridReactPath)}"></script>
-      <script>
-          const rowData = ${JSON.stringify(rowData)};
-          const colDefs = ${JSON.stringify(colDefs)};
-          const gridOptions = {
-                                columnDefs: colDefs,
-                                rowData: rowData,
-                              };
-
-          // Specify the grid container element
-          const gridDiv = document.querySelector('#agGrid');
-  
-          // Create the AG-Grid
-          const { api } = agGrid.createGrid(gridDiv, gridOptions);
-       </script>
-    </body>
-    </html> 
+    <title>React Webview</title>
+  </head>
+  <body>
+    <div id="root" 
+    style="height: 500px; width: 100%;" class=${
+      isDarkTheme ? 'ag-theme-balham-dark' : 'ag-theme-balham'
+    }
+         data-row-data='${JSON.stringify(rowData)}'
+         data-column-defs='${JSON.stringify(colDefs)}'
+         data-is-dark-theme='${isDarkTheme}'> 
+    </div>
+    <script src=${webviewScript}></script>
+  </body>
+  </html>
   `;
   return htmlString;
 };
@@ -160,12 +139,13 @@ const renderTDSResultMessage = (
 const renderResultMessage = (
   mssg: string,
   link: Uri,
+  extensionPath: string,
   webview: Webview,
 ): string => {
   try {
     const json = JSON.parse(mssg) as PlainObject<TDSLegendExecutionResult>;
     const result = TDSLegendExecutionResult.serialization.fromJson(json);
-    return renderTDSResultMessage(result.result, link, webview);
+    return renderTDSResultMessage(result.result, link, extensionPath, webview);
   } catch (e) {
     // do nothing
   }
@@ -226,6 +206,7 @@ export const renderTestResults = (
   result: LanguageClientProgressResult,
   resultsTreeDataProvider: LegendTreeDataProvider,
   uri: Uri,
+  extensionPath: string,
   webview: Webview,
 ): void => {
   showExecutionProgress(false);
@@ -237,7 +218,7 @@ export const renderTestResults = (
     const viewResultCommand = {
       title: SHOW_RESULTS_COMMAND_TITLE,
       command: SHOW_RESULTS_COMMAND_ID,
-      arguments: [renderResultMessage(r.message, uri, webview)],
+      arguments: [renderResultMessage(r.message, uri, extensionPath, webview)],
     };
     if (r.ids.length === 2) {
       const testId = guaranteeNonNullable(r.ids[1]);

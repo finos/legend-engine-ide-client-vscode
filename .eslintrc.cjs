@@ -137,6 +137,27 @@ const IMPORT_RULES = {
   'import/no-default-export': WARN,
 };
 
+const REACT_RULES = {
+  'react-hooks/rules-of-hooks': ERROR,
+  'react-hooks/exhaustive-deps': WARN,
+  'react/jsx-boolean-value': [ERROR, 'always'],
+  'react/jsx-fragments': [WARN, 'syntax'],
+  'react/react-in-jsx-scope': OFF, // turn off as we use React@17 new JSX transform
+  // using index as key often cause bug when we do form view so we have to be careful
+  // NOTE: to handle this, we will use object UUID (UUID when we create an object) to make sure the key is unique
+  'react/jsx-key': ERROR,
+  'react/jsx-no-target-blank': ERROR,
+  'react/no-array-index-key': WARN,
+  'react/no-deprecated': ERROR,
+  'react/no-direct-mutation-state': ERROR,
+  'react/no-unescaped-entities': ERROR,
+  // we use Typescript interface instead of `prop-types`
+  'react/prop-types': OFF,
+  // here are a few rules we follow to make `vscode` auto format work better with eslint
+  'react/jsx-tag-spacing': [WARN, { beforeSelfClosing: 'always' }],
+  'react/jsx-curly-spacing': [WARN, { when: 'never', allowMultiline: true }],
+};
+
 const TYPESCRIPT_RULES = {
   '@typescript-eslint/ban-types': WARN,
   '@typescript-eslint/consistent-type-imports': WARN,
@@ -165,15 +186,21 @@ const TYPESCRIPT_RULES = {
 module.exports = {
   extends: ['eslint:recommended', 'plugin:@typescript-eslint/recommended'],
   parser: '@typescript-eslint/parser',
-  plugins: ['prettier', '@typescript-eslint'],
+  plugins: ['prettier', 'react-hooks', '@typescript-eslint'],
   parserOptions: {
     tsconfigRootDir: __dirname,
     project: './tsconfig.json',
+  },
+  settings: {
+    react: {
+      version: 'detect',
+    },
   },
   extends: [
     'eslint:recommended',
     'plugin:@typescript-eslint/eslint-recommended',
     'plugin:@typescript-eslint/recommended',
+    'plugin:react/recommended',
     'plugin:import/errors', // See https://github.com/benmosher/eslint-plugin-import/blob/master/config/errors.js
     'plugin:import/typescript', // See https://github.com/benmosher/eslint-plugin-import/blob/master/config/typescript.js
   ],
@@ -181,6 +208,7 @@ module.exports = {
     ...ES_RULES,
     ...TYPESCRIPT_RULES,
     ...IMPORT_RULES,
+    ...REACT_RULES,
     '@typescript-eslint/no-unsafe-argument': OFF,
     '@typescript-eslint/no-unsafe-member-access': OFF,
   },
