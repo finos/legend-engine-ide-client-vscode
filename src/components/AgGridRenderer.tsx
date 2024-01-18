@@ -38,6 +38,6 @@ if (rowDataString && columnDefsString) {
       }
       rowData={rowData}
       columnDefs={columnDefs}
-    />
+    />,
   );
 }

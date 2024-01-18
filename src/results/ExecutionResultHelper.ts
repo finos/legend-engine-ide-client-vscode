@@ -53,7 +53,8 @@ import { guaranteeNonNullable, isBoolean } from '../utils/AssertionUtils';
 import type { LegendWebViewProvider } from '../utils/LegendWebViewProvider';
 import type { PlainObject } from '../utils/SerializationUtils';
 import {
-  TDSLegendExecutionResult, type TabularDataSet,
+  TDSLegendExecutionResult,
+  type TabularDataSet,
 } from './TDSLegendExecutionResult';
 import * as path from 'path';
 
@@ -102,12 +103,7 @@ const renderTDSResultMessage = (
     return row;
   });
   const webviewScriptPath = Uri.file(
-    path.join(
-      extensionPath,
-      'lib',
-      'components',
-      'AgGridRenderer.js',
-    ),
+    path.join(extensionPath, 'lib', 'components', 'AgGridRenderer.js'),
   );
 
   const webviewScript = webview.asWebviewUri(webviewScriptPath);

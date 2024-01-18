@@ -15,7 +15,9 @@
  */
 
 import {
-  AgGridReact, type AgGridReactProps, type AgReactUiProps,
+  AgGridReact,
+  type AgGridReactProps,
+  type AgReactUiProps,
 } from '@ag-grid-community/react';
 import { ClientSideRowModelModule } from '@ag-grid-community/client-side-row-model';
 import { CsvExportModule } from '@ag-grid-community/csv-export';
@@ -41,4 +43,3 @@ export function AgGridComponent<TData = unknown>(
 export const configureAgGridComponent = (): void => {
   ModuleRegistry.registerModules([ClientSideRowModelModule]);
 };
-
