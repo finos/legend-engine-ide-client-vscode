@@ -32,6 +32,11 @@ export const TEST_ERROR_COLOR = 'testing.iconErrored';
 export const SHOW_RESULTS_COMMAND_ID = 'showResults';
 export const SHOW_RESULTS_COMMAND_TITLE = 'Results';
 export const SET_CONTEXT_COMMAND_ID = 'setContext';
+export const LEGEND_COMMAND = 'legend.command';
+export const LEGEND_EXECUTE_COMMAND = 'legend.executeCommand';
+export const LEGEND_COMMAND_WITH_INPUTS_ID = 'legend.command.withInputs';
+export const EXEC_FUNCTION_WITH_PARAMETERS_ID =
+  'legend.pure.executeFunctionWithParameters';
 
 // Context variables
 export const SHOW_EXECUTION_RESULTS = 'showExecutionResults';
@@ -46,3 +51,25 @@ export const AG_GRID_COMMUNITY = '@ag-grid-community';
 export const STYLES_MODULE = 'styles';
 export const AG_GRID_STYLE_PATH = 'ag-grid.css';
 export const AG_GRID_BALHAM_THEME = 'ag-theme-balham.min.css';
+
+// Webviews
+export const FUNCTION_PARAMTER_VALUES_ID = 'functionParameterValues';
+
+// Primitive types
+export enum PRIMITIVE_TYPE {
+  STRING = 'String',
+  BOOLEAN = 'Boolean',
+  BINARY = 'Binary',
+  NUMBER = 'Number', // `Number` is the supper type of all other numeric types
+  INTEGER = 'Integer',
+  FLOAT = 'Float',
+  DECIMAL = 'Decimal',
+  DATE = 'Date', // `Date` is the supper type of all other temporal types
+  STRICTDATE = 'StrictDate', // just date, without time
+  DATETIME = 'DateTime',
+  STRICTTIME = 'StrictTime', // NOTE: not a sub-type of Date, this is used to measure length of time, not pointing at a particular moment in time like Date
+  // NOTE: `LatestDate` is a special type that is used for milestoning in store so its used in the body of function and lamdba but never should be exposed to users
+  // as such, if there is a day we want to have `LatestDate` in the graph but not exposed to the users
+  LATESTDATE = 'LatestDate',
+  BYTE = 'Byte',
+}
