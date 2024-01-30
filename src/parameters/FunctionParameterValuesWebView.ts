@@ -20,6 +20,8 @@ import {
   commands,
   Uri,
   type WebviewPanel,
+  ColorThemeKind,
+  window,
 } from 'vscode';
 import { LEGEND_COMMAND, LEGEND_EXECUTE_COMMAND } from '../utils/Const';
 
@@ -41,6 +43,7 @@ export const renderFunctionParameterValuesWebView = (
     functionParametersWebViewPanel.webview.asWebviewUri(
       parametersEditorScriptPath,
     );
+  const isDarkTheme = window.activeColorTheme.kind === ColorThemeKind.Dark;
 
   functionParametersWebViewPanel.webview.html = `
     <!DOCTYPE html>
@@ -50,7 +53,9 @@ export const renderFunctionParameterValuesWebView = (
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
       </head>
       <body>
-        <div id="root" data-input-parameters=${JSON.stringify(args)}></div>
+        <div id="root" data-input-parameters=${JSON.stringify(
+          args,
+        )} data-is-dark-theme='${isDarkTheme}'></div>
         <script src=${parametersEditorScript}></script>
         <script>
           const vscode = acquireVsCodeApi();

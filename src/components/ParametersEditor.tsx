@@ -1,12 +1,28 @@
+/**
+ * Copyright (c) 2023-present, Goldman Sachs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 import {
-  PrimitiveTypeEditor,
+  InstanceValueEditor,
   getDefaultValueForPrimitiveType,
-} from './PrimitiveTypeEditor';
-import type { Variable } from '../model/VariableExpression';
+} from './InstanceValueEditor';
 import { guaranteeNonNullable } from '../utils/AssertionUtils';
 import { serializeMap } from '../utils/SerializationUtils';
 import '../../style/index.scss';
 import { LEGEND_EXECUTE_COMMAND } from '../utils/Const';
+import type { InputParamter } from '../model/InputParameter';
 
 interface vscode {
   postMessage(message: unknown): void;
@@ -16,13 +32,18 @@ interface vscode {
 declare const vscode: vscode;
 
 export const ParametersEditor: React.FC<{
-  parameters: Variable[];
-}> = ({ parameters }) => {
+  inputParameters: InputParamter[];
+  isDarkTheme: boolean;
+}> = ({ inputParameters, isDarkTheme }) => {
   const parameterValues = new Map<string, unknown>();
-  parameters.forEach((parameter) =>
+  inputParameters.forEach((parameter) =>
     parameterValues.set(
-      parameter.name,
-      getDefaultValueForPrimitiveType(parameter._class),
+      parameter.variable.name,
+      getDefaultValueForPrimitiveType(
+        parameter.variable._class,
+        parameter.variable.multiplicity,
+        parameter.element,
+      ),
     ),
   );
   const submit = (): void => {
@@ -35,13 +56,23 @@ export const ParametersEditor: React.FC<{
     <div className="parameters__editor">
       {Array.from(parameterValues.entries()).map(([key, value], idx) => (
         <div className="parameters__editor__parameter" key={key}>
-          <div className="parameters__editor__parameter__name">{key}</div>
-          <PrimitiveTypeEditor
-            type={guaranteeNonNullable(parameters[idx])._class}
+          <div className="parameters__editor__parameter__title">
+            <div className="parameters__editor__parameter__name">{key}</div>
+            <div className="parameters__editor__parameter__label">
+              {guaranteeNonNullable(inputParameters[idx]).variable._class}
+            </div>
+          </div>
+          <InstanceValueEditor
+            isDarkTheme={isDarkTheme}
+            type={guaranteeNonNullable(inputParameters[idx]).variable._class}
+            multiplicity={
+              guaranteeNonNullable(inputParameters[idx]).variable.multiplicity
+            }
             value={value}
             onChange={(val: unknown) => {
               parameterValues.set(key, val);
             }}
+            element={inputParameters[idx]?.element}
           />
         </div>
       ))}

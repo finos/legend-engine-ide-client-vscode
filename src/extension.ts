@@ -105,11 +105,12 @@ export function registerComamnds(context: ExtensionContext): void {
   const executeFunctionWithParametersCommand = commands.registerCommand(
     LEGEND_COMMAND_WITH_INPUTS_ID,
     async (...args: unknown[]) => {
+      const functionSignature = args[2] as string;
       const commandId = args[3] as string;
       if (commandId === EXEC_FUNCTION_WITH_PARAMETERS_ID) {
         const functionParametersWebView = window.createWebviewPanel(
           FUNCTION_PARAMTER_VALUES_ID,
-          'Function Parameter Values',
+          `Function Execution: ${functionSignature}`,
           ViewColumn.One,
           {
             enableScripts: true,
