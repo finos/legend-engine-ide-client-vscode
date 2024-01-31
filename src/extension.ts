@@ -21,6 +21,7 @@ import {
   languages,
   window,
   commands,
+  ViewColumn,
 } from 'vscode';
 import {
   LanguageClient,
@@ -36,6 +37,9 @@ import {
   RESULTS_WEB_VIEW,
   SHOW_RESULTS_COMMAND_ID,
   EXECUTION_TREE_VIEW,
+  EXEC_FUNCTION_WITH_PARAMETERS_ID,
+  LEGEND_COMMAND_WITH_INPUTS_ID,
+  FUNCTION_PARAMTER_VALUES_ID,
 } from './utils/Const';
 import { LegendWebViewProvider } from './utils/LegendWebViewProvider';
 import {
@@ -44,6 +48,7 @@ import {
 } from './results/ExecutionResultHelper';
 import { error } from 'console';
 import { isPlainObject } from './utils/AssertionUtils';
+import { renderFunctionParameterValuesWebView } from './parameters/FunctionParameterValuesWebView';
 
 let client: LanguageClient;
 
@@ -94,6 +99,32 @@ export function createClient(context: ExtensionContext): LanguageClient {
   // Initialize client
   client.start();
   return client;
+}
+
+export function registerComamnds(context: ExtensionContext): void {
+  const executeFunctionWithParametersCommand = commands.registerCommand(
+    LEGEND_COMMAND_WITH_INPUTS_ID,
+    async (...args: unknown[]) => {
+      const functionSignature = args[2] as string;
+      const commandId = args[3] as string;
+      if (commandId === EXEC_FUNCTION_WITH_PARAMETERS_ID) {
+        const functionParametersWebView = window.createWebviewPanel(
+          FUNCTION_PARAMTER_VALUES_ID,
+          `Function Execution: ${functionSignature}`,
+          ViewColumn.One,
+          {
+            enableScripts: true,
+          },
+        );
+        renderFunctionParameterValuesWebView(
+          functionParametersWebView,
+          context,
+          args,
+        );
+      }
+    },
+  );
+  context.subscriptions.push(executeFunctionWithParametersCommand);
 }
 
 export function registerClientViews(context: ExtensionContext): void {
@@ -154,6 +185,7 @@ export function registerClientViews(context: ExtensionContext): void {
 export function activate(context: ExtensionContext): void {
   createClient(context);
   registerClientViews(context);
+  registerComamnds(context);
 }
 
 export function deactivate(): Thenable<void> | undefined {

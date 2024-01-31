@@ -13,3 +13,201 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+:root {
+  --color-white: #fff;
+  --color-light-grey-0: #fafafa;
+  --color-light-grey-50: #f3f3f3;
+  --color-light-grey-100: #efefef;
+  --color-light-grey-150: #e6e6e6;
+  --color-light-grey-180: #dcdcdc;
+  --color-light-grey-200: #ddd;
+  --color-light-grey-250: #d4d4d4;
+  --color-light-grey-300: #cecece;
+  --color-light-grey-400: #bbb;
+  --color-black: #000;
+  --color-dark-grey-50: #1e1e1e;
+  --color-dark-grey-80: #252525;
+  --color-dark-grey-85: #272727;
+  --color-dark-grey-100: #2d2d2d;
+  --color-dark-grey-200: #353535;
+  --color-dark-grey-250: #3e3e3e;
+  --color-dark-grey-280: #404040;
+  --color-dark-grey-300: #595959;
+  --color-dark-grey-350: #606060;
+  --color-dark-grey-400: #737373;
+  --color-dark-grey-500: #9a9a9a;
+  --color-blue-40: #40a6ff;
+  --color-blue-50: #1c89d2;
+  --color-blue-100: #007acc;
+  --color-blue-150: #0a73b9;
+  --color-blue-180: #0c6bab;
+  --color-blue-200: #08629e;
+  --color-blue-300: #014a7b;
+  --color-blue-500: #002f4f;
+}
+
+.parameters__editor {
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  padding: 1rem;
+
+  &__parameter {
+    padding-bottom: 1rem;
+
+    &__name {
+      font-weight: 400;
+    }
+
+    &__title {
+      display: flex;
+    }
+
+    &__label {
+      margin-left: 0.3rem;
+      font-size: 0.7rem;
+      text-align: center;
+      padding: 0.2rem;
+      background-color: var(--color-dark-grey-400);
+      color: var(--color-white);
+      width: fit-content;
+      border-radius: 0.2rem;
+    }
+  }
+
+  &__submit-btn {
+    border: 0.1rem solid var(--color-dark-grey-500);
+    background-color: var(--color-blue-150);
+    color: var(--color-light-grey-100);
+    cursor: pointer;
+    width: 5rem;
+    height: 1.7rem;
+    margin-left: 0.2rem;
+  }
+}
+
+.primitive__editor {
+  &__string__type__editor,
+  &__number__type__editor,
+  &__date__type__editor {
+    padding: 0.2rem 0;
+
+    &__input {
+      border: 0.1rem solid var(--color-dark-grey-250);
+      width: 15rem;
+      height: 1.2rem;
+      background-color: inherit;
+      color: var(--vscode-input-foreground);
+    }
+  }
+
+  &__enum__value__editor {
+    padding: 0.2rem 0;
+
+    &__input {
+      padding: 0.2rem 0;
+      width: 15rem;
+      height: 1rem;
+      margin-bottom: 0.5rem;
+    }
+  }
+
+  &__collection__value__editor {
+    padding: 0.2rem 0;
+
+    &__tags-input {
+      width: 15rem;
+      border: 0.1rem solid var(--color-dark-grey-250);
+      font-size: 0.7rem;
+      display: flex;
+      flex-wrap: wrap;
+      color: var(--color-black);
+
+      &__input {
+        width: 100%;
+        height: 1.2rem;
+        background-color: inherit;
+        border: none;
+        outline: none;
+        color: var(--vscode-input-foreground);
+      }
+    }
+
+    &__tags-input-read-only {
+      display: inline-flex;
+      width: 15rem;
+      border: 0.1rem solid var(--color-dark-grey-250);
+      font-size: 0.7rem;
+
+      &__input {
+        width: 100%;
+        height: 1.2rem;
+        border: none;
+        outline: none;
+        background-color: inherit;
+        text-overflow: ellipsis;
+        color: var(--vscode-input-foreground);
+      }
+
+      &__btn {
+        border: 0.1rem solid var(--color-dark-grey-500);
+        background-color: var(--color-blue-150);
+        color: var(--color-light-grey-100);
+        cursor: pointer;
+      }
+    }
+
+    &__tag {
+      margin-right: 0.5rem;
+      display: inline-flex;
+      padding: 0.2rem;
+      background-color: var(--color-light-grey-300);
+      border-radius: 0.2rem;
+    }
+
+    &__delete {
+      display: inline-block;
+      margin-left: 0.5rem;
+      padding: 0;
+      width: 0.9rem;
+      height: 0.9rem;
+      background-color: var(--color-dark-grey-400);
+      color: var(--color-white);
+      font-size: 0.6rem;
+      font-weight: bold;
+      cursor: pointer;
+      border-radius: 0.3rem;
+      border: none;
+      outline: none;
+      user-select: none;
+    }
+
+    &__delete::after {
+      content: 'X';
+      width: 0.9rem;
+      height: 0.9rem;
+      line-height: 0.9rem;
+      text-align: center;
+    }
+  }
+
+  &__boolean__type__editor {
+    &__input {
+      border: 0.1rem solid var(--color-dark-grey-250);
+      background-color: inherit;
+    }
+  }
+
+  &__default__editor {
+    padding: 0.2rem 0;
+
+    &__input {
+      border: 0.1rem solid var(--color-dark-grey-250);
+      width: 15rem;
+      height: 5rem;
+      background-color: inherit;
+      color: var(--vscode-input-foreground);
+    }
+  }
+}

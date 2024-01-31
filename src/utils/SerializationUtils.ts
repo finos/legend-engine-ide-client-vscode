@@ -47,3 +47,28 @@ export const usingModelSchema = <T>(schema: ModelSchema<T>): PropSchema =>
     (value) => (value === undefined ? SKIP : serialize(schema, value)),
     (value) => deserialize(schema, value),
   );
+
+export const serializeMap = <T>(
+  val: Map<string, T>,
+  itemSerializer: (val: T) => T extends object ? PlainObject<T> : T,
+): PlainObject => {
+  const result: PlainObject = {};
+  val.forEach((v, key) => {
+    result[key] = itemSerializer(v);
+  });
+  return result;
+};
+
+export const deserializeMap = <T>(
+  val: Record<string, T extends object ? PlainObject<T> : T>,
+  itemDeserializer: (val: T extends object ? PlainObject<T> : T) => T,
+): Map<string, T> => {
+  const result = new Map<string, T>();
+  Object.keys(val).forEach((key: string) =>
+    result.set(
+      key,
+      itemDeserializer(val[key] as T extends object ? PlainObject<T> : T),
+    ),
+  );
+  return result;
+};
