@@ -27,3 +27,6 @@ npm-debug.log*
 /temp
 *.vsix
 /server/*.jar
+
+# Test
+/.vscode-test/

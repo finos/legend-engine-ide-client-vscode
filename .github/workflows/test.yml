@@ -1,0 +1,55 @@
+name: Run tests
+
+on:
+  push:
+    branches:
+      - main
+      - 'release/**'
+  pull_request:
+    branches:
+      - '**'
+
+# Cancel running jobs from previous pipelines of the same workflow on PR to save resource when commits are pushed quickly
+# NOTE: we don't want this behavior on default branch
+# See https://stackoverflow.com/a/68422069
+concurrency:
+  group: ${{ github.ref == 'refs/heads/main' && format('ci-default-branch-{0}-{1}', github.sha, github.workflow) || format('ci-pr-{0}-{1}', github.ref, github.workflow) }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Configure git
+        run: |
+          git config --global committer.email "infra@finos.org"
+          git config --global committer.name "FINOS Admin"
+          git config --global author.email "${GITHUB_ACTOR}@users.noreply.github.com"
+          git config --global author.name "${GITHUB_ACTOR}"
+
+      - name: Checkout code
+        uses: actions/checkout@v4.1.0
+
+      - name: Setup Node
+        uses: actions/setup-node@v3.8.1
+        with:
+          node-version: 16
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: 21
+          java-package: jdk
+
+      - name: Install dependencies
+        run: |
+          npm install
+          npm install -g @vscode/vsce
+
+      - name: Run tests
+        run: |
+          xvfb-run -a npm run test        
+            
