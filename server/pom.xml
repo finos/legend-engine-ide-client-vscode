@@ -12,7 +12,7 @@
 
   <properties>
     <!-- this version is also used to download the lsp shaded server jar -->
-    <ide.lsp.version>0.0.5</ide.lsp.version>
+    <ide.lsp.version>0.0.9-SNAPSHOT</ide.lsp.version>
   </properties>
 
   <dependencies>
@@ -32,37 +32,54 @@
     <dependency>
       <groupId>org.finos.legend.engine</groupId>
       <artifactId>legend-engine-extensions-collection-execution</artifactId>
-      <version>4.37.0</version>
+      <version>4.38.2</version>
     </dependency>
 
     <dependency>
       <groupId>org.finos.legend.engine</groupId>
       <artifactId>legend-engine-extensions-collection-generation</artifactId>
-      <version>4.37.0</version>
+      <version>4.38.2</version>
     </dependency>
 
     <dependency>
       <groupId>org.finos.legend.engine</groupId>
       <artifactId>legend-engine-configuration</artifactId>
-      <version>4.37.0</version>
+      <version>4.38.2</version>
     </dependency>
 
     <dependency>
       <groupId>org.finos.legend.engine</groupId>
       <artifactId>legend-engine-test-runner-shared</artifactId>
-      <version>4.37.0</version>
+      <version>4.38.2</version>
     </dependency>
 
     <dependency>
       <groupId>org.finos.legend.engine</groupId>
       <artifactId>legend-engine-test-runner-mapping</artifactId>
-      <version>4.37.0</version>
+      <version>4.38.2</version>
     </dependency>    
 
     <dependency>
       <groupId>org.finos.legend.engine</groupId>
       <artifactId>legend-engine-test-runner-service</artifactId>
-      <version>4.37.0</version>
+      <version>4.38.2</version>
+    </dependency>
+
+
+    <dependency>
+      <groupId>org.finos.legend.sdlc</groupId>
+      <artifactId>legend-sdlc-test-utils</artifactId>
+      <version>0.155.2</version>
+      <exclusions>
+        <exclusion>
+            <groupId>org.finos.legend.pure</groupId>
+            <artifactId>*</artifactId>
+        </exclusion>
+        <exclusion>
+            <groupId>org.finos.legend.engine</groupId>
+            <artifactId>*</artifactId>
+        </exclusion>        
+      </exclusions>
     </dependency>
 
   </dependencies>

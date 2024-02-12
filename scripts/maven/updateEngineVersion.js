@@ -20,7 +20,7 @@ const mvn = require('maven').create({
 mvn
   .execute('versions:use-latest-releases', {
     generateBackupPoms: false,
-    includes: 'org.finos.legend.engine:*',
+    includes: ['org.finos.legend.engine:*', 'org.finos.legend.sdlc:*'],
   })
   .then(() => {
     // todo what we should do here?
