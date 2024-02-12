@@ -37,6 +37,9 @@ export const LEGEND_EXECUTE_COMMAND = 'legend.executeCommand';
 export const LEGEND_COMMAND_WITH_INPUTS_ID = 'legend.command.withInputs';
 export const EXEC_FUNCTION_WITH_PARAMETERS_ID =
   'legend.pure.executeFunctionWithParameters';
+export const SEND_TDS_REQUEST_ID = 'sendTDSRequest';
+export const TDS_JSON_REQUEST_ID = 'textDocument/TDSRequest';
+export const GET_TDS_REQUEST_RESULTS_ID = 'getTDSRequestResultsId';
 
 // Context variables
 export const SHOW_EXECUTION_RESULTS = 'showExecutionResults';

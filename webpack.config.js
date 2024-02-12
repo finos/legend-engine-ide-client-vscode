@@ -18,8 +18,8 @@ const path = require('path');
 
 module.exports = {
   entry: {
-    AgGridRenderer: './src/components/AgGridRenderer.tsx',
-    ParametersEditorRenderer: './src/components/ParametersEditorRenderer.tsx',
+    AgGridRenderer: './src/components/grid/AgGridRenderer.tsx',
+    ParametersEditorRenderer: './src/components/parameters/ParametersEditorRenderer.tsx',
     // Add more entry points as needed
   },
   externals: {
@@ -44,7 +44,6 @@ module.exports = {
           'css-loader',
           {
             loader: 'sass-loader',
-
           },
         ],
         exclude: /node_modules/,

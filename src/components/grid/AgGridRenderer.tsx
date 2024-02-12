@@ -28,6 +28,10 @@ const columnDefsString = rootElement
 const isDarkTheme = rootElement
   ? rootElement.getAttribute('data-is-dark-theme')
   : 'false';
+const agGridLicense = rootElement
+  ? rootElement.getAttribute('data-ag-grid-license')
+  : '';
+
 if (rowDataString && columnDefsString) {
   const rowData = JSON.parse(rowDataString as string);
   const columnDefs = JSON.parse(columnDefsString as string);
@@ -36,6 +40,7 @@ if (rowDataString && columnDefsString) {
       className={
         isDarkTheme === 'true' ? 'ag-theme-balham-dark' : 'ag-theme-balham'
       }
+      licenseKey={agGridLicense ?? ''}
       rowData={rowData}
       columnDefs={columnDefs}
     />,

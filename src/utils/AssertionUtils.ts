@@ -33,6 +33,34 @@ export const guaranteeNonNullable = <T>(
   return value;
 };
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/ban-types
+export type GenericClazz<T> = { new (...args: any[]): T } | Function;
+
+// Aserts typing doesn't work with all arrow function type declaration form
+// So we can use this: export const assertType: <T>(value: unknown, clazz: Clazz<T>, message: string) => asserts value is T = (value, clazz, message = '') => {
+// or the normal function form
+// See https://github.com/microsoft/TypeScript/issues/34523
+// See https://github.com/microsoft/TypeScript/pull/33622
+export function assertType<T>(
+  value: unknown,
+  clazz: GenericClazz<T>,
+  message = '',
+): asserts value is T {
+  if (!(value instanceof clazz)) {
+    throw new Error(
+      message || `Value is expected to be of type '${clazz.name}'`,
+    );
+  }
+}
+export const guaranteeType = <T>(
+  value: unknown,
+  clazz: GenericClazz<T>,
+  message = '',
+): T => {
+  assertType(value, clazz, message);
+  return value;
+};
+
 export const isBoolean = (val: unknown): val is boolean =>
   typeof val === 'boolean';
 

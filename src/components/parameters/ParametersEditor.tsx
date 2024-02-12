@@ -18,18 +18,12 @@ import {
   InstanceValueEditor,
   getDefaultValueForPrimitiveType,
 } from './InstanceValueEditor';
-import { guaranteeNonNullable } from '../utils/AssertionUtils';
-import { serializeMap } from '../utils/SerializationUtils';
-import '../../style/index.scss';
-import { LEGEND_EXECUTE_COMMAND } from '../utils/Const';
-import type { InputParamter } from '../model/InputParameter';
-
-interface vscode {
-  postMessage(message: unknown): void;
-}
-
-// eslint-disable-next-line @typescript-eslint/no-redeclare
-declare const vscode: vscode;
+import { guaranteeNonNullable } from '../../utils/AssertionUtils';
+import { serializeMap } from '../../utils/SerializationUtils';
+import '../../../style/index.scss';
+import { LEGEND_EXECUTE_COMMAND } from '../../utils/Const';
+import type { InputParamter } from '../../model/InputParameter';
+import { postMessage } from '../../utils/VsCodeUtils';
 
 export const ParametersEditor: React.FC<{
   inputParameters: InputParamter[];
@@ -47,7 +41,7 @@ export const ParametersEditor: React.FC<{
     ),
   );
   const submit = (): void => {
-    vscode.postMessage({
+    postMessage({
       command: LEGEND_EXECUTE_COMMAND,
       parameterValues: serializeMap(parameterValues, (val: unknown) => val),
     });

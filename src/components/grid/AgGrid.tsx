@@ -22,20 +22,46 @@ import {
 import { ClientSideRowModelModule } from '@ag-grid-community/client-side-row-model';
 import { CsvExportModule } from '@ag-grid-community/csv-export';
 import { ModuleRegistry } from '@ag-grid-community/core';
+import { ServerSideRowModelModule } from '@ag-grid-enterprise/server-side-row-model';
+import { RowGroupingModule } from '@ag-grid-enterprise/row-grouping';
+import { MenuModule } from '@ag-grid-enterprise/menu';
+import { type TDSRowDataType, getDefaultColumnDefintions } from './GridUtils';
+import { ServerSideDataSource } from './ServerSideDataSource';
+import { LicenseManager } from '@ag-grid-enterprise/core';
 
 const communityModules = [ClientSideRowModelModule, CsvExportModule];
+const enterpriseModules = [
+  ServerSideRowModelModule,
+  RowGroupingModule,
+  MenuModule,
+];
+const allModules = communityModules.concat(enterpriseModules);
 
 export function AgGridComponent<TData = unknown>(
-  props: AgGridReactProps<TData> | AgReactUiProps<TData>,
+  props: (AgGridReactProps<TData> | AgReactUiProps<TData>) & {
+    licenseKey: string;
+  },
 ): JSX.Element {
+  let isAgGridLicenseEnabled = false;
+  if (props.licenseKey) {
+    LicenseManager.setLicenseKey(props.licenseKey);
+    isAgGridLicenseEnabled = true;
+  }
+  const server = new ServerSideDataSource(props.rowData as TDSRowDataType[]);
   return (
     <AgGridReact
+      rowGroupPanelShow={isAgGridLicenseEnabled ? 'always' : 'never'}
       suppressBrowserResizeObserver={true}
       suppressScrollOnNewData={true}
       rowSelection="multiple"
       enableRangeSelection={true}
+      gridOptions={{
+        serverSideDatasource: server,
+      }}
+      rowModelType={isAgGridLicenseEnabled ? 'serverSide' : 'clientSide'}
       {...props}
-      modules={communityModules}
+      defaultColDef={getDefaultColumnDefintions(isAgGridLicenseEnabled)}
+      modules={isAgGridLicenseEnabled ? allModules : communityModules}
     />
   );
 }

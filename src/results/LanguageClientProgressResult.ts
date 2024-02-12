@@ -19,7 +19,11 @@ import {
   SerializationFactory,
   usingModelSchema,
 } from '../utils/SerializationUtils';
-import { createModelSchema, list, primitive } from 'serializr';
+import { createModelSchema, custom, list, primitive } from 'serializr';
+import {
+  deserializeLegendExecutionResult,
+  serializeLegendExecutionResult,
+} from './LegendExecutionResultSerializationHelper';
 
 export class LanguageClientProgressResult {
   token?: string | number;
@@ -28,7 +32,12 @@ export class LanguageClientProgressResult {
   static readonly serialization = new SerializationFactory(
     createModelSchema(LanguageClientProgressResult, {
       token: primitive(),
-      value: list(usingModelSchema(LegendExecutionResult.serialization.schema)),
+      value: list(
+        custom(
+          (value) => serializeLegendExecutionResult(value),
+          (value) => deserializeLegendExecutionResult(value),
+        ),
+      ),
     }),
   );
 }

@@ -1,8 +1,8 @@
 import { useState, type ClipboardEvent, useRef, useEffect } from 'react';
-import { PRIMITIVE_TYPE } from '../utils/Const';
+import { PRIMITIVE_TYPE } from '../../utils/Const';
 import Select from 'react-select';
-import type { Enumeration } from '../model/Enumeration';
-import type { Multiplicity } from '../model/VariableExpression';
+import type { Enumeration } from '../../model/Enumeration';
+import type { Multiplicity } from '../../model/VariableExpression';
 
 export const getDefaultValueForPrimitiveType = (
   type: string,
