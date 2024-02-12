@@ -12,7 +12,7 @@
 
   <properties>
     <!-- this version is also used to download the lsp shaded server jar -->
-    <ide.lsp.version>0.0.9-SNAPSHOT</ide.lsp.version>
+    <ide.lsp.version>0.0.8</ide.lsp.version>
   </properties>
 
   <dependencies>
@@ -64,7 +64,6 @@
       <artifactId>legend-engine-test-runner-service</artifactId>
       <version>4.38.2</version>
     </dependency>
-
 
     <dependency>
       <groupId>org.finos.legend.sdlc</groupId>
