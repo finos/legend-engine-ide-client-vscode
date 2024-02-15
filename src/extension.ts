@@ -229,7 +229,7 @@ export function createReplTerminal(context: ExtensionContext): void {
             'org.finos.legend.engine.ide.lsp.server.LegendREPLTerminal',
             mavenPath,
             pomPath,
-          ].concat(workspace.workspaceFolders?.map(v => v.uri.toString)?.toString() || [])
+          ].concat(workspace.workspaceFolders?.map(v => v.uri.toString()) || [])
         }
       };
     }
