@@ -216,11 +216,6 @@ export function createReplTerminal(context: ExtensionContext): void {
         pomPath = context.asAbsolutePath(path.join('server', 'pom.xml'));
       }
 
-      if (mavenPath.trim().length == 0)
-      {
-        mavenPath = 'mvn';
-      }
-
       return {
         options: {
           name: 'Legend REPL (Beta)',
