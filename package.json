@@ -1,7 +1,7 @@
 {
   "name": "legend-engine-ide-client-vscode",
   "publisher": "FINOS",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "type": "commonjs",
   "repository": {
     "type": "git",
@@ -91,7 +91,15 @@
         "scopeName": "source.legend",
         "path": "./legend.tmlanguage"
       }
-    ]
+    ],
+    "terminal": {
+      "profiles": [
+        {
+          "id": "legend.terminal.repl",
+          "title": "Legend REPL (Beta)"
+        }
+      ]
+    }
   },
   "scripts": {
     "test": "jest",

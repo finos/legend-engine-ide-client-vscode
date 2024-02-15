@@ -32,39 +32,38 @@
     <dependency>
       <groupId>org.finos.legend.engine</groupId>
       <artifactId>legend-engine-extensions-collection-execution</artifactId>
-      <version>4.38.2</version>
+      <version>4.38.3-SNAPSHOT</version>
     </dependency>
 
     <dependency>
       <groupId>org.finos.legend.engine</groupId>
       <artifactId>legend-engine-extensions-collection-generation</artifactId>
-      <version>4.38.2</version>
+      <version>4.38.3-SNAPSHOT</version>
     </dependency>
 
     <dependency>
       <groupId>org.finos.legend.engine</groupId>
       <artifactId>legend-engine-configuration</artifactId>
-      <version>4.38.2</version>
+      <version>4.38.3-SNAPSHOT</version>
     </dependency>
 
     <dependency>
       <groupId>org.finos.legend.engine</groupId>
       <artifactId>legend-engine-test-runner-shared</artifactId>
-      <version>4.38.2</version>
+      <version>4.38.3-SNAPSHOT</version>
     </dependency>
 
     <dependency>
       <groupId>org.finos.legend.engine</groupId>
       <artifactId>legend-engine-test-runner-mapping</artifactId>
-      <version>4.38.2</version>
+      <version>4.38.3-SNAPSHOT</version>
     </dependency>    
 
     <dependency>
       <groupId>org.finos.legend.engine</groupId>
       <artifactId>legend-engine-test-runner-service</artifactId>
-      <version>4.38.2</version>
+      <version>4.38.3-SNAPSHOT</version>
     </dependency>
-
 
     <dependency>
       <groupId>org.finos.legend.sdlc</groupId>
@@ -80,6 +79,12 @@
             <artifactId>*</artifactId>
         </exclusion>        
       </exclusions>
+    </dependency>
+
+    <dependency>
+      <groupId>org.finos.legend.engine</groupId>
+      <artifactId>legend-engine-repl-client</artifactId>
+      <version>4.38.3-SNAPSHOT</version>
     </dependency>
 
   </dependencies>

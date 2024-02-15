@@ -22,6 +22,9 @@ import {
   window,
   commands,
   ViewColumn,
+  CancellationToken,
+  TerminalProfile,
+  ProviderResult
 } from 'vscode';
 import {
   LanguageClient,
@@ -186,6 +189,7 @@ export function activate(context: ExtensionContext): void {
   createClient(context);
   registerClientViews(context);
   registerComamnds(context);
+  createReplTerminal(context);
 }
 
 export function deactivate(): Thenable<void> | undefined {
@@ -193,4 +197,48 @@ export function deactivate(): Thenable<void> | undefined {
     return undefined;
   }
   return client.stop();
+}
+
+export function createReplTerminal(context: ExtensionContext): void {
+
+  const provider = window.registerTerminalProfileProvider('legend.terminal.repl', {
+    provideTerminalProfile(token: CancellationToken): ProviderResult<TerminalProfile> {
+
+      var mavenPath = workspace.getConfiguration()
+            .get('maven.executable.path', '');
+
+      var pomPath = workspace.getConfiguration()
+            .get('legend.extensions.dependencies.pom', '');
+
+      // settings might have it as empty on actaul workspace, hence we cannot default thru the config lookup          
+      if (pomPath.trim().length == 0)
+      {
+        pomPath = context.asAbsolutePath(path.join('server', 'pom.xml'));
+      }
+
+      if (mavenPath.trim().length == 0)
+      {
+        mavenPath = 'mvn';
+      }
+
+      return {
+        options: {
+          name: 'Legend REPL (Beta)',
+          shellPath: 'java',
+          shellArgs: [
+            // '-agentlib:jdwp=transport=dt_socket,server=y,quiet=y,suspend=y,address=*:11292',
+            '-cp',
+            context.asAbsolutePath(
+              path.join('server', 'legend-engine-ide-lsp-server-shaded.jar'),
+            ),
+            'org.finos.legend.engine.ide.lsp.server.LegendREPLTerminal',
+            mavenPath,
+            pomPath,
+          ].concat(workspace.workspaceFolders?.map(v => v.uri.toString)?.toString() || [])
+        }
+      };
+    }
+  });
+
+  context.subscriptions.push(provider);
 }
