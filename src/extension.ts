@@ -22,9 +22,9 @@ import {
   window,
   commands,
   ViewColumn,
-  CancellationToken,
-  TerminalProfile,
-  ProviderResult
+  type CancellationToken,
+  type TerminalProfile,
+  type ProviderResult
 } from 'vscode';
 import {
   LanguageClient,
