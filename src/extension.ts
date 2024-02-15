@@ -204,14 +204,14 @@ export function createReplTerminal(context: ExtensionContext): void {
   const provider = window.registerTerminalProfileProvider('legend.terminal.repl', {
     provideTerminalProfile(token: CancellationToken): ProviderResult<TerminalProfile> {
 
-      var mavenPath = workspace.getConfiguration()
+      const mavenPath = workspace.getConfiguration()
             .get('maven.executable.path', '');
 
-      var pomPath = workspace.getConfiguration()
+      let pomPath = workspace.getConfiguration()
             .get('legend.extensions.dependencies.pom', '');
 
-      // settings might have it as empty on actaul workspace, hence we cannot default thru the config lookup          
-      if (pomPath.trim().length == 0)
+      // settings might have it as empty on actaul workspace, hence we cannot default thru the config lookup
+      if (pomPath.trim().length === 0)
       {
         pomPath = context.asAbsolutePath(path.join('server', 'pom.xml'));
       }
@@ -229,7 +229,7 @@ export function createReplTerminal(context: ExtensionContext): void {
             'org.finos.legend.engine.ide.lsp.server.LegendREPLTerminal',
             mavenPath,
             pomPath,
-          ].concat(workspace.workspaceFolders?.map(v => v.uri.toString()) || [])
+          ].concat(workspace.workspaceFolders?.map((v) => v.uri.toString()) || [])
         }
       };
     }
