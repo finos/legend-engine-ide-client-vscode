@@ -24,7 +24,7 @@ import {
   ViewColumn,
   type CancellationToken,
   type TerminalProfile,
-  type ProviderResult
+  type ProviderResult,
 } from 'vscode';
 import {
   LanguageClient,
@@ -200,40 +200,46 @@ export function deactivate(): Thenable<void> | undefined {
 }
 
 export function createReplTerminal(context: ExtensionContext): void {
+  const provider = window.registerTerminalProfileProvider(
+    'legend.terminal.repl',
+    {
+      provideTerminalProfile(
+        token: CancellationToken,
+      ): ProviderResult<TerminalProfile> {
+        const mavenPath = workspace
+          .getConfiguration()
+          .get('maven.executable.path', '');
 
-  const provider = window.registerTerminalProfileProvider('legend.terminal.repl', {
-    provideTerminalProfile(token: CancellationToken): ProviderResult<TerminalProfile> {
+        let pomPath = workspace
+          .getConfiguration()
+          .get('legend.extensions.dependencies.pom', '');
 
-      const mavenPath = workspace.getConfiguration()
-            .get('maven.executable.path', '');
-
-      let pomPath = workspace.getConfiguration()
-            .get('legend.extensions.dependencies.pom', '');
-
-      // settings might have it as empty on actaul workspace, hence we cannot default thru the config lookup
-      if (pomPath.trim().length === 0)
-      {
-        pomPath = context.asAbsolutePath(path.join('server', 'pom.xml'));
-      }
-
-      return {
-        options: {
-          name: 'Legend REPL (Beta)',
-          shellPath: 'java',
-          shellArgs: [
-            // '-agentlib:jdwp=transport=dt_socket,server=y,quiet=y,suspend=y,address=*:11292',
-            '-cp',
-            context.asAbsolutePath(
-              path.join('server', 'legend-engine-ide-lsp-server-shaded.jar'),
-            ),
-            'org.finos.legend.engine.ide.lsp.server.LegendREPLTerminal',
-            mavenPath,
-            pomPath,
-          ].concat(workspace.workspaceFolders?.map((v) => v.uri.toString()) || [])
+        // settings might have it as empty on actaul workspace, hence we cannot default thru the config lookup
+        if (pomPath.trim().length === 0) {
+          pomPath = context.asAbsolutePath(path.join('server', 'pom.xml'));
         }
-      };
-    }
-  });
+
+        return {
+          options: {
+            name: 'Legend REPL (Beta)',
+            shellPath: 'java',
+            shellArgs: [
+              // '-agentlib:jdwp=transport=dt_socket,server=y,quiet=y,suspend=y,address=*:11292',
+              '-cp',
+              context.asAbsolutePath(
+                path.join('server', 'legend-engine-ide-lsp-server-shaded.jar'),
+              ),
+              'org.finos.legend.engine.ide.lsp.server.LegendREPLTerminal',
+              mavenPath,
+              pomPath,
+            ].concat(
+              workspace.workspaceFolders?.map((v) => v.uri.toString()) || [],
+            ),
+          },
+        };
+      },
+    },
+  );
 
   context.subscriptions.push(provider);
 }
