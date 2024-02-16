@@ -91,7 +91,15 @@
         "scopeName": "source.legend",
         "path": "./legend.tmlanguage"
       }
-    ]
+    ],
+    "terminal": {
+      "profiles": [
+        {
+          "id": "legend.terminal.repl",
+          "title": "Legend REPL (Beta)"
+        }
+      ]
+    }
   },
   "scripts": {
     "test": "jest",
