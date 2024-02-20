@@ -22,6 +22,7 @@ import {
   commands,
   window,
   ColorThemeKind,
+  workspace,
 } from 'vscode';
 import {
   SET_CONTEXT_COMMAND_ID,
@@ -40,6 +41,8 @@ import {
   STYLES_MODULE,
   AG_GRID_STYLE_PATH,
   AG_GRID_BALHAM_THEME,
+  SEND_TDS_REQUEST_ID,
+  GET_TDS_REQUEST_RESULTS_ID,
 } from '../utils/Const';
 import type { LanguageClientProgressResult } from './LanguageClientProgressResult';
 import {
@@ -49,32 +52,27 @@ import {
   buildTreeNodeId,
 } from '../utils/LegendTreeProvider';
 import { LegendExecutionResultType } from './LegendExecutionResultType';
-import { guaranteeNonNullable, isBoolean } from '../utils/AssertionUtils';
+import { guaranteeNonNullable, guaranteeType } from '../utils/AssertionUtils';
 import type { LegendWebViewProvider } from '../utils/LegendWebViewProvider';
 import type { PlainObject } from '../utils/SerializationUtils';
-import {
-  TDSLegendExecutionResult,
-  type TabularDataSet,
-} from './TDSLegendExecutionResult';
+import { TDSLegendExecutionResult } from './TDSLegendExecutionResult';
 import * as path from 'path';
-
-export type TDSResultCellDataType =
-  | string
-  | number
-  | boolean
-  | null
-  | undefined;
-
-export interface TDSRowDataType {
-  [key: string]: TDSResultCellDataType;
-}
+import {
+  getAggregationTDSColumnCustomizations,
+  getTDSRowData,
+} from '../components/grid/GridUtils';
+import type { LegendExecutionResult } from './LegendExecutionResult';
+import { FunctionLegendExecutionResult } from './FunctionLegendExecutionResult';
+// import { isAgGridLicenseEnabled } from '../components/grid/AgGrid';
 
 const renderTDSResultMessage = (
-  tds: TabularDataSet,
+  legendExecutionResult: LegendExecutionResult,
+  result: TDSLegendExecutionResult,
   link: Uri,
   extensionPath: string,
   webview: Webview,
 ): string => {
+  const tds = result.result;
   const agGridStylePath = Uri.joinPath(
     link,
     NODE_MODULES,
@@ -89,19 +87,14 @@ const renderTDSResultMessage = (
     STYLES_MODULE,
     AG_GRID_BALHAM_THEME,
   );
-  const colDefs = tds.columns.map((c) => ({ field: c, headerName: c }));
-  const rowData = tds.rows.map((_row, rowIdx) => {
-    const row: TDSRowDataType = {};
-    const cols = tds.columns;
-    _row.values.forEach((value, colIdx) => {
-      // `ag-grid` shows `false` value as empty string so we have
-      // call `.toString()` to avoid this behavior.
-      row[cols[colIdx] as string] = isBoolean(value) ? String(value) : value;
-    });
-
-    row.rowNumber = rowIdx;
-    return row;
-  });
+  const config = workspace.getConfiguration('legend');
+  const agGridLicense = config.get<string>('agGridLicense', '');
+  const colDefs = tds.columns.map((c) => ({
+    field: c,
+    headerName: c,
+    ...getAggregationTDSColumnCustomizations(agGridLicense !== '', result, c),
+  }));
+  const rowData = getTDSRowData(tds);
   const webviewScriptPath = Uri.file(
     path.join(extensionPath, 'lib', 'components', 'AgGridRenderer.js'),
   );
@@ -127,25 +120,53 @@ const renderTDSResultMessage = (
     }
          data-row-data='${JSON.stringify(rowData)}'
          data-column-defs='${JSON.stringify(colDefs)}'
-         data-is-dark-theme='${isDarkTheme}'> 
+         data-is-dark-theme='${isDarkTheme}'
+         data-ag-grid-license='${agGridLicense}'> 
     </div>
     <script src=${webviewScript}></script>
+    <script>
+          const vscode = acquireVsCodeApi();
+    </script>
   </body>
   </html>
   `;
+
+  const functionResult = guaranteeType(
+    legendExecutionResult,
+    FunctionLegendExecutionResult,
+  );
+  webview.onDidReceiveMessage(async (msg) => {
+    switch (msg.command) {
+      case SEND_TDS_REQUEST_ID: {
+        const r = await commands.executeCommand(SEND_TDS_REQUEST_ID, {
+          entity: functionResult.ids[0],
+          sectionNum: functionResult.sectionNum,
+          uri: functionResult.uri,
+          inputParameters: functionResult.inputParameters,
+          request: msg.values,
+        });
+        webview.postMessage({ command: GET_TDS_REQUEST_RESULTS_ID, result: r });
+        break;
+      }
+
+      default:
+        throw new Error(`Unsupported request ${msg.command}`);
+    }
+  }, undefined);
   return htmlString;
 };
 
 const renderResultMessage = (
-  mssg: string,
+  r: LegendExecutionResult,
   link: Uri,
   extensionPath: string,
   webview: Webview,
 ): string => {
+  const mssg = r.message;
   try {
     const json = JSON.parse(mssg) as PlainObject<TDSLegendExecutionResult>;
     const result = TDSLegendExecutionResult.serialization.fromJson(json);
-    return renderTDSResultMessage(result.result, link, extensionPath, webview);
+    return renderTDSResultMessage(r, result, link, extensionPath, webview);
   } catch (e) {
     // do nothing
   }
@@ -218,7 +239,7 @@ export const renderTestResults = (
     const viewResultCommand = {
       title: SHOW_RESULTS_COMMAND_TITLE,
       command: SHOW_RESULTS_COMMAND_ID,
-      arguments: [renderResultMessage(r.message, uri, extensionPath, webview)],
+      arguments: [renderResultMessage(r, uri, extensionPath, webview)],
     };
     if (r.ids.length === 2) {
       const testId = guaranteeNonNullable(r.ids[1]);

@@ -26,11 +26,11 @@ import {
   type TerminalProfile,
   type ProviderResult,
 } from 'vscode';
-import {
+import type {
   LanguageClient,
-  type LanguageClientOptions,
-  type Executable,
-  type ServerOptions,
+  LanguageClientOptions,
+  Executable,
+  ServerOptions,
 } from 'vscode-languageclient/node';
 import { LegendTreeDataProvider } from './utils/LegendTreeProvider';
 import { LanguageClientProgressResult } from './results/LanguageClientProgressResult';
@@ -43,6 +43,7 @@ import {
   EXEC_FUNCTION_WITH_PARAMETERS_ID,
   LEGEND_COMMAND_WITH_INPUTS_ID,
   FUNCTION_PARAMTER_VALUES_ID,
+  SEND_TDS_REQUEST_ID,
 } from './utils/Const';
 import { LegendWebViewProvider } from './utils/LegendWebViewProvider';
 import {
@@ -52,8 +53,12 @@ import {
 import { error } from 'console';
 import { isPlainObject } from './utils/AssertionUtils';
 import { renderFunctionParameterValuesWebView } from './parameters/FunctionParameterValuesWebView';
+import type { FunctionTDSRequest } from './model/FunctionTDSRequest';
+import { LegendExecutionResult } from './results/LegendExecutionResult';
+import { TDSLegendExecutionResult } from './results/TDSLegendExecutionResult';
+import { LegendLanguageClient } from './LegendLanguageClient';
 
-let client: LanguageClient;
+let client: LegendLanguageClient;
 
 export function createClient(context: ExtensionContext): LanguageClient {
   languages.setLanguageConfiguration('legend', {
@@ -98,7 +103,12 @@ export function createClient(context: ExtensionContext): LanguageClient {
     documentSelector: [{ scheme: 'file', language: 'legend' }],
     synchronize: { fileEvents: workspace.createFileSystemWatcher('**/*.pure') },
   };
-  client = new LanguageClient('Legend', 'Legend', serverOptions, clientOptions);
+  client = new LegendLanguageClient(
+    'Legend',
+    'Legend',
+    serverOptions,
+    clientOptions,
+  );
   // Initialize client
   client.start();
   return client;
@@ -128,6 +138,16 @@ export function registerComamnds(context: ExtensionContext): void {
     },
   );
   context.subscriptions.push(executeFunctionWithParametersCommand);
+  const functiontds = commands.registerCommand(
+    SEND_TDS_REQUEST_ID,
+    async (request: FunctionTDSRequest) => {
+      const result = await client.sendTDSRequest(request);
+      const mssg = LegendExecutionResult.serialization.fromJson(result).message;
+      const json = JSON.parse(mssg) as PlainObject<TDSLegendExecutionResult>;
+      return TDSLegendExecutionResult.serialization.fromJson(json);
+    },
+  );
+  context.subscriptions.push(functiontds);
 }
 
 export function registerClientViews(context: ExtensionContext): void {

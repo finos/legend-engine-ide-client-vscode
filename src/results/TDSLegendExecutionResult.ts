@@ -14,11 +14,37 @@
  * limitations under the License.
  */
 
-import { createModelSchema, list, primitive } from 'serializr';
+import { createModelSchema, list, optional, primitive } from 'serializr';
 import {
   SerializationFactory,
   usingModelSchema,
 } from '../utils/SerializationUtils';
+
+export class INTERNAL__TDSColumn {
+  name!: string;
+  type?: string | undefined;
+  relationalType?: string | undefined;
+  doc?: string | undefined;
+
+  static readonly serialization = new SerializationFactory(
+    createModelSchema(INTERNAL__TDSColumn, {
+      name: primitive(),
+      type: optional(primitive()),
+      doc: optional(primitive()),
+      relationalType: optional(primitive()),
+    }),
+  );
+}
+
+export class TDSBuilder {
+  columns: INTERNAL__TDSColumn[] = [];
+
+  static readonly serialization = new SerializationFactory(
+    createModelSchema(TDSBuilder, {
+      columns: list(usingModelSchema(INTERNAL__TDSColumn.serialization.schema)),
+    }),
+  );
+}
 
 export class TDSRow {
   values: (string | number | boolean | null)[] = [];
@@ -44,10 +70,12 @@ export class TabularDataSet {
 
 export class TDSLegendExecutionResult {
   result!: TabularDataSet;
+  builder!: TDSBuilder;
 
   static readonly serialization = new SerializationFactory(
     createModelSchema(TDSLegendExecutionResult, {
       result: usingModelSchema(TabularDataSet.serialization.schema),
+      builder: usingModelSchema(TDSBuilder.serialization.schema),
     }),
   );
 }

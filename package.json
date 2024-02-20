@@ -65,6 +65,11 @@
           "default": false,
           "description": "Indicates if we have to show execution is happening"
         },
+        "legend.agGridLicense": {
+          "type": "string",
+          "default": "",
+          "description": "Set the AgGrid License"
+        },
         "legend.extensions.dependencies.pom": {
           "type": "string",
           "default": "",
@@ -127,6 +132,10 @@
     "@ag-grid-community/csv-export": "30.2.0",
     "@ag-grid-community/react": "30.2.0",
     "@ag-grid-community/styles": "30.2.0",
+    "@ag-grid-enterprise/server-side-row-model": "30.2.0",
+    "@ag-grid-enterprise/row-grouping": "30.2.0",
+    "@ag-grid-enterprise/menu": "30.2.0",
+    "@ag-grid-enterprise/core": "30.2.0",
     "path": "0.12.7",
     "react": "18.2.0",
     "react-dom": "18.2.0",
