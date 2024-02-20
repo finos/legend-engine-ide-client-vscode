@@ -167,6 +167,7 @@ export function registerClientViews(context: ExtensionContext): void {
         ) {
           resetExecutionTab(resultsTreeDataProvider, resultsViewprovider);
         }
+        resultsViewprovider.focus();
         const result =
           LanguageClientProgressResult.serialization.fromJson(objectResult);
         renderTestResults(
