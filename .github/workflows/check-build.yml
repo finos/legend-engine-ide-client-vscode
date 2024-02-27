@@ -48,6 +48,11 @@ jobs:
         run: |
           npm install
           npm install -g @vscode/vsce
+          npm install -g ovsx
+
+      - name: Check OpenVSX
+        run: |
+          npx ovsx verify-pat FINOS -p ${{ secrets.OVSX_TOKEN }}
 
       - name: Package
         run: |
