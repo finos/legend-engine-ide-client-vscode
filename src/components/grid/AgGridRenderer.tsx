@@ -31,15 +31,20 @@ const isDarkTheme = rootElement
 const agGridLicense = rootElement
   ? rootElement.getAttribute('data-ag-grid-license')
   : '';
+const columnsString = rootElement
+  ? rootElement.getAttribute('data-columns')
+  : [];
 
 if (rowDataString && columnDefsString) {
   const rowData = JSON.parse(rowDataString as string);
   const columnDefs = JSON.parse(columnDefsString as string);
+  const columns = JSON.parse(columnsString as string);
   createRoot(rootElement as HTMLElement).render(
     <AgGridComponent
       className={
         isDarkTheme === 'true' ? 'ag-theme-balham-dark' : 'ag-theme-balham'
       }
+      columns={columns}
       licenseKey={agGridLicense ?? ''}
       rowData={rowData}
       columnDefs={columnDefs}

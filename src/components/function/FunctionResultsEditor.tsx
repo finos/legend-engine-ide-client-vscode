@@ -29,7 +29,10 @@ import {
   getTDSRowData,
 } from '../grid/GridUtils';
 import type { ColDef } from '@ag-grid-community/core';
-import { TDSLegendExecutionResult } from '../../results/TDSLegendExecutionResult';
+import {
+  type INTERNAL__TDSColumn,
+  TDSLegendExecutionResult,
+} from '../../results/TDSLegendExecutionResult';
 import { AgGridComponent } from '../grid/AgGrid';
 import type { LegendExecutionResult } from '../../results/LegendExecutionResult';
 import { ParametersEditor } from './ParametersEditor';
@@ -41,6 +44,7 @@ export const FunctionResultsEditor: React.FC<{
 }> = ({ inputParameters, isDarkTheme, agGridLicense }) => {
   const [rowData, setRowData] = useState<TDSRowDataType[]>([]);
   const [colDefs, setColDefs] = useState<ColDef[]>([]);
+  const [columns, setColumns] = useState<INTERNAL__TDSColumn[]>([]);
   const [resultMessage, setResultMessage] = useState<string>(
     'No results to display',
   );
@@ -55,6 +59,7 @@ export const FunctionResultsEditor: React.FC<{
         const json = JSON.parse(mssg) as PlainObject<TDSLegendExecutionResult>;
         const result = TDSLegendExecutionResult.serialization.fromJson(json);
         setRowData(getTDSRowData(result.result));
+        setColumns(result.builder.columns);
         setColDefs(
           result.result.columns.map((c) => ({
             field: c,
@@ -107,6 +112,7 @@ export const FunctionResultsEditor: React.FC<{
               className={
                 isDarkTheme ? 'ag-theme-balham-dark' : 'ag-theme-balham'
               }
+              columns={columns}
               licenseKey={agGridLicense ?? ''}
               rowData={rowData}
               columnDefs={colDefs}
