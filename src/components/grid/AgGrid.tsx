@@ -28,6 +28,7 @@ import { MenuModule } from '@ag-grid-enterprise/menu';
 import { type TDSRowDataType, getDefaultColumnDefintions } from './GridUtils';
 import { ServerSideDataSource } from './ServerSideDataSource';
 import { LicenseManager } from '@ag-grid-enterprise/core';
+import type { INTERNAL__TDSColumn } from '../../results/TDSLegendExecutionResult';
 
 const communityModules = [ClientSideRowModelModule, CsvExportModule];
 const enterpriseModules = [
@@ -40,6 +41,7 @@ const allModules = communityModules.concat(enterpriseModules);
 export function AgGridComponent<TData = unknown>(
   props: (AgGridReactProps<TData> | AgReactUiProps<TData>) & {
     licenseKey: string;
+    columns: INTERNAL__TDSColumn[];
   },
 ): JSX.Element {
   let isAgGridLicenseEnabled = false;
@@ -47,7 +49,10 @@ export function AgGridComponent<TData = unknown>(
     LicenseManager.setLicenseKey(props.licenseKey);
     isAgGridLicenseEnabled = true;
   }
-  const server = new ServerSideDataSource(props.rowData as TDSRowDataType[]);
+  const server = new ServerSideDataSource(
+    props.rowData as TDSRowDataType[],
+    props.columns,
+  );
   return (
     <AgGridReact
       rowGroupPanelShow={isAgGridLicenseEnabled ? 'always' : 'never'}
