@@ -63,6 +63,7 @@ import {
 } from '../components/grid/GridUtils';
 import type { LegendExecutionResult } from './LegendExecutionResult';
 import { FunctionLegendExecutionResult } from './FunctionLegendExecutionResult';
+// import { isAgGridLicenseEnabled } from '../components/grid/AgGrid';
 
 const renderTDSResultMessage = (
   legendExecutionResult: LegendExecutionResult,
@@ -120,8 +121,7 @@ const renderTDSResultMessage = (
          data-row-data='${JSON.stringify(rowData)}'
          data-column-defs='${JSON.stringify(colDefs)}'
          data-is-dark-theme='${isDarkTheme}'
-         data-ag-grid-license='${agGridLicense}'
-         data-columns='${JSON.stringify(result.builder.columns)}'> 
+         data-ag-grid-license='${agGridLicense}'> 
     </div>
     <script src=${webviewScript}></script>
     <script>

@@ -14,11 +14,6 @@
  * limitations under the License.
  */
 
-import {
-  TDS_AGGREGATION_FUNCTION,
-  TDS_FILTER_OPERATION,
-  TDS_SORT_ORDER,
-} from '../../model/TDSRequest';
 import type {
   TDSLegendExecutionResult,
   TabularDataSet,
@@ -36,74 +31,6 @@ export type TDSResultCellDataType =
 export interface TDSRowDataType {
   [key: string]: TDSResultCellDataType;
 }
-
-export const getTDSSortOrder = (sortOrder: string): TDS_SORT_ORDER => {
-  switch (sortOrder) {
-    case 'asc':
-      return TDS_SORT_ORDER.ASCENDING;
-    case 'desc':
-      return TDS_SORT_ORDER.DESCENDING;
-    default:
-      throw new Error(`Unsupported tds sort order ${sortOrder}`);
-  }
-};
-
-export const getAggregationFunction = (
-  aggFunc: string,
-): TDS_AGGREGATION_FUNCTION => {
-  switch (aggFunc) {
-    case 'sum':
-      return TDS_AGGREGATION_FUNCTION.SUM;
-    case 'min':
-      return TDS_AGGREGATION_FUNCTION.MIN;
-    case 'max':
-      return TDS_AGGREGATION_FUNCTION.MAX;
-    case 'count':
-      return TDS_AGGREGATION_FUNCTION.COUNT;
-    default:
-      throw new Error(`Unsupported aggregation function ${aggFunc}`);
-  }
-};
-
-export const getTDSFilterOperation = (
-  filterOperation: string,
-): TDS_FILTER_OPERATION => {
-  switch (filterOperation) {
-    case 'equals':
-      return TDS_FILTER_OPERATION.EQUALS;
-    case 'notEquals':
-      return TDS_FILTER_OPERATION.NOT_EQUAL;
-    case 'greaterThan':
-      return TDS_FILTER_OPERATION.GREATER_THAN;
-    case 'greaterThanOrEqual':
-      return TDS_FILTER_OPERATION.GREATER_THAN_OR_EQUAL;
-    case 'lessThan':
-      return TDS_FILTER_OPERATION.LESS_THAN;
-    case 'lessThanOrEqual':
-      return TDS_FILTER_OPERATION.LESS_THAN_OR_EQUAL;
-    case 'blank':
-      return TDS_FILTER_OPERATION.BLANK;
-    case 'notBlank':
-      return TDS_FILTER_OPERATION.NOT_BLANK;
-    default:
-      throw new Error(`Unsupported filter operation ${filterOperation}`);
-  }
-};
-
-export const getFilterColumnType = (type: string): PRIMITIVE_TYPE => {
-  switch (type) {
-    case 'text':
-      return PRIMITIVE_TYPE.STRING;
-    case 'number':
-      return PRIMITIVE_TYPE.NUMBER;
-    case 'boolean':
-      return PRIMITIVE_TYPE.BOOLEAN;
-    case 'date':
-      return PRIMITIVE_TYPE.DATE;
-    default:
-      throw new Error(`Unsupported filter type ${type}`);
-  }
-};
 
 export const getAggregationTDSColumnCustomizations = (
   isAgGridLicenseEnabled: boolean,

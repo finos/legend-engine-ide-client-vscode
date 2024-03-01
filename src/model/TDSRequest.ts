@@ -14,32 +14,30 @@
  * limitations under the License.
  */
 
-import type { PRIMITIVE_TYPE } from '../utils/Const';
-
 export enum TDS_FILTER_OPERATION {
-  EQUALS = 'EQUALS',
-  NOT_EQUAL = 'NOT_EQUAL',
-  GREATER_THAN = 'GREATER_THAN',
-  GREATER_THAN_OR_EQUAL = 'GREATER_THAN_OR_EQUAL',
-  LESS_THAN = 'LESS_THAN',
-  LESS_THAN_OR_EQUAL = 'LESS_THAN_OR_EQUAL',
-  BLANK = 'BLANK',
-  NOT_BLANK = 'NOT_BLANK',
+  EQUALS = 'equals',
+  NOT_EQUAL = 'notEqual',
+  GREATER_THAN = 'greaterThan',
+  GREATER_THAN_OR_EQUAL = 'greaterThanOrEqual',
+  LESS_THAN = 'lessThan',
+  LESS_THAN_OR_EQUAL = 'lessThanOrEqual',
+  BLANK = 'blank',
+  NOT_BLANK = 'notBlank',
 }
 
 export enum TDS_AGGREGATION_FUNCTION {
-  SUM = 'SUM',
-  MIN = 'MIN',
-  MAX = 'MAX',
-  COUNT = 'COUNT',
-  AVG = 'AVG',
-  FIRST = 'FIRST',
-  LAST = 'LAST',
+  SUM = 'sum',
+  MIN = 'min',
+  MAX = 'max',
+  COUNT = 'count',
+  AVG = 'avg',
+  FIRST = 'first',
+  LAST = 'last',
 }
 
 export enum TDS_SORT_ORDER {
-  ASCENDING = 'ASCENDING',
-  DESCENDING = 'DESCENDING',
+  ASCENDING = 'asc',
+  DESCENDING = 'desc',
 }
 
 export enum FILTER_TYPE {
@@ -49,18 +47,11 @@ export enum FILTER_TYPE {
 
 export class TDSFilter {
   column!: string;
-  columnType!: PRIMITIVE_TYPE;
   operation!: TDS_FILTER_OPERATION;
   value!: unknown;
 
-  constructor(
-    column: string,
-    columnType: PRIMITIVE_TYPE,
-    operation: TDS_FILTER_OPERATION,
-    value: unknown,
-  ) {
+  constructor(column: string, operation: TDS_FILTER_OPERATION, value: unknown) {
     this.column = column;
-    this.columnType = columnType;
     this.operation = operation;
     this.value = value;
   }
@@ -78,32 +69,20 @@ export class TDSSort {
 
 export class TDSAggregation {
   column!: string;
-  columnType!: PRIMITIVE_TYPE;
   function!: TDS_AGGREGATION_FUNCTION;
 
-  constructor(
-    column: string,
-    columnType: PRIMITIVE_TYPE,
-    _function: TDS_AGGREGATION_FUNCTION,
-  ) {
+  constructor(column: string, _function: TDS_AGGREGATION_FUNCTION) {
     this.column = column;
-    this.columnType = columnType;
     this.function = _function;
   }
 }
 
 export class TDSGroupby {
   columns!: string[];
-  groupKeys!: string[];
   aggregations!: TDSAggregation[];
 
-  constructor(
-    columns: string[],
-    groupKeys: string[],
-    aggregations: TDSAggregation[],
-  ) {
+  constructor(columns: string[], aggregations: TDSAggregation[]) {
     this.columns = columns;
-    this.groupKeys = groupKeys;
     this.aggregations = aggregations;
   }
 }
@@ -114,13 +93,13 @@ export class LegendTDSRequest {
   columns!: string[];
   filter!: TDSFilter[];
   sort!: TDSSort[];
-  groupBy!: TDSGroupby;
+  groupBy!: TDSGroupby[];
 
   constructor(
     columns: string[],
     filter: TDSFilter[],
     sort: TDSSort[],
-    groupBy: TDSGroupby,
+    groupBy: TDSGroupby[],
     startRow?: number | undefined,
     endRow?: number | undefined,
   ) {
