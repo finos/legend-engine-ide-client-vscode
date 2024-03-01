@@ -20,28 +20,41 @@ import type {
 } from '@ag-grid-community/core';
 import {
   TDSGroupby,
-  type TDS_AGGREGATION_FUNCTION,
-  type TDS_SORT_ORDER,
   TDSAggregation,
-  type TDSFilter,
+  TDSFilter,
   LegendTDSRequest,
   TDSSort,
 } from '../../model/TDSRequest';
 import { guaranteeNonNullable } from '../../utils/AssertionUtils';
 import { postMessage } from '../../utils/VsCodeUtils';
-import type { TDSLegendExecutionResult } from '../../results/TDSLegendExecutionResult';
+import type {
+  INTERNAL__TDSColumn,
+  TDSLegendExecutionResult,
+} from '../../results/TDSLegendExecutionResult';
 import {
   GET_TDS_REQUEST_RESULTS_ID,
+  type PRIMITIVE_TYPE,
   SEND_TDS_REQUEST_ID,
 } from '../../utils/Const';
-import { type TDSRowDataType, getTDSRowData } from './GridUtils';
+import {
+  type TDSRowDataType,
+  getTDSRowData,
+  getTDSSortOrder,
+  getTDSFilterOperation,
+  getAggregationFunction,
+} from './GridUtils';
 
 export class ServerSideDataSource implements IServerSideDatasource {
   executions = 0;
   rowData: TDSRowDataType[] = [];
+  columns: INTERNAL__TDSColumn[] = [];
 
-  constructor(rowData?: TDSRowDataType[] | undefined) {
+  constructor(
+    rowData?: TDSRowDataType[] | undefined,
+    columns?: INTERNAL__TDSColumn[] | undefined,
+  ) {
     this.rowData = rowData ?? [];
+    this.columns = columns ?? [];
   }
 
   fetchRows(params: IServerSideGetRowsParams<unknown, unknown>): void {
@@ -51,12 +64,17 @@ export class ServerSideDataSource implements IServerSideDatasource {
         values: this.extractRequest(params),
       });
       let rowData: TDSRowDataType[] = [];
+      let count = 0;
       window.addEventListener('message', (event) => {
         const message = event.data;
         if (message.command === GET_TDS_REQUEST_RESULTS_ID) {
-          const result: TDSLegendExecutionResult = message.result;
-          rowData = getTDSRowData(result.result);
-          params.success({ rowData: rowData });
+          // This check is to make sure we only set rowData once when we get results back from server
+          if (count === 0) {
+            const result: TDSLegendExecutionResult = message.result;
+            rowData = getTDSRowData(result.result);
+            params.success({ rowData: rowData });
+            count++;
+          }
         }
       });
     } else {
@@ -77,17 +95,19 @@ export class ServerSideDataSource implements IServerSideDatasource {
     const endRow = request.endRow;
     const columns = params.columnApi.getColumns()?.map((c) => c.getColId());
     const sort = request.sortModel.map(
-      (i) => new TDSSort(i.colId, i.sort as TDS_SORT_ORDER),
+      (i) => new TDSSort(i.colId, getTDSSortOrder(i.sort)),
     );
-    const aggregations = request.valueCols.map(
-      (v) =>
-        new TDSAggregation(
-          guaranteeNonNullable(v.field),
-          guaranteeNonNullable(v.aggFunc) as TDS_AGGREGATION_FUNCTION,
-        ),
-    );
+    const aggregations = request.valueCols.map((v) => {
+      const colType = this.columns.find((c) => c.name === v.field)?.type;
+      return new TDSAggregation(
+        guaranteeNonNullable(v.field),
+        colType as PRIMITIVE_TYPE,
+        getAggregationFunction(guaranteeNonNullable(v.aggFunc)),
+      );
+    });
     const groupBy = new TDSGroupby(
-      aggregations.map((a) => a.column),
+      request.rowGroupCols.map((r) => r.id),
+      request.groupKeys,
       aggregations,
     );
     const filter: TDSFilter[] = [];
@@ -95,18 +115,25 @@ export class ServerSideDataSource implements IServerSideDatasource {
     if (filterModel) {
       Object.keys(filterModel).forEach((key) => {
         const item = filterModel[key];
-        filter.push({
-          operation: item.type,
-          value: item.filter,
-          column: key,
-        } as TDSFilter);
+        const colType = this.columns.find((c) => c.name === key)?.type;
+        if (item.filter === undefined) {
+          throw new Error('Nested filtering is not supported yet');
+        }
+        filter.push(
+          new TDSFilter(
+            key,
+            colType as PRIMITIVE_TYPE,
+            getTDSFilterOperation(item.type),
+            item.filter,
+          ),
+        );
       });
     }
     const tdsRequest = new LegendTDSRequest(
       columns ?? [],
       filter,
       sort,
-      [groupBy],
+      groupBy,
       startRow,
       endRow,
     );
