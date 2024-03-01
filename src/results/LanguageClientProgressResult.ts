@@ -14,10 +14,9 @@
  * limitations under the License.
  */
 
-import { LegendExecutionResult } from './LegendExecutionResult';
+import { type LegendExecutionResult } from './LegendExecutionResult';
 import {
   SerializationFactory,
-  usingModelSchema,
 } from '../utils/SerializationUtils';
 import { createModelSchema, custom, list, primitive } from 'serializr';
 import {
