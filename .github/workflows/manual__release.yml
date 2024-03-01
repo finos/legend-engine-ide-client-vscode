@@ -43,9 +43,13 @@ jobs:
         run: |
           npm install
           npm install -g @vscode/vsce
-          npm run release:prepare          
+          npm install -g opensx
+          npm run release:prepare
       - name: Publish to VS Code Marketplace        
-        run: npm run release
+        run: npm run release:marketPlace
         env:
-          VSCE_PAT: ${{ secrets.VSCE_PAT }}          
+          VSCE_PAT: ${{ secrets.VSCE_PAT }}
+      - name: Publish to OpenVSX Marketplace
+        run: npm run release:openvsx -- -p ${{ secrets.OVSX_TOKEN }}
+                
           

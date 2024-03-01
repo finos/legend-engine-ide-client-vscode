@@ -16,6 +16,7 @@
 
 import * as path from 'path';
 import {
+  Uri,
   workspace,
   type ExtensionContext,
   languages,
@@ -75,6 +76,7 @@ export function createClient(context: ExtensionContext): LanguageClient {
   const serverOptionsRun: Executable = {
     command: 'java',
     args: [
+      `-DstoragePath=${context.storageUri!.fsPath}`,
       '-jar',
       context.asAbsolutePath(
         path.join('server', 'legend-engine-ide-lsp-server-shaded.jar'),
@@ -86,7 +88,8 @@ export function createClient(context: ExtensionContext): LanguageClient {
   const serverOptionsDebug: Executable = {
     command: 'java',
     args: [
-      // '-agentlib:jdwp=transport=dt_socket,server=y,quiet=y,suspend=y,address=*:11285',
+      `-DstoragePath=${context.storageUri!.fsPath}`,
+      '-agentlib:jdwp=transport=dt_socket,server=y,quiet=y,suspend=y,address=*:11285',
       '-jar',
       context.asAbsolutePath(
         path.join('server', 'legend-engine-ide-lsp-server-shaded.jar'),
@@ -143,6 +146,15 @@ export function registerComamnds(context: ExtensionContext): void {
     },
   );
   context.subscriptions.push(executeFunctionWithParametersCommand);
+
+  const openLog = commands.registerCommand('legend.log', () => {
+    const openPath = Uri.joinPath(context.storageUri!, 'engine-lsp', 'log.txt');
+    workspace.openTextDocument(openPath).then((doc) => {
+      window.showTextDocument(doc);
+    });
+  });
+  context.subscriptions.push(openLog);
+
   const functiontds = commands.registerCommand(
     SEND_TDS_REQUEST_ID,
     async (request: FunctionTDSRequest) => {
@@ -250,6 +262,7 @@ export function createReplTerminal(context: ExtensionContext): void {
             name: 'Legend REPL (Beta)',
             shellPath: 'java',
             shellArgs: [
+              `-DstoragePath=${path.join(context.storageUri!.fsPath, 'repl')}`,
               // '-agentlib:jdwp=transport=dt_socket,server=y,quiet=y,suspend=y,address=*:11292',
               '-cp',
               context.asAbsolutePath(
