@@ -28,7 +28,8 @@ import { postMessage } from '../../utils/VsCodeUtils';
 export const ParametersEditor: React.FC<{
   inputParameters: InputParamter[];
   isDarkTheme: boolean;
-}> = ({ inputParameters, isDarkTheme }) => {
+  setLoading?: (val: boolean) => void;
+}> = ({ inputParameters, isDarkTheme, setLoading }) => {
   const parameterValues = new Map<string, unknown>();
   inputParameters.forEach((parameter) =>
     parameterValues.set(
@@ -41,6 +42,7 @@ export const ParametersEditor: React.FC<{
     ),
   );
   const submit = (): void => {
+    setLoading?.(true);
     postMessage({
       command: LEGEND_EXECUTE_COMMAND,
       parameterValues: serializeMap(parameterValues, (val: unknown) => val),
@@ -48,6 +50,7 @@ export const ParametersEditor: React.FC<{
   };
   return (
     <div className="parameters__editor">
+      <div className="parameters__editor__title">Set Parameter Values</div>
       {Array.from(parameterValues.entries()).map(([key, value], idx) => (
         <div className="parameters__editor__parameter" key={key}>
           <div className="parameters__editor__parameter__title">

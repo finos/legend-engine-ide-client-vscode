@@ -41,9 +41,10 @@ import {
   SHOW_RESULTS_COMMAND_ID,
   EXECUTION_TREE_VIEW,
   EXEC_FUNCTION_WITH_PARAMETERS_ID,
-  LEGEND_COMMAND_WITH_INPUTS_ID,
+  LEGEND_CLIENT_COMMAND_ID,
   FUNCTION_PARAMTER_VALUES_ID,
   SEND_TDS_REQUEST_ID,
+  EXEC_FUNCTION_ID,
 } from './utils/Const';
 import { LegendWebViewProvider } from './utils/LegendWebViewProvider';
 import {
@@ -52,7 +53,7 @@ import {
 } from './results/ExecutionResultHelper';
 import { error } from 'console';
 import { isPlainObject } from './utils/AssertionUtils';
-import { renderFunctionParameterValuesWebView } from './parameters/FunctionParameterValuesWebView';
+import { renderFunctionResultsWebView } from './function/FunctionResultsWebView';
 import type { FunctionTDSRequest } from './model/FunctionTDSRequest';
 import { LegendExecutionResult } from './results/LegendExecutionResult';
 import { TDSLegendExecutionResult } from './results/TDSLegendExecutionResult';
@@ -116,11 +117,14 @@ export function createClient(context: ExtensionContext): LanguageClient {
 
 export function registerComamnds(context: ExtensionContext): void {
   const executeFunctionWithParametersCommand = commands.registerCommand(
-    LEGEND_COMMAND_WITH_INPUTS_ID,
+    LEGEND_CLIENT_COMMAND_ID,
     async (...args: unknown[]) => {
       const functionSignature = args[2] as string;
       const commandId = args[3] as string;
-      if (commandId === EXEC_FUNCTION_WITH_PARAMETERS_ID) {
+      if (
+        commandId === EXEC_FUNCTION_WITH_PARAMETERS_ID ||
+        commandId === EXEC_FUNCTION_ID
+      ) {
         const functionParametersWebView = window.createWebviewPanel(
           FUNCTION_PARAMTER_VALUES_ID,
           `Function Execution: ${functionSignature}`,
@@ -129,8 +133,9 @@ export function registerComamnds(context: ExtensionContext): void {
             enableScripts: true,
           },
         );
-        renderFunctionParameterValuesWebView(
+        renderFunctionResultsWebView(
           functionParametersWebView,
+          context.extensionUri,
           context,
           args,
         );

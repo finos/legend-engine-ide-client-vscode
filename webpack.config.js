@@ -19,7 +19,7 @@ const path = require('path');
 module.exports = {
   entry: {
     AgGridRenderer: './src/components/grid/AgGridRenderer.tsx',
-    ParametersEditorRenderer: './src/components/parameters/ParametersEditorRenderer.tsx',
+    FunctionResultsEditorRenderer: './src/components/function/FunctionResultsEditorRenderer.tsx',
     // Add more entry points as needed
   },
   externals: {

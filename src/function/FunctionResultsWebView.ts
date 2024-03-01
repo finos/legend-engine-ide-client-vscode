@@ -1,0 +1,116 @@
+/**
+ * Copyright (c) 2023-present, Goldman Sachs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+import * as path from 'path';
+import {
+  type ExtensionContext,
+  commands,
+  Uri,
+  type WebviewPanel,
+  ColorThemeKind,
+  window,
+  workspace,
+} from 'vscode';
+import {
+  AG_GRID_BALHAM_THEME,
+  AG_GRID_COMMUNITY,
+  AG_GRID_STYLE_PATH,
+  GET_TDS_REQUEST_RESULTS_ID,
+  LEGEND_COMMAND,
+  LEGEND_EXECUTE_COMMAND,
+  NODE_MODULES,
+  STYLES_MODULE,
+} from '../utils/Const';
+
+export const renderFunctionResultsWebView = (
+  functionResultsWebViewPanel: WebviewPanel,
+  link: Uri,
+  context: ExtensionContext,
+  args: unknown[],
+): void => {
+  const functionResultsEditorScriptPath = Uri.file(
+    path.join(
+      context.extensionPath,
+      'lib',
+      'components',
+      'FunctionResultsEditorRenderer.js',
+    ),
+  );
+  const functionResultsScript =
+    functionResultsWebViewPanel.webview.asWebviewUri(
+      functionResultsEditorScriptPath,
+    );
+  const webview = functionResultsWebViewPanel.webview;
+  const isDarkTheme = window.activeColorTheme.kind === ColorThemeKind.Dark;
+  const agGridStylePath = Uri.joinPath(
+    link,
+    NODE_MODULES,
+    AG_GRID_COMMUNITY,
+    STYLES_MODULE,
+    AG_GRID_STYLE_PATH,
+  );
+  const agGridBalhamThemePath = Uri.joinPath(
+    link,
+    NODE_MODULES,
+    AG_GRID_COMMUNITY,
+    STYLES_MODULE,
+    AG_GRID_BALHAM_THEME,
+  );
+  const config = workspace.getConfiguration('legend');
+  const agGridLicense = config.get<string>('agGridLicense', '');
+
+  webview.html = `
+    <!DOCTYPE html>
+    <html lang="en">
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="${webview.asWebviewUri(agGridStylePath)}">
+        <link rel="stylesheet" href="${webview.asWebviewUri(
+          agGridBalhamThemePath,
+        )}">
+      </head>
+      <body>
+        <div id="root" style="height: 500px; width: 100%;" class=${
+          isDarkTheme ? 'ag-theme-balham-dark' : 'ag-theme-balham'
+        } data-input-parameters=${JSON.stringify(
+          args,
+        )} data-is-dark-theme='${isDarkTheme}'
+          data-ag-grid-license='${agGridLicense}'></div>
+        <script src=${functionResultsScript}></script>
+        <script>
+          const vscode = acquireVsCodeApi();
+        </script>
+      </body>
+    </html>
+  `;
+  webview.onDidReceiveMessage(async (msg) => {
+    switch (msg.command) {
+      case LEGEND_EXECUTE_COMMAND: {
+        const results = await commands.executeCommand(
+          LEGEND_COMMAND,
+          ...args.slice(0, 5).concat(msg.parameterValues),
+        );
+        webview.postMessage({
+          command: GET_TDS_REQUEST_RESULTS_ID,
+          result: results,
+        });
+        break;
+      }
+      default:
+    }
+  }, undefined);
+};

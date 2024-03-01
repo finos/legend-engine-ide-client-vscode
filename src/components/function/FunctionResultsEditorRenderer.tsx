@@ -19,9 +19,11 @@ import {
   type PlainObject,
   deserializeMap,
 } from '../../utils/SerializationUtils';
-import { ParametersEditor } from './ParametersEditor';
 import { InputParamter } from '../../model/InputParameter';
+import { configureAgGridComponent } from '../grid/AgGrid';
+import { FunctionResultsEditor } from './FunctionResultsEditor';
 
+configureAgGridComponent();
 const rootElement = document.getElementById('root');
 const inputParamtersFromHtml = rootElement
   ? rootElement.getAttribute('data-input-parameters')
@@ -29,6 +31,9 @@ const inputParamtersFromHtml = rootElement
 const isDarkTheme = rootElement
   ? rootElement.getAttribute('data-is-dark-theme')
   : 'false';
+const agGridLicense = rootElement
+  ? rootElement.getAttribute('data-ag-grid-license')
+  : '';
 
 if (inputParamtersFromHtml) {
   const input = JSON.parse(inputParamtersFromHtml) as unknown[];
@@ -39,7 +44,8 @@ if (inputParamtersFromHtml) {
       InputParamter.serialization.fromJson(json),
   );
   createRoot(rootElement as HTMLElement).render(
-    <ParametersEditor
+    <FunctionResultsEditor
+      agGridLicense={agGridLicense ?? ''}
       isDarkTheme={isDarkTheme === 'true' ? true : false}
       inputParameters={Array.from(inputParameters.values())}
     />,
