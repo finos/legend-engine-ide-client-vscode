@@ -71,7 +71,7 @@ export const getTDSFilterOperation = (
   switch (filterOperation) {
     case 'equals':
       return TDS_FILTER_OPERATION.EQUALS;
-    case 'notEquals':
+    case 'notEqual':
       return TDS_FILTER_OPERATION.NOT_EQUAL;
     case 'greaterThan':
       return TDS_FILTER_OPERATION.GREATER_THAN;
