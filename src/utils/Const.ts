@@ -39,7 +39,7 @@ export const EXEC_FUNCTION_WITH_PARAMETERS_ID =
   'legend.pure.executeFunctionWithParameters';
 export const EXEC_FUNCTION_ID = 'legend.pure.executeFunction';
 export const SEND_TDS_REQUEST_ID = 'sendTDSRequest';
-export const TDS_JSON_REQUEST_ID = 'textDocument/TDSRequest';
+export const TDS_JSON_REQUEST_ID = 'legend/TDSRequest';
 export const GET_TDS_REQUEST_RESULTS_ID = 'getTDSRequestResultsId';
 
 // Context variables

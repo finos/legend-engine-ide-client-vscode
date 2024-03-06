@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2023-present, Goldman Sachs
+ * Copyright (c) 2024-present, Goldman Sachs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,28 +14,29 @@
  * limitations under the License.
  */
 
-import { createModelSchema, list, optional, primitive } from 'serializr';
+import { Range, Position } from 'vscode';
+import { createModelSchema } from 'serializr';
 import {
   usingModelSchema,
   SerializationFactory,
 } from '../utils/SerializationUtils';
-import type { LegendExecutionResultType } from './LegendExecutionResultType';
-import { TextLocation } from '../model/TextLocation';
+import { TextPosition } from './TextPosition';
 
-export class LegendExecutionResult {
-  ids!: string[];
-  type!: LegendExecutionResultType;
-  message!: string;
-  logMessage?: string | undefined;
-  location?: TextLocation | undefined;
+export class TextInterval {
+  start!: TextPosition;
+  end!: TextPosition;
+
+  toRange(): Range {
+    return new Range(
+      new Position(this.start.line, this.start.column),
+      new Position(this.end.line, this.end.column + 1),
+    );
+  }
 
   static readonly serialization = new SerializationFactory(
-    createModelSchema(LegendExecutionResult, {
-      ids: list(primitive()),
-      type: primitive(),
-      message: primitive(),
-      logMessage: optional(primitive()),
-      location: usingModelSchema(TextLocation.serialization.schema),
+    createModelSchema(TextInterval, {
+      start: usingModelSchema(TextPosition.serialization.schema),
+      end: usingModelSchema(TextPosition.serialization.schema),
     }),
   );
 }
