@@ -25,6 +25,7 @@ import {
   ViewColumn,
   StatusBarAlignment,
   ThemeIcon,
+  type TextDocumentContentProvider,
   type CancellationToken,
   type TerminalProfile,
   type ProviderResult,
@@ -48,6 +49,7 @@ import {
   FUNCTION_PARAMTER_VALUES_ID,
   SEND_TDS_REQUEST_ID,
   EXEC_FUNCTION_ID,
+  LEGEND_VIRTUAL_FS_SCHEME,
 } from './utils/Const';
 import { LegendWebViewProvider } from './utils/LegendWebViewProvider';
 import {
@@ -107,7 +109,10 @@ export function createClient(context: ExtensionContext): LanguageClient {
   };
 
   const clientOptions: LanguageClientOptions = {
-    documentSelector: [{ scheme: 'file', language: 'legend' }],
+    documentSelector: [
+      { scheme: 'file', language: 'legend' },
+      { scheme: LEGEND_VIRTUAL_FS_SCHEME, language: 'legend' },
+    ],
     synchronize: { fileEvents: workspace.createFileSystemWatcher('**/*.pure') },
   };
   client = new LegendLanguageClient(
@@ -241,6 +246,7 @@ export function activate(context: ExtensionContext): void {
   registerClientViews(context);
   registerComamnds(context);
   createReplTerminal(context);
+  registerLegendVirtualFilesystemProvider(client, context);
   context.subscriptions.push(createTestController(client));
 }
 
@@ -334,4 +340,24 @@ export function createReplTerminal(context: ExtensionContext): void {
   );
 
   context.subscriptions.push(provider);
+}
+
+function registerLegendVirtualFilesystemProvider(
+  client: LegendLanguageClient,
+  context: ExtensionContext,
+) {
+  const legendVfsProvider = new (class implements TextDocumentContentProvider {
+    async provideTextDocumentContent(
+      uri: Uri,
+      token: CancellationToken,
+    ): Promise<string> {
+      return client.legendVirtualFile(uri, token);
+    }
+  })();
+  context.subscriptions.push(
+    workspace.registerTextDocumentContentProvider(
+      LEGEND_VIRTUAL_FS_SCHEME,
+      legendVfsProvider,
+    ),
+  );
 }

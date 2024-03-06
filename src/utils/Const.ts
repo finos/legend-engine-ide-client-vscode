@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+export const LEGEND_VIRTUAL_FS_SCHEME = 'legend-vfs';
+
 // Views
 export const EXECUTION_TREE_VIEW = 'executionView';
 export const RESULTS_WEB_VIEW = 'resultsView';
@@ -43,6 +45,7 @@ export const TDS_JSON_REQUEST_ID = 'legend/TDSRequest';
 export const REPL_CLASSPATH_REQUEST_ID = 'legend/replClasspath';
 export const TEST_CASES_REQUEST_ID = 'legend/testCases';
 export const EXECUTE_TESTS_REQUEST_ID = 'legend/executeTests';
+export const VIRTUAL_FILE_SYSTEM_FILE_REQUEST_ID = 'legend/legendVirtualFile';
 export const GET_TDS_REQUEST_RESULTS_ID = 'getTDSRequestResultsId';
 
 // Context variables
