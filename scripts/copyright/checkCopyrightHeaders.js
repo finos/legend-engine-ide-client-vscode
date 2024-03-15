@@ -54,7 +54,10 @@ const needsCopyrightHeader = (copyrightText, file) => {
     pkg: {},
     onlyGenerateCommentContent: true,
   });
-  return fileContent.trim().length > 0 && !fileContent.includes(text);
+  return (
+    fileContent.trim().length > 0 &&
+    !fileContent.replace('2023-', '2024-').includes(text)
+  );
 };
 
 const generateCopyrightComment = ({

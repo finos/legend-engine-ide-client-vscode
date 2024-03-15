@@ -120,10 +120,10 @@ export class LegendTreeDataProvider implements TreeDataProvider<TreeNodeData> {
     node!.iconPath = icon;
   }
 
-  addChildNode(parentId: string, node: TreeChildNodeData): void {
+  addChildNode(node: TreeChildNodeData): void {
     const nodeId = guaranteeNonNullable(node.id);
     if (this.treeData.nodes.get(nodeId) === undefined) {
-      const parentNode = this.treeData.nodes.get(parentId);
+      const parentNode = this.treeData.nodes.get(node.parentId);
       if (parentNode) {
         parentNode.collapsibleState = TreeItemCollapsibleState.Expanded;
         parentNode.childrenIds.push(nodeId);

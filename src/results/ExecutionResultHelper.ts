@@ -52,7 +52,7 @@ import {
   buildTreeNodeId,
 } from '../utils/LegendTreeProvider';
 import { LegendExecutionResultType } from './LegendExecutionResultType';
-import { guaranteeNonNullable, guaranteeType } from '../utils/AssertionUtils';
+import { guaranteeType } from '../utils/AssertionUtils';
 import type { LegendWebViewProvider } from '../utils/LegendWebViewProvider';
 import type { PlainObject } from '../utils/SerializationUtils';
 import { TDSLegendExecutionResult } from './TDSLegendExecutionResult';
@@ -61,7 +61,7 @@ import {
   getAggregationTDSColumnCustomizations,
   getTDSRowData,
 } from '../components/grid/GridUtils';
-import type { LegendExecutionResult } from './LegendExecutionResult';
+import { type LegendExecutionResult } from './LegendExecutionResult';
 import { FunctionLegendExecutionResult } from './FunctionLegendExecutionResult';
 
 const renderTDSResultMessage = (
@@ -239,68 +239,39 @@ export const renderTestResults = (
     const viewResultCommand = {
       title: SHOW_RESULTS_COMMAND_TITLE,
       command: SHOW_RESULTS_COMMAND_ID,
-      arguments: [renderResultMessage(r, uri, extensionPath, webview)],
+      arguments: [
+        renderResultMessage(r, uri, extensionPath, webview),
+        r.location?.uri(),
+        r.location?.textInterval.toRange(),
+      ],
     };
-    if (r.ids.length === 2) {
-      const testId = guaranteeNonNullable(r.ids[1]);
-      resultsTreeDataProvider.addRootNode(
-        new TreeRootNodeData(testId, testId, themeIcon, viewResultCommand),
-      );
-    } else if (r.ids.length > 2) {
-      const testSuiteId = guaranteeNonNullable(r.ids[1]);
-      const testId = guaranteeNonNullable(r.ids[2]);
-      const assertionId = r.ids[3];
-      const rootNode = new TreeRootNodeData(
-        testSuiteId,
-        testSuiteId,
-        themeIcon,
-      );
-      resultsTreeDataProvider.addRootNode(rootNode);
-      const testIdNode = new TreeChildNodeData(
-        guaranteeNonNullable(rootNode.id),
-        buildTreeNodeId([testSuiteId, testId]),
-        testId,
-        themeIcon,
-      );
-      resultsTreeDataProvider.addChildNode(
-        guaranteeNonNullable(rootNode.id),
-        testIdNode,
-      );
-      if (r.type !== LegendExecutionResultType.SUCCESS) {
-        // Update testSuite and test node icons when we encounter failures
-        resultsTreeDataProvider.updateNodeIcon(
-          guaranteeNonNullable(rootNode.id),
-          themeIcon,
-        );
-        resultsTreeDataProvider.updateNodeIcon(
-          guaranteeNonNullable(testIdNode.id),
-          themeIcon,
-        );
+
+    r.ids.forEach((id, i, ids) => {
+      let cmd;
+      if (ids.length === i + 1) {
+        cmd = viewResultCommand;
       }
-      if (assertionId) {
-        const assertionNode = new TreeChildNodeData(
-          guaranteeNonNullable(rootNode.id),
-          buildTreeNodeId([testSuiteId, testId, assertionId]),
-          assertionId,
+
+      if (i === 0) {
+        resultsTreeDataProvider.addRootNode(
+          new TreeRootNodeData(id, id, themeIcon, cmd),
+        );
+      } else {
+        const childNode = new TreeChildNodeData(
+          buildTreeNodeId(ids.slice(0, i)),
+          buildTreeNodeId(ids.slice(0, i + 1)),
+          id,
           themeIcon,
-          viewResultCommand,
+          cmd,
         );
-        resultsTreeDataProvider.addChildNode(
-          guaranteeNonNullable(testIdNode.id),
-          assertionNode,
-        );
+
+        resultsTreeDataProvider.addChildNode(childNode);
+
+        if (r.type !== LegendExecutionResultType.SUCCESS) {
+          resultsTreeDataProvider.updateNodeIcon(childNode.parentId, themeIcon);
+        }
       }
-    } else {
-      const entityPath = guaranteeNonNullable(r.ids[0]);
-      resultsTreeDataProvider.addRootNode(
-        new TreeRootNodeData(
-          entityPath,
-          entityPath,
-          themeIcon,
-          viewResultCommand,
-        ),
-      );
-    }
+    });
   });
   // Refresh the tree view to reflect the changes
   resultsTreeDataProvider.refresh();
