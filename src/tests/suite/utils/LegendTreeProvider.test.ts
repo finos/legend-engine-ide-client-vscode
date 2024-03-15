@@ -105,7 +105,7 @@ suite('LegendTreeProvider Test Suite', () => {
       context.extensionPath,
       resultsViewprovider.getWebView(),
     );
-    strictEqual(resultsTreeDataProvider.treeData.nodes.size, 3);
+    strictEqual(resultsTreeDataProvider.treeData.nodes.size, 2);
     const nodeValues = Array.from(
       resultsTreeDataProvider.treeData.nodes.values(),
     );
@@ -114,22 +114,15 @@ suite('LegendTreeProvider Test Suite', () => {
       nodeValues[0]?.iconPath,
       new ThemeIcon(TEST_PASS_ICON, new ThemeColor(TEST_PASS_COLOR)),
     );
-    strictEqual(nodeValues[0].id, 'service');
-    deepStrictEqual(nodeValues[0].childrenIds, ['service:testSuite']);
+    strictEqual(nodeValues[0].id, 'testSuite');
+    deepStrictEqual(nodeValues[0].childrenIds, ['testSuite:test']);
 
     deepStrictEqual(
       nodeValues[1]?.iconPath,
       new ThemeIcon(TEST_PASS_ICON, new ThemeColor(TEST_PASS_COLOR)),
     );
-    strictEqual(nodeValues[1].id, 'service:testSuite');
-    deepStrictEqual(nodeValues[1].childrenIds, ['service:testSuite:test']);
-
-    deepStrictEqual(
-      nodeValues[2]?.iconPath,
-      new ThemeIcon(TEST_PASS_ICON, new ThemeColor(TEST_PASS_COLOR)),
-    );
-    strictEqual(nodeValues[2].id, 'service:testSuite:test');
-    deepStrictEqual(nodeValues[2].childrenIds, []);
+    strictEqual(nodeValues[1].id, 'testSuite:test');
+    deepStrictEqual(nodeValues[1].childrenIds, []);
   });
 
   test('Test results tree view when execution fails', async () => {
@@ -148,11 +141,7 @@ suite('LegendTreeProvider Test Suite', () => {
       context.extensionPath,
       resultsViewprovider.getWebView(),
     );
-    strictEqual(
-      resultsTreeDataProvider.treeData.nodes.size,
-      4,
-      'expect 4 nodes',
-    );
+    strictEqual(resultsTreeDataProvider.treeData.nodes.size, 3);
     const nodeValues = Array.from(
       resultsTreeDataProvider.treeData.nodes.values(),
     );
@@ -161,31 +150,24 @@ suite('LegendTreeProvider Test Suite', () => {
       nodeValues[0]?.iconPath,
       new ThemeIcon(TEST_FAIL_ICON, new ThemeColor(TEST_FAIL_COLOR)),
     );
-    strictEqual(nodeValues[0].id, 'Service');
-    deepStrictEqual(nodeValues[0].childrenIds, ['Service:testSuite']);
+    strictEqual(nodeValues[0].id, 'testSuite');
+    deepStrictEqual(nodeValues[0].childrenIds, [
+      'testSuite:test1',
+      'testSuite:test2',
+    ]);
 
     deepStrictEqual(
       nodeValues[1]?.iconPath,
       new ThemeIcon(TEST_FAIL_ICON, new ThemeColor(TEST_FAIL_COLOR)),
     );
-    strictEqual(nodeValues[1].id, 'Service:testSuite');
-    deepStrictEqual(nodeValues[1].childrenIds, [
-      'Service:testSuite:test1',
-      'Service:testSuite:test2',
-    ]);
+    strictEqual(nodeValues[1].id, 'testSuite:test1');
+    deepStrictEqual(nodeValues[1].childrenIds, []);
 
     deepStrictEqual(
       nodeValues[2]?.iconPath,
-      new ThemeIcon(TEST_FAIL_ICON, new ThemeColor(TEST_FAIL_COLOR)),
-    );
-    strictEqual(nodeValues[2].id, 'Service:testSuite:test1');
-    deepStrictEqual(nodeValues[2].childrenIds, []);
-
-    deepStrictEqual(
-      nodeValues[3]?.iconPath,
       new ThemeIcon(TEST_PASS_ICON, new ThemeColor(TEST_PASS_COLOR)),
     );
-    strictEqual(nodeValues[3].id, 'Service:testSuite:test2');
-    deepStrictEqual(nodeValues[3].childrenIds, []);
+    strictEqual(nodeValues[2].id, 'testSuite:test2');
+    deepStrictEqual(nodeValues[2].childrenIds, []);
   });
 });

@@ -47,14 +47,12 @@
     ],
     "commands": [
       {
-        "command": "legend.log",
-        "title": "Show Language Server log",
-        "category": "Legend"
+        "command": "showResults",
+        "title": "Results"
       },
       {
-        "command": "legend.runAllTests.command",
-        "title": "Execute all tests cases",
-        "category": "Legend"
+        "command": "legend.log",
+        "title": "Show Legend Extension Log"
       }
     ],
     "configuration": {
@@ -74,12 +72,12 @@
         "legend.agGridLicense": {
           "type": "string",
           "default": "",
-          "description": "Set the AgGrid License to enable enterprise features.  Without a licence, only community features are available"
+          "description": "Set the AgGrid License"
         },
         "legend.extensions.dependencies.pom": {
           "type": "string",
           "default": "",
-          "description": "Defines the POM to use to determine the runtime dependencies of the language server.  When not provided, a default POM is used for this purpose"
+          "description": "Override the defaut pom to use to discover dependencies"
         },
         "legend.engine.server.url": {
           "type": "string",

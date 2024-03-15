@@ -23,7 +23,6 @@ import {
   window,
   commands,
   ViewColumn,
-  StatusBarAlignment,
   type CancellationToken,
   type TerminalProfile,
   type ProviderResult,
@@ -188,17 +187,8 @@ export function registerClientViews(context: ExtensionContext): void {
   // Register commands
   const showResultsCommand = commands.registerCommand(
     SHOW_RESULTS_COMMAND_ID,
-    (errorMssg: string, uri?: string, range?: Range) => {
+    (errorMssg: string) => {
       resultsViewprovider.updateView(errorMssg);
-      if (uri) {
-        let options = {};
-        if (range) {
-          options = {
-            selection: range,
-          };
-        }
-        commands.executeCommand('vscode.openWith', uri, 'default', options);
-      }
     },
   );
   context.subscriptions.push(showResultsCommand);
@@ -234,63 +224,10 @@ export function registerClientViews(context: ExtensionContext): void {
 }
 
 export function activate(context: ExtensionContext): void {
-  createStatusBarItem(context);
   createClient(context);
   registerClientViews(context);
   registerComamnds(context);
   createReplTerminal(context);
-}
-
-export function createStatusBarItem(context: ExtensionContext): void {
-  // todo have mechanism to push status of server...
-  // example: https://github.com/redhat-developer/vscode-java/blob/master/src/serverStatusBarProvider.ts#L36
-  const statusBarItem = window.createStatusBarItem(
-    'legend.serverStatus',
-    StatusBarAlignment.Left,
-  );
-  context.subscriptions.push(statusBarItem);
-  statusBarItem.name = 'Legend';
-  statusBarItem.text = '$(compass) Legend';
-  statusBarItem.tooltip = 'Show Legend commands';
-  statusBarItem.command = {
-    title: 'Show Legend commands',
-    command: 'legend.showCommands.shorcut',
-    tooltip: 'Show Legend commands',
-  };
-
-  const shortcutCommand = commands.registerCommand(
-    'legend.showCommands.shorcut',
-    async () => {
-      const items = [];
-      items.push(
-        {
-          label: '$(run-all) Execute all tests cases',
-          command: 'legend.runAllTests.command',
-        },
-        {
-          label: '$(go-to-file) Show Language Server log',
-          command: 'legend.log',
-        },
-        {
-          label: '$(settings-gear) Open Legend Settings',
-          command: 'workbench.action.openSettings',
-          args: ['@ext:FINOS.legend-engine-ide-client-vscode'],
-        },
-      );
-
-      const choice = await window.showQuickPick(items);
-      if (!choice) {
-        return;
-      }
-
-      if (choice.command) {
-        commands.executeCommand(choice.command, ...(choice.args || []));
-      }
-    },
-  );
-
-  context.subscriptions.push(shortcutCommand);
-  statusBarItem.show();
 }
 
 export function deactivate(): Thenable<void> | undefined {

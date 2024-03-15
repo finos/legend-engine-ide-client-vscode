@@ -15,19 +15,14 @@
  */
 
 import { createModelSchema, list, optional, primitive } from 'serializr';
-import {
-  usingModelSchema,
-  SerializationFactory,
-} from '../utils/SerializationUtils';
+import { SerializationFactory } from '../utils/SerializationUtils';
 import type { LegendExecutionResultType } from './LegendExecutionResultType';
-import { TextLocation } from '../model/TextLocation';
 
 export class LegendExecutionResult {
   ids!: string[];
   type!: LegendExecutionResultType;
   message!: string;
   logMessage?: string | undefined;
-  location?: TextLocation | undefined;
 
   static readonly serialization = new SerializationFactory(
     createModelSchema(LegendExecutionResult, {
@@ -35,7 +30,6 @@ export class LegendExecutionResult {
       type: primitive(),
       message: primitive(),
       logMessage: optional(primitive()),
-      location: usingModelSchema(TextLocation.serialization.schema),
     }),
   );
 }
