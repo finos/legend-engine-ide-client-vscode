@@ -24,6 +24,7 @@ import {
   commands,
   ViewColumn,
   StatusBarAlignment,
+  ThemeIcon,
   type CancellationToken,
   type TerminalProfile,
   type ProviderResult,
@@ -90,7 +91,7 @@ export function createClient(context: ExtensionContext): LanguageClient {
     command: 'java',
     args: [
       `-DstoragePath=${context.storageUri!.fsPath}`,
-      '-agentlib:jdwp=transport=dt_socket,server=y,quiet=y,suspend=y,address=*:11285',
+      '-agentlib:jdwp=transport=dt_socket,server=y,quiet=y,suspend=n,address=*:11285',
       '-jar',
       context.asAbsolutePath(
         path.join('server', 'legend-engine-ide-lsp-server-shaded.jar'),
@@ -307,38 +308,29 @@ export function createReplTerminal(context: ExtensionContext): void {
       provideTerminalProfile(
         token: CancellationToken,
       ): ProviderResult<TerminalProfile> {
-        const mavenPath = workspace
-          .getConfiguration()
-          .get('maven.executable.path', '');
-
-        let pomPath = workspace
-          .getConfiguration()
-          .get('legend.extensions.dependencies.pom', '');
-
-        // settings might have it as empty on actaul workspace, hence we cannot default thru the config lookup
-        if (pomPath.trim().length === 0) {
-          pomPath = context.asAbsolutePath(path.join('server', 'pom.xml'));
-        }
-
-        return {
+        return client.replClasspath(token).then((cp) => ({
           options: {
-            name: 'Legend REPL (Beta)',
+            name: 'Legend REPL',
             shellPath: 'java',
             shellArgs: [
               `-DstoragePath=${path.join(context.storageUri!.fsPath, 'repl')}`,
-              // '-agentlib:jdwp=transport=dt_socket,server=y,quiet=y,suspend=y,address=*:11292',
-              '-cp',
-              context.asAbsolutePath(
-                path.join('server', 'legend-engine-ide-lsp-server-shaded.jar'),
-              ),
+              // '-agentlib:jdwp=transport=dt_socket,server=y,quiet=y,suspend=n,address=*:11292',
               'org.finos.legend.engine.ide.lsp.server.LegendREPLTerminal',
-              mavenPath,
-              pomPath,
-            ].concat(
-              workspace.workspaceFolders?.map((v) => v.uri.toString()) || [],
-            ),
+            ],
+            env: {
+              CLASSPATH: cp,
+            },
+            message: `REPL log file: ${Uri.file(
+              path.join(
+                context.storageUri!.fsPath,
+                'repl',
+                'engine-lsp',
+                'log.txt',
+              ),
+            )}`,
+            iconPath: new ThemeIcon('compass'),
           },
-        };
+        }));
       },
     },
   );

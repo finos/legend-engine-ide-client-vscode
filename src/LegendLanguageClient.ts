@@ -14,9 +14,10 @@
  * limitations under the License.
  */
 
+import type { CancellationToken } from 'vscode';
 import type { FunctionTDSRequest } from './model/FunctionTDSRequest';
 import type { LegendExecutionResult } from './results/LegendExecutionResult';
-import { TDS_JSON_REQUEST_ID } from './utils/Const';
+import { REPL_CLASSPATH_REQUEST_ID, TDS_JSON_REQUEST_ID } from './utils/Const';
 import type { PlainObject } from './utils/SerializationUtils';
 import { LanguageClient } from 'vscode-languageclient/node';
 
@@ -25,5 +26,9 @@ export class LegendLanguageClient extends LanguageClient {
     request: FunctionTDSRequest,
   ): Promise<PlainObject<LegendExecutionResult>> {
     return this.sendRequest(TDS_JSON_REQUEST_ID, request);
+  }
+
+  async replClasspath(token?: CancellationToken): Promise<string> {
+    return this.sendRequest(REPL_CLASSPATH_REQUEST_ID, token);
   }
 }
