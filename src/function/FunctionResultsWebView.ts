@@ -32,6 +32,7 @@ import {
   LEGEND_COMMAND,
   LEGEND_EXECUTE_COMMAND,
   NODE_MODULES,
+  SEND_TDS_REQUEST_ID,
   STYLES_MODULE,
 } from '../utils/Const';
 
@@ -110,7 +111,19 @@ export const renderFunctionResultsWebView = (
         });
         break;
       }
+      case SEND_TDS_REQUEST_ID: {
+        const r = await commands.executeCommand(SEND_TDS_REQUEST_ID, {
+          entity: args[2],
+          sectionNum: args[1],
+          uri: args[0],
+          inputParameters: args[5],
+          request: msg.values,
+        });
+        webview.postMessage({ command: GET_TDS_REQUEST_RESULTS_ID, result: r });
+        break;
+      }
       default:
+        throw new Error(`Unsupported request ${msg.command}`);
     }
   }, undefined);
 };
