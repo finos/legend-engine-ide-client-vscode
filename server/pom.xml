@@ -12,41 +12,88 @@
 
   <properties>
     <!-- this version is also used to download the lsp shaded server jar -->
-    <ide.lsp.version>0.0.11-SNAPSHOT</ide.lsp.version>
+    <ide.lsp.version>0.0.10</ide.lsp.version>
   </properties>
 
   <dependencies>
-    <dependency>
-        <groupId>org.finos.legend.engine.ide.lsp</groupId>
-        <artifactId>legend-engine-ide-lsp-default-extensions-dependencies</artifactId>
-        <version>${ide.lsp.version}</version>
-        <type>pom</type>
-    </dependency>
-  </dependencies>
 
-  <!-- todo update to use engine dependency - https://github.com/finos/legend-engine/pull/2721 -->
-  <profiles>
-      <profile>
-          <id>platform-windows</id>
-          <activation>
-              <os>
-                  <family>windows</family>
-              </os>
-          </activation>
-          <dependencies>
-              <dependency>
-                  <groupId>org.jline</groupId>
-                  <artifactId>jline-terminal-jansi</artifactId>
-                  <version>3.25.0</version>
-              </dependency>
-              <dependency>
-                  <groupId>org.fusesource.jansi</groupId>
-                  <artifactId>jansi</artifactId>
-                  <version>2.4.1</version>
-              </dependency>
-          </dependencies>
-      </profile>
-  </profiles>
+    <dependency>
+      <groupId>org.finos.legend.engine.ide.lsp</groupId>
+      <artifactId>legend-engine-ide-lsp-default-extensions</artifactId>
+      <version>${ide.lsp.version}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>*</groupId>
+          <artifactId>*</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+
+    <dependency>
+      <groupId>org.finos.legend.engine</groupId>
+      <artifactId>legend-engine-extensions-collection-execution</artifactId>
+      <version>4.42.2</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.finos.legend.engine</groupId>
+      <artifactId>legend-engine-extensions-collection-generation</artifactId>
+      <version>4.42.2</version>
+    </dependency>
+
+    <dependency>
+        <groupId>org.finos.legend.engine</groupId>
+        <artifactId>legend-engine-configuration-plan-generation-serialization</artifactId>
+        <version>4.42.2</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.finos.legend.engine</groupId>
+      <artifactId>legend-engine-test-runner-shared</artifactId>
+      <version>4.42.2</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.finos.legend.engine</groupId>
+      <artifactId>legend-engine-test-runner-mapping</artifactId>
+      <version>4.42.2</version>
+    </dependency>    
+
+    <dependency>
+      <groupId>org.finos.legend.engine</groupId>
+      <artifactId>legend-engine-test-runner-service</artifactId>
+      <version>4.42.2</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.finos.legend.sdlc</groupId>
+      <artifactId>legend-sdlc-test-utils</artifactId>
+      <version>0.158.1</version>
+      <exclusions>
+        <exclusion>
+            <groupId>org.finos.legend.pure</groupId>
+            <artifactId>*</artifactId>
+        </exclusion>
+        <exclusion>
+            <groupId>org.finos.legend.engine</groupId>
+            <artifactId>*</artifactId>
+        </exclusion>        
+      </exclusions>
+    </dependency>
+
+    <dependency>
+      <groupId>org.finos.legend.engine</groupId>
+      <artifactId>legend-engine-repl-client</artifactId>
+      <version>4.42.2</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.finos.legend.engine</groupId>
+      <artifactId>legend-engine-repl-relational</artifactId>
+      <version>4.42.2</version>
+    </dependency>    
+
+  </dependencies>
 
   <!-- todo update to use engine dependency - https://github.com/finos/legend-engine/pull/2721 -->
   <profiles>

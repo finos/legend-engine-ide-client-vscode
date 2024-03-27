@@ -20,7 +20,7 @@ import {
   SerializationFactory,
 } from '../utils/SerializationUtils';
 import { TextLocation } from './TextLocation';
-import { LegendExecutionResultType } from '../results/LegendExecutionResultType';
+import type { LegendExecutionResultType } from '../results/LegendExecutionResultType';
 
 export class LegendTestAssertionResult {
   assertId!: string;

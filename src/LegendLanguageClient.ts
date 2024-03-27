@@ -15,7 +15,6 @@
  */
 
 import type { CancellationToken } from 'vscode';
-import type { CancellationToken } from 'vscode';
 import type { FunctionTDSRequest } from './model/FunctionTDSRequest';
 import type { LegendExecutionResult } from './results/LegendExecutionResult';
 import {
@@ -26,9 +25,9 @@ import {
 } from './utils/Const';
 import type { PlainObject } from './utils/SerializationUtils';
 import { LanguageClient } from 'vscode-languageclient/node';
-import { LegendTest } from './model/LegendTest';
-import { ExecuteTestRequest } from './model/ExecuteTestRequest';
-import { LegendTestExecutionResult } from './model/LegendTestExecutionResult';
+import type { LegendTest } from './model/LegendTest';
+import type { ExecuteTestRequest } from './model/ExecuteTestRequest';
+import type { LegendTestExecutionResult } from './model/LegendTestExecutionResult';
 
 export class LegendLanguageClient extends LanguageClient {
   async sendTDSRequest(

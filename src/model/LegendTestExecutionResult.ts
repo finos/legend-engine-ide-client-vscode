@@ -19,7 +19,7 @@ import {
   usingModelSchema,
   SerializationFactory,
 } from '../utils/SerializationUtils';
-import { LegendExecutionResultType } from '../results/LegendExecutionResultType';
+import type { LegendExecutionResultType } from '../results/LegendExecutionResultType';
 import { LegendTestAssertionResult } from './LegendTestAssertionResult';
 
 export class LegendTestExecutionResult {

@@ -16,17 +16,16 @@
 
 import {
   tests,
-  CancellationToken,
-  TestRunRequest,
-  TestRunProfileKind,
-  TestController,
-  TestItem,
   workspace,
-  TestMessage,
+  TestRunProfileKind,
+  type CancellationToken,
+  type TestRunRequest,
+  type TestController,
+  type TestItem,
+  type TestMessage,
 } from 'vscode';
-import { LegendLanguageClient } from './LegendLanguageClient';
+import type { LegendLanguageClient } from './LegendLanguageClient';
 import { LegendTest } from './model/LegendTest';
-import { LegendExecutionResult } from './results/LegendExecutionResult';
 import { LegendExecutionResultType } from './results/LegendExecutionResultType';
 import { LegendTestExecutionResult } from './model/LegendTestExecutionResult';
 
@@ -52,7 +51,7 @@ function executeTests(
 ): Thenable<void> | void {
   const testRun = controller.createTestRun(request);
 
-  var legendTests;
+  let legendTests;
 
   if (request.include) {
     legendTests = request.include.map(
@@ -92,10 +91,10 @@ function executeTests(
               case LegendExecutionResultType.SUCCESS:
                 testRun.passed(testItem);
                 break;
-              case LegendExecutionResultType.FAILURE:
+              case LegendExecutionResultType.FAILURE: {
                 const assertionResults = result.assertionResults?.map(
                   (assertion) => {
-                    var msg: TestMessage;
+                    let msg: TestMessage;
 
                     if (assertion.expected && assertion.actual) {
                       msg = {
@@ -104,22 +103,26 @@ function executeTests(
                           `Assertion ${assertion.assertId} failed`,
                         expectedOutput: assertion.expected,
                         actualOutput: assertion.actual,
-                        location: assertion.location?.toLocation()!,
                       };
                     } else {
                       msg = {
                         message:
                           assertion.message ||
                           `Assertion ${assertion.assertId} failed`,
-                        location: assertion.location?.toLocation()!,
                       };
                     }
+
+                    if (assertion.location?.toLocation()) {
+                      msg.location = assertion.location.toLocation();
+                    }
+
                     return msg;
                   },
                 );
 
                 testRun.failed(testItem, assertionResults || []);
                 break;
+              }
               case LegendExecutionResultType.ERROR:
               case LegendExecutionResultType.WARNING:
               default:
