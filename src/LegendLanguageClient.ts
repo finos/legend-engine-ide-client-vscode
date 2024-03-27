@@ -17,9 +17,17 @@
 import type { CancellationToken } from 'vscode';
 import type { FunctionTDSRequest } from './model/FunctionTDSRequest';
 import type { LegendExecutionResult } from './results/LegendExecutionResult';
-import { REPL_CLASSPATH_REQUEST_ID, TDS_JSON_REQUEST_ID } from './utils/Const';
+import {
+  REPL_CLASSPATH_REQUEST_ID,
+  TDS_JSON_REQUEST_ID,
+  TEST_CASES_REQUEST_ID,
+  EXECUTE_TESTS_REQUEST_ID,
+} from './utils/Const';
 import type { PlainObject } from './utils/SerializationUtils';
 import { LanguageClient } from 'vscode-languageclient/node';
+import { LegendTest } from './model/LegendTest';
+import { ExecuteTestRequest } from './model/ExecuteTestRequest';
+import { LegendTestExecutionResult } from './model/LegendTestExecutionResult';
 
 export class LegendLanguageClient extends LanguageClient {
   async sendTDSRequest(
@@ -30,5 +38,18 @@ export class LegendLanguageClient extends LanguageClient {
 
   async replClasspath(token?: CancellationToken): Promise<string> {
     return this.sendRequest(REPL_CLASSPATH_REQUEST_ID, token);
+  }
+
+  async testCases(
+    token?: CancellationToken,
+  ): Promise<PlainObject<LegendTest>[]> {
+    return this.sendRequest(TEST_CASES_REQUEST_ID, token);
+  }
+
+  async executeTests(
+    req: ExecuteTestRequest,
+    token?: CancellationToken,
+  ): Promise<PlainObject<LegendTestExecutionResult>[]> {
+    return this.sendRequest(EXECUTE_TESTS_REQUEST_ID, req, token);
   }
 }
