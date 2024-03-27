@@ -15,6 +15,7 @@
  */
 
 import type { CancellationToken } from 'vscode';
+import type { CancellationToken } from 'vscode';
 import type { FunctionTDSRequest } from './model/FunctionTDSRequest';
 import type { LegendExecutionResult } from './results/LegendExecutionResult';
 import {

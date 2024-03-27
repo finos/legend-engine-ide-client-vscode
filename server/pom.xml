@@ -48,4 +48,28 @@
       </profile>
   </profiles>
 
+  <!-- todo update to use engine dependency - https://github.com/finos/legend-engine/pull/2721 -->
+  <profiles>
+      <profile>
+          <id>platform-windows</id>
+          <activation>
+              <os>
+                  <family>windows</family>
+              </os>
+          </activation>
+          <dependencies>
+              <dependency>
+                  <groupId>org.jline</groupId>
+                  <artifactId>jline-terminal-jansi</artifactId>
+                  <version>3.25.0</version>
+              </dependency>
+              <dependency>
+                  <groupId>org.fusesource.jansi</groupId>
+                  <artifactId>jansi</artifactId>
+                  <version>2.4.1</version>
+              </dependency>
+          </dependencies>
+      </profile>
+  </profiles>
+
 </project>
