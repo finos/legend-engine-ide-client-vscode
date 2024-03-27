@@ -41,6 +41,8 @@ export const EXEC_FUNCTION_ID = 'legend.pure.executeFunction';
 export const SEND_TDS_REQUEST_ID = 'sendTDSRequest';
 export const TDS_JSON_REQUEST_ID = 'legend/TDSRequest';
 export const REPL_CLASSPATH_REQUEST_ID = 'legend/replClasspath';
+export const TEST_CASES_REQUEST_ID = 'legend/testCases';
+export const EXECUTE_TESTS_REQUEST_ID = 'legend/executeTests';
 export const GET_TDS_REQUEST_RESULTS_ID = 'getTDSRequestResultsId';
 
 // Context variables

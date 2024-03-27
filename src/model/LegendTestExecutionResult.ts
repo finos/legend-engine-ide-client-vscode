@@ -14,30 +14,30 @@
  * limitations under the License.
  */
 
-import { Uri, Location } from 'vscode';
-import { createModelSchema, primitive } from 'serializr';
+import { createModelSchema, list, optional, primitive } from 'serializr';
 import {
   usingModelSchema,
   SerializationFactory,
 } from '../utils/SerializationUtils';
-import { TextInterval } from './TextInterval';
+import type { LegendExecutionResultType } from '../results/LegendExecutionResultType';
+import { LegendTestAssertionResult } from './LegendTestAssertionResult';
 
-export class TextLocation {
-  documentId!: string;
-  textInterval!: TextInterval;
-
-  uri(): Uri {
-    return Uri.parse(this.documentId);
-  }
-
-  toLocation(): Location {
-    return new Location(this.uri(), this.textInterval.toRange());
-  }
+export class LegendTestExecutionResult {
+  id!: string;
+  type!: LegendExecutionResultType;
+  message?: string;
+  output?: string;
+  assertionResults?: LegendTestAssertionResult[];
 
   static readonly serialization = new SerializationFactory(
-    createModelSchema(TextLocation, {
-      documentId: primitive(),
-      textInterval: usingModelSchema(TextInterval.serialization.schema),
+    createModelSchema(LegendTestExecutionResult, {
+      id: primitive(),
+      type: primitive(),
+      message: optional(primitive()),
+      output: optional(primitive()),
+      assertionResults: optional(
+        list(usingModelSchema(LegendTestAssertionResult.serialization.schema)),
+      ),
     }),
   );
 }

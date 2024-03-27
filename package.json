@@ -50,11 +50,6 @@
         "command": "legend.log",
         "title": "Show Language Server log",
         "category": "Legend"
-      },
-      {
-        "command": "legend.runAllTests.command",
-        "title": "Execute all tests cases",
-        "category": "Legend"
       }
     ],
     "configuration": {

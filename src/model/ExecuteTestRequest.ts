@@ -14,30 +14,23 @@
  * limitations under the License.
  */
 
-import { Uri, Location } from 'vscode';
-import { createModelSchema, primitive } from 'serializr';
+import { createModelSchema, primitive, list } from 'serializr';
 import {
-  usingModelSchema,
   SerializationFactory,
+  usingModelSchema,
 } from '../utils/SerializationUtils';
-import { TextInterval } from './TextInterval';
+import { TextLocation } from './TextLocation';
 
-export class TextLocation {
-  documentId!: string;
-  textInterval!: TextInterval;
-
-  uri(): Uri {
-    return Uri.parse(this.documentId);
-  }
-
-  toLocation(): Location {
-    return new Location(this.uri(), this.textInterval.toRange());
-  }
+export class ExecuteTestRequest {
+  location!: TextLocation;
+  testId!: string;
+  excludedTestIds: string[] | undefined;
 
   static readonly serialization = new SerializationFactory(
-    createModelSchema(TextLocation, {
-      documentId: primitive(),
-      textInterval: usingModelSchema(TextInterval.serialization.schema),
+    createModelSchema(ExecuteTestRequest, {
+      location: usingModelSchema(TextLocation.serialization.schema),
+      testId: primitive(),
+      excludedTestIds: list(primitive()),
     }),
   );
 }
