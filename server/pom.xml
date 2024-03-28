@@ -32,43 +32,43 @@
     <dependency>
       <groupId>org.finos.legend.engine</groupId>
       <artifactId>legend-engine-extensions-collection-execution</artifactId>
-      <version>4.42.0</version>
+      <version>4.42.2</version>
     </dependency>
 
     <dependency>
       <groupId>org.finos.legend.engine</groupId>
       <artifactId>legend-engine-extensions-collection-generation</artifactId>
-      <version>4.42.0</version>
+      <version>4.42.2</version>
     </dependency>
 
     <dependency>
         <groupId>org.finos.legend.engine</groupId>
         <artifactId>legend-engine-configuration-plan-generation-serialization</artifactId>
-        <version>4.42.0</version>
+        <version>4.42.2</version>
     </dependency>
 
     <dependency>
       <groupId>org.finos.legend.engine</groupId>
       <artifactId>legend-engine-test-runner-shared</artifactId>
-      <version>4.42.0</version>
+      <version>4.42.2</version>
     </dependency>
 
     <dependency>
       <groupId>org.finos.legend.engine</groupId>
       <artifactId>legend-engine-test-runner-mapping</artifactId>
-      <version>4.42.0</version>
+      <version>4.42.2</version>
     </dependency>    
 
     <dependency>
       <groupId>org.finos.legend.engine</groupId>
       <artifactId>legend-engine-test-runner-service</artifactId>
-      <version>4.42.0</version>
+      <version>4.42.2</version>
     </dependency>
 
     <dependency>
       <groupId>org.finos.legend.sdlc</groupId>
       <artifactId>legend-sdlc-test-utils</artifactId>
-      <version>0.158.0</version>
+      <version>0.158.1</version>
       <exclusions>
         <exclusion>
             <groupId>org.finos.legend.pure</groupId>
@@ -84,13 +84,13 @@
     <dependency>
       <groupId>org.finos.legend.engine</groupId>
       <artifactId>legend-engine-repl-client</artifactId>
-      <version>4.42.0</version>
+      <version>4.42.2</version>
     </dependency>
 
     <dependency>
       <groupId>org.finos.legend.engine</groupId>
       <artifactId>legend-engine-repl-relational</artifactId>
-      <version>4.42.0</version>
+      <version>4.42.2</version>
     </dependency>    
 
   </dependencies>

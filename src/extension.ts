@@ -61,6 +61,7 @@ import type { FunctionTDSRequest } from './model/FunctionTDSRequest';
 import { LegendExecutionResult } from './results/LegendExecutionResult';
 import { TDSLegendExecutionResult } from './results/TDSLegendExecutionResult';
 import { LegendLanguageClient } from './LegendLanguageClient';
+import { createTestController } from './testController';
 
 let client: LegendLanguageClient;
 
@@ -240,6 +241,7 @@ export function activate(context: ExtensionContext): void {
   registerClientViews(context);
   registerComamnds(context);
   createReplTerminal(context);
+  context.subscriptions.push(createTestController(client));
 }
 
 export function createStatusBarItem(context: ExtensionContext): void {
@@ -264,10 +266,6 @@ export function createStatusBarItem(context: ExtensionContext): void {
     async () => {
       const items = [];
       items.push(
-        {
-          label: '$(run-all) Execute all tests cases',
-          command: 'legend.runAllTests.command',
-        },
         {
           label: '$(go-to-file) Show Language Server log',
           command: 'legend.log',
