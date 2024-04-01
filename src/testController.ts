@@ -18,6 +18,7 @@ import {
   tests,
   workspace,
   TestRunProfileKind,
+  type Disposable,
   type CancellationToken,
   type TestRunRequest,
   type TestController,
@@ -177,7 +178,7 @@ function refreshTests(
 
 export function createTestController(
   client: LegendLanguageClient,
-): TestController {
+): Disposable[] {
   const controller = tests.createTestController(
     'leged.test.controller',
     'Legend Tests',
@@ -194,17 +195,25 @@ export function createTestController(
     undefined,
     false,
   );
+
   controller.refreshHandler = (token) =>
     refreshTests(controller, client, testIdToCommand, token);
 
-  // delayed by 500ms to allow language server to ack the change
-  // before we request a refresh of test cases
-  workspace.onDidOpenTextDocument((e) =>
-    setTimeout(() => refreshTests(controller, client, testIdToCommand), 500),
-  );
-  workspace.onDidChangeTextDocument((e) =>
-    setTimeout(() => refreshTests(controller, client, testIdToCommand), 500),
-  );
+  const disposables: Disposable[] = [controller];
 
-  return controller;
+  // delayed by 500ms to allow language server to ack the change
+  // before we request a refresh of concepts
+  workspace.onDidChangeTextDocument(
+    (e) => {
+      if (e.document.uri.path.endsWith('.pure')) {
+        setTimeout(() => {
+          return refreshTests(controller, client, testIdToCommand);
+        }, 500);
+      }
+    },
+    undefined,
+    disposables,
+  );  
+
+  return disposables;
 }

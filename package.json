@@ -21,6 +21,13 @@
       ]
     },
     "views": {
+      "explorer": [
+        {
+          "id": "legendConceptTree",
+          "name": "Legend Concept Tree",
+          "icon": "./icons/legend.svg"
+        }
+      ],
       "resultsViewContainer": [
         {
           "id": "executionView",
@@ -43,13 +50,27 @@
         "view": "executionView",
         "contents": "Execution in progress...",
         "when": "isExecutionHappening"
-      }
+      },
+      {
+        "view": "legendConceptTree",
+        "contents": "[Load](command:legend.conceptTree.refresh) Legend concpets."
+      }      
     ],
     "commands": [
       {
         "command": "legend.log",
         "title": "Show Language Server log",
         "category": "Legend"
+      },
+      {
+        "command": "legend.conceptTree.navigate",
+        "title": "GoTo",
+        "icon": "$(go-to-file)"        
+      },
+      {
+        "command": "legend.conceptTree.refresh",
+        "title": "Refresh",
+        "icon": "$(refresh)"
       }
     ],
     "configuration": {
@@ -88,7 +109,11 @@
         "id": "legend",
         "extensions": [
           ".pure"
-        ]
+        ],
+        "icon": {
+          "dark": "./icons/legend.svg",
+          "light": "./icons/legend.svg"
+        }
       }
     ],
     "grammars": [
@@ -105,6 +130,22 @@
           "title": "Legend REPL (Beta)"
         }
       ]
+    },
+    "menus": {
+      "view/item/context": [
+        {
+          "command": "legend.conceptTree.navigate",
+          "when": "view == legendConceptTree && viewItem != package",
+          "group": "inline"
+        }    
+      ],
+      "view/title": [
+        {
+            "command": "legend.conceptTree.refresh",
+            "when": "view == legendConceptTree",
+            "group": "navigation"
+        }
+      ]      
     }
   },
   "scripts": {
