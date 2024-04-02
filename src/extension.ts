@@ -246,7 +246,7 @@ export function activate(context: ExtensionContext): void {
   registerClientViews(context);
   registerComamnds(context);
   createReplTerminal(context);
-  registerLegendVirtualFilesystemProvider(client, context);
+  registerLegendVirtualFilesystemProvider(context);
   context.subscriptions.push(createTestController(client));
 }
 
@@ -343,9 +343,8 @@ export function createReplTerminal(context: ExtensionContext): void {
 }
 
 function registerLegendVirtualFilesystemProvider(
-  client: LegendLanguageClient,
   context: ExtensionContext,
-) {
+): void {
   const legendVfsProvider = new (class implements TextDocumentContentProvider {
     async provideTextDocumentContent(
       uri: Uri,
