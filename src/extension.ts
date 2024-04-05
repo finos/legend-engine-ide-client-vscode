@@ -29,6 +29,10 @@ import {
   type CancellationToken,
   type TerminalProfile,
   type ProviderResult,
+  SnippetString,
+  SnippetTextEdit,
+  WorkspaceEdit,
+  EndOfLine,
 } from 'vscode';
 import type {
   LanguageClient,
@@ -50,6 +54,7 @@ import {
   SEND_TDS_REQUEST_ID,
   EXEC_FUNCTION_ID,
   LEGEND_VIRTUAL_FS_SCHEME,
+  ACTIVATE_FUNCTION_ID,
 } from './utils/Const';
 import { LegendWebViewProvider } from './utils/LegendWebViewProvider';
 import {
@@ -126,34 +131,74 @@ export function createClient(context: ExtensionContext): LanguageClient {
   return client;
 }
 
-export function registerComamnds(context: ExtensionContext): void {
-  const executeFunctionWithParametersCommand = commands.registerCommand(
+export function registerCommands(context: ExtensionContext): void {
+  const functionCommand = commands.registerCommand(
     LEGEND_CLIENT_COMMAND_ID,
     async (...args: unknown[]) => {
-      const functionSignature = args[2] as string;
       const commandId = args[3] as string;
-      if (
-        commandId === EXEC_FUNCTION_WITH_PARAMETERS_ID ||
-        commandId === EXEC_FUNCTION_ID
-      ) {
-        const functionParametersWebView = window.createWebviewPanel(
-          FUNCTION_PARAMTER_VALUES_ID,
-          `Function Execution: ${functionSignature}`,
-          ViewColumn.One,
-          {
-            enableScripts: true,
-          },
-        );
-        renderFunctionResultsWebView(
-          functionParametersWebView,
-          context.extensionUri,
-          context,
-          args,
-        );
+      switch (commandId) {
+        case EXEC_FUNCTION_WITH_PARAMETERS_ID: case EXEC_FUNCTION_ID: {
+          const functionSignature = args[2] as string;
+          const functionParametersWebView = window.createWebviewPanel(
+            FUNCTION_PARAMTER_VALUES_ID,
+            `Function Execution: ${functionSignature}`,
+            ViewColumn.One,
+            {
+              enableScripts: true,
+            },
+          );
+          renderFunctionResultsWebView(
+            functionParametersWebView,
+            context.extensionUri,
+            context,
+            args,
+          );
+          break;
+        }
+
+        case ACTIVATE_FUNCTION_ID: {
+          const items = [];
+          const functionActivatorSnippets: Map<string, string> = new Map(Object.entries(args[4] as string));
+          for (const entry of Array.from(functionActivatorSnippets.entries())) {
+            items.push(
+              {
+                label: entry[0],
+                snippet: entry[1],
+              },
+            );
+          }
+          window.showQuickPick(items).then((choice) => {
+              if (!choice) {
+                return;
+              }
+              const uri = Uri.parse(args[0] as string);
+              workspace.openTextDocument(uri).then((document) => {
+                  const snippet = (document.eol === EndOfLine.CRLF) ? new SnippetString(choice.snippet.replaceAll('\n', '\r\n')) : new SnippetString(choice.snippet);
+                  const lastLine = document.lineCount - 1;
+                  const snippetPosition = document.lineAt(lastLine).range.end;
+                  const snippetTextEdit = SnippetTextEdit.insert(snippetPosition, snippet);
+                  const workspaceEdit = new WorkspaceEdit();
+                  workspaceEdit.set(uri, [snippetTextEdit]);
+                  workspace.applyEdit(workspaceEdit).then((x) => {
+                      if (!x) {
+                        throw new Error('Edit failed to apply.');
+                      }
+                    }
+                  );
+                }
+              );
+            }
+          );
+          break;
+        }
+
+        default: {
+          break;
+        }
       }
     },
   );
-  context.subscriptions.push(executeFunctionWithParametersCommand);
+  context.subscriptions.push(functionCommand);
 
   const openLog = commands.registerCommand('legend.log', () => {
     const openPath = Uri.joinPath(context.storageUri!, 'engine-lsp', 'log.txt');
@@ -244,7 +289,7 @@ export function activate(context: ExtensionContext): void {
   createStatusBarItem(context);
   createClient(context);
   registerClientViews(context);
-  registerComamnds(context);
+  registerCommands(context);
   createReplTerminal(context);
   registerLegendVirtualFilesystemProvider(context);
   context.subscriptions.push(createTestController(client));
