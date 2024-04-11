@@ -3,7 +3,7 @@
     "jsx": "react-jsx",
     "module": "CommonJS",
     "target": "es2020",
-    "lib": ["es2020", "dom"],
+    "lib": ["es2021", "dom"],
     "outDir": "lib",
     "rootDir": "src",
     "sourceMap": true,
