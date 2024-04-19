@@ -1,7 +1,7 @@
 {
   "name": "legend-engine-ide-client-vscode",
   "publisher": "FINOS",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "type": "commonjs",
   "repository": {
     "type": "git",
@@ -82,11 +82,10 @@
             "type": "string",
             "pattern": "(?<groupId>[^:]+):(?<artifatcId>[^:]+):(?<version>[^:]+)",
             "description": "Dependency in GAV foramt"
-
           },
           "default": [],
           "description": "Other dependencies in GAV format to be added to the classpath after classpath constructed from POM"
-        },        
+        },
         "legend.engine.server.url": {
           "type": "string",
           "default": "",
@@ -96,7 +95,7 @@
           "type": "string",
           "default": "",
           "description": "Set the SDLC server url to eneable auto update of platform versions"
-        }        
+        }
       }
     },
     "languages": [
