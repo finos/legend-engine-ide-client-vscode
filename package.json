@@ -50,7 +50,12 @@
         "command": "legend.log",
         "title": "Show Language Server log",
         "category": "Legend"
-      }
+      },
+      {
+        "command": "legend.reload",
+        "title": "Reload Extension",
+        "category": "Legend"
+      }      
     ],
     "configuration": {
       "type": "object",
