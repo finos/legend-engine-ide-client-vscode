@@ -143,7 +143,7 @@ export function createClient(context: ExtensionContext): LanguageClient {
         )
         .then((answer) => {
           if (answer === 'Reload') {
-            return client.restart();
+            client.restart();
           }
         });
     }
@@ -167,7 +167,7 @@ export function createClient(context: ExtensionContext): LanguageClient {
         )
         .then((answer) => {
           if (answer === 'Reload') {
-            return client.restart();
+            client.restart();
           }
         });
     }
