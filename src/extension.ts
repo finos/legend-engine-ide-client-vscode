@@ -133,10 +133,15 @@ export function createClient(context: ExtensionContext): LanguageClient {
   workspace.onDidSaveTextDocument((e) => {
     if (e.fileName.endsWith('pom.xml')) {
       window
-        .showInformationMessage('Reload Legend Extension?', 
-        { modal: true, detail: `You just change POM file that can affect your project dependencies.  Should reload to pick changes?`},
-        'Reload')
-        .then(answer => {
+        .showInformationMessage(
+          'Reload Legend Extension?',
+          {
+            modal: true,
+            detail: `You just change POM file that can affect your project dependencies.  Should reload to pick changes?`,
+          },
+          'Reload',
+        )
+        .then((answer) => {
           if (answer === 'Reload') {
             return client.restart();
           }
@@ -146,20 +151,27 @@ export function createClient(context: ExtensionContext): LanguageClient {
 
   // if settings change, ask user if we should reload extension
   workspace.onDidChangeConfiguration((e) => {
-    if (e.affectsConfiguration('legend.sdlc.server.url') 
-      || e.affectsConfiguration('legend.extensions.other.dependencies')
-      || e.affectsConfiguration('legend.extensions.dependencies.pom')) {
-        window
-        .showInformationMessage('Reload Legend Extension?', 
-        { modal: true, detail: `You just change a configuration setting that can affect your project dependencies.  Should reload to pick changes?`},
-        'Reload')
-        .then(answer => {
+    if (
+      e.affectsConfiguration('legend.sdlc.server.url') ||
+      e.affectsConfiguration('legend.extensions.other.dependencies') ||
+      e.affectsConfiguration('legend.extensions.dependencies.pom')
+    ) {
+      window
+        .showInformationMessage(
+          'Reload Legend Extension?',
+          {
+            modal: true,
+            detail: `You just change a configuration setting that can affect your project dependencies.  Should reload to pick changes?`,
+          },
+          'Reload',
+        )
+        .then((answer) => {
           if (answer === 'Reload') {
             return client.restart();
           }
         });
     }
-  })
+  });
 
   return client;
 }
@@ -368,7 +380,7 @@ export function createStatusBarItem(context: ExtensionContext): void {
         },
         {
           label: '$(refresh) Reload Legend Extension',
-          command: 'legend.reload'
+          command: 'legend.reload',
         },
         {
           label: '$(settings-gear) Open Legend Settings',
