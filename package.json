@@ -1,7 +1,7 @@
 {
   "name": "legend-engine-ide-client-vscode",
   "publisher": "FINOS",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "type": "commonjs",
   "repository": {
     "type": "git",
