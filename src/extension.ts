@@ -128,6 +128,51 @@ export function createClient(context: ExtensionContext): LanguageClient {
   );
   // Initialize client
   client.start();
+
+  // if pom changes, ask user if we should reload extension
+  workspace.onDidSaveTextDocument((e) => {
+    if (e.fileName.endsWith('pom.xml')) {
+      window
+        .showInformationMessage(
+          'Reload Legend Extension?',
+          {
+            modal: true,
+            detail: `You just change POM file that can affect your project dependencies.  Should reload to pick changes?`,
+          },
+          'Reload',
+        )
+        .then((answer) => {
+          if (answer === 'Reload') {
+            client.restart();
+          }
+        });
+    }
+  });
+
+  // if settings change, ask user if we should reload extension
+  workspace.onDidChangeConfiguration((e) => {
+    if (
+      e.affectsConfiguration('legend.sdlc.server.url') ||
+      e.affectsConfiguration('legend.extensions.other.dependencies') ||
+      e.affectsConfiguration('legend.extensions.dependencies.pom')
+    ) {
+      window
+        .showInformationMessage(
+          'Reload Legend Extension?',
+          {
+            modal: true,
+            detail: `You just change a configuration setting that can affect your project dependencies.  Should reload to pick changes?`,
+          },
+          'Reload',
+        )
+        .then((answer) => {
+          if (answer === 'Reload') {
+            client.restart();
+          }
+        });
+    }
+  });
+
   return client;
 }
 
@@ -163,6 +208,11 @@ export function registerCommands(context: ExtensionContext): void {
     });
   });
   context.subscriptions.push(openLog);
+
+  const reloadServer = commands.registerCommand('legend.reload', () => {
+    client.restart();
+  });
+  context.subscriptions.push(reloadServer);
 
   const functiontds = commands.registerCommand(
     SEND_TDS_REQUEST_ID,
@@ -327,6 +377,10 @@ export function createStatusBarItem(context: ExtensionContext): void {
         {
           label: '$(go-to-file) Show Language Server log',
           command: 'legend.log',
+        },
+        {
+          label: '$(refresh) Reload Legend Extension',
+          command: 'legend.reload',
         },
         {
           label: '$(settings-gear) Open Legend Settings',
