@@ -37,9 +37,7 @@ export const SET_CONTEXT_COMMAND_ID = 'setContext';
 export const LEGEND_COMMAND = 'legend.command';
 export const LEGEND_EXECUTE_COMMAND = 'legend.executeCommand';
 export const LEGEND_CLIENT_COMMAND_ID = 'legend.client.command';
-export const EXEC_FUNCTION_WITH_PARAMETERS_ID =
-  'legend.pure.executeFunctionWithParameters';
-export const EXEC_FUNCTION_ID = 'legend.pure.executeFunction';
+export const EXEC_FUNCTION_ID = 'legend.function.execute';
 export const ACTIVATE_FUNCTION_ID = 'legend.pure.activateFunction';
 export const SEND_TDS_REQUEST_ID = 'sendTDSRequest';
 export const TDS_JSON_REQUEST_ID = 'legend/TDSRequest';
