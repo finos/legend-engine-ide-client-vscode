@@ -48,7 +48,6 @@ import {
   RESULTS_WEB_VIEW,
   SHOW_RESULTS_COMMAND_ID,
   EXECUTION_TREE_VIEW,
-  EXEC_FUNCTION_WITH_PARAMETERS_ID,
   LEGEND_CLIENT_COMMAND_ID,
   FUNCTION_PARAMTER_VALUES_ID,
   SEND_TDS_REQUEST_ID,
@@ -137,7 +136,6 @@ export function registerCommands(context: ExtensionContext): void {
     async (...args: unknown[]) => {
       const commandId = args[3] as string;
       switch (commandId) {
-        case EXEC_FUNCTION_WITH_PARAMETERS_ID:
         case EXEC_FUNCTION_ID: {
           handleExecuteFunctionCommand(context, args);
           break;
