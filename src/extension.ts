@@ -497,7 +497,7 @@ export function createReplTerminal(context: ExtensionContext): void {
             0,
             terminalContext.line.length,
             proxyUrl,
-            'open on broswer',
+            'Open on Browser',
           ),
         ];
       },
