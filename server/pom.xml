@@ -12,7 +12,7 @@
 
   <properties>
     <!-- this version is also used to download the lsp shaded server jar -->
-    <ide.lsp.version>0.2.4</ide.lsp.version>
+    <ide.lsp.version>0.2.5</ide.lsp.version>
   </properties>
 
   <dependencies>
