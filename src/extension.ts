@@ -420,6 +420,8 @@ class LegendTerminalLink extends TerminalLink {
   }
 }
 
+const REPL_NAME = 'Legend REPL';
+
 export function createReplTerminal(context: ExtensionContext): void {
   const provider = window.registerTerminalProfileProvider(
     'legend.terminal.repl',
@@ -429,7 +431,7 @@ export function createReplTerminal(context: ExtensionContext): void {
       ): ProviderResult<TerminalProfile> {
         return client.replClasspath(token).then((cp) => ({
           options: {
-            name: 'Legend REPL',
+            name: REPL_NAME,
             shellPath: 'java',
             shellArgs: [
               `-DstoragePath=${path.join(context.storageUri!.fsPath, 'repl')}`,
@@ -457,32 +459,40 @@ export function createReplTerminal(context: ExtensionContext): void {
 
   context.subscriptions.push(provider);
 
+  // eslint-disable-next-line no-process-env
   if (process.env.VSCODE_PROXY_URI !== undefined) {
     const terminalLinkProvider = window.registerTerminalLinkProvider({
-      provideTerminalLinks: (context) => {
-        const isLocalHost = context.line.startsWith('http://localhost:');
-        let indexOfReplPath = context.line.indexOf('/repl');
+      provideTerminalLinks: (terminalContext) => {
+
+        if (terminalContext.terminal.creationOptions.name !== REPL_NAME) {
+          return [];
+        }
+
+        const isLocalHost = terminalContext.line.startsWith('http://localhost:');
+        let indexOfReplPath = terminalContext.line.indexOf('/repl');
 
         if (!isLocalHost || indexOfReplPath !== -1) {
           return [];
         }
 
-        const localHostUrl = Uri.parse(context.line);
+        const localHostUrl = Uri.parse(terminalContext.line);
         const port = localHostUrl.authority.split(':')[1]!;
 
-        // manage the trailing / when concat paths...
+        // eslint-disable-next-line no-process-env
         if (process.env.VSCODE_PROXY_URI!.endsWith('/')) {
+          // manage the trailing / when concat paths...
           indexOfReplPath++;
         }
 
         const proxyUrl = Uri.parse(
+          // eslint-disable-next-line no-process-env
           process.env.VSCODE_PROXY_URI!.replace('{{port}}', port) +
-            context.line.substring(indexOfReplPath),
+            terminalContext.line.substring(indexOfReplPath),
         );
         return [
           new LegendTerminalLink(
             0,
-            context.line.length,
+            terminalContext.line.length,
             proxyUrl,
             'open on broswer',
           ),
