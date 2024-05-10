@@ -463,12 +463,12 @@ export function createReplTerminal(context: ExtensionContext): void {
   if (process.env.VSCODE_PROXY_URI !== undefined) {
     const terminalLinkProvider = window.registerTerminalLinkProvider({
       provideTerminalLinks: (terminalContext) => {
-
         if (terminalContext.terminal.creationOptions.name !== REPL_NAME) {
           return [];
         }
 
-        const isLocalHost = terminalContext.line.startsWith('http://localhost:');
+        const isLocalHost =
+          terminalContext.line.startsWith('http://localhost:');
         let indexOfReplPath = terminalContext.line.indexOf('/repl');
 
         if (!isLocalHost || indexOfReplPath !== -1) {
