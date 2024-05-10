@@ -472,7 +472,7 @@ export function createReplTerminal(context: ExtensionContext): void {
           terminalContext.line.startsWith('http://localhost:');
         let indexOfReplPath = terminalContext.line.indexOf('/repl');
 
-        if (!isLocalHost || indexOfReplPath !== -1) {
+        if (!isLocalHost || indexOfReplPath === -1) {
           return [];
         }
 
