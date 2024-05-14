@@ -219,7 +219,7 @@ export function registerCommands(context: ExtensionContext): void {
   const showOutput = commands.registerCommand('legend.extension.output', () => {
     client.outputChannel.show();
   });
-  context.subscriptions.push(showOutput);  
+  context.subscriptions.push(showOutput);
 
   const functiontds = commands.registerCommand(
     SEND_TDS_REQUEST_ID,
