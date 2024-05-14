@@ -174,6 +174,8 @@ export function createClient(context: ExtensionContext): LanguageClient {
     }
   });
 
+  client.outputChannel.show();
+
   return client;
 }
 
@@ -213,6 +215,11 @@ export function registerCommands(context: ExtensionContext): void {
     client.restart();
   });
   context.subscriptions.push(reloadServer);
+
+  const showOutput = commands.registerCommand('legend.extension.output', () => {
+    client.outputChannel.show();
+  });
+  context.subscriptions.push(showOutput);
 
   const functiontds = commands.registerCommand(
     SEND_TDS_REQUEST_ID,
@@ -375,7 +382,11 @@ export function createStatusBarItem(context: ExtensionContext): void {
       const items = [];
       items.push(
         {
-          label: '$(go-to-file) Show Language Server log',
+          label: '$(output) Show Legend Extension Output',
+          command: 'legend.extension.output',
+        },
+        {
+          label: '$(go-to-file) Show Legend Server logs',
           command: 'legend.log',
         },
         {

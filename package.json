@@ -48,12 +48,17 @@
     "commands": [
       {
         "command": "legend.log",
-        "title": "Show Language Server log",
+        "title": "Show Legend Server logs",
         "category": "Legend"
       },
       {
+        "command": "legend.extension.output",
+        "title": "Show Legend Extension Output",
+        "category": "Legend"
+      },      
+      {
         "command": "legend.reload",
-        "title": "Reload Extension",
+        "title": "Reload Legend Extension",
         "category": "Legend"
       }
     ],
