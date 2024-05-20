@@ -34,7 +34,6 @@ import {
   WorkspaceEdit,
   EndOfLine,
   TerminalLink,
-  env,
 } from 'vscode';
 import type {
   LanguageClient,
@@ -514,7 +513,7 @@ export function createReplTerminal(context: ExtensionContext): void {
       },
 
       handleTerminalLink: (link: LegendTerminalLink) => {
-        env.openExternal(link.url);
+        commands.executeCommand('simpleBrowser.api.open', link.url);
       },
     });
 
