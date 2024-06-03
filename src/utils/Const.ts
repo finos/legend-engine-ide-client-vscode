@@ -44,6 +44,7 @@ export const TDS_JSON_REQUEST_ID = 'legend/TDSRequest';
 export const REPL_CLASSPATH_REQUEST_ID = 'legend/replClasspath';
 export const TEST_CASES_REQUEST_ID = 'legend/testCases';
 export const EXECUTE_TESTS_REQUEST_ID = 'legend/executeTests';
+export const ENTITIES_REQUEST_ID = 'legend/entities';
 export const VIRTUAL_FILE_SYSTEM_FILE_REQUEST_ID = 'legend/legendVirtualFile';
 export const GET_TDS_REQUEST_RESULTS_ID = 'getTDSRequestResultsId';
 

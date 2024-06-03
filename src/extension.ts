@@ -69,6 +69,7 @@ import { LegendExecutionResult } from './results/LegendExecutionResult';
 import { TDSLegendExecutionResult } from './results/TDSLegendExecutionResult';
 import { LegendLanguageClient } from './LegendLanguageClient';
 import { createTestController } from './testController';
+import { createLegendConceptTreeProvider } from './conceptTree';
 
 let client: LegendLanguageClient;
 
@@ -356,6 +357,7 @@ export function activate(context: ExtensionContext): void {
   createReplTerminal(context);
   registerLegendVirtualFilesystemProvider(context);
   context.subscriptions.push(createTestController(client));
+  context.subscriptions.push(...createLegendConceptTreeProvider(client));
 }
 
 export function createStatusBarItem(context: ExtensionContext): void {
@@ -380,6 +382,10 @@ export function createStatusBarItem(context: ExtensionContext): void {
     async () => {
       const items = [];
       items.push(
+        {
+          label: '$(list-tree) Show Legend Concept Tree',
+          command: 'legend.conceptTree.show',
+        },
         {
           label: '$(output) Show Legend Extension Output',
           command: 'legend.extension.output',
