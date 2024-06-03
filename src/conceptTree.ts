@@ -46,6 +46,12 @@ import type { LegendEntity } from './model/LegendEntity';
 const TREE_ID = 'legendConceptTree';
 const MIME_TYPE = `application/vnd.code.tree.${TREE_ID.toLowerCase()}`;
 
+const CMD_CONCEPT_TREE_NAVIGATE = 'legend.conceptTree.navigate';
+const CMD_CONCEPT_TREE_REFRESH = 'legend.conceptTree.refresh';
+const CMD_CONCEPT_TREE_FOCUS_ELEMENT = 'legend.conceptTree.focusOnElement';
+const CMD_CONCEPT_TREE_FOCUS = `${TREE_ID}.focus`;
+const CMD_CONCEPT_TREE_SHOW = 'legend.conceptTree.show';
+
 class LegendConceptTreeItem extends TreeItem {
   constructor(
     private readonly _parent: LegendConceptTreeItem | undefined,
@@ -311,7 +317,7 @@ export function createLegendConceptTreeProvider(
   );
 
   const navigateRegistration = commands.registerCommand(
-    'legend.conceptTree.navigate',
+    CMD_CONCEPT_TREE_NAVIGATE,
     (node: LegendConceptTreeItem) => {
       const location = node.location;
       if (location) {
@@ -322,15 +328,15 @@ export function createLegendConceptTreeProvider(
   disposables.push(navigateRegistration);
 
   const refreshRegistration = commands.registerCommand(
-    'legend.conceptTree.refresh',
+    CMD_CONCEPT_TREE_REFRESH,
     () => provider.refresh(),
   );
   disposables.push(refreshRegistration);
 
   const focusOnElementRegistration = commands.registerCommand(
-    'legend.conceptTree.focusOnElement',
+    CMD_CONCEPT_TREE_FOCUS_ELEMENT,
     () => {
-      commands.executeCommand('legend.conceptTree.refresh').then(() => {
+      commands.executeCommand(CMD_CONCEPT_TREE_REFRESH).then(() => {
         if (window.activeTextEditor?.document.languageId === 'legend') {
           const cursorPos = window.activeTextEditor.selection.active;
           const conceptAtCursoPos = provider
@@ -348,13 +354,11 @@ export function createLegendConceptTreeProvider(
   disposables.push(focusOnElementRegistration);
 
   const showRegistration = commands.registerCommand(
-    'legend.conceptTree.show',
+    CMD_CONCEPT_TREE_SHOW,
     () => {
       commands
-        .executeCommand(`${TREE_ID}.focus`)
-        .then(() =>
-          commands.executeCommand('legend.conceptTree.focusOnElement'),
-        );
+        .executeCommand(CMD_CONCEPT_TREE_FOCUS)
+        .then(() => commands.executeCommand(CMD_CONCEPT_TREE_FOCUS_ELEMENT));
     },
   );
   disposables.push(showRegistration);
