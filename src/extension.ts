@@ -55,6 +55,7 @@ import {
   EXEC_FUNCTION_ID,
   LEGEND_VIRTUAL_FS_SCHEME,
   ACTIVATE_FUNCTION_ID,
+  LEGEND_LANGUAGE_ID,
 } from './utils/Const';
 import { LegendWebViewProvider } from './utils/LegendWebViewProvider';
 import {
@@ -69,11 +70,12 @@ import { LegendExecutionResult } from './results/LegendExecutionResult';
 import { TDSLegendExecutionResult } from './results/TDSLegendExecutionResult';
 import { LegendLanguageClient } from './LegendLanguageClient';
 import { createTestController } from './testController';
+import { createLegendConceptTreeProvider } from './conceptTree';
 
 let client: LegendLanguageClient;
 
 export function createClient(context: ExtensionContext): LanguageClient {
-  languages.setLanguageConfiguration('legend', {
+  languages.setLanguageConfiguration(LEGEND_LANGUAGE_ID, {
     wordPattern:
       // eslint-disable-next-line prefer-named-capture-group
       /(-?\d*\.\d\w*)|([^`~!@#%^$&*()\-=+[{\]}\\|;:'",.<>/?\s][^`~!@#%^&*()\-=+[{\]}\\|;:'",.<>/?\s]*)/,
@@ -115,8 +117,8 @@ export function createClient(context: ExtensionContext): LanguageClient {
 
   const clientOptions: LanguageClientOptions = {
     documentSelector: [
-      { scheme: 'file', language: 'legend' },
-      { scheme: LEGEND_VIRTUAL_FS_SCHEME, language: 'legend' },
+      { scheme: 'file', language: LEGEND_LANGUAGE_ID },
+      { scheme: LEGEND_VIRTUAL_FS_SCHEME, language: LEGEND_LANGUAGE_ID },
     ],
     synchronize: { fileEvents: workspace.createFileSystemWatcher('**/*.pure') },
   };
@@ -356,6 +358,7 @@ export function activate(context: ExtensionContext): void {
   createReplTerminal(context);
   registerLegendVirtualFilesystemProvider(context);
   context.subscriptions.push(createTestController(client));
+  context.subscriptions.push(...createLegendConceptTreeProvider(client));
 }
 
 export function createStatusBarItem(context: ExtensionContext): void {
@@ -380,6 +383,10 @@ export function createStatusBarItem(context: ExtensionContext): void {
     async () => {
       const items = [];
       items.push(
+        {
+          label: '$(list-tree) Show Legend Concept Tree',
+          command: 'legend.conceptTree.show',
+        },
         {
           label: '$(output) Show Legend Extension Output',
           command: 'legend.extension.output',

@@ -18,9 +18,22 @@
           "title": "Results",
           "icon": ""
         }
+      ],
+      "activitybar": [
+        {
+          "id": "legend-activity-bar-menu",
+          "title": "Legend",
+          "icon": "./icons/legend.svg"
+        }
       ]
     },
     "views": {
+      "legend-activity-bar-menu": [
+        {
+          "id": "legendConceptTree",
+          "name": "Concept Tree"
+        }
+      ],
       "resultsViewContainer": [
         {
           "id": "executionView",
@@ -43,7 +56,11 @@
         "view": "executionView",
         "contents": "Execution in progress...",
         "when": "isExecutionHappening"
-      }
+      },
+      {
+        "view": "legendConceptTree",
+        "contents": "[Load](command:legend.conceptTree.refresh) Legend concpets."
+      }  
     ],
     "commands": [
       {
@@ -53,14 +70,34 @@
       },
       {
         "command": "legend.extension.output",
-        "title": "Show Legend Extension Output",
+        "title": "Show Extension Output",
         "category": "Legend"
       },
       {
         "command": "legend.reload",
-        "title": "Reload Legend Extension",
+        "title": "Reload Extension",
         "category": "Legend"
-      }
+      },
+      {
+        "command": "legend.conceptTree.show",
+        "title": "Show In Concept Tree",
+        "category": "Legend"  
+      },      
+      {
+        "command": "legend.conceptTree.navigate",
+        "title": "GoTo",
+        "icon": "$(go-to-file)"        
+      },
+      {
+        "command": "legend.conceptTree.focusOnElement",
+        "title": "Focus Current Concept",
+        "icon": "$(target)"
+      },         
+      {
+        "command": "legend.conceptTree.refresh",
+        "title": "Refresh",
+        "icon": "$(refresh)"
+      }      
     ],
     "configuration": {
       "type": "object",
@@ -113,7 +150,11 @@
         "id": "legend",
         "extensions": [
           ".pure"
-        ]
+        ],
+        "icon": {
+          "dark": "./icons/legend.svg",
+          "light": "./icons/legend.svg"
+        }        
       }
     ],
     "grammars": [
@@ -130,7 +171,54 @@
           "title": "Legend REPL (Beta)"
         }
       ]
-    }
+    },
+    "menus": {
+      "view/item/context": [
+        {
+          "command": "legend.conceptTree.navigate",
+          "when": "view == legendConceptTree && viewItem != package",
+          "group": "inline"
+        }    
+      ],
+      "view/title": [
+        {
+          "command": "legend.conceptTree.focusOnElement",
+          "when": "view == legendConceptTree",
+          "group": "navigation"
+        },
+        {
+            "command": "legend.conceptTree.refresh",
+            "when": "view == legendConceptTree",
+            "group": "navigation"
+        }
+      ],
+      "editor/context": [
+        {
+          "group": "Legend",
+          "submenu": "legend.editor.context",
+          "when": "editorTextFocus && editorLangId == legend"
+        }  
+      ],
+      "legend.editor.context": [
+        {
+          "group": "Legend",
+          "command": "legend.conceptTree.show"
+        }  
+      ]
+    },
+    "submenus": [
+      {
+          "id": "legend.editor.context",
+          "label": "Legend"
+      }
+    ],
+    "keybindings":[
+      {
+        "command": "legend.conceptTree.show",
+        "key": "ctrl+shift+l",
+        "mac": "shift+cmd+l"
+      }
+    ] 
   },
   "scripts": {
     "test": "npm run build && node ./lib/tests/runTest.js",
