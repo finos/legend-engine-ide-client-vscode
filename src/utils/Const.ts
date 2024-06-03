@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+export const LEGEND_LANGUAGE_ID = 'legend';
+
 export const LEGEND_VIRTUAL_FS_SCHEME = 'legend-vfs';
 
 // Views

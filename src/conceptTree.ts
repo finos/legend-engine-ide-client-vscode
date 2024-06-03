@@ -42,6 +42,7 @@ import {
   TextDocumentIdentifier,
 } from 'vscode-languageclient';
 import type { LegendEntity } from './model/LegendEntity';
+import { LEGEND_LANGUAGE_ID } from './utils/Const';
 
 const TREE_ID = 'legendConceptTree';
 const MIME_TYPE = `application/vnd.code.tree.${TREE_ID.toLowerCase()}`;
@@ -308,7 +309,7 @@ export function createLegendConceptTreeProvider(
   // before we request a refresh of concepts
   workspace.onDidChangeTextDocument(
     (e) => {
-      if (e.document.uri.path.endsWith('.pure')) {
+      if (e.document.languageId === LEGEND_LANGUAGE_ID) {
         setTimeout(() => provider.refresh(e.document), 500);
       }
     },
@@ -337,7 +338,9 @@ export function createLegendConceptTreeProvider(
     CMD_CONCEPT_TREE_FOCUS_ELEMENT,
     () => {
       commands.executeCommand(CMD_CONCEPT_TREE_REFRESH).then(() => {
-        if (window.activeTextEditor?.document.languageId === 'legend') {
+        if (
+          window.activeTextEditor?.document.languageId === LEGEND_LANGUAGE_ID
+        ) {
           const cursorPos = window.activeTextEditor.selection.active;
           const conceptAtCursoPos = provider
             .getConceptsFrom(window.activeTextEditor.document.uri.toString())
