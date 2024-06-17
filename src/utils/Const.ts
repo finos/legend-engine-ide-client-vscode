@@ -49,6 +49,11 @@ export const EXECUTE_TESTS_REQUEST_ID = 'legend/executeTests';
 export const ENTITIES_REQUEST_ID = 'legend/entities';
 export const VIRTUAL_FILE_SYSTEM_FILE_REQUEST_ID = 'legend/legendVirtualFile';
 export const GET_TDS_REQUEST_RESULTS_ID = 'getTDSRequestResultsId';
+export const LEGEND_SHOW_DIAGRAM = 'legend.show.diagram';
+
+// Event Types
+export const GET_PROJECT_ENTITIES = 'getProjectEntities';
+export const GET_PROJECT_ENTITIES_RESPONSE = 'getProjectEntitiesResponse';
 
 // Context variables
 export const SHOW_EXECUTION_RESULTS = 'showExecutionResults';
@@ -66,6 +71,7 @@ export const AG_GRID_BALHAM_THEME = 'ag-theme-balham.min.css';
 
 // Webviews
 export const FUNCTION_PARAMTER_VALUES_ID = 'functionParameterValues';
+export const DIAGRAM_RENDERER = 'diagramRenderer';
 
 // Primitive types
 export enum PRIMITIVE_TYPE {

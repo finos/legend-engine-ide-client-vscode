@@ -15,11 +15,13 @@
  */
 
 const path = require('path');
+const webpack = require('webpack');
 
 module.exports = {
   entry: {
     AgGridRenderer: './src/components/grid/AgGridRenderer.tsx',
     FunctionResultsEditorRenderer: './src/components/function/FunctionResultsEditorRenderer.tsx',
+    DiagramRendererRoot: './src/components/diagram/DiagramRendererRoot.tsx',
     // Add more entry points as needed
   },
   externals: {
@@ -29,6 +31,7 @@ module.exports = {
     filename: '[name].js',
     path: path.resolve(__dirname, 'lib', 'components'),
   },
+  devtool: 'source-map',
   module: {
     rules: [
       {
@@ -50,7 +53,20 @@ module.exports = {
       },
     ],
   },
+  plugins: [
+    new webpack.ProvidePlugin({
+           process: 'process/browser',
+    }),
+  ],
   resolve: {
     extensions: ['.tsx', '.ts', '.js', '.css', '.scss'],
+    fallback: {
+      stream: require.resolve("stream-browserify"),
+      crypto: require.resolve("crypto-browserify"),
+      vm: require.resolve("vm-browserify")
+    },
+    alias: {
+      process: "process/browser"
+    }
   },
 };

@@ -34,12 +34,14 @@ import {
   WorkspaceEdit,
   EndOfLine,
   TerminalLink,
+  TreeItem,
 } from 'vscode';
-import type {
-  LanguageClient,
-  LanguageClientOptions,
-  Executable,
-  ServerOptions,
+import {
+  type LanguageClient,
+  type LanguageClientOptions,
+  type Executable,
+  type ServerOptions,
+  TextDocumentIdentifier,
 } from 'vscode-languageclient/node';
 import { LegendTreeDataProvider } from './utils/LegendTreeProvider';
 import { LanguageClientProgressResult } from './results/LanguageClientProgressResult';
@@ -56,6 +58,8 @@ import {
   LEGEND_VIRTUAL_FS_SCHEME,
   ACTIVATE_FUNCTION_ID,
   LEGEND_LANGUAGE_ID,
+  LEGEND_SHOW_DIAGRAM,
+  DIAGRAM_RENDERER,
 } from './utils/Const';
 import { LegendWebViewProvider } from './utils/LegendWebViewProvider';
 import {
@@ -64,13 +68,14 @@ import {
 } from './results/ExecutionResultHelper';
 import { error } from 'console';
 import { isPlainObject } from './utils/AssertionUtils';
-import { renderFunctionResultsWebView } from './function/FunctionResultsWebView';
+import { renderFunctionResultsWebView } from './webviews/FunctionResultsWebView';
 import type { FunctionTDSRequest } from './model/FunctionTDSRequest';
 import { LegendExecutionResult } from './results/LegendExecutionResult';
 import { TDSLegendExecutionResult } from './results/TDSLegendExecutionResult';
-import { LegendLanguageClient } from './LegendLanguageClient';
+import { LegendEntitiesRequest, LegendLanguageClient } from './LegendLanguageClient';
 import { createTestController } from './testController';
-import { createLegendConceptTreeProvider } from './conceptTree';
+import { LegendConceptTreeItem, createLegendConceptTreeProvider } from './conceptTree';
+import { renderDiagramRendererWebView } from './webviews/DiagramWebView';
 
 let client: LegendLanguageClient;
 
@@ -232,6 +237,28 @@ export function registerCommands(context: ExtensionContext): void {
     },
   );
   context.subscriptions.push(functiontds);
+
+  const showDiagram = commands.registerCommand(
+    LEGEND_SHOW_DIAGRAM,
+    async (...args: unknown[]) => {
+      const diagramRendererWebView = window.createWebviewPanel(
+        DIAGRAM_RENDERER,
+        `Diagram Render`,
+        ViewColumn.One,
+        {
+          enableScripts: true,
+        },
+      );
+      const entities = await client.entities(new LegendEntitiesRequest([]));
+      renderDiagramRendererWebView(
+        diagramRendererWebView,
+        context,
+        (args[0] as LegendConceptTreeItem).id as string,
+        entities
+      );
+    },
+  );
+  context.subscriptions.push(showDiagram);
 }
 
 function handleExecuteFunctionCommand(

@@ -60,9 +60,15 @@
       {
         "view": "legendConceptTree",
         "contents": "[Load](command:legend.conceptTree.refresh) Legend concpets."
-      }  
+      }
     ],
     "commands": [
+      {
+        "command": "legend.show.diagram",
+        "title": "View Diagram",
+        "icon": "$(graph-line)",
+        "category": "Legend"
+      },
       {
         "command": "legend.log",
         "title": "Show Legend Server logs",
@@ -81,23 +87,23 @@
       {
         "command": "legend.conceptTree.show",
         "title": "Show In Concept Tree",
-        "category": "Legend"  
-      },      
+        "category": "Legend"
+      },
       {
         "command": "legend.conceptTree.navigate",
         "title": "GoTo",
-        "icon": "$(go-to-file)"        
+        "icon": "$(go-to-file)"
       },
       {
         "command": "legend.conceptTree.focusOnElement",
         "title": "Focus Current Concept",
         "icon": "$(target)"
-      },         
+      },
       {
         "command": "legend.conceptTree.refresh",
         "title": "Refresh",
         "icon": "$(refresh)"
-      }      
+      }
     ],
     "configuration": {
       "type": "object",
@@ -154,7 +160,7 @@
         "icon": {
           "dark": "./icons/legend.svg",
           "light": "./icons/legend.svg"
-        }        
+        }
       }
     ],
     "grammars": [
@@ -178,7 +184,12 @@
           "command": "legend.conceptTree.navigate",
           "when": "view == legendConceptTree && viewItem != package",
           "group": "inline"
-        }    
+        },
+        {
+          "command": "legend.show.diagram",
+          "when": "viewItem == meta::pure::metamodel::diagram::Diagram",
+          "group": "inline"
+        }
       ],
       "view/title": [
         {
@@ -187,9 +198,9 @@
           "group": "navigation"
         },
         {
-            "command": "legend.conceptTree.refresh",
-            "when": "view == legendConceptTree",
-            "group": "navigation"
+          "command": "legend.conceptTree.refresh",
+          "when": "view == legendConceptTree",
+          "group": "navigation"
         }
       ],
       "editor/context": [
@@ -197,28 +208,28 @@
           "group": "Legend",
           "submenu": "legend.editor.context",
           "when": "editorTextFocus && editorLangId == legend"
-        }  
+        }
       ],
       "legend.editor.context": [
         {
           "group": "Legend",
           "command": "legend.conceptTree.show"
-        }  
+        }
       ]
     },
     "submenus": [
       {
-          "id": "legend.editor.context",
-          "label": "Legend"
+        "id": "legend.editor.context",
+        "label": "Legend"
       }
     ],
-    "keybindings":[
+    "keybindings": [
       {
         "command": "legend.conceptTree.show",
         "key": "ctrl+shift+l",
         "mac": "shift+cmd+l"
       }
-    ] 
+    ]
   },
   "scripts": {
     "test": "npm run build && node ./lib/tests/runTest.js",
@@ -252,10 +263,11 @@
     "@ag-grid-enterprise/menu": "30.2.0",
     "@ag-grid-enterprise/row-grouping": "30.2.0",
     "@ag-grid-enterprise/server-side-row-model": "30.2.0",
+    "@finos/legend-vscode-extension-dependencies": "^1.0.2",
     "@types/vscode": "1.83.0",
     "path": "0.12.7",
-    "react": "18.2.0",
-    "react-dom": "18.2.0",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
     "react-select": "5.8.0",
     "serializr": "3.0.2",
     "vscode-languageclient": "9.0.1"
@@ -264,15 +276,18 @@
     "@types/glob": "7.1.3",
     "@types/mocha": "10.0.1",
     "@types/node": "20.8.4",
-    "@types/react": "18.2.31",
-    "@types/react-dom": "18.2.14",
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
     "@types/react-select": "5.0.1",
     "@types/sinon": "17.0.3",
     "@typescript-eslint/eslint-plugin": "6.9.0",
     "@typescript-eslint/parser": "6.9.0",
     "@vscode/test-cli": "0.0.4",
     "@vscode/test-electron": "2.3.9",
+    "assert": "^2.1.0",
+    "console-browserify": "^1.2.0",
     "cross-env": "7.0.3",
+    "crypto-browserify": "^3.12.0",
     "css-loader": "4.2.0",
     "eslint": "8.52.0",
     "eslint-config-prettier": "9.0.0",
@@ -285,9 +300,11 @@
     "postcss": "8.4.31",
     "postcss-scss": "4.0.9",
     "prettier": "3.0.3",
+    "process": "^0.11.10",
     "sass": "1.70.0",
     "sass-loader": "14.0.0",
     "sinon": "17.0.1",
+    "stream-browserify": "^3.0.0",
     "style-loader": "1.2.1",
     "stylelint": "15.11.0",
     "stylelint-config-standard": "34.0.0",
@@ -295,13 +312,19 @@
     "ts-jest": "29.1.2",
     "ts-loader": "9.5.1",
     "typescript": "5.2.2",
+    "util": "^0.12.5",
+    "vm-browserify": "^1.1.2",
     "webpack": "5.89.0",
     "webpack-cli": "5.1.4",
     "yo": "4.3.1"
   },
-  "main": "lib/extension",
+  "main": "./lib/extension",
   "activationEvents": [
     "onLanguage:legend",
     "workspaceContains:**/*.pure"
-  ]
+  ],
+  "overrides": {
+    "react": "18.3.1",
+    "react-dom": "18.3.1"
+  }
 }

@@ -53,7 +53,8 @@ const CMD_CONCEPT_TREE_FOCUS_ELEMENT = 'legend.conceptTree.focusOnElement';
 const CMD_CONCEPT_TREE_FOCUS = `${TREE_ID}.focus`;
 const CMD_CONCEPT_TREE_SHOW = 'legend.conceptTree.show';
 
-class LegendConceptTreeItem extends TreeItem {
+export class LegendConceptTreeItem extends TreeItem {
+
   constructor(
     private readonly _parent: LegendConceptTreeItem | undefined,
     label: string,

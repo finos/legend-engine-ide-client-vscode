@@ -18,13 +18,14 @@ import { createModelSchema, primitive, raw } from 'serializr';
 import {
   usingModelSchema,
   SerializationFactory,
+  type PlainObject,
 } from '../utils/SerializationUtils';
 import { TextLocation } from './TextLocation';
 
 export class LegendEntity {
   path!: string;
   classifierPath!: string;
-  content!: Map<string, unknown>;
+  content!: PlainObject<string>;
   location!: TextLocation;
 
   static readonly serialization = new SerializationFactory(
