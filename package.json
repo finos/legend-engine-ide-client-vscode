@@ -1,5 +1,17 @@
 {
   "name": "legend-engine-ide-client-vscode",
+  "displayName": "Legend",
+  "description": "Legend Language Support (parse, compile, execute)",
+  "categories": [
+    "Programming Languages",
+    "Linters",
+    "Other"
+  ],
+  "keywords": [
+
+  ],
+  "icon": "icons/legend_full.png",
+  "homepage": "https://legend.finos.org/",
   "publisher": "FINOS",
   "version": "0.6.0",
   "type": "commonjs",
@@ -8,7 +20,7 @@
     "url": "https://github.com/finos/legend-engine-ide-client-vscode/"
   },
   "engines": {
-    "vscode": "^1.73.0"
+    "vscode": "^1.90.0"
   },
   "contributes": {
     "viewsContainers": {

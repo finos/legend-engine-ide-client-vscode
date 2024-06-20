@@ -1,15 +1,19 @@
 [FINOS Incubating](https://community.finos.org/docs/governance/Software-Projects/stages/incubating)
 
-# legend-engine-ide-client-vscode
+The Legend VSCode extension provides an easy and quick way to develop using Legend data modeling language.  
 
-## Roadmap
+An overview of the language can be found [here](https://legend.finos.org/docs/overview/legend-overview).
 
-The code in this repository is prototype code for a VS Code - Legend Studio integration. 
+## Available Features
 
-It is in alpha stage and therefore not intended for wide production usage yet. Work on security deployment, licensing, and vulnerability scanning is ongoing. Below is a list of known issues that need to be addressed before wide production usage can be recommended:
-- https://github.com/finos/legend-engine-ide-client-vscode/issues/15
-
-Visit our [roadmap](https://github.com/finos/legend#roadmap) to know more about the upcoming features.
+- Parse and Compile
+- Code navigation (goTo, find usage)
+- Execute functions (throught CodeLends command)
+- DataCube vizualization for tabular results
+- Testing integration
+- Legend Concept Tree
+- Snippets for common element types
+- Legend REPL Terminal
 
 ## Contributing
 
