@@ -4,11 +4,13 @@ The Legend VSCode extension provides an easy and quick way to develop using Lege
 
 An overview of the language can be found [here](https://legend.finos.org/docs/overview/legend-overview).
 
+This extension leverage the [Legend LSP server](https://github.com/finos/legend-engine-ide-lsp).
+
 ## Available Features
 
 - Parse and Compile
 - Code navigation (goTo, find usage)
-- Execute functions (throught CodeLends command)
+- Execute functions (through CodeLends command)
 - DataCube vizualization for tabular results
 - Testing integration
 - Legend Concept Tree
