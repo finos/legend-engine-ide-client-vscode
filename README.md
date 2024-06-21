@@ -12,7 +12,7 @@ For more things _Legend_, visit our GitHub [here](https://github.com/finos/legen
 
 - Parse and Compile
 - Code navigation (goTo, find usage)
-- Execute functions (through CodeLends command)
+- Execute functions (through CodeLens commands)
 - DataCube vizualization for tabular results
 - Testing integration
 - Legend Concept Tree
