@@ -6,7 +6,7 @@
     "lib": ["es2021", "dom"],
     "outDir": "lib",
     "rootDir": "src",
-    "sourceMap": true,
+    "sourceMap": false,
     "strict": true,
     "noImplicitOverride": true,
     "noUncheckedIndexedAccess": true,
