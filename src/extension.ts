@@ -72,9 +72,15 @@ import { renderFunctionResultsWebView } from './webviews/FunctionResultsWebView'
 import type { FunctionTDSRequest } from './model/FunctionTDSRequest';
 import { LegendExecutionResult } from './results/LegendExecutionResult';
 import { TDSLegendExecutionResult } from './results/TDSLegendExecutionResult';
-import { LegendEntitiesRequest, LegendLanguageClient } from './LegendLanguageClient';
+import {
+  LegendEntitiesRequest,
+  LegendLanguageClient,
+} from './LegendLanguageClient';
 import { createTestController } from './testController';
-import { LegendConceptTreeItem, createLegendConceptTreeProvider } from './conceptTree';
+import {
+  LegendConceptTreeItem,
+  createLegendConceptTreeProvider,
+} from './conceptTree';
 import { renderDiagramRendererWebView } from './webviews/DiagramWebView';
 
 let client: LegendLanguageClient;
@@ -254,7 +260,7 @@ export function registerCommands(context: ExtensionContext): void {
         diagramRendererWebView,
         context,
         (args[0] as LegendConceptTreeItem).id as string,
-        entities
+        entities,
       );
     },
   );

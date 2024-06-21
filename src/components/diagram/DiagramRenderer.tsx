@@ -14,14 +14,24 @@
  * limitations under the License.
  */
 
-import { type Diagram, getPureGraph, getDiagram, DiagramRenderer } from '@finos/legend-vscode-extension-dependencies';
+import {
+  type Diagram,
+  getPureGraph,
+  getDiagram,
+  DiagramRenderer,
+} from '@finos/legend-vscode-extension-dependencies';
 import { createRef, useEffect, useState } from 'react';
 import '../../../style/index.scss';
 import type { LegendEntity } from '../../model/LegendEntity';
 import { postMessage } from '../../utils/VsCodeUtils';
-import { GET_PROJECT_ENTITIES, GET_PROJECT_ENTITIES_RESPONSE } from '../../utils/Const';
+import {
+  GET_PROJECT_ENTITIES,
+  GET_PROJECT_ENTITIES_RESPONSE,
+} from '../../utils/Const';
 
-export const DiagramRendererComponent: React.FC<{diagramId: string}> = ({ diagramId }) => {
+export const DiagramRendererComponent: React.FC<{ diagramId: string }> = ({
+  diagramId,
+}) => {
   const ref = createRef<HTMLDivElement>();
   const [diagram, setDiagram] = useState<Diagram | null>(null);
   const [entities, setEntities] = useState<LegendEntity[]>([]);
@@ -29,7 +39,7 @@ export const DiagramRendererComponent: React.FC<{diagramId: string}> = ({ diagra
 
   useEffect(() => {
     postMessage({
-      command: GET_PROJECT_ENTITIES
+      command: GET_PROJECT_ENTITIES,
     });
   }, [diagramId]);
 
@@ -43,32 +53,41 @@ export const DiagramRendererComponent: React.FC<{diagramId: string}> = ({ diagra
 
   useEffect(() => {
     if (entities.length && diagramId) {
-      getPureGraph(entities).then((pureModel) => {
-        setDiagram(getDiagram(diagramId, pureModel));
-        setError(null);
-      }).catch((error) => {
-        setError(error.message);
-        setDiagram(null);
-      });
+      getPureGraph(entities)
+        .then((pureModel) => {
+          setDiagram(getDiagram(diagramId, pureModel));
+          setError(null);
+        })
+        .catch((error) => {
+          setError(error.message);
+          setDiagram(null);
+        });
     }
   }, [entities, diagramId]);
 
   useEffect(() => {
     if (diagram) {
-      const diagramRenderer = new DiagramRenderer(ref.current as HTMLDivElement, diagram);
+      const diagramRenderer = new DiagramRenderer(
+        ref.current as HTMLDivElement,
+        diagram,
+      );
       diagramRenderer.render({ initial: true });
     }
   }, [ref, diagram]);
 
   return (
     <div className="diagram__renderer" ref={ref}>
-      {error ?
-      <div className="diagram__renderer__error">
-        <span>Something went wrong. Diagram cannot be created.</span>
-        <span className="diagram__renderer__error__details" title={`${error}`}>
-          Error Details.
-        </span>
-      </div> : null }
-      </div>
+      {error ? (
+        <div className="diagram__renderer__error">
+          <span>Something went wrong. Diagram cannot be created.</span>
+          <span
+            className="diagram__renderer__error__details"
+            title={`${error}`}
+          >
+            Error Details.
+          </span>
+        </div>
+      ) : null}
+    </div>
   );
 };

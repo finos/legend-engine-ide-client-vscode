@@ -25,5 +25,7 @@ const inputParamtersFromHtml = rootElement
 if (inputParamtersFromHtml) {
   const parsedParams = JSON.parse(inputParamtersFromHtml) as PlainObject;
 
-  createRoot(rootElement as HTMLElement).render(<DiagramRendererComponent diagramId={parsedParams.diagramId as string}/>);
+  createRoot(rootElement as HTMLElement).render(
+    <DiagramRendererComponent diagramId={parsedParams.diagramId as string} />,
+  );
 }

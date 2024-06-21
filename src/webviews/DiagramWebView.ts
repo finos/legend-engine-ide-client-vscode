@@ -17,7 +17,10 @@
 import * as path from 'path';
 import { Uri, type ExtensionContext, type WebviewPanel } from 'vscode';
 import type { LegendEntity } from '../model/LegendEntity';
-import { GET_PROJECT_ENTITIES, GET_PROJECT_ENTITIES_RESPONSE } from '../utils/Const';
+import {
+  GET_PROJECT_ENTITIES,
+  GET_PROJECT_ENTITIES_RESPONSE,
+} from '../utils/Const';
 
 export const renderDiagramRendererWebView = (
   diagramRendererWebViewPanel: WebviewPanel,
@@ -34,9 +37,8 @@ export const renderDiagramRendererWebView = (
     ),
   );
 
-  const diagramRendererScript = diagramRendererWebViewPanel.webview.asWebviewUri(
-    diagramRendererScriptPath,
-  );
+  const diagramRendererScript =
+    diagramRendererWebViewPanel.webview.asWebviewUri(diagramRendererScriptPath);
   const webview = diagramRendererWebViewPanel.webview;
 
   webview.html = `
