@@ -25,7 +25,7 @@ For more things _Legend_, visit our GitHub [here](https://github.com/finos/legen
 
 To start using the extension, create a `hello.pure` file in your workspace, and copy/paste the content of one of our showcases
 - Relational Database Showcase (using in-memory H2) - https://raw.githubusercontent.com/finos/legend-studio/master/packages/legend-server-showcase-deployment/data/showcases/Stores/Relational%20Database/Mapping/code.pure
-- Model to Model transformation (consume JSON inout, transform to new model) - https://raw.githubusercontent.com/finos/legend-studio/master/packages/legend-server-showcase-deployment/data/showcases/Stores/Model%20Store/Mapping/code.pure
+- Model to Model transformation (consume JSON input, transform to new model) - https://raw.githubusercontent.com/finos/legend-studio/master/packages/legend-server-showcase-deployment/data/showcases/Stores/Model%20Store/Mapping/code.pure
 
 ## Contributing
 
