@@ -7,13 +7,11 @@
     "Linters",
     "Other"
   ],
-  "keywords": [
-
-  ],
+  "keywords": [],
   "icon": "icons/legend_full.png",
   "homepage": "https://legend.finos.org/",
   "publisher": "FINOS",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "type": "commonjs",
   "repository": {
     "type": "git",
@@ -72,7 +70,7 @@
       {
         "view": "legendConceptTree",
         "contents": "[Load](command:legend.conceptTree.refresh) Legend concpets."
-      }  
+      }
     ],
     "commands": [
       {
@@ -93,23 +91,23 @@
       {
         "command": "legend.conceptTree.show",
         "title": "Show In Concept Tree",
-        "category": "Legend"  
-      },      
+        "category": "Legend"
+      },
       {
         "command": "legend.conceptTree.navigate",
         "title": "GoTo",
-        "icon": "$(go-to-file)"        
+        "icon": "$(go-to-file)"
       },
       {
         "command": "legend.conceptTree.focusOnElement",
         "title": "Focus Current Concept",
         "icon": "$(target)"
-      },         
+      },
       {
         "command": "legend.conceptTree.refresh",
         "title": "Refresh",
         "icon": "$(refresh)"
-      }      
+      }
     ],
     "configuration": {
       "type": "object",
@@ -166,7 +164,7 @@
         "icon": {
           "dark": "./icons/legend.svg",
           "light": "./icons/legend.svg"
-        }        
+        }
       }
     ],
     "grammars": [
@@ -190,7 +188,7 @@
           "command": "legend.conceptTree.navigate",
           "when": "view == legendConceptTree && viewItem != package",
           "group": "inline"
-        }    
+        }
       ],
       "view/title": [
         {
@@ -199,9 +197,9 @@
           "group": "navigation"
         },
         {
-            "command": "legend.conceptTree.refresh",
-            "when": "view == legendConceptTree",
-            "group": "navigation"
+          "command": "legend.conceptTree.refresh",
+          "when": "view == legendConceptTree",
+          "group": "navigation"
         }
       ],
       "editor/context": [
@@ -209,28 +207,28 @@
           "group": "Legend",
           "submenu": "legend.editor.context",
           "when": "editorTextFocus && editorLangId == legend"
-        }  
+        }
       ],
       "legend.editor.context": [
         {
           "group": "Legend",
           "command": "legend.conceptTree.show"
-        }  
+        }
       ]
     },
     "submenus": [
       {
-          "id": "legend.editor.context",
-          "label": "Legend"
+        "id": "legend.editor.context",
+        "label": "Legend"
       }
     ],
-    "keybindings":[
+    "keybindings": [
       {
         "command": "legend.conceptTree.show",
         "key": "ctrl+shift+l",
         "mac": "shift+cmd+l"
       }
-    ] 
+    ]
   },
   "scripts": {
     "test": "npm run build && node ./lib/tests/runTest.js",
