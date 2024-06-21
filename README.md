@@ -1,10 +1,12 @@
 [FINOS Incubating](https://community.finos.org/docs/governance/Software-Projects/stages/incubating)
 
-The Legend VSCode extension provides an easy and quick way to develop using Legend data modeling language.  
+The ___Legend VSCode___ extension provides an easy and quick way to develop using _Legend_ data modeling language.  
 
 An overview of the language can be found [here](https://legend.finos.org/docs/overview/legend-overview).
 
-This extension leverage the [Legend LSP server](https://github.com/finos/legend-engine-ide-lsp).
+This extension leverages the [Legend LSP server](https://github.com/finos/legend-engine-ide-lsp).
+
+For more things _Legend_, visit our GitHub [here](https://github.com/finos/legend).
 
 ## Available Features
 
@@ -16,6 +18,14 @@ This extension leverage the [Legend LSP server](https://github.com/finos/legend-
 - Legend Concept Tree
 - Snippets for common element types
 - Legend REPL Terminal
+
+### Hello World
+
+![Hello World](docs/demo.gif)
+
+To start using the extension, create a `hello.pure` file in your workspace, and copy/paste the content of one of our showcases
+- Relational Database Showcase (using in-memory H2) - https://raw.githubusercontent.com/finos/legend-studio/master/packages/legend-server-showcase-deployment/data/showcases/Stores/Relational%20Database/Mapping/code.pure
+- Model to Model transformation (consume JSON inout, transform to new model) - https://raw.githubusercontent.com/finos/legend-studio/master/packages/legend-server-showcase-deployment/data/showcases/Stores/Model%20Store/Mapping/code.pure
 
 ## Contributing
 
