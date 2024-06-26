@@ -49,7 +49,7 @@ jobs:
         run: npm run release:marketPlace
         env:
           VSCE_PAT: ${{ secrets.VSCE_PAT }}
-      - name: Publish to OpenVSX Marketplace
-        run: npm run release:openvsx -- -p ${{ secrets.OVSX_TOKEN }}
+      # - name: Publish to OpenVSX Marketplace
+      #   run: npm run release:openvsx -- -p ${{ secrets.OVSX_TOKEN }}
                 
           
