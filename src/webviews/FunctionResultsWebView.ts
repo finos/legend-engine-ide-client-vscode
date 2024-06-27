@@ -45,8 +45,7 @@ export const renderFunctionResultsWebView = (
   const functionResultsEditorScriptPath = Uri.file(
     path.join(
       context.extensionPath,
-      'lib',
-      'components',
+      'dist',
       'FunctionResultsEditorRenderer.js',
     ),
   );

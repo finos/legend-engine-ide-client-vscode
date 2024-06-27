@@ -34,14 +34,12 @@ import {
   WorkspaceEdit,
   EndOfLine,
   TerminalLink,
-  TreeItem,
 } from 'vscode';
 import {
   type LanguageClient,
   type LanguageClientOptions,
   type Executable,
   type ServerOptions,
-  TextDocumentIdentifier,
 } from 'vscode-languageclient/node';
 import { LegendTreeDataProvider } from './utils/LegendTreeProvider';
 import { LanguageClientProgressResult } from './results/LanguageClientProgressResult';
@@ -78,7 +76,7 @@ import {
 } from './LegendLanguageClient';
 import { createTestController } from './testController';
 import {
-  LegendConceptTreeItem,
+  type LegendConceptTreeItem,
   createLegendConceptTreeProvider,
 } from './conceptTree';
 import { renderDiagramRendererWebView } from './webviews/DiagramWebView';

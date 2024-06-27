@@ -328,7 +328,7 @@
     "webpack-cli": "5.1.4",
     "yo": "4.3.1"
   },
-  "main": "./lib/extension",
+  "main": "./dist/extension",
   "activationEvents": [
     "onLanguage:legend",
     "workspaceContains:**/*.pure"
