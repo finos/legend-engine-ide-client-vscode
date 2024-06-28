@@ -40,7 +40,7 @@ const webViewConfig = {
       },
       // Allow importing CSS modules:
       {
-        test: /\.s(a|c)ss$/,
+        test: /\.s?(a|c)ss$/,
         use: [
           'style-loader',
           'css-loader',
@@ -48,7 +48,6 @@ const webViewConfig = {
             loader: 'sass-loader',
           },
         ],
-        exclude: /node_modules/,
       },
     ],
   },
@@ -105,7 +104,7 @@ const extensionConfig = {
         ]
       },
       {
-        test: /\.s(a|c)ss$/,
+        test: /\.s?(a|c)ss$/,
         use: [
           'style-loader',
           'css-loader',
@@ -113,7 +112,6 @@ const extensionConfig = {
             loader: 'sass-loader',
           },
         ],
-        exclude: /node_modules/,
       },
     ]
   }
