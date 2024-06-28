@@ -29,12 +29,7 @@ export const renderDiagramRendererWebView = (
   entities: LegendEntity[],
 ): void => {
   const diagramRendererScriptPath = Uri.file(
-    path.join(
-      context.extensionPath,
-      'lib',
-      'components',
-      'DiagramRendererRoot.js',
-    ),
+    path.join(context.extensionPath, 'dist', 'DiagramRendererRoot.js'),
   );
 
   const diagramRendererScript =

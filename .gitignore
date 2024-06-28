@@ -19,6 +19,7 @@ npm-debug.log
 npm-debug.log*
 /build/
 /lib
+/dist
 
 # Dependencies
 **/node_modules

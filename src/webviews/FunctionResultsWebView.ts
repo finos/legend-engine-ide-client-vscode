@@ -25,15 +25,10 @@ import {
   workspace,
 } from 'vscode';
 import {
-  AG_GRID_BALHAM_THEME,
-  AG_GRID_COMMUNITY,
-  AG_GRID_STYLE_PATH,
   GET_TDS_REQUEST_RESULTS_ID,
   LEGEND_COMMAND,
   LEGEND_EXECUTE_COMMAND,
-  NODE_MODULES,
   SEND_TDS_REQUEST_ID,
-  STYLES_MODULE,
 } from '../utils/Const';
 
 export const renderFunctionResultsWebView = (
@@ -45,8 +40,7 @@ export const renderFunctionResultsWebView = (
   const functionResultsEditorScriptPath = Uri.file(
     path.join(
       context.extensionPath,
-      'lib',
-      'components',
+      'dist',
       'FunctionResultsEditorRenderer.js',
     ),
   );
@@ -56,20 +50,6 @@ export const renderFunctionResultsWebView = (
     );
   const webview = functionResultsWebViewPanel.webview;
   const isDarkTheme = window.activeColorTheme.kind === ColorThemeKind.Dark;
-  const agGridStylePath = Uri.joinPath(
-    link,
-    NODE_MODULES,
-    AG_GRID_COMMUNITY,
-    STYLES_MODULE,
-    AG_GRID_STYLE_PATH,
-  );
-  const agGridBalhamThemePath = Uri.joinPath(
-    link,
-    NODE_MODULES,
-    AG_GRID_COMMUNITY,
-    STYLES_MODULE,
-    AG_GRID_BALHAM_THEME,
-  );
   const config = workspace.getConfiguration('legend');
   const agGridLicense = config.get<string>('agGridLicense', '');
 
@@ -79,10 +59,6 @@ export const renderFunctionResultsWebView = (
       <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link rel="stylesheet" href="${webview.asWebviewUri(agGridStylePath)}">
-        <link rel="stylesheet" href="${webview.asWebviewUri(
-          agGridBalhamThemePath,
-        )}">
       </head>
       <body>
         <div id="root" style="height: 500px; width: 100%;" class=${

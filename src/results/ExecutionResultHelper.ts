@@ -36,11 +36,6 @@ import {
   TEST_PASS_ICON,
   WARNING_ICON,
   IS_EXECUTION_HAPPENNG,
-  NODE_MODULES,
-  AG_GRID_COMMUNITY,
-  STYLES_MODULE,
-  AG_GRID_STYLE_PATH,
-  AG_GRID_BALHAM_THEME,
   SEND_TDS_REQUEST_ID,
   GET_TDS_REQUEST_RESULTS_ID,
 } from '../utils/Const';
@@ -72,20 +67,6 @@ const renderTDSResultMessage = (
   webview: Webview,
 ): string => {
   const tds = result.result;
-  const agGridStylePath = Uri.joinPath(
-    link,
-    NODE_MODULES,
-    AG_GRID_COMMUNITY,
-    STYLES_MODULE,
-    AG_GRID_STYLE_PATH,
-  );
-  const agGridBalhamThemePath = Uri.joinPath(
-    link,
-    NODE_MODULES,
-    AG_GRID_COMMUNITY,
-    STYLES_MODULE,
-    AG_GRID_BALHAM_THEME,
-  );
   const config = workspace.getConfiguration('legend');
   const agGridLicense = config.get<string>('agGridLicense', '');
   const colDefs = tds.columns.map((c) => ({
@@ -95,7 +76,7 @@ const renderTDSResultMessage = (
   }));
   const rowData = getTDSRowData(tds);
   const webviewScriptPath = Uri.file(
-    path.join(extensionPath, 'lib', 'components', 'AgGridRenderer.js'),
+    path.join(extensionPath, 'dist', 'AgGridRenderer.js'),
   );
 
   const webviewScript = webview.asWebviewUri(webviewScriptPath);
@@ -106,10 +87,6 @@ const renderTDSResultMessage = (
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="${webview.asWebviewUri(agGridStylePath)}">
-      <link rel="stylesheet" href="${webview.asWebviewUri(
-        agGridBalhamThemePath,
-      )}">
     <title>React Webview</title>
   </head>
   <body>
