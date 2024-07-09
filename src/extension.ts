@@ -94,11 +94,11 @@ export function createClient(context: ExtensionContext): LanguageClient {
     },
   });
 
-  let extraVmArgs = workspace
+  const extraVmArgs = workspace
     .getConfiguration('legend')
     .get('language.server.vmargs', []);
 
-  let params = [];
+  const params = [];
   params.push(...extraVmArgs);
   params.push(`-DstoragePath=${context.storageUri!.fsPath}`);
   params.push('-jar');
@@ -114,7 +114,7 @@ export function createClient(context: ExtensionContext): LanguageClient {
     args: params,
   };
 
-  let debugParams = [];
+  const debugParams = [];
   debugParams.push(
     '-agentlib:jdwp=transport=dt_socket,server=y,quiet=y,suspend=n,address=*:11285',
   );
