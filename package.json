@@ -158,6 +158,15 @@
           "type": "string",
           "default": "",
           "description": "Set the SDLC server url to eneable auto update of platform versions"
+        },
+        "legend.language.server.vmargs": {
+          "type": "array",
+          "default": [],
+          "items": {
+            "type": "string",
+            "description": "Individual extra VM argument for Legend Language Server"
+          },
+          "description": "Specifies extra VM arguments used to launch the Legend Language Server"
         }
       }
     },

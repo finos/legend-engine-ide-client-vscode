@@ -94,29 +94,35 @@ export function createClient(context: ExtensionContext): LanguageClient {
     },
   });
 
+  const extraVmArgs = workspace
+    .getConfiguration('legend')
+    .get('language.server.vmargs', []);
+
+  const params = [];
+  params.push(...extraVmArgs);
+  params.push(`-DstoragePath=${context.storageUri!.fsPath}`);
+  params.push('-jar');
+  params.push(
+    context.asAbsolutePath(
+      path.join('server', 'legend-engine-ide-lsp-server-shaded.jar'),
+    ),
+  );
+  params.push(context.asAbsolutePath(path.join('server', 'pom.xml')));
+
   const serverOptionsRun: Executable = {
     command: 'java',
-    args: [
-      `-DstoragePath=${context.storageUri!.fsPath}`,
-      '-jar',
-      context.asAbsolutePath(
-        path.join('server', 'legend-engine-ide-lsp-server-shaded.jar'),
-      ),
-      context.asAbsolutePath(path.join('server', 'pom.xml')),
-    ],
+    args: params,
   };
+
+  const debugParams = [];
+  debugParams.push(
+    '-agentlib:jdwp=transport=dt_socket,server=y,quiet=y,suspend=n,address=*:11285',
+  );
+  debugParams.push(...params);
 
   const serverOptionsDebug: Executable = {
     command: 'java',
-    args: [
-      `-DstoragePath=${context.storageUri!.fsPath}`,
-      '-agentlib:jdwp=transport=dt_socket,server=y,quiet=y,suspend=n,address=*:11285',
-      '-jar',
-      context.asAbsolutePath(
-        path.join('server', 'legend-engine-ide-lsp-server-shaded.jar'),
-      ),
-      context.asAbsolutePath(path.join('server', 'pom.xml')),
-    ],
+    args: debugParams,
   };
 
   const serverOptions: ServerOptions = {
@@ -165,7 +171,8 @@ export function createClient(context: ExtensionContext): LanguageClient {
     if (
       e.affectsConfiguration('legend.sdlc.server.url') ||
       e.affectsConfiguration('legend.extensions.other.dependencies') ||
-      e.affectsConfiguration('legend.extensions.dependencies.pom')
+      e.affectsConfiguration('legend.extensions.dependencies.pom') ||
+      e.affectsConfiguration('legend.language.server.vmargs')
     ) {
       window
         .showInformationMessage(
