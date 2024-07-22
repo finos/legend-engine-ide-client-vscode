@@ -167,6 +167,11 @@
             "description": "Individual extra VM argument for Legend Language Server"
           },
           "description": "Specifies extra VM arguments used to launch the Legend Language Server"
+        },
+        "legend.studio.forms.file": {
+          "type": "string",
+          "default": "",
+          "description": "Specifies file to be used for legend studio web forms"
         }
       }
     },
@@ -282,8 +287,9 @@
     "@ag-grid-enterprise/menu": "30.2.0",
     "@ag-grid-enterprise/row-grouping": "30.2.0",
     "@ag-grid-enterprise/server-side-row-model": "30.2.0",
-    "@finos/legend-vscode-extension-dependencies": "^1.0.2",
+    "@finos/legend-vscode-extension-dependencies": "2.1.0",
     "@types/vscode": "1.83.0",
+    "glob": "7.2.3",
     "path": "0.12.7",
     "react": "18.3.1",
     "react-dom": "18.3.1",

@@ -260,12 +260,14 @@ export function registerCommands(context: ExtensionContext): void {
           enableScripts: true,
         },
       );
+
       const entities = await client.entities(new LegendEntitiesRequest([]));
       renderDiagramRendererWebView(
         diagramRendererWebView,
         context,
         (args[0] as LegendConceptTreeItem).id as string,
         entities,
+        workspace.getConfiguration('legend').get('studio.forms.file', ''),
       );
     },
   );
