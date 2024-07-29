@@ -27,14 +27,18 @@ export const renderDiagramRendererWebView = (
   context: ExtensionContext,
   diagramId: string,
   entities: LegendEntity[],
+  renderFilePath: string,
 ): void => {
-  const diagramRendererScriptPath = Uri.file(
-    path.join(context.extensionPath, 'dist', 'DiagramRendererRoot.js'),
-  );
-
-  const diagramRendererScript =
-    diagramRendererWebViewPanel.webview.asWebviewUri(diagramRendererScriptPath);
-  const webview = diagramRendererWebViewPanel.webview;
+  let diagramRendererScript;
+  const { webview } = diagramRendererWebViewPanel;
+  if (renderFilePath.length === 0) {
+    const diagramRendererScriptPath = Uri.file(
+      path.join(context.extensionPath, 'dist', 'DiagramRendererRoot.js'),
+    );
+    diagramRendererScript = webview.asWebviewUri(diagramRendererScriptPath);
+  } else {
+    diagramRendererScript = renderFilePath;
+  }
 
   webview.html = `
     <!DOCTYPE html>

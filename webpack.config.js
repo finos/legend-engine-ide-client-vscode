@@ -64,6 +64,7 @@ const webViewConfig = {
       vm: require.resolve("vm-browserify")
     },
     alias: {
+      react: path.resolve('./node_modules/react'),
       process: "process/browser"
     }
   },
@@ -90,6 +91,9 @@ const extensionConfig = {
       // see https://webpack.js.org/configuration/resolve/#resolvefallback
       console: require.resolve('console-browserify'),
       assert: require.resolve('assert'),
+    },
+    alias: {
+      react: path.resolve('./node_modules/react')
     }
   },
   module: {

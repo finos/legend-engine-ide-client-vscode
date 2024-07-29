@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 
+import '@finos/legend-vscode-extension-dependencies/style/index.css';
 import { createRoot } from 'react-dom/client';
-import { DiagramRendererComponent } from './DiagramRenderer';
+import { DiagramRendererComponent } from '@finos/legend-vscode-extension-dependencies';
 import { type PlainObject } from '../../utils/SerializationUtils';
 
 const rootElement = document.getElementById('root');
@@ -26,6 +27,9 @@ if (inputParamtersFromHtml) {
   const parsedParams = JSON.parse(inputParamtersFromHtml) as PlainObject;
 
   createRoot(rootElement as HTMLElement).render(
-    <DiagramRendererComponent diagramId={parsedParams.diagramId as string} />,
+    <DiagramRendererComponent
+      diagramId={parsedParams.diagramId as string}
+      presets={[]}
+    />,
   );
 }
