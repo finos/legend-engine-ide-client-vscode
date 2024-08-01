@@ -18,6 +18,7 @@ For more things _Legend_, visit our GitHub [here](https://github.com/finos/legen
 - Legend Concept Tree
 - Snippets for common element types
 - Legend REPL Terminal
+- Diagram vizualization
 
 ### Hello World
 
