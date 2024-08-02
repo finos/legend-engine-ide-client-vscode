@@ -480,6 +480,10 @@ class LegendTerminalLink extends TerminalLink {
 const REPL_NAME = 'Legend REPL';
 
 export function createReplTerminal(context: ExtensionContext): void {
+  const planExecutorConfiguration = workspace
+    .getConfiguration('legend')
+    .get('planExecutor.configuration', '');
+
   const provider = window.registerTerminalProfileProvider(
     'legend.terminal.repl',
     {
@@ -497,6 +501,7 @@ export function createReplTerminal(context: ExtensionContext): void {
                 .get('agGridLicense', '')}`,
               // '-agentlib:jdwp=transport=dt_socket,server=y,quiet=y,suspend=n,address=*:11292',
               'org.finos.legend.engine.ide.lsp.server.LegendREPLTerminal',
+              planExecutorConfiguration,
             ],
             env: {
               CLASSPATH: cp,

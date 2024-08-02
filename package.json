@@ -172,6 +172,11 @@
           "type": "string",
           "default": "",
           "description": "Specifies file to be used for legend studio web forms"
+        },
+        "legend.planExecutor.configuration": {
+          "type": "string",
+          "default": "",
+          "description": "Defines the path to the plan executor configuration JSON"
         }
       }
     },
