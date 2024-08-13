@@ -489,7 +489,7 @@ export function createReplTerminal(context: ExtensionContext): void {
     `-Dlegend.repl.grid.licenseKey=${workspace
       .getConfiguration('legend')
       .get('agGridLicense', '')}`,
-    '-agentlib:jdwp=transport=dt_socket,server=y,quiet=y,suspend=n,address=*:11292',
+    // '-agentlib:jdwp=transport=dt_socket,server=y,quiet=y,suspend=n,address=*:11292',
     'org.finos.legend.engine.ide.lsp.server.LegendREPLTerminal',
     planExecutorConfiguration,
   ];
