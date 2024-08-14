@@ -497,6 +497,23 @@ export function createReplTerminal(context: ExtensionContext): void {
     .getConfiguration('legend')
     .get('planExecutor.configuration', '');
 
+  const shellArgs = [
+    `-DstoragePath=${path.join(context.storageUri!.fsPath, 'repl')}`,
+    `-Dlegend.repl.grid.licenseKey=${workspace
+      .getConfiguration('legend')
+      .get('agGridLicense', '')}`,
+    // '-agentlib:jdwp=transport=dt_socket,server=y,quiet=y,suspend=n,address=*:11292',
+    'org.finos.legend.engine.ide.lsp.server.LegendREPLTerminal',
+    planExecutorConfiguration,
+  ];
+
+  const workspaceFolders = workspace.workspaceFolders?.map(
+    (workspaceFolder) => workspaceFolder.name,
+  );
+  if (workspaceFolders) {
+    shellArgs.concat(workspaceFolders);
+  }
+
   const provider = window.registerTerminalProfileProvider(
     'legend.terminal.repl',
     {
@@ -507,15 +524,7 @@ export function createReplTerminal(context: ExtensionContext): void {
           options: {
             name: REPL_NAME,
             shellPath: 'java',
-            shellArgs: [
-              `-DstoragePath=${path.join(context.storageUri!.fsPath, 'repl')}`,
-              `-Dlegend.repl.grid.licenseKey=${workspace
-                .getConfiguration('legend')
-                .get('agGridLicense', '')}`,
-              // '-agentlib:jdwp=transport=dt_socket,server=y,quiet=y,suspend=n,address=*:11292',
-              'org.finos.legend.engine.ide.lsp.server.LegendREPLTerminal',
-              planExecutorConfiguration,
-            ],
+            shellArgs,
             env: {
               CLASSPATH: cp,
             },
