@@ -24,6 +24,7 @@ import {
   EXECUTE_TESTS_REQUEST_ID,
   VIRTUAL_FILE_SYSTEM_FILE_REQUEST_ID,
   ENTITIES_REQUEST_ID,
+  ONE_ENTITY_PER_FILE_REQUEST_ID,
 } from './utils/Const';
 import type { PlainObject } from './utils/SerializationUtils';
 import {
@@ -116,5 +117,15 @@ export class LegendLanguageClient extends LanguageClient {
     return promise.then((res) =>
       res.map((x) => LegendEntity.serialization.fromJson(x)),
     );
+  }
+
+  async oneEntityPerFileRefactoring(
+    token?: CancellationToken,
+  ): Promise<string> {
+    if (token) {
+      return this.sendRequest(ONE_ENTITY_PER_FILE_REQUEST_ID, token);
+    } else {
+      return this.sendRequest(ONE_ENTITY_PER_FILE_REQUEST_ID);
+    }
   }
 }

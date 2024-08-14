@@ -58,6 +58,7 @@ import {
   LEGEND_LANGUAGE_ID,
   LEGEND_SHOW_DIAGRAM,
   DIAGRAM_RENDERER,
+  ONE_ENTITY_PER_FILE_COMMAND_ID,
 } from './utils/Const';
 import { LegendWebViewProvider } from './utils/LegendWebViewProvider';
 import {
@@ -272,6 +273,14 @@ export function registerCommands(context: ExtensionContext): void {
     },
   );
   context.subscriptions.push(showDiagram);
+
+  const oneEntityPerFileRefactor = commands.registerCommand(
+    ONE_ENTITY_PER_FILE_COMMAND_ID,
+    () => {
+      client.oneEntityPerFileRefactoring();
+    },
+  );
+  context.subscriptions.push(oneEntityPerFileRefactor);
 }
 
 function handleExecuteFunctionCommand(
@@ -426,6 +435,10 @@ export function createStatusBarItem(context: ExtensionContext): void {
         {
           label: '$(list-tree) Show Legend Concept Tree',
           command: 'legend.conceptTree.show',
+        },
+        {
+          label: '$(type-hierarchy) One Entity Per File Refactoring',
+          command: 'legend.refactor.oneEntityPerFile',
         },
         {
           label: '$(output) Show Legend Extension Output',
