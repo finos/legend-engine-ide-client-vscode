@@ -439,7 +439,7 @@ export function createStatusBarItem(context: ExtensionContext): void {
         {
           label: '$(type-hierarchy) One Entity Per File Refactoring',
           command: 'legend.refactor.oneEntityPerFile',
-        },        
+        },
         {
           label: '$(output) Show Legend Extension Output',
           command: 'legend.extension.output',

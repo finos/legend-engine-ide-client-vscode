@@ -123,10 +123,7 @@ export class LegendLanguageClient extends LanguageClient {
     token?: CancellationToken,
   ): Promise<string> {
     if (token) {
-      return this.sendRequest(
-        ONE_ENTITY_PER_FILE_REQUEST_ID,
-        token,
-      );
+      return this.sendRequest(ONE_ENTITY_PER_FILE_REQUEST_ID, token);
     } else {
       return this.sendRequest(ONE_ENTITY_PER_FILE_REQUEST_ID);
     }

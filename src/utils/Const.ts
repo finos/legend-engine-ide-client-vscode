@@ -50,8 +50,10 @@ export const ENTITIES_REQUEST_ID = 'legend/entities';
 export const VIRTUAL_FILE_SYSTEM_FILE_REQUEST_ID = 'legend/legendVirtualFile';
 export const GET_TDS_REQUEST_RESULTS_ID = 'getTDSRequestResultsId';
 export const LEGEND_SHOW_DIAGRAM = 'legend.show.diagram';
-export const ONE_ENTITY_PER_FILE_REQUEST_ID = 'legend/oneEntityPerFileRefactoring';
-export const ONE_ENTITY_PER_FILE_COMMAND_ID = 'legend.refactor.oneEntityPerFile';
+export const ONE_ENTITY_PER_FILE_REQUEST_ID =
+  'legend/oneEntityPerFileRefactoring';
+export const ONE_ENTITY_PER_FILE_COMMAND_ID =
+  'legend.refactor.oneEntityPerFile';
 
 // Event Types
 export const GET_PROJECT_ENTITIES = 'getProjectEntities';
