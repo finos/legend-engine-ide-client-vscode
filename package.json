@@ -113,6 +113,11 @@
         "command": "legend.conceptTree.refresh",
         "title": "Refresh",
         "icon": "$(refresh)"
+      },
+      {
+        "command": "legend.refactor.oneEntityPerFile",
+        "title": "One Entity Per File Refactoring",
+        "icon": "$(type-hierarchy)"
       }
     ],
     "configuration": {
