@@ -230,9 +230,7 @@ export function registerCommands(context: ExtensionContext): void {
   });
   context.subscriptions.push(openLog);
 
-  //added this
   const openReport = commands.registerCommand('legend.report', () => {
-    // const file = Uri.file('/home/developer/projects/legend-engine-ide-client-vscode/src/PCT_Report_Compatibility.md');
     const file = Uri.parse(
       `${LEGEND_VIRTUAL_FS_SCHEME}:/PCT_Report_Compatibility.md`,
     );
