@@ -493,26 +493,23 @@ class LegendTerminalLink extends TerminalLink {
 const REPL_NAME = 'Legend REPL';
 
 export function createReplTerminal(context: ExtensionContext): void {
-  const planExecutorConfiguration = workspace
-    .getConfiguration('legend')
-    .get('planExecutor.configuration', '');
+  const workspaceFolders =
+    workspace.workspaceFolders?.map(
+      (workspaceFolder) => workspaceFolder.uri.fsPath,
+    ) || [];
 
   const shellArgs = [
     `-DstoragePath=${path.join(context.storageUri!.fsPath, 'repl')}`,
     `-Dlegend.repl.grid.licenseKey=${workspace
       .getConfiguration('legend')
       .get('agGridLicense', '')}`,
+    `-Dlegend.planExecutor.configuration=${workspace
+      .getConfiguration('legend')
+      .get('planExecutor.configuration', '')}`,
     // '-agentlib:jdwp=transport=dt_socket,server=y,quiet=y,suspend=n,address=*:11292',
     'org.finos.legend.engine.ide.lsp.server.LegendREPLTerminal',
-    planExecutorConfiguration,
+    ...workspaceFolders,
   ];
-
-  const workspaceFolders = workspace.workspaceFolders?.map(
-    (workspaceFolder) => workspaceFolder.name,
-  );
-  if (workspaceFolders) {
-    shellArgs.concat(workspaceFolders);
-  }
 
   const provider = window.registerTerminalProfileProvider(
     'legend.terminal.repl',
