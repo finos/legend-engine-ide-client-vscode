@@ -69,7 +69,7 @@
       },
       {
         "view": "legendConceptTree",
-        "contents": "[Load](command:legend.conceptTree.refresh) Legend concpets."
+        "contents": "[Load](command:legend.conceptTree.refresh) Legend concepts."
       }
     ],
     "commands": [
@@ -208,7 +208,7 @@
       "profiles": [
         {
           "id": "legend.terminal.repl",
-          "title": "Legend REPL (Beta)"
+          "title": "Legend REPL"
         }
       ]
     },
@@ -268,6 +268,10 @@
   "scripts": {
     "test": "npm run build && node ./lib/tests/runTest.js",
     "compile": "tsc -b",
+    "dev": "npm-run-all --parallel dev:ts dev:webpack",
+    "dev:setup": "npm run release:prepare",
+    "dev:ts": "tsc -b --watch",
+    "dev:webpack": "webpack --mode development --watch",
     "webpack": "webpack --mode development",
     "webpack:package": "webpack --mode production --devtool hidden-source-map",
     "build": "npm run compile && npm run webpack",
@@ -331,6 +335,7 @@
     "eslint-plugin-react-hooks": "4.6.0",
     "license-check-and-add": "4.0.5",
     "maven": "5.0.0",
+    "npm-run-all": "4.1.5",
     "postcss": "8.4.31",
     "postcss-scss": "4.0.9",
     "prettier": "3.3.3",

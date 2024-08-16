@@ -496,7 +496,7 @@ export function createReplTerminal(context: ExtensionContext): void {
   const workspaceFolders =
     workspace.workspaceFolders?.map(
       (workspaceFolder) => workspaceFolder.uri.fsPath,
-    ) || [];
+    ) ?? [];
 
   const shellArgs = [
     `-DstoragePath=${path.join(context.storageUri!.fsPath, 'repl')}`,
@@ -533,7 +533,7 @@ export function createReplTerminal(context: ExtensionContext): void {
                 'log.txt',
               ),
             )}`,
-            iconPath: new ThemeIcon('compass'),
+            iconPath: new ThemeIcon('repl'),
             isTransient: true,
           },
         }));

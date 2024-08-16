@@ -30,7 +30,7 @@ const webViewConfig = {
     filename: '[name].js',
     path: path.resolve(__dirname, 'dist'),
   },
-  devtool: 'source-map',
+  devtool: 'nosources-source-map',
   module: {
     rules: [
       {
@@ -79,7 +79,7 @@ const extensionConfig = {
     libraryTarget: 'commonjs2',
     devtoolModuleFilenameTemplate: '../[resource-path]'
   },
-  devtool: 'source-map',
+  devtool: 'nosources-source-map',
   externals: {
     vscode: 'commonjs vscode',
     'vscode-languageclient/node': 'vscode-languageclient/node'
