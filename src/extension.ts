@@ -533,7 +533,7 @@ export function createReplTerminal(context: ExtensionContext): void {
                 'log.txt',
               ),
             )}`,
-            iconPath: new ThemeIcon('repl'),
+            iconPath: new ThemeIcon('compass'),
             isTransient: true,
           },
         }));
