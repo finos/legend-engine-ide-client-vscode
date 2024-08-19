@@ -30,7 +30,7 @@ To start using the extension, create a `hello.pure` file in your workspace, and 
 
 ## Contributing
 
-Visit Legend [Contribution Guide](https://github.com/finos/legend/blob/master/CONTRIBUTING.md) to learn how to contribute to Legend.
+Please read our [contributing guide](./CONTRIBUTING.md).
 
 ## License
 

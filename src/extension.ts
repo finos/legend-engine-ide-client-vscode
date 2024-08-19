@@ -509,7 +509,7 @@ export function createReplTerminal(context: ExtensionContext): void {
   const workspaceFolders =
     workspace.workspaceFolders?.map(
       (workspaceFolder) => workspaceFolder.uri.fsPath,
-    ) || [];
+    ) ?? [];
 
   const shellArgs = [
     `-DstoragePath=${path.join(context.storageUri!.fsPath, 'repl')}`,

@@ -28,6 +28,7 @@ npm-debug.log*
 /temp
 *.vsix
 /server/*.jar
+/server/legend_extension_pom*.xml
 
 # Test
 /.vscode-test/
