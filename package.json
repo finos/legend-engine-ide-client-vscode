@@ -85,6 +85,11 @@
         "category": "Legend"
       },
       {
+        "command": "legend.report",
+        "title": "Show Report",
+        "category": "Legend"
+      },
+      {
         "command": "legend.extension.output",
         "title": "Show Extension Output",
         "category": "Legend"
@@ -119,6 +124,7 @@
         "title": "One Entity Per File Refactoring",
         "icon": "$(type-hierarchy)"
       }
+      
     ],
     "configuration": {
       "type": "object",

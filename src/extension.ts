@@ -223,11 +223,20 @@ export function registerCommands(context: ExtensionContext): void {
 
   const openLog = commands.registerCommand('legend.log', () => {
     const openPath = Uri.joinPath(context.storageUri!, 'engine-lsp', 'log.txt');
+
     workspace.openTextDocument(openPath).then((doc) => {
       window.showTextDocument(doc);
     });
   });
   context.subscriptions.push(openLog);
+
+  const openReport = commands.registerCommand('legend.report', () => {
+    const file = Uri.parse(
+      `${LEGEND_VIRTUAL_FS_SCHEME}:/PCT_Report_Compatibility.md`,
+    );
+    commands.executeCommand('markdown.showPreview', file);
+  });
+  context.subscriptions.push(openReport);
 
   const reloadServer = commands.registerCommand('legend.reload', () => {
     client.restart();
@@ -447,6 +456,10 @@ export function createStatusBarItem(context: ExtensionContext): void {
         {
           label: '$(go-to-file) Show Legend Server logs',
           command: 'legend.log',
+        },
+        {
+          label: '$(go-to-file) Show Report',
+          command: 'legend.report',
         },
         {
           label: '$(refresh) Reload Legend Extension',
