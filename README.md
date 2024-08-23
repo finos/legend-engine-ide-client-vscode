@@ -1,7 +1,6 @@
-<img src="https://cdn.jsdelivr.net/gh/finos/contrib-toolbox@master/images/badge-incubating.png" width="150"/>
-
-![Visual Studio Marketplace](https://img.shields.io/visual-studio-marketplace/v/FINOS.legend-engine-ide-client-vscode.png?label=Visual%20Studio%20Marketplace)
-![Open VSX Marketplace](https://img.shields.io/open-vsx/v/finos/legend-engine-ide-client-vscode.png?label=Open%20VSX%20Marketplace)
+<img src="https://cdn.jsdelivr.net/gh/finos/contrib-toolbox@master/images/badge-incubating.svg" style="height:20px"/>
+<img src="https://img.shields.io/visual-studio-marketplace/v/FINOS.legend-engine-ide-client-vscode.svg?label=Visual%20Studio%20Marketplace"/>
+<img src="https://img.shields.io/open-vsx/v/finos/legend-engine-ide-client-vscode.svg?label=Open%20VSX%20Marketplace"/>
 
 The **_Legend VSCode_** extension provides an easy and quick way to develop using _Legend_ data modeling language.
 
