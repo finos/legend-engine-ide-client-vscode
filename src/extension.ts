@@ -33,7 +33,6 @@ import {
   SnippetTextEdit,
   WorkspaceEdit,
   EndOfLine,
-  TerminalLink,
 } from 'vscode';
 import {
   type LanguageClient,
@@ -494,15 +493,6 @@ export function deactivate(): Thenable<void> | undefined {
   return client.stop();
 }
 
-class LegendTerminalLink extends TerminalLink {
-  url: Uri;
-
-  constructor(startIndex: number, lenght: number, url: Uri, tooltip?: string) {
-    super(startIndex, lenght, tooltip);
-    this.url = url;
-  }
-}
-
 const REPL_NAME = 'Legend REPL';
 
 export function createReplTerminal(context: ExtensionContext): void {
@@ -510,19 +500,31 @@ export function createReplTerminal(context: ExtensionContext): void {
     workspace.workspaceFolders?.map(
       (workspaceFolder) => workspaceFolder.uri.fsPath,
     ) ?? [];
+  const replHomeDir = path.join(context.storageUri!.fsPath, 'repl');
+  // NOTE: when used in Coder, auto-forwarding is set up so an URL template is specified in the environment
+  // See https://coder.com/docs/code-server/guide#using-your-own-proxy
+  // eslint-disable-next-line no-process-env
+  const coderVSCodeProxyURLTemplate = process.env.VSCODE_PROXY_URI;
 
   const shellArgs = [
-    `-DstoragePath=${path.join(context.storageUri!.fsPath, 'repl')}`,
+    `-DstoragePath=${replHomeDir}`,
+    coderVSCodeProxyURLTemplate
+      ? `-Dlegend.repl.dataCube.urlTemplate=${coderVSCodeProxyURLTemplate}`
+      : undefined,
     `-Dlegend.repl.grid.licenseKey=${workspace
       .getConfiguration('legend')
       .get('agGridLicense', '')}`,
+    `-Dlegend.repl.configuration.homeDir=${replHomeDir}`,
+    `-Dlegend.repl.initializationMessage=${`Log file: ${Uri.file(
+      path.join(context.storageUri!.fsPath, 'repl', 'engine-lsp', 'log.txt'),
+    )}`}`,
     `-Dlegend.planExecutor.configuration=${workspace
       .getConfiguration('legend')
       .get('planExecutor.configuration', '')}`,
     // '-agentlib:jdwp=transport=dt_socket,server=y,quiet=y,suspend=n,address=*:11292',
     'org.finos.legend.engine.ide.lsp.server.LegendREPLTerminal',
     ...workspaceFolders,
-  ];
+  ].filter((arg): arg is string => arg !== undefined);
 
   const provider = window.registerTerminalProfileProvider(
     'legend.terminal.repl',
@@ -538,14 +540,6 @@ export function createReplTerminal(context: ExtensionContext): void {
             env: {
               CLASSPATH: cp,
             },
-            message: `REPL log file: ${Uri.file(
-              path.join(
-                context.storageUri!.fsPath,
-                'repl',
-                'engine-lsp',
-                'log.txt',
-              ),
-            )}`,
             iconPath: new ThemeIcon('compass'),
             isTransient: true,
           },
@@ -555,54 +549,6 @@ export function createReplTerminal(context: ExtensionContext): void {
   );
 
   context.subscriptions.push(provider);
-
-  // eslint-disable-next-line no-process-env
-  if (process.env.VSCODE_PROXY_URI !== undefined) {
-    const terminalLinkProvider = window.registerTerminalLinkProvider({
-      provideTerminalLinks: (terminalContext) => {
-        if (terminalContext.terminal.creationOptions.name !== REPL_NAME) {
-          return [];
-        }
-
-        const isLocalHost =
-          terminalContext.line.startsWith('http://localhost:');
-        let indexOfReplPath = terminalContext.line.indexOf('/repl');
-
-        if (!isLocalHost || indexOfReplPath === -1) {
-          return [];
-        }
-
-        const localHostUrl = Uri.parse(terminalContext.line);
-        const port = localHostUrl.authority.split(':')[1]!;
-
-        // eslint-disable-next-line no-process-env
-        if (process.env.VSCODE_PROXY_URI!.endsWith('/')) {
-          // manage the trailing / when concat paths...
-          indexOfReplPath++;
-        }
-
-        const proxyUrl = Uri.parse(
-          // eslint-disable-next-line no-process-env
-          process.env.VSCODE_PROXY_URI!.replace('{{port}}', port) +
-            terminalContext.line.substring(indexOfReplPath),
-        );
-        return [
-          new LegendTerminalLink(
-            0,
-            terminalContext.line.length,
-            proxyUrl,
-            'Open on Browser',
-          ),
-        ];
-      },
-
-      handleTerminalLink: (link: LegendTerminalLink) => {
-        commands.executeCommand('simpleBrowser.api.open', link.url);
-      },
-    });
-
-    context.subscriptions.push(terminalLinkProvider);
-  }
 }
 
 function registerLegendVirtualFilesystemProvider(
