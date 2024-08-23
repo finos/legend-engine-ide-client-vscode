@@ -1,4 +1,4 @@
-<img src="https://cdn.jsdelivr.net/gh/finos/contrib-toolbox@master/images/badge-incubating.png" width="48"/>
+<img src="https://cdn.jsdelivr.net/gh/finos/contrib-toolbox@master/images/badge-incubating.png" width="150"/>
 
 ![Visual Studio Marketplace](https://img.shields.io/visual-studio-marketplace/v/FINOS.legend-engine-ide-client-vscode.png?label=Visual%20Studio%20Marketplace)
 ![Open VSX Marketplace](https://img.shields.io/open-vsx/v/finos/legend-engine-ide-client-vscode.png?label=Open%20VSX%20Marketplace)
