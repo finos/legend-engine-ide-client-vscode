@@ -1,6 +1,8 @@
-[FINOS Incubating](https://community.finos.org/docs/governance/Software-Projects/stages/incubating)
+[![FINOS - Incubating](https://cdn.jsdelivr.net/gh/finos/contrib-toolbox@master/images/badge-incubating.png | width=100)](https://finosfoundation.atlassian.net/wiki/display/FINOS/Incubating)
+![Visual Studio Marketplace](https://img.shields.io/visual-studio-marketplace/v/FINOS.legend-engine-ide-client-vscode.png?label=Visual%20Studio%20Marketplace)
+![Open VSX Marketplace](https://img.shields.io/open-vsx/v/finos/legend-engine-ide-client-vscode.png?label=Open%20VSX%20Marketplace)
 
-The ___Legend VSCode___ extension provides an easy and quick way to develop using _Legend_ data modeling language.  
+The **_Legend VSCode_** extension provides an easy and quick way to develop using _Legend_ data modeling language.
 
 An overview of the language can be found [here](https://legend.finos.org/docs/overview/legend-overview).
 
@@ -25,6 +27,7 @@ For more things _Legend_, visit our GitHub [here](https://github.com/finos/legen
 ![Hello World](docs/demo.gif)
 
 To start using the extension, create a `hello.pure` file in your workspace, and copy/paste the content of one of our showcases
+
 - Relational Database Showcase (using in-memory H2) - https://raw.githubusercontent.com/finos/legend-studio/master/packages/legend-server-showcase-deployment/data/showcases/Stores/Relational%20Database/Mapping/code.pure
 - Model to Model transformation (consume JSON input, transform to new model) - https://raw.githubusercontent.com/finos/legend-studio/master/packages/legend-server-showcase-deployment/data/showcases/Stores/Model%20Store/Mapping/code.pure
 
