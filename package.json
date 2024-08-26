@@ -11,7 +11,7 @@
   "icon": "icons/legend_full.png",
   "homepage": "https://legend.finos.org/",
   "publisher": "FINOS",
-  "version": "0.10.0",
+  "version": "0.11.0",
   "type": "commonjs",
   "repository": {
     "type": "git",
@@ -124,7 +124,6 @@
         "title": "One Entity Per File Refactoring",
         "icon": "$(type-hierarchy)"
       }
-      
     ],
     "configuration": {
       "type": "object",
