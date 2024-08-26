@@ -33,6 +33,7 @@ import {
   SnippetTextEdit,
   WorkspaceEdit,
   EndOfLine,
+  ProgressLocation,
 } from 'vscode';
 import {
   type LanguageClient,
@@ -515,7 +516,7 @@ export function createReplTerminal(context: ExtensionContext): void {
       .getConfiguration('legend')
       .get('agGridLicense', '')}`,
     `-Dlegend.repl.configuration.homeDir=${replHomeDir}`,
-    `-Dlegend.repl.initializationMessage=${`Log file: ${Uri.file(
+    `-Dlegend.repl.initializationMessage=${`[DEV] Log file: ${Uri.file(
       path.join(context.storageUri!.fsPath, 'repl', 'engine-lsp', 'log.txt'),
     )}`}`,
     `-Dlegend.planExecutor.configuration=${workspace
@@ -532,18 +533,32 @@ export function createReplTerminal(context: ExtensionContext): void {
       provideTerminalProfile(
         token: CancellationToken,
       ): ProviderResult<TerminalProfile> {
-        return client.replClasspath(token).then((cp) => ({
-          options: {
-            name: REPL_NAME,
-            shellPath: 'java',
-            shellArgs,
-            env: {
-              CLASSPATH: cp,
+        return (async () => {
+          // So a progress bar while waiting for the classpath to be computed/the server going through post-initialization
+          const classpath = await window.withProgress(
+            {
+              location: ProgressLocation.Notification,
+              title: `Initializing ${REPL_NAME}`,
             },
-            iconPath: new ThemeIcon('compass'),
-            isTransient: true,
-          },
-        }));
+            () => client.replClasspath(token),
+          );
+          // As we output while initializing the REPL, the IDE automatically switch to show the Output panel
+          // we must force it back to Terminal panel
+          window.activeTerminal?.show();
+          return {
+            options: {
+              name: REPL_NAME,
+              shellPath: 'java',
+              shellArgs,
+              env: {
+                CLASSPATH: classpath,
+              },
+              message: `Lauching ${REPL_NAME}...`,
+              iconPath: new ThemeIcon('compass'),
+              isTransient: true,
+            },
+          };
+        })();
       },
     },
   );
