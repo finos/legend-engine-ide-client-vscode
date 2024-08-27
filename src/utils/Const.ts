@@ -48,6 +48,7 @@ export const TEST_CASES_REQUEST_ID = 'legend/testCases';
 export const EXECUTE_TESTS_REQUEST_ID = 'legend/executeTests';
 export const ENTITIES_REQUEST_ID = 'legend/entities';
 export const VIRTUAL_FILE_SYSTEM_FILE_REQUEST_ID = 'legend/legendVirtualFile';
+export const LEGEND_WRITE_ENTITY = 'legend/writeEntity';
 export const GET_TDS_REQUEST_RESULTS_ID = 'getTDSRequestResultsId';
 export const LEGEND_SHOW_DIAGRAM = 'legend.show.diagram';
 export const ONE_ENTITY_PER_FILE_REQUEST_ID =
@@ -58,6 +59,8 @@ export const ONE_ENTITY_PER_FILE_COMMAND_ID =
 // Event Types
 export const GET_PROJECT_ENTITIES = 'getProjectEntities';
 export const GET_PROJECT_ENTITIES_RESPONSE = 'getProjectEntitiesResponse';
+export const DIAGRAM_DROP_CLASS_ERROR = 'diagramDropClassError';
+export const WRITE_ENTITY = 'writeEntity';
 
 // Context variables
 export const SHOW_EXECUTION_RESULTS = 'showExecutionResults';

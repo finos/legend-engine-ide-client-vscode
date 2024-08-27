@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+const { type } = require('os');
 const path = require('path');
 const webpack = require('webpack');
 
@@ -29,6 +30,7 @@ const webViewConfig = {
   output: {
     filename: '[name].js',
     path: path.resolve(__dirname, 'dist'),
+    assetModuleFilename: 'assets/[hash][ext][query]'
   },
   devtool: 'nosources-source-map',
   module: {
@@ -38,7 +40,6 @@ const webViewConfig = {
         use: 'ts-loader',
         exclude: /node_modules/,
       },
-      // Allow importing CSS modules:
       {
         test: /\.s?(a|c)ss$/,
         use: [
@@ -49,6 +50,10 @@ const webViewConfig = {
           },
         ],
       },
+      {
+        test: /\.(woff|woff2|eot|ttf|otf)$/i,
+        type: 'asset',
+      }
     ],
   },
   plugins: [

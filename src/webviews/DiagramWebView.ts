@@ -15,12 +15,15 @@
  */
 
 import * as path from 'path';
-import { Uri, type ExtensionContext, type WebviewPanel } from 'vscode';
+import { Uri, type ExtensionContext, type WebviewPanel, window } from 'vscode';
 import type { LegendEntity } from '../model/LegendEntity';
 import {
+  DIAGRAM_DROP_CLASS_ERROR,
   GET_PROJECT_ENTITIES,
   GET_PROJECT_ENTITIES_RESPONSE,
+  WRITE_ENTITY,
 } from '../utils/Const';
+import type { LegendLanguageClient } from '../LegendLanguageClient';
 
 export const renderDiagramRendererWebView = (
   diagramRendererWebViewPanel: WebviewPanel,
@@ -28,6 +31,7 @@ export const renderDiagramRendererWebView = (
   diagramId: string,
   entities: LegendEntity[],
   renderFilePath: string,
+  client: LegendLanguageClient,
 ): void => {
   let diagramRendererScript;
   const { webview } = diagramRendererWebViewPanel;
@@ -59,8 +63,8 @@ export const renderDiagramRendererWebView = (
     </html>
   `;
 
-  webview.onDidReceiveMessage(async (msg) => {
-    switch (msg.command) {
+  webview.onDidReceiveMessage(async (message) => {
+    switch (message.command) {
       case GET_PROJECT_ENTITIES: {
         webview.postMessage({
           command: GET_PROJECT_ENTITIES_RESPONSE,
@@ -68,8 +72,19 @@ export const renderDiagramRendererWebView = (
         });
         break;
       }
+      case DIAGRAM_DROP_CLASS_ERROR: {
+        window.showErrorMessage('Unsupported operation', {
+          modal: true,
+          detail: 'Only Class drop is supported.',
+        });
+        break;
+      }
+      case WRITE_ENTITY: {
+        client.writeEntity({ content: message.msg });
+        break;
+      }
       default:
-        throw new Error(`Unsupported request ${msg.command}`);
+        throw new Error(`Unsupported request ${message.command}`);
     }
   }, undefined);
 };

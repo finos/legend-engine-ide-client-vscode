@@ -16,7 +16,10 @@
 
 import '@finos/legend-vscode-extension-dependencies/style/index.css';
 import { createRoot } from 'react-dom/client';
-import { DiagramRendererComponent } from '@finos/legend-vscode-extension-dependencies';
+import {
+  DiagramEditor,
+  DiagramEditorState,
+} from '@finos/legend-vscode-extension-dependencies';
 import { type PlainObject } from '../../utils/SerializationUtils';
 
 const rootElement = document.getElementById('root');
@@ -27,9 +30,11 @@ if (inputParamtersFromHtml) {
   const parsedParams = JSON.parse(inputParamtersFromHtml) as PlainObject;
 
   createRoot(rootElement as HTMLElement).render(
-    <DiagramRendererComponent
+    <DiagramEditor
+      diagramEditorState={
+        new DiagramEditorState(parsedParams.diagramId as string)
+      }
       diagramId={parsedParams.diagramId as string}
-      presets={[]}
     />,
   );
 }
