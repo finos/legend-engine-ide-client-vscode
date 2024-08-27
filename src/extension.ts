@@ -516,9 +516,6 @@ export function createReplTerminal(context: ExtensionContext): void {
       .getConfiguration('legend')
       .get('agGridLicense', '')}`,
     `-Dlegend.repl.configuration.homeDir=${replHomeDir}`,
-    `-Dlegend.repl.initializationMessage=${`[DEV] Log file: ${Uri.file(
-      path.join(context.storageUri!.fsPath, 'repl', 'engine-lsp', 'log.txt'),
-    )}`}`,
     `-Dlegend.planExecutor.configuration=${workspace
       .getConfiguration('legend')
       .get('planExecutor.configuration', '')}`,
@@ -553,7 +550,15 @@ export function createReplTerminal(context: ExtensionContext): void {
               env: {
                 CLASSPATH: classpath,
               },
-              message: `Lauching ${REPL_NAME}...`,
+              // dim the text to make it similar to header of REPL
+              message: `\x1b[90mLauching ${REPL_NAME}...\r\n[DEV] Log: ${Uri.file(
+                path.join(
+                  context.storageUri!.fsPath,
+                  'repl',
+                  'engine-lsp',
+                  'log.txt',
+                ),
+              )}\x1b[0m`,
               iconPath: new ThemeIcon('compass'),
               isTransient: true,
             },
