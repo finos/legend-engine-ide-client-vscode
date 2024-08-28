@@ -512,7 +512,7 @@ export function createReplTerminal(context: ExtensionContext): void {
     coderVSCodeProxyURLTemplate
       ? `-Dlegend.repl.dataCube.urlTemplate=${coderVSCodeProxyURLTemplate}`
       : undefined,
-    `-Dlegend.repl.grid.licenseKey=${workspace
+    `-Dlegend.repl.dataCube.gridLicenseKey=${workspace
       .getConfiguration('legend')
       .get('agGridLicense', '')}`,
     `-Dlegend.repl.configuration.homeDir=${replHomeDir}`,
