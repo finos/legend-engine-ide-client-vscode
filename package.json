@@ -75,7 +75,7 @@
     "commands": [
       {
         "command": "legend.show.diagram",
-        "title": "View Diagram",
+        "title": "View/Edit Diagram",
         "icon": "$(graph-line)",
         "category": "Legend"
       },
@@ -306,7 +306,7 @@
     "@ag-grid-enterprise/menu": "30.2.0",
     "@ag-grid-enterprise/row-grouping": "30.2.0",
     "@ag-grid-enterprise/server-side-row-model": "30.2.0",
-    "@finos/legend-vscode-extension-dependencies": "2.1.0",
+    "@finos/legend-vscode-extension-dependencies": "3.0.0",
     "@types/vscode": "1.83.0",
     "glob": "11.0.0",
     "path": "0.12.7",

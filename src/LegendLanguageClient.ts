@@ -25,6 +25,7 @@ import {
   VIRTUAL_FILE_SYSTEM_FILE_REQUEST_ID,
   ENTITIES_REQUEST_ID,
   ONE_ENTITY_PER_FILE_REQUEST_ID,
+  LEGEND_WRITE_ENTITY,
 } from './utils/Const';
 import type { PlainObject } from './utils/SerializationUtils';
 import {
@@ -42,6 +43,10 @@ export class LegendEntitiesRequest {
   constructor(textDocuments: TextDocumentIdentifier[]) {
     this.textDocuments = textDocuments;
   }
+}
+
+interface LegendWriteEntityRequest {
+  content: PlainObject;
 }
 
 export class LegendLanguageClient extends LanguageClient {
@@ -126,6 +131,17 @@ export class LegendLanguageClient extends LanguageClient {
       return this.sendRequest(ONE_ENTITY_PER_FILE_REQUEST_ID, token);
     } else {
       return this.sendRequest(ONE_ENTITY_PER_FILE_REQUEST_ID);
+    }
+  }
+
+  async writeEntity(
+    request: LegendWriteEntityRequest,
+    token?: CancellationToken,
+  ): Promise<string> {
+    if (token) {
+      return this.sendRequest(LEGEND_WRITE_ENTITY, request, token);
+    } else {
+      return this.sendRequest(LEGEND_WRITE_ENTITY, request);
     }
   }
 }

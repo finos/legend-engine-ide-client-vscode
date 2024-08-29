@@ -264,10 +264,11 @@ export function registerCommands(context: ExtensionContext): void {
     async (...args: unknown[]) => {
       const diagramRendererWebView = window.createWebviewPanel(
         DIAGRAM_RENDERER,
-        `Diagram Render`,
+        `Diagram Editor`,
         ViewColumn.One,
         {
           enableScripts: true,
+          retainContextWhenHidden: true,
         },
       );
 
@@ -278,6 +279,7 @@ export function registerCommands(context: ExtensionContext): void {
         (args[0] as LegendConceptTreeItem).id as string,
         entities,
         workspace.getConfiguration('legend').get('studio.forms.file', ''),
+        client,
       );
     },
   );

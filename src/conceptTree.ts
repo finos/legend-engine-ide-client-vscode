@@ -158,8 +158,8 @@ class LegendConceptTreeProvider
     LegendConceptTreeItem | LegendConceptTreeItem[] | void
   > = this._onDidChangeTreeData.event;
 
-  readonly dragMimeTypes = [MIME_TYPE];
-  readonly dropMimeTypes = [];
+  readonly dragMimeTypes = [MIME_TYPE, 'text/uri-list'];
+  readonly dropMimeTypes = [MIME_TYPE];
 
   constructor(
     private client: LegendLanguageClient,
@@ -176,6 +176,7 @@ class LegendConceptTreeProvider
     dataTransfer: DataTransfer,
   ): void {
     dataTransfer.set(MIME_TYPE, new DataTransferItem(source));
+    //dataTransfer.set('text/uri-list', new DataTransferItem(source.map(s => s.id).join(',')));
   }
 
   getTreeItem(element: LegendConceptTreeItem): TreeItem {
