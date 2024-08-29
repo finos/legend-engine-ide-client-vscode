@@ -60,6 +60,8 @@ import {
   LEGEND_SHOW_DIAGRAM,
   DIAGRAM_RENDERER,
   ONE_ENTITY_PER_FILE_COMMAND_ID,
+  LEGEND_EDIT_SERVICE_QUERY,
+  SERVICE_QUERY_EDITOR,
 } from './utils/Const';
 import { LegendWebViewProvider } from './utils/LegendWebViewProvider';
 import {
@@ -82,6 +84,7 @@ import {
   createLegendConceptTreeProvider,
 } from './conceptTree';
 import { renderDiagramRendererWebView } from './webviews/DiagramWebView';
+import { renderServiceQueryEditorWebView } from './webviews/ServiceQueryEditorWebView';
 
 let client: LegendLanguageClient;
 const openedWebViews: Record<string, WebviewPanel> = {};
@@ -311,6 +314,30 @@ export function registerCommands(context: ExtensionContext): void {
     },
   );
   context.subscriptions.push(showDiagram);
+
+  const editServiceQuery = commands.registerCommand(
+    LEGEND_EDIT_SERVICE_QUERY,
+    async (...args: unknown[]) => {
+      const serviceQueryEditorWebView = window.createWebviewPanel(
+        SERVICE_QUERY_EDITOR,
+        `Service Query Editor`,
+        ViewColumn.One,
+        {
+          enableScripts: true,
+        },
+      );
+
+      const entities = await client.entities(new LegendEntitiesRequest([]));
+      renderServiceQueryEditorWebView(
+        serviceQueryEditorWebView,
+        context,
+        (args[0] as LegendConceptTreeItem).id as string,
+        entities,
+        workspace.getConfiguration('legend').get('studio.forms.file', ''),
+      );
+    },
+  );
+  context.subscriptions.push(editServiceQuery);
 
   const oneEntityPerFileRefactor = commands.registerCommand(
     ONE_ENTITY_PER_FILE_COMMAND_ID,

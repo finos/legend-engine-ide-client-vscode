@@ -80,6 +80,12 @@
         "category": "Legend"
       },
       {
+        "command": "legend.edit.service.query",
+        "title": "Edit Query",
+        "icon": "$(search)",
+        "category": "Legend"
+      },
+      {
         "command": "legend.log",
         "title": "Show Legend Server logs",
         "category": "Legend"
@@ -246,6 +252,11 @@
         {
           "command": "legend.show.diagram",
           "when": "viewItem == meta::pure::metamodel::diagram::Diagram",
+          "group": "inline"
+        },
+        {
+          "command": "legend.edit.service.query",
+          "when": "viewItem == meta::legend::service::metamodel::Service",
           "group": "inline"
         }
       ],

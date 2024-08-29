@@ -23,6 +23,7 @@ const webViewConfig = {
     AgGridRenderer: './src/components/grid/AgGridRenderer.tsx',
     FunctionResultsEditorRenderer: './src/components/function/FunctionResultsEditorRenderer.tsx',
     DiagramRendererRoot: './src/components/diagram/DiagramRendererRoot.tsx',
+    ServiceQueryEditorRoot: './src/components/query/ServiceQueryEditorRoot.tsx',
   },
   externals: {
     vscode: 'commonjs vscode',
