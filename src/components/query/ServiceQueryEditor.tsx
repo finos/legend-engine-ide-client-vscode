@@ -30,7 +30,9 @@ import {
   LegendVSCodeApplicationConfig,
   LegendVSCodePluginManager,
   QueryBuilderVSCodeWorkflowState,
-  ApplicationStoreProvider
+  ApplicationStoreProvider,
+  ApplicationFrameworkProvider,
+  BrowserEnvironmentProvider
 } from '@finos/legend-vscode-extension-dependencies';
 import { GET_PROJECT_ENTITIES, GET_PROJECT_ENTITIES_RESPONSE } from '../../utils/Const';
 import { type LegendEntity } from '../../model/LegendEntity';
@@ -130,7 +132,9 @@ export const ServiceQueryEditor: React.FC<{
 
   return (
     <ApplicationStoreProvider store={applicationStore}>
-      <div className="diagram__renderer">
+              <BrowserEnvironmentProvider baseUrl="/">
+      <ApplicationFrameworkProvider simple={true}>
+        <div className="diagram__renderer">
         {queryBuilderState && (
           <QueryBuilder queryBuilderState={queryBuilderState} />
         )}
@@ -147,6 +151,11 @@ export const ServiceQueryEditor: React.FC<{
           </div>
         ) : null}
       </div>
+      
+      </ApplicationFrameworkProvider>
+      </BrowserEnvironmentProvider>
+
+      
     </ApplicationStoreProvider>
   );
 };
