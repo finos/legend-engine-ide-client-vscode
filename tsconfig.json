@@ -2,8 +2,8 @@
   "compilerOptions": {
     "jsx": "react-jsx",
     "module": "CommonJS",
-    "target": "esnext",
-    "lib": ["esnext", "dom", "dom.iterable"],
+    "target": "es2020",
+    "lib": ["es2021", "dom"],
     "outDir": "lib",
     "rootDir": "src",
 		"sourceMap": true,
