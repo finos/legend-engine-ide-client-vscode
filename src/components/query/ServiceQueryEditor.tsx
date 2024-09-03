@@ -17,14 +17,13 @@
 import { useEffect, useMemo, useState } from 'react';
 import {
   type AbstractPreset,
-  ApplicationStore,
-  getPureGraph,
+  type AbstractPlugin,
   type LegendApplicationConfigurationData,
   type LegendApplicationConfigurationInput,
   type QueryBuilderState,
+  ApplicationStore,
   GraphManagerState,
   ServiceQueryBuilderState,
-  type Service,
   QueryBuilderActionConfig,
   QueryBuilder,
   LegendVSCodeApplicationConfig,
@@ -44,12 +43,11 @@ import { postMessage } from '../../utils/VsCodeUtils';
 export const ServiceQueryEditor: React.FC<{
   serviceId: string;
   presets: AbstractPreset[];
-}> = ({ serviceId, presets }) => {
+  plugins: AbstractPlugin[];
+}> = ({ serviceId, presets, plugins }) => {
   const [queryBuilderState, setQueryBuilderState] =
     useState<QueryBuilderState | null>(null);
-  const [service, setService] = useState<Service | null>(null);
   const [entities, setEntities] = useState<LegendEntity[]>([]);
-  const [error, setError] = useState<string | null>();
 
   const applicationStore = useMemo(() => {
     const input: LegendApplicationConfigurationInput<LegendApplicationConfigurationData> =
@@ -69,8 +67,9 @@ export const ServiceQueryEditor: React.FC<{
       new LegendVSCodeApplicationConfig(input);
     const pluginManager: LegendVSCodePluginManager =
       LegendVSCodePluginManager.create();
+    pluginManager.usePresets(presets).usePlugins(plugins).install();
     return new ApplicationStore(config, pluginManager);
-  }, []);
+  }, [plugins, presets]);
 
   console.log('serviceId:', serviceId);
 
@@ -93,32 +92,46 @@ export const ServiceQueryEditor: React.FC<{
     },
   );
 
-  useEffect(() => {
-    if (entities.length && serviceId) {
-      getPureGraph(entities, presets)
-        .then((pureModel) => {
-          console.log('made pure model:', pureModel);
-          console.log('service:', pureModel.getService(serviceId));
-          setService(pureModel.getService(serviceId));
-          setError(null);
-        })
-        .catch((e) => {
-          setError(e.message);
-          setService(null);
-        });
-    }
-  }, [entities, serviceId, presets]);
+  // useEffect(() => {
+  //   if (entities.length && serviceId) {
+
+  //     getPureGraph(entities, presets)
+  //       .then((pureModel) => {
+  //         console.log('made pure model:', pureModel);
+  //         console.log('service:', pureModel.getService(serviceId));
+  //         setService(pureModel.getService(serviceId));
+  //         setError(null);
+  //       })
+  //       .catch((e) => {
+  //         setError(e.message);
+  //         setService(null);
+  //       });
+  //   }
+  // }, [entities, serviceId, presets]);
 
   useEffect(() => {
-    console.log('service in useEffect:', service);
-    if (service && applicationStore) {
-      setQueryBuilderState(
-        new ServiceQueryBuilderState(
+    if (entities.length && serviceId && applicationStore) {
+      const initializeQuery = async (): Promise<void> => {
+        const graphManagerState = new GraphManagerState(
+          applicationStore.pluginManager,
+          applicationStore.logService,
+        );
+        await graphManagerState.graphManager.initialize({
+          env: 'test',
+          tabSize: 2,
+          clientConfig: {},
+        });
+        await graphManagerState.initializeSystem();
+        await graphManagerState.graphManager.buildGraph(
+          graphManagerState.graph,
+          entities,
+          graphManagerState.graphBuildState,
+          {},
+        );
+        const service = graphManagerState.graph.getService(serviceId);
+        const newQueryBuilderState = new ServiceQueryBuilderState(
           applicationStore,
-          new GraphManagerState(
-            applicationStore.pluginManager,
-            applicationStore.logService,
-          ),
+          graphManagerState,
           QueryBuilderVSCodeWorkflowState.INSTANCE,
           QueryBuilderActionConfig.INSTANCE,
           service,
@@ -127,11 +140,18 @@ export const ServiceQueryEditor: React.FC<{
           undefined,
           undefined,
           undefined,
-          undefined,
-        ),
-      );
+          {
+            service: service.path,
+          },
+        );
+        newQueryBuilderState.initializeWithQuery(service.execution.func);
+        setQueryBuilderState(newQueryBuilderState);
+      };
+      initializeQuery();
     }
-  }, [service, applicationStore]);
+  }, [serviceId, applicationStore, entities]);
+
+  console.log('queryBuilderState:', queryBuilderState);
 
   return (
     <ApplicationStoreProvider store={applicationStore}>
@@ -141,17 +161,6 @@ export const ServiceQueryEditor: React.FC<{
             <QueryBuilder queryBuilderState={queryBuilderState} />
           )}
           {!queryBuilderState && <>Failed setting up QueryBuilderState</>}
-          {error ? (
-            <div className="service__query__editor__error">
-              <span>Something went wrong. Diagram cannot be created.</span>
-              <span
-                className="service__query__editor_error__details"
-                title={`${error}`}
-              >
-                Error Details.
-              </span>
-            </div>
-          ) : null}
         </ApplicationFrameworkProvider>
       </BrowserEnvironmentProvider>
     </ApplicationStoreProvider>
