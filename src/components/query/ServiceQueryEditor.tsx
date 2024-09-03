@@ -17,19 +17,21 @@
 import { useEffect, useMemo, useState } from 'react';
 import { flowResult } from 'mobx';
 import {
-  type AbstractPreset,
   type AbstractPlugin,
+  type AbstractPreset,
   type LegendApplicationConfigurationData,
   type LegendApplicationConfigurationInput,
   type QueryBuilderState,
-  ApplicationStore,
-  GraphManagerState,
-  ServiceQueryBuilderState,
-  QueryBuilderActionConfig,
-  QueryBuilder,
-  ApplicationStoreProvider,
   ApplicationFrameworkProvider,
+  ApplicationStore,
+  ApplicationStoreProvider,
   BrowserEnvironmentProvider,
+  CubesLoadingIndicator,
+  CubesLoadingIndicatorIcon,
+  GraphManagerState,
+  QueryBuilder,
+  QueryBuilderActionConfig,
+  ServiceQueryBuilderState,
 } from '@finos/legend-vscode-extension-dependencies';
 import {
   GET_PROJECT_ENTITIES,
@@ -49,6 +51,7 @@ export const ServiceQueryEditor: React.FC<{
   const [queryBuilderState, setQueryBuilderState] =
     useState<QueryBuilderState | null>(null);
   const [entities, setEntities] = useState<LegendEntity[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   const applicationStore = useMemo(() => {
     const input: LegendApplicationConfigurationInput<LegendApplicationConfigurationData> =
@@ -73,6 +76,7 @@ export const ServiceQueryEditor: React.FC<{
   }, [plugins, presets]);
 
   useEffect(() => {
+    setIsLoading(true);
     postMessage({
       command: GET_PROJECT_ENTITIES,
     });
@@ -92,48 +96,54 @@ export const ServiceQueryEditor: React.FC<{
   useEffect(() => {
     if (entities.length && serviceId && applicationStore) {
       const initializeQuery = async (): Promise<void> => {
-        const graphManagerState = new GraphManagerState(
-          applicationStore.pluginManager,
-          applicationStore.logService,
-        );
-        await graphManagerState.graphManager.initialize({
-          env: 'test',
-          tabSize: 2,
-          clientConfig: {
-            baseUrl: applicationStore.config.engineServerUrl,
-            enableCompression: false,
-          },
-        });
-        await graphManagerState.initializeSystem();
-        await graphManagerState.graphManager.buildGraph(
-          graphManagerState.graph,
-          entities,
-          graphManagerState.graphBuildState,
-          {},
-        );
-        const service = graphManagerState.graph.getService(serviceId);
-        const newQueryBuilderState = new ServiceQueryBuilderState(
-          applicationStore,
-          graphManagerState,
-          QueryBuilderVSCodeWorkflowState.INSTANCE,
-          QueryBuilderActionConfig.INSTANCE,
-          service,
-          undefined,
-          undefined,
-          undefined,
-          undefined,
-          undefined,
-          {
-            service: service.path,
-          },
-        );
-        newQueryBuilderState.initializeWithQuery(service.execution.func);
-        await flowResult(newQueryBuilderState.explorerState.analyzeMappingModelCoverage()).catch(
-          applicationStore.alertUnhandledError,
-        );
-        setQueryBuilderState(newQueryBuilderState);
+        try {
+          const graphManagerState = new GraphManagerState(
+            applicationStore.pluginManager,
+            applicationStore.logService,
+          );
+          await graphManagerState.graphManager.initialize({
+            env: 'test',
+            tabSize: 2,
+            clientConfig: {
+              baseUrl: applicationStore.config.engineServerUrl,
+              enableCompression: false,
+            },
+          });
+          await graphManagerState.initializeSystem();
+          await graphManagerState.graphManager.buildGraph(
+            graphManagerState.graph,
+            entities,
+            graphManagerState.graphBuildState,
+            {},
+          );
+          const service = graphManagerState.graph.getService(serviceId);
+          const newQueryBuilderState = new ServiceQueryBuilderState(
+            applicationStore,
+            graphManagerState,
+            QueryBuilderVSCodeWorkflowState.INSTANCE,
+            QueryBuilderActionConfig.INSTANCE,
+            service,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            {
+              service: service.path,
+            },
+          );
+          newQueryBuilderState.initializeWithQuery(service.execution.func);
+          await flowResult(newQueryBuilderState.explorerState.analyzeMappingModelCoverage()).catch(
+            applicationStore.alertUnhandledError,
+          );
+          setQueryBuilderState(newQueryBuilderState);
+        } finally {
+          setIsLoading(false);
+        }
       };
       initializeQuery();
+    } else {
+      setIsLoading(false);
     }
   }, [serviceId, applicationStore, entities]);
 
@@ -141,10 +151,13 @@ export const ServiceQueryEditor: React.FC<{
     <ApplicationStoreProvider store={applicationStore}>
       <BrowserEnvironmentProvider baseUrl="/">
         <ApplicationFrameworkProvider simple={true}>
-          {queryBuilderState && (
+          <CubesLoadingIndicator isLoading={isLoading}>
+            <CubesLoadingIndicatorIcon />
+          </CubesLoadingIndicator>
+          {queryBuilderState && !isLoading && (
             <QueryBuilder queryBuilderState={queryBuilderState} />
           )}
-          {!queryBuilderState && <>Failed setting up QueryBuilderState</>}
+          {!queryBuilderState && !isLoading && <>Failed setting up QueryBuilderState</>}
         </ApplicationFrameworkProvider>
       </BrowserEnvironmentProvider>
     </ApplicationStoreProvider>
