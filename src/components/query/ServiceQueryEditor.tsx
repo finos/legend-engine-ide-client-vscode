@@ -72,10 +72,7 @@ export const ServiceQueryEditor: React.FC<{
     return new ApplicationStore(config, pluginManager);
   }, [plugins, presets]);
 
-  console.log('serviceId:', serviceId);
-
   useEffect(() => {
-    console.log('sending message to get project entities');
     postMessage({
       command: GET_PROJECT_ENTITIES,
     });
@@ -85,30 +82,12 @@ export const ServiceQueryEditor: React.FC<{
     'message',
     (event: MessageEvent<{ result: LegendEntity[]; command: string }>) => {
       const message = event.data;
-      console.log('got message:', message);
       if (message.command === GET_PROJECT_ENTITIES_RESPONSE) {
         const es: LegendEntity[] = message.result;
         setEntities(es);
       }
     },
   );
-
-  // useEffect(() => {
-  //   if (entities.length && serviceId) {
-
-  //     getPureGraph(entities, presets)
-  //       .then((pureModel) => {
-  //         console.log('made pure model:', pureModel);
-  //         console.log('service:', pureModel.getService(serviceId));
-  //         setService(pureModel.getService(serviceId));
-  //         setError(null);
-  //       })
-  //       .catch((e) => {
-  //         setError(e.message);
-  //         setService(null);
-  //       });
-  //   }
-  // }, [entities, serviceId, presets]);
 
   useEffect(() => {
     if (entities.length && serviceId && applicationStore) {
@@ -157,8 +136,6 @@ export const ServiceQueryEditor: React.FC<{
       initializeQuery();
     }
   }, [serviceId, applicationStore, entities]);
-
-  console.log('queryBuilderState:', queryBuilderState);
 
   return (
     <ApplicationStoreProvider store={applicationStore}>
