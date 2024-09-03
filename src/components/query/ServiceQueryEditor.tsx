@@ -32,9 +32,12 @@ import {
   QueryBuilderVSCodeWorkflowState,
   ApplicationStoreProvider,
   ApplicationFrameworkProvider,
-  BrowserEnvironmentProvider
+  BrowserEnvironmentProvider,
 } from '@finos/legend-vscode-extension-dependencies';
-import { GET_PROJECT_ENTITIES, GET_PROJECT_ENTITIES_RESPONSE } from '../../utils/Const';
+import {
+  GET_PROJECT_ENTITIES,
+  GET_PROJECT_ENTITIES_RESPONSE,
+} from '../../utils/Const';
 import { type LegendEntity } from '../../model/LegendEntity';
 import { postMessage } from '../../utils/VsCodeUtils';
 
@@ -50,18 +53,18 @@ export const ServiceQueryEditor: React.FC<{
 
   const applicationStore = useMemo(() => {
     const input: LegendApplicationConfigurationInput<LegendApplicationConfigurationData> =
-    {
-      baseAddress: 'http://localhost:9000',
-      configData: {
-        appName: 'legend-vs-code',
-        env: 'dev',
-      },
-      versionData: {
-        buildTime: 'now',
-        version: '0.0.0',
-        commitSHA: 'commitSHA',
-      },
-    };
+      {
+        baseAddress: 'http://localhost:9000',
+        configData: {
+          appName: 'legend-vs-code',
+          env: 'dev',
+        },
+        versionData: {
+          buildTime: 'now',
+          version: '0.0.0',
+          commitSHA: 'commitSHA',
+        },
+      };
     const config: LegendVSCodeApplicationConfig =
       new LegendVSCodeApplicationConfig(input);
     const pluginManager: LegendVSCodePluginManager =
@@ -109,53 +112,48 @@ export const ServiceQueryEditor: React.FC<{
   useEffect(() => {
     console.log('service in useEffect:', service);
     if (service && applicationStore) {
-    setQueryBuilderState(
-      new ServiceQueryBuilderState(
-        applicationStore,
-        new GraphManagerState(
-          applicationStore.pluginManager,
-          applicationStore.logService,
+      setQueryBuilderState(
+        new ServiceQueryBuilderState(
+          applicationStore,
+          new GraphManagerState(
+            applicationStore.pluginManager,
+            applicationStore.logService,
+          ),
+          QueryBuilderVSCodeWorkflowState.INSTANCE,
+          QueryBuilderActionConfig.INSTANCE,
+          service,
+          undefined,
+          undefined,
+          undefined,
+          undefined,
+          undefined,
+          undefined,
         ),
-        QueryBuilderVSCodeWorkflowState.INSTANCE,
-        QueryBuilderActionConfig.INSTANCE,
-        service,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-      ),
-    );
+      );
     }
-  }, [service]);
+  }, [service, applicationStore]);
 
   return (
     <ApplicationStoreProvider store={applicationStore}>
-              <BrowserEnvironmentProvider baseUrl="/">
-      <ApplicationFrameworkProvider simple={true}>
-        <div className="diagram__renderer">
-        {queryBuilderState && (
-          <QueryBuilder queryBuilderState={queryBuilderState} />
-        )}
-        {!queryBuilderState && <>Failed setting up QueryBuilderState</>}
-        {error ? (
-          <div className="diagram__renderer__error">
-            <span>Something went wrong. Diagram cannot be created.</span>
-            <span
-              className="diagram__renderer__error__details"
-              title={`${error}`}
-            >
-              Error Details.
-            </span>
-          </div>
-        ) : null}
-      </div>
-      
-      </ApplicationFrameworkProvider>
+      <BrowserEnvironmentProvider baseUrl="/">
+        <ApplicationFrameworkProvider simple={true}>
+          {queryBuilderState && (
+            <QueryBuilder queryBuilderState={queryBuilderState} />
+          )}
+          {!queryBuilderState && <>Failed setting up QueryBuilderState</>}
+          {error ? (
+            <div className="service__query__editor__error">
+              <span>Something went wrong. Diagram cannot be created.</span>
+              <span
+                className="service__query__editor_error__details"
+                title={`${error}`}
+              >
+                Error Details.
+              </span>
+            </div>
+          ) : null}
+        </ApplicationFrameworkProvider>
       </BrowserEnvironmentProvider>
-
-      
     </ApplicationStoreProvider>
   );
 };
