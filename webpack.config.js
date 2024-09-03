@@ -61,6 +61,9 @@ const webViewConfig = {
     new webpack.ProvidePlugin({
            process: 'process/browser',
     }),
+    new webpack.DefinePlugin({
+      AG_GRID_LICENSE: null,
+    }),
   ],
   resolve: {
     extensions: ['.tsx', '.ts', '.js', '.css', '.scss'],
