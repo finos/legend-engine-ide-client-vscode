@@ -15,6 +15,7 @@
  */
 
 import { useEffect, useMemo, useState } from 'react';
+import { flowResult } from 'mobx';
 import {
   type AbstractPreset,
   type AbstractPlugin,
@@ -26,9 +27,6 @@ import {
   ServiceQueryBuilderState,
   QueryBuilderActionConfig,
   QueryBuilder,
-  LegendVSCodeApplicationConfig,
-  LegendVSCodePluginManager,
-  QueryBuilderVSCodeWorkflowState,
   ApplicationStoreProvider,
   ApplicationFrameworkProvider,
   BrowserEnvironmentProvider,
@@ -39,6 +37,9 @@ import {
 } from '../../utils/Const';
 import { type LegendEntity } from '../../model/LegendEntity';
 import { postMessage } from '../../utils/VsCodeUtils';
+import { LegendVSCodeApplicationConfig } from './LegendVSCodeApplicationConfig';
+import { LegendVSCodePluginManager } from './LegendVSCodePluginManager';
+import { QueryBuilderVSCodeWorkflowState } from './QueryBuilderWorkflowState';
 
 export const ServiceQueryEditor: React.FC<{
   serviceId: string;
@@ -119,7 +120,10 @@ export const ServiceQueryEditor: React.FC<{
         await graphManagerState.graphManager.initialize({
           env: 'test',
           tabSize: 2,
-          clientConfig: {},
+          clientConfig: {
+            baseUrl: applicationStore.config.engineServerUrl,
+            enableCompression: false,
+          },
         });
         await graphManagerState.initializeSystem();
         await graphManagerState.graphManager.buildGraph(
@@ -145,6 +149,9 @@ export const ServiceQueryEditor: React.FC<{
           },
         );
         newQueryBuilderState.initializeWithQuery(service.execution.func);
+        await flowResult(newQueryBuilderState.explorerState.analyzeMappingModelCoverage()).catch(
+          applicationStore.alertUnhandledError,
+        );
         setQueryBuilderState(newQueryBuilderState);
       };
       initializeQuery();
