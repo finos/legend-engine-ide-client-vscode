@@ -52,6 +52,7 @@ export const ServiceQueryEditor: React.FC<{
     useState<QueryBuilderState | null>(null);
   const [entities, setEntities] = useState<LegendEntity[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
 
   const applicationStore = useMemo(() => {
     const input: LegendApplicationConfigurationInput<LegendApplicationConfigurationData> =
@@ -137,6 +138,10 @@ export const ServiceQueryEditor: React.FC<{
             applicationStore.alertUnhandledError,
           );
           setQueryBuilderState(newQueryBuilderState);
+        } catch (e) {
+          if (e instanceof Error) {
+            setError(e.message);
+          }
         } finally {
           setIsLoading(false);
         }
@@ -157,7 +162,7 @@ export const ServiceQueryEditor: React.FC<{
           {queryBuilderState && !isLoading && (
             <QueryBuilder queryBuilderState={queryBuilderState} />
           )}
-          {!queryBuilderState && !isLoading && <>Failed setting up QueryBuilderState</>}
+          {!queryBuilderState && !isLoading && error && <>Failed setting up QueryBuilderState&nbsp;{error}</>}
         </ApplicationFrameworkProvider>
       </BrowserEnvironmentProvider>
     </ApplicationStoreProvider>
