@@ -20,7 +20,9 @@ import { type PlainObject } from '../../utils/SerializationUtils';
 import { ServiceQueryEditor } from './ServiceQueryEditor';
 import {
   Core_GraphManagerPreset,
+  Core_LegendApplicationPlugin,
   QueryBuilder_GraphManagerPreset,
+  QueryBuilder_LegendApplicationPlugin,
 } from '@finos/legend-vscode-extension-dependencies';
 
 const rootElement = document.getElementById('root');
@@ -37,7 +39,10 @@ if (inputParamtersFromHtml) {
         new Core_GraphManagerPreset(),
         new QueryBuilder_GraphManagerPreset(),
       ]}
-      plugins={[]}
+      plugins={[
+        new Core_LegendApplicationPlugin(),
+        new QueryBuilder_LegendApplicationPlugin(),
+      ]}
     />,
   );
 }
