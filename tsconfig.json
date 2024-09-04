@@ -12,6 +12,8 @@
     "noUncheckedIndexedAccess": true,
     "declaration": true,
     "declarationMap": true,
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
     // ---exactOptionalPropertyTypes specifies that optional property types should be interpreted exactly as
     // written, meaning that `| undefined` is not added to the type.
     // This makes it possible to ensure that optional properties are never `undefined` when they're present
@@ -24,8 +26,8 @@
     "useDefineForClassFields": true,
   },
   "include": [
-    "src"
-    // "./.eslintrc.cjs",
+    "src",
+    "./.eslintrc.cjs",
   ],
   "exclude": ["node_modules", ".vscode-test"]
 }
