@@ -1,0 +1,60 @@
+/**
+ * Copyright (c) 2020-present, Goldman Sachs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+import packageJson from '../../../package.json';
+import {
+  type QueryBuilderHeaderActionConfiguration,
+  type QueryBuilderState,
+  Button,
+  SaveCurrIcon,
+} from '@finos/legend-vscode-extension-dependencies';
+import { LegendVSCodeApplicationPlugin } from './LegendVSCodePlugin';
+
+export class Core_LegendVSCodeApplicationPlugin extends LegendVSCodeApplicationPlugin {
+  static NAME = packageJson.extensions.applicationVSCodePlugin;
+
+  constructor() {
+    super(Core_LegendVSCodeApplicationPlugin.NAME, packageJson.version);
+  }
+
+  getExtraQueryBuilderHeaderActionConfigurations?(): QueryBuilderHeaderActionConfiguration[] {
+    return [
+      {
+        key: 'save-query',
+        category: 0,
+        renderer: (queryBuilderState: QueryBuilderState): React.ReactNode => {
+          const handleSaveQuery = (): void => {
+            console.log('save query');
+          };
+
+          return (
+            <div className="query-editor__header__action-combo btn__dropdown-combo">
+              <Button
+                className="query-editor__header__action query-editor__header__action-combo__main-btn btn--dak"
+                disabled={!queryBuilderState.canBuildQuery}
+                onClick={handleSaveQuery}
+                title="Save query"
+              >
+                <SaveCurrIcon />
+                <div className="query-editor__header__action__label">Save</div>
+              </Button>
+            </div>
+          );
+        },
+      },
+    ];
+  }
+}

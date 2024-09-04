@@ -24,6 +24,7 @@ import {
   QueryBuilder_GraphManagerPreset,
   QueryBuilder_LegendApplicationPlugin,
 } from '@finos/legend-vscode-extension-dependencies';
+import { Core_LegendVSCodeApplicationPlugin } from './Core_LegendVSCodeApplicationPlugin';
 
 const rootElement = document.getElementById('root');
 const inputParamtersFromHtml = rootElement
@@ -42,6 +43,7 @@ if (inputParamtersFromHtml) {
       plugins={[
         new Core_LegendApplicationPlugin(),
         new QueryBuilder_LegendApplicationPlugin(),
+        new Core_LegendVSCodeApplicationPlugin(),
       ]}
     />,
   );

@@ -15,25 +15,13 @@
  */
 
 import {
-  LegendApplicationPlugin,
   LegendApplicationPluginManager,
   type GraphManagerPluginManager,
   type PureGraphManagerPlugin,
   type PureGraphPlugin,
   type PureProtocolProcessorPlugin,
 } from '@finos/legend-vscode-extension-dependencies';
-
-abstract class LegendVSCodeApplicationPlugin extends LegendApplicationPlugin {
-  /**
-   * This helps to better type-check for this empty abtract type
-   * See https://github.com/finos/legend-studio/blob/master/docs/technical/typescript-usage.md#understand-typescript-structual-type-system
-   */
-  private readonly _$nominalTypeBrand!: 'LegendVSCodeApplicationPlugin';
-
-  install(pluginManager: LegendVSCodePluginManager): void {
-    pluginManager.registerApplicationPlugin(this);
-  }
-}
+import { type LegendVSCodeApplicationPlugin } from './LegendVSCodePlugin';
 
 export class LegendVSCodePluginManager
   extends LegendApplicationPluginManager<LegendVSCodeApplicationPlugin>
