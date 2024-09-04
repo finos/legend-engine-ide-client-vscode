@@ -324,6 +324,7 @@ export function registerCommands(context: ExtensionContext): void {
         ViewColumn.One,
         {
           enableScripts: true,
+          retainContextWhenHidden: true,
         },
       );
 
@@ -334,6 +335,7 @@ export function registerCommands(context: ExtensionContext): void {
         (args[0] as LegendConceptTreeItem).id as string,
         entities,
         workspace.getConfiguration('legend').get('studio.forms.file', ''),
+        client,
       );
     },
   );
@@ -455,7 +457,7 @@ export function registerClientViews(context: ExtensionContext): void {
           context.extensionPath,
           resultsViewprovider.getWebView(),
         );
-      } catch (e) {
+      } catch {
         if (error instanceof Error) {
           window.showErrorMessage(error.message);
         }

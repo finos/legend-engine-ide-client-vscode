@@ -16,8 +16,13 @@
 
 import * as path from 'path';
 import { Uri, type ExtensionContext, type WebviewPanel } from 'vscode';
-import { GET_PROJECT_ENTITIES, GET_PROJECT_ENTITIES_RESPONSE } from '../utils/Const';
+import {
+  GET_PROJECT_ENTITIES,
+  GET_PROJECT_ENTITIES_RESPONSE,
+  WRITE_ENTITY,
+} from '../utils/Const';
 import { type LegendEntity } from '../model/LegendEntity';
+import { type LegendLanguageClient } from '../LegendLanguageClient';
 
 export const renderServiceQueryEditorWebView = (
   serviceQueryEditorWebViewPanel: WebviewPanel,
@@ -25,6 +30,7 @@ export const renderServiceQueryEditorWebView = (
   serviceId: string,
   entities: LegendEntity[],
   renderFilePath: string,
+  client: LegendLanguageClient,
 ): void => {
   let serviceQueryEditorScript;
   const { webview } = serviceQueryEditorWebViewPanel;
@@ -32,7 +38,9 @@ export const renderServiceQueryEditorWebView = (
     const serviceQueryEditorScriptPath = Uri.file(
       path.join(context.extensionPath, 'dist', 'ServiceQueryEditorRoot.js'),
     );
-    serviceQueryEditorScript = webview.asWebviewUri(serviceQueryEditorScriptPath);
+    serviceQueryEditorScript = webview.asWebviewUri(
+      serviceQueryEditorScriptPath,
+    );
   } else {
     serviceQueryEditorScript = renderFilePath;
   }
@@ -56,9 +64,8 @@ export const renderServiceQueryEditorWebView = (
     </html>
   `;
 
-  webview.onDidReceiveMessage(async (msg) => {
-    console.log('webview received message:', msg);
-    switch (msg.command) {
+  webview.onDidReceiveMessage(async (message) => {
+    switch (message.command) {
       case GET_PROJECT_ENTITIES: {
         webview.postMessage({
           command: GET_PROJECT_ENTITIES_RESPONSE,
@@ -66,8 +73,12 @@ export const renderServiceQueryEditorWebView = (
         });
         break;
       }
+      case WRITE_ENTITY: {
+        client.writeEntity({ content: message.msg });
+        break;
+      }
       default:
-        throw new Error(`Unsupported request ${msg.command}`);
+        throw new Error(`Unsupported request ${message.command}`);
     }
   }, undefined);
 };

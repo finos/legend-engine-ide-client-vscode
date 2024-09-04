@@ -18,10 +18,19 @@ import packageJson from '../../../package.json';
 import {
   type QueryBuilderHeaderActionConfiguration,
   type QueryBuilderState,
+  type V1_Service,
+  assertErrorThrown,
   Button,
+  guaranteeType,
+  pureExecution_setFunction,
   SaveCurrIcon,
+  ServiceQueryBuilderState,
+  V1_PureGraphManager,
+  V1_serializePackageableElement,
 } from '@finos/legend-vscode-extension-dependencies';
 import { LegendVSCodeApplicationPlugin } from './LegendVSCodePlugin';
+import { postMessage } from '../../utils/VsCodeUtils';
+import { WRITE_ENTITY } from '../../utils/Const';
 
 export class Core_LegendVSCodeApplicationPlugin extends LegendVSCodeApplicationPlugin {
   static NAME = packageJson.extensions.applicationVSCodePlugin;
@@ -36,22 +45,57 @@ export class Core_LegendVSCodeApplicationPlugin extends LegendVSCodeApplicationP
         key: 'save-query',
         category: 0,
         renderer: (queryBuilderState: QueryBuilderState): React.ReactNode => {
-          const handleSaveQuery = (): void => {
-            console.log('save query');
-          };
+          const handleSaveQuery =
+            queryBuilderState.applicationStore.guardUnhandledError(async () => {
+              try {
+                if (queryBuilderState instanceof ServiceQueryBuilderState) {
+                  guaranteeType(
+                    queryBuilderState.graphManagerState.graphManager,
+                    V1_PureGraphManager,
+                    'Graph manager must be a V1_PureGraphManager',
+                  );
+                  const rawLambda = queryBuilderState.buildQuery();
+                  const service =
+                    queryBuilderState.graphManagerState.graph.getElement(
+                      queryBuilderState.service.path,
+                    );
+                  pureExecution_setFunction(service.execution, rawLambda);
+                  const serviceProtocol =
+                    queryBuilderState.graphManagerState.graphManager.elementToProtocol<V1_Service>(
+                      queryBuilderState.graphManagerState.graph.getElement(
+                        queryBuilderState.service.path,
+                      ),
+                      { keepSourceInformation: false },
+                    );
+                  postMessage({
+                    command: WRITE_ENTITY,
+                    msg: V1_serializePackageableElement(
+                      serviceProtocol,
+                      queryBuilderState.graphManagerState.pluginManager.getPureProtocolProcessorPlugins(),
+                    ),
+                  });
+                  queryBuilderState.applicationStore.notificationService.notifySuccess(
+                    `Service query is updated`,
+                  );
+                }
+              } catch (error) {
+                assertErrorThrown(error);
+                queryBuilderState.applicationStore.notificationService.notifyError(
+                  `Can't save query: ${error.message}`,
+                );
+              }
+            });
 
           return (
-            <div className="query-editor__header__action-combo btn__dropdown-combo">
-              <Button
-                className="query-editor__header__action query-editor__header__action-combo__main-btn btn--dak"
-                disabled={!queryBuilderState.canBuildQuery}
-                onClick={handleSaveQuery}
-                title="Save query"
-              >
-                <SaveCurrIcon />
-                <div className="query-editor__header__action__label">Save</div>
-              </Button>
-            </div>
+            <Button
+              className="query-editor__header__action btn--dak"
+              disabled={!queryBuilderState.canBuildQuery}
+              onClick={handleSaveQuery}
+              title="Save query"
+            >
+              <SaveCurrIcon />
+              <div className="query-editor__header__action__label">Save</div>
+            </Button>
           );
         },
       },
