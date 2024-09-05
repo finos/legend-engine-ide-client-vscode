@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import packageJson from '../../../package.json';
+import packageJson from '../../package.json';
 import {
   type QueryBuilderHeaderActionConfiguration,
   type QueryBuilderState,
@@ -28,9 +28,9 @@ import {
   V1_PureGraphManager,
   V1_serializePackageableElement,
 } from '@finos/legend-vscode-extension-dependencies';
-import { LegendVSCodeApplicationPlugin } from './LegendVSCodePlugin';
-import { postMessage } from '../../utils/VsCodeUtils';
-import { WRITE_ENTITY } from '../../utils/Const';
+import { LegendVSCodeApplicationPlugin } from './LegendVSCodeApplicationPlugin';
+import { postMessage } from '../utils/VsCodeUtils';
+import { WRITE_ENTITY } from '../utils/Const';
 
 export class Core_LegendVSCodeApplicationPlugin extends LegendVSCodeApplicationPlugin {
   static NAME = packageJson.extensions.applicationVSCodePlugin;

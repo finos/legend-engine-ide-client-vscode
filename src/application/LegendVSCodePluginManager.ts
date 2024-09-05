@@ -21,7 +21,7 @@ import {
   type PureGraphPlugin,
   type PureProtocolProcessorPlugin,
 } from '@finos/legend-vscode-extension-dependencies';
-import { type LegendVSCodeApplicationPlugin } from './LegendVSCodePlugin';
+import { type LegendVSCodeApplicationPlugin } from './LegendVSCodeApplicationPlugin';
 
 export class LegendVSCodePluginManager
   extends LegendApplicationPluginManager<LegendVSCodeApplicationPlugin>

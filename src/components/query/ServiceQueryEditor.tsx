@@ -40,8 +40,8 @@ import {
 } from '../../utils/Const';
 import { type LegendEntity } from '../../model/LegendEntity';
 import { postMessage } from '../../utils/VsCodeUtils';
-import { LegendVSCodeApplicationConfig } from './LegendVSCodeApplicationConfig';
-import { LegendVSCodePluginManager } from './LegendVSCodePluginManager';
+import { LegendVSCodeApplicationConfig } from '../../application/LegendVSCodeApplicationConfig';
+import { LegendVSCodePluginManager } from '../../application/LegendVSCodePluginManager';
 import { QueryBuilderVSCodeWorkflowState } from './QueryBuilderWorkflowState';
 
 export const ServiceQueryEditor: React.FC<{

@@ -24,7 +24,7 @@ import {
   QueryBuilder_GraphManagerPreset,
   QueryBuilder_LegendApplicationPlugin,
 } from '@finos/legend-vscode-extension-dependencies';
-import { Core_LegendVSCodeApplicationPlugin } from './Core_LegendVSCodeApplicationPlugin';
+import { Core_LegendVSCodeApplicationPlugin } from '../../application/Core_LegendVSCodeApplicationPlugin';
 
 const rootElement = document.getElementById('root');
 const inputParamtersFromHtml = rootElement
