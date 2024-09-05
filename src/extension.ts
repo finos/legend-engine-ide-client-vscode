@@ -16,25 +16,25 @@
 
 import * as path from 'path';
 import {
-  Uri,
-  workspace,
-  type ExtensionContext,
-  languages,
-  window,
-  commands,
-  ViewColumn,
-  StatusBarAlignment,
-  ThemeIcon,
-  type TextDocumentContentProvider,
   type CancellationToken,
-  type TerminalProfile,
+  type ExtensionContext,
   type ProviderResult,
+  type TerminalProfile,
+  type TextDocumentContentProvider,
+  type WebviewPanel,
+  commands,
+  EndOfLine,
+  languages,
+  ProgressLocation,
   SnippetString,
   SnippetTextEdit,
+  StatusBarAlignment,
+  ThemeIcon,
+  Uri,
+  ViewColumn,
+  window,
+  workspace,
   WorkspaceEdit,
-  EndOfLine,
-  ProgressLocation,
-  type WebviewPanel,
 } from 'vscode';
 import {
   type LanguageClient,
@@ -88,6 +88,8 @@ import { renderServiceQueryEditorWebView } from './webviews/ServiceQueryEditorWe
 
 let client: LegendLanguageClient;
 const openedWebViews: Record<string, WebviewPanel> = {};
+
+const queryBuilderPanels: Map<string, WebviewPanel> = new Map();
 
 export function createClient(context: ExtensionContext): LanguageClient {
   languages.setLanguageConfiguration(LEGEND_LANGUAGE_ID, {
@@ -318,25 +320,38 @@ export function registerCommands(context: ExtensionContext): void {
   const editServiceQuery = commands.registerCommand(
     LEGEND_EDIT_SERVICE_QUERY,
     async (...args: unknown[]) => {
-      const serviceQueryEditorWebView = window.createWebviewPanel(
-        SERVICE_QUERY_EDITOR,
-        `Service Query Editor: ${(args[0] as LegendConceptTreeItem).label}`,
-        ViewColumn.One,
-        {
-          enableScripts: true,
-          retainContextWhenHidden: true,
-        },
-      );
-
-      const entities = await client.entities(new LegendEntitiesRequest([]));
-      renderServiceQueryEditorWebView(
-        serviceQueryEditorWebView,
-        context,
-        (args[0] as LegendConceptTreeItem).id as string,
-        entities,
-        workspace.getConfiguration('legend').get('studio.forms.file', ''),
-        client,
-      );
+      const serviceId = (args[0] as LegendConceptTreeItem).id as string;
+      const columnToShowIn = window.activeTextEditor
+        ? window.activeTextEditor.viewColumn
+        : undefined;
+      if (queryBuilderPanels.has(serviceId)) {
+        queryBuilderPanels.get(serviceId)?.reveal(columnToShowIn);
+      } else {
+        const serviceQueryEditorWebView = window.createWebviewPanel(
+          SERVICE_QUERY_EDITOR,
+          `Service Query Editor: ${(args[0] as LegendConceptTreeItem).label}`,
+          ViewColumn.One,
+          {
+            enableScripts: true,
+            retainContextWhenHidden: true,
+          },
+        );
+        queryBuilderPanels.set(serviceId, serviceQueryEditorWebView);
+        serviceQueryEditorWebView.onDidDispose(
+          () => queryBuilderPanels.delete(serviceId),
+          null,
+          context.subscriptions,
+        );
+        const entities = await client.entities(new LegendEntitiesRequest([]));
+        renderServiceQueryEditorWebView(
+          serviceQueryEditorWebView,
+          context,
+          serviceId,
+          entities,
+          workspace.getConfiguration('legend').get('studio.forms.file', ''),
+          client,
+        );
+      }
     },
   );
   context.subscriptions.push(editServiceQuery);
