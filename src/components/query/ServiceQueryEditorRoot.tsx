@@ -18,13 +18,7 @@ import '@finos/legend-vscode-extension-dependencies/style/index.css';
 import { createRoot } from 'react-dom/client';
 import { type PlainObject } from '../../utils/SerializationUtils';
 import { ServiceQueryEditor } from './ServiceQueryEditor';
-import {
-  Core_GraphManagerPreset,
-  Core_LegendApplicationPlugin,
-  QueryBuilder_GraphManagerPreset,
-  QueryBuilder_LegendApplicationPlugin,
-} from '@finos/legend-vscode-extension-dependencies';
-import { Core_LegendVSCodeApplicationPlugin } from '../../application/Core_LegendVSCodeApplicationPlugin';
+import { LegendVSCodeApplication } from '../../application/LegendVSCodeApplication';
 
 const rootElement = document.getElementById('root');
 const inputParamtersFromHtml = rootElement
@@ -34,17 +28,8 @@ if (inputParamtersFromHtml) {
   const parsedParams = JSON.parse(inputParamtersFromHtml) as PlainObject;
 
   createRoot(rootElement as HTMLElement).render(
-    <ServiceQueryEditor
-      serviceId={parsedParams.serviceId as string}
-      presets={[
-        new Core_GraphManagerPreset(),
-        new QueryBuilder_GraphManagerPreset(),
-      ]}
-      plugins={[
-        new Core_LegendApplicationPlugin(),
-        new QueryBuilder_LegendApplicationPlugin(),
-        new Core_LegendVSCodeApplicationPlugin(),
-      ]}
-    />,
+    <LegendVSCodeApplication>
+      <ServiceQueryEditor serviceId={parsedParams.serviceId as string} />
+    </LegendVSCodeApplication>,
   );
 }

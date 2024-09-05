@@ -14,24 +14,17 @@
  * limitations under the License.
  */
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { flowResult } from 'mobx';
 import {
-  type AbstractPlugin,
-  type AbstractPreset,
-  type LegendApplicationConfigurationData,
-  type LegendApplicationConfigurationInput,
   type QueryBuilderState,
-  ApplicationFrameworkProvider,
-  ApplicationStore,
-  ApplicationStoreProvider,
-  BrowserEnvironmentProvider,
   CubesLoadingIndicator,
   CubesLoadingIndicatorIcon,
   GraphManagerState,
   QueryBuilder,
   QueryBuilderActionConfig,
   ServiceQueryBuilderState,
+  useApplicationStore,
 } from '@finos/legend-vscode-extension-dependencies';
 import {
   GET_PROJECT_ENTITIES,
@@ -40,42 +33,22 @@ import {
 } from '../../utils/Const';
 import { type LegendEntity } from '../../model/LegendEntity';
 import { postMessage } from '../../utils/VsCodeUtils';
-import { LegendVSCodeApplicationConfig } from '../../application/LegendVSCodeApplicationConfig';
-import { LegendVSCodePluginManager } from '../../application/LegendVSCodePluginManager';
 import { QueryBuilderVSCodeWorkflowState } from './QueryBuilderWorkflowState';
+import { type LegendVSCodeApplicationConfig } from '../../application/LegendVSCodeApplicationConfig';
+import { type LegendVSCodePluginManager } from '../../application/LegendVSCodePluginManager';
 
 export const ServiceQueryEditor: React.FC<{
   serviceId: string;
-  presets: AbstractPreset[];
-  plugins: AbstractPlugin[];
-}> = ({ serviceId, presets, plugins }) => {
+}> = ({ serviceId }) => {
+  const applicationStore = useApplicationStore<
+    LegendVSCodeApplicationConfig,
+    LegendVSCodePluginManager
+  >();
   const [queryBuilderState, setQueryBuilderState] =
     useState<QueryBuilderState | null>(null);
   const [entities, setEntities] = useState<LegendEntity[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
-
-  const applicationStore = useMemo(() => {
-    const input: LegendApplicationConfigurationInput<LegendApplicationConfigurationData> =
-      {
-        baseAddress: 'http://localhost:9000',
-        configData: {
-          appName: 'legend-vs-code',
-          env: 'dev',
-        },
-        versionData: {
-          buildTime: 'now',
-          version: '0.0.0',
-          commitSHA: 'commitSHA',
-        },
-      };
-    const config: LegendVSCodeApplicationConfig =
-      new LegendVSCodeApplicationConfig(input);
-    const pluginManager: LegendVSCodePluginManager =
-      LegendVSCodePluginManager.create();
-    pluginManager.usePresets(presets).usePlugins(plugins).install();
-    return new ApplicationStore(config, pluginManager);
-  }, [plugins, presets]);
 
   useEffect(() => {
     setIsLoading(true);
@@ -166,20 +139,16 @@ export const ServiceQueryEditor: React.FC<{
   }, [serviceId, applicationStore, entities]);
 
   return (
-    <ApplicationStoreProvider store={applicationStore}>
-      <BrowserEnvironmentProvider baseUrl="/">
-        <ApplicationFrameworkProvider simple={true}>
-          <CubesLoadingIndicator isLoading={isLoading}>
-            <CubesLoadingIndicatorIcon />
-          </CubesLoadingIndicator>
-          {queryBuilderState && !isLoading && (
-            <QueryBuilder queryBuilderState={queryBuilderState} />
-          )}
-          {!queryBuilderState && !isLoading && error && (
-            <>Failed setting up QueryBuilderState&nbsp;{error}</>
-          )}
-        </ApplicationFrameworkProvider>
-      </BrowserEnvironmentProvider>
-    </ApplicationStoreProvider>
+    <>
+      <CubesLoadingIndicator isLoading={isLoading}>
+        <CubesLoadingIndicatorIcon />
+      </CubesLoadingIndicator>
+      {queryBuilderState && !isLoading && (
+        <QueryBuilder queryBuilderState={queryBuilderState} />
+      )}
+      {!queryBuilderState && !isLoading && error && (
+        <>Failed setting up QueryBuilderState&nbsp;{error}</>
+      )}
+    </>
   );
 };
