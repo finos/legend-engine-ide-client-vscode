@@ -62,6 +62,7 @@ import {
   ONE_ENTITY_PER_FILE_COMMAND_ID,
   LEGEND_EDIT_SERVICE_QUERY,
   SERVICE_QUERY_EDITOR,
+  LEGEND_REFRESH_QUERY_BUILDER,
 } from './utils/Const';
 import { LegendWebViewProvider } from './utils/LegendWebViewProvider';
 import {
@@ -81,6 +82,7 @@ import {
 import { createTestController } from './testController';
 import {
   type LegendConceptTreeItem,
+  type LegendConceptTreeProvider,
   createLegendConceptTreeProvider,
 } from './conceptTree';
 import { renderDiagramRendererWebView } from './webviews/DiagramWebView';
@@ -88,6 +90,7 @@ import { renderServiceQueryEditorWebView } from './webviews/ServiceQueryEditorWe
 
 let client: LegendLanguageClient;
 const openedWebViews: Record<string, WebviewPanel> = {};
+let legendConceptTreeProvider: LegendConceptTreeProvider;
 
 const queryBuilderPanels: Map<string, WebviewPanel> = new Map();
 
@@ -154,8 +157,17 @@ export function createClient(context: ExtensionContext): LanguageClient {
   // Initialize client
   client.start();
 
-  // if pom changes, ask user if we should reload extension
+  // if pom changes, ask user if we should reload extension.
+  // if query changes, we should reload any query builders that are open.
   workspace.onDidSaveTextDocument((e) => {
+    const legendItem = legendConceptTreeProvider.getConceptsFrom(
+      e.uri.toString(),
+    )?.[0];
+    if (legendItem && legendItem.id && queryBuilderPanels.has(legendItem.id)) {
+      queryBuilderPanels.get(legendItem.id)?.webview.postMessage({
+        command: LEGEND_REFRESH_QUERY_BUILDER,
+      });
+    }
     if (e.fileName.endsWith('pom.xml')) {
       window
         .showInformationMessage(
@@ -342,12 +354,10 @@ export function registerCommands(context: ExtensionContext): void {
           null,
           context.subscriptions,
         );
-        const entities = await client.entities(new LegendEntitiesRequest([]));
         renderServiceQueryEditorWebView(
           serviceQueryEditorWebView,
           context,
           serviceId,
-          entities,
           workspace.getConfiguration('legend').get('studio.forms.file', ''),
           client,
         );
@@ -489,7 +499,10 @@ export function activate(context: ExtensionContext): void {
   createReplTerminal(context);
   registerLegendVirtualFilesystemProvider(context);
   context.subscriptions.push(createTestController(client));
-  context.subscriptions.push(...createLegendConceptTreeProvider(client));
+  const { disposables, treeDataProvider } =
+    createLegendConceptTreeProvider(client);
+  context.subscriptions.push(...disposables);
+  legendConceptTreeProvider = treeDataProvider;
 }
 
 export function createStatusBarItem(context: ExtensionContext): void {

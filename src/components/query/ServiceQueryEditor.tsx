@@ -36,6 +36,7 @@ import {
 import {
   GET_PROJECT_ENTITIES,
   GET_PROJECT_ENTITIES_RESPONSE,
+  LEGEND_REFRESH_QUERY_BUILDER,
 } from '../../utils/Const';
 import { type LegendEntity } from '../../model/LegendEntity';
 import { postMessage } from '../../utils/VsCodeUtils';
@@ -87,9 +88,21 @@ export const ServiceQueryEditor: React.FC<{
     'message',
     (event: MessageEvent<{ result: LegendEntity[]; command: string }>) => {
       const message = event.data;
-      if (message.command === GET_PROJECT_ENTITIES_RESPONSE) {
-        const es: LegendEntity[] = message.result;
-        setEntities(es);
+      switch (message.command) {
+        case GET_PROJECT_ENTITIES_RESPONSE: {
+          const es: LegendEntity[] = message.result;
+          setEntities(es);
+          break;
+        }
+        case LEGEND_REFRESH_QUERY_BUILDER: {
+          setIsLoading(true);
+          postMessage({
+            command: GET_PROJECT_ENTITIES,
+          });
+          break;
+        }
+        default:
+          throw new Error(`Unsupported request ${message.command}`);
       }
     },
   );
@@ -134,9 +147,9 @@ export const ServiceQueryEditor: React.FC<{
             },
           );
           newQueryBuilderState.initializeWithQuery(service.execution.func);
-          await flowResult(newQueryBuilderState.explorerState.analyzeMappingModelCoverage()).catch(
-            applicationStore.alertUnhandledError,
-          );
+          await flowResult(
+            newQueryBuilderState.explorerState.analyzeMappingModelCoverage(),
+          ).catch(applicationStore.alertUnhandledError);
           setQueryBuilderState(newQueryBuilderState);
         } catch (e) {
           if (e instanceof Error) {
@@ -162,7 +175,9 @@ export const ServiceQueryEditor: React.FC<{
           {queryBuilderState && !isLoading && (
             <QueryBuilder queryBuilderState={queryBuilderState} />
           )}
-          {!queryBuilderState && !isLoading && error && <>Failed setting up QueryBuilderState&nbsp;{error}</>}
+          {!queryBuilderState && !isLoading && error && (
+            <>Failed setting up QueryBuilderState&nbsp;{error}</>
+          )}
         </ApplicationFrameworkProvider>
       </BrowserEnvironmentProvider>
     </ApplicationStoreProvider>

@@ -21,14 +21,15 @@ import {
   GET_PROJECT_ENTITIES_RESPONSE,
   WRITE_ENTITY,
 } from '../utils/Const';
-import { type LegendEntity } from '../model/LegendEntity';
-import { type LegendLanguageClient } from '../LegendLanguageClient';
+import {
+  type LegendLanguageClient,
+  LegendEntitiesRequest,
+} from '../LegendLanguageClient';
 
 export const renderServiceQueryEditorWebView = (
   serviceQueryEditorWebViewPanel: WebviewPanel,
   context: ExtensionContext,
   serviceId: string,
-  entities: LegendEntity[],
   renderFilePath: string,
   client: LegendLanguageClient,
 ): void => {
@@ -67,6 +68,7 @@ export const renderServiceQueryEditorWebView = (
   webview.onDidReceiveMessage(async (message) => {
     switch (message.command) {
       case GET_PROJECT_ENTITIES: {
+        const entities = await client.entities(new LegendEntitiesRequest([]));
         webview.postMessage({
           command: GET_PROJECT_ENTITIES_RESPONSE,
           result: entities,

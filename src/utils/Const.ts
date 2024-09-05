@@ -52,6 +52,7 @@ export const LEGEND_WRITE_ENTITY = 'legend/writeEntity';
 export const GET_TDS_REQUEST_RESULTS_ID = 'getTDSRequestResultsId';
 export const LEGEND_SHOW_DIAGRAM = 'legend.show.diagram';
 export const LEGEND_EDIT_SERVICE_QUERY = 'legend.edit.service.query';
+export const LEGEND_REFRESH_QUERY_BUILDER = 'legend.refresh.query.builder';
 export const ONE_ENTITY_PER_FILE_REQUEST_ID =
   'legend/oneEntityPerFileRefactoring';
 export const ONE_ENTITY_PER_FILE_COMMAND_ID =

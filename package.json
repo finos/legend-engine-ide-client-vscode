@@ -86,6 +86,11 @@
         "category": "Legend"
       },
       {
+        "command": "legend.refresh.query.builder",
+        "title": "Refresh Query Builder",
+        "category": "Legend"
+      },
+      {
         "command": "legend.log",
         "title": "Show Legend Server logs",
         "category": "Legend"
