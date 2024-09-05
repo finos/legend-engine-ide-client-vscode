@@ -320,7 +320,7 @@ export function registerCommands(context: ExtensionContext): void {
     async (...args: unknown[]) => {
       const serviceQueryEditorWebView = window.createWebviewPanel(
         SERVICE_QUERY_EDITOR,
-        `Service Query Editor`,
+        `Service Query Editor: ${(args[0] as LegendConceptTreeItem).label}`,
         ViewColumn.One,
         {
           enableScripts: true,
