@@ -13,14 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 import '@finos/legend-vscode-extension-dependencies/style/index.css';
+import '../../../style/index.scss';
 import { createRoot } from 'react-dom/client';
-import {
-  DiagramEditor,
-  DiagramEditorState,
-} from '@finos/legend-vscode-extension-dependencies';
 import { type PlainObject } from '../../utils/SerializationUtils';
+import { DiagramEditor } from './DiagramEditor';
+import { DiagramEditorState } from '../../stores/DiagramEditorState';
 
 const rootElement = document.getElementById('root');
 const inputParamtersFromHtml = rootElement
@@ -34,7 +32,6 @@ if (inputParamtersFromHtml) {
       diagramEditorState={
         new DiagramEditorState(parsedParams.diagramId as string)
       }
-      diagramId={parsedParams.diagramId as string}
     />,
   );
 }

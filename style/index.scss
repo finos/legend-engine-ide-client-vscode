@@ -85,22 +85,27 @@
   }
 }
 
-.diagram__renderer {
+.diagram-editor__error {
   height: 100%;
-  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
-  &__error {
-    font-size: 1.5rem;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  &__details {
+    border-bottom: 1px dotted white;
+    cursor: help;
+    margin-left: 5px;
+  }
+}
 
-    &__details {
-      border-bottom: 1px dotted white;
-      cursor: help;
-      margin-left: 5px
-    }
+.diagram-editor__header__search__action {
+  width: 40rem;
+  flex-grow: 1;
+  justify-content: flex-start;
+  margin-left: 4.3rem;
+
+  .selector-input--dark__control {
+    width: inherit;
   }
 }
 
