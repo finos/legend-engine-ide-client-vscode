@@ -88,13 +88,15 @@ export class Core_LegendVSCodeApplicationPlugin extends LegendVSCodeApplicationP
 
           return (
             <Button
-              className="query-editor__header__action btn--dak"
+              className="query-builder__header__advanced-dropdown"
               disabled={!queryBuilderState.canBuildQuery}
               onClick={handleSaveQuery}
               title="Save query"
             >
               <SaveCurrIcon />
-              <div className="query-editor__header__action__label">Save</div>
+              <div className="query-builder__header__advanced-dropdown__label">
+                Save
+              </div>
             </Button>
           );
         },
