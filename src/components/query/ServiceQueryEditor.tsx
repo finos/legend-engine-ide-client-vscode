@@ -89,11 +89,11 @@ export const ServiceQueryEditor: React.FC<{
             applicationStore.logService,
           );
           await graphManagerState.graphManager.initialize({
-            env: 'test',
+            env: 'dev',
             tabSize: 2,
             clientConfig: {
               baseUrl: applicationStore.config.engineServerUrl,
-              enableCompression: false,
+              enableCompression: true,
             },
           });
           await graphManagerState.initializeSystem();
