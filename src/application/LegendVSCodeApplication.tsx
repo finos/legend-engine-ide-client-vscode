@@ -29,12 +29,12 @@ export const LegendVSCodeApplication = (props: {
   const applicationStore = useMemo(() => {
     const input: LegendApplicationConfigurationInput<LegendVSCodeApplicationConfigurationData> =
       {
-        baseAddress: 'http://localhost:9000',
+        baseAddress: '',
         configData,
         versionData: {
-          buildTime: 'now',
-          version: '0.0.0',
-          commitSHA: 'commitSHA',
+          buildTime: '',
+          version: '',
+          commitSHA: '',
         },
       };
     try {
