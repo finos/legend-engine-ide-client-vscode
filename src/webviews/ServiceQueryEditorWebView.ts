@@ -15,10 +15,11 @@
  */
 
 import * as path from 'path';
-import { Uri, type ExtensionContext, type WebviewPanel } from 'vscode';
+import { Uri, type ExtensionContext, type WebviewPanel, window } from 'vscode';
 import {
   GET_PROJECT_ENTITIES,
   GET_PROJECT_ENTITIES_RESPONSE,
+  QUERY_BUILDER_CONFIG_ERROR,
   WRITE_ENTITY,
 } from '../utils/Const';
 import {
@@ -30,6 +31,7 @@ export const renderServiceQueryEditorWebView = (
   serviceQueryEditorWebViewPanel: WebviewPanel,
   context: ExtensionContext,
   serviceId: string,
+  engineUrl: string,
   renderFilePath: string,
   client: LegendLanguageClient,
 ): void => {
@@ -55,7 +57,7 @@ export const renderServiceQueryEditorWebView = (
       </head>
       <body>
         <div id="root" style="height: 100vh; width: 100%;" data-input-parameters=${JSON.stringify(
-          { serviceId },
+          { serviceId, engineUrl },
         )}></div>
         <script src=${serviceQueryEditorScript}></script>
         <script>
@@ -77,6 +79,13 @@ export const renderServiceQueryEditorWebView = (
       }
       case WRITE_ENTITY: {
         client.writeEntity({ content: message.msg });
+        break;
+      }
+      case QUERY_BUILDER_CONFIG_ERROR: {
+        window.showErrorMessage('Error setting up Query Builder', {
+          modal: true,
+          detail: message.msg,
+        });
         break;
       }
       default:

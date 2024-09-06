@@ -16,9 +16,10 @@
 
 import '@finos/legend-vscode-extension-dependencies/style/index.css';
 import { createRoot } from 'react-dom/client';
-import { type PlainObject } from '../../utils/SerializationUtils';
 import { ServiceQueryEditor } from './ServiceQueryEditor';
 import { LegendVSCodeApplication } from '../../application/LegendVSCodeApplication';
+import { type PlainObject } from '@finos/legend-vscode-extension-dependencies';
+import { type LegendVSCodeApplicationConfigurationData } from '../../application/LegendVSCodeApplicationConfig';
 
 const rootElement = document.getElementById('root');
 const inputParamtersFromHtml = rootElement
@@ -26,9 +27,14 @@ const inputParamtersFromHtml = rootElement
   : '';
 if (inputParamtersFromHtml) {
   const parsedParams = JSON.parse(inputParamtersFromHtml) as PlainObject;
+  const configData: LegendVSCodeApplicationConfigurationData = {
+    appName: 'legend-vs-code',
+    env: 'dev',
+    engineURL: parsedParams.engineUrl as string,
+  };
 
   createRoot(rootElement as HTMLElement).render(
-    <LegendVSCodeApplication>
+    <LegendVSCodeApplication configData={configData}>
       <ServiceQueryEditor serviceId={parsedParams.serviceId as string} />
     </LegendVSCodeApplication>,
   );

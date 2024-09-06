@@ -1,9 +1,9 @@
 import {
-  type LegendApplicationConfigurationData,
   type LegendApplicationConfigurationInput,
   ApplicationFrameworkProvider,
   ApplicationStore,
   ApplicationStoreProvider,
+  assertErrorThrown,
   BrowserEnvironmentProvider,
   Core_GraphManagerPreset,
   Core_LegendApplicationPlugin,
@@ -11,54 +11,65 @@ import {
   QueryBuilder_LegendApplicationPlugin,
 } from '@finos/legend-vscode-extension-dependencies';
 import { useMemo } from 'react';
-import { LegendVSCodeApplicationConfig } from './LegendVSCodeApplicationConfig';
+import {
+  LegendVSCodeApplicationConfig,
+  type LegendVSCodeApplicationConfigurationData,
+} from './LegendVSCodeApplicationConfig';
 import { LegendVSCodePluginManager } from './LegendVSCodePluginManager';
 import { Core_LegendVSCodeApplicationPlugin } from './Core_LegendVSCodeApplicationPlugin';
+import { postMessage } from '../utils/VsCodeUtils';
+import { QUERY_BUILDER_CONFIG_ERROR } from '../utils/Const';
 
 export const LegendVSCodeApplication = (props: {
+  configData: LegendVSCodeApplicationConfigurationData;
   children: React.ReactNode;
 }): React.ReactNode => {
-  const { children } = props;
+  const { configData, children } = props;
 
   const applicationStore = useMemo(() => {
-    const input: LegendApplicationConfigurationInput<LegendApplicationConfigurationData> =
+    const input: LegendApplicationConfigurationInput<LegendVSCodeApplicationConfigurationData> =
       {
         baseAddress: 'http://localhost:9000',
-        configData: {
-          appName: 'legend-vs-code',
-          env: 'dev',
-        },
+        configData,
         versionData: {
           buildTime: 'now',
           version: '0.0.0',
           commitSHA: 'commitSHA',
         },
       };
-    const config: LegendVSCodeApplicationConfig =
-      new LegendVSCodeApplicationConfig(input);
-    const pluginManager: LegendVSCodePluginManager =
-      LegendVSCodePluginManager.create();
-    pluginManager
-      .usePresets([
-        new Core_GraphManagerPreset(),
-        new QueryBuilder_GraphManagerPreset(),
-      ])
-      .usePlugins([
-        new Core_LegendApplicationPlugin(),
-        new QueryBuilder_LegendApplicationPlugin(),
-        new Core_LegendVSCodeApplicationPlugin(),
-      ])
-      .install();
-    return new ApplicationStore(config, pluginManager);
-  }, []);
+    try {
+      const config: LegendVSCodeApplicationConfig =
+        new LegendVSCodeApplicationConfig(input);
+      const pluginManager: LegendVSCodePluginManager =
+        LegendVSCodePluginManager.create();
+      pluginManager
+        .usePresets([
+          new Core_GraphManagerPreset(),
+          new QueryBuilder_GraphManagerPreset(),
+        ])
+        .usePlugins([
+          new Core_LegendApplicationPlugin(),
+          new QueryBuilder_LegendApplicationPlugin(),
+          new Core_LegendVSCodeApplicationPlugin(),
+        ])
+        .install();
+      return new ApplicationStore(config, pluginManager);
+    } catch (e) {
+      assertErrorThrown(e);
+      postMessage({ command: QUERY_BUILDER_CONFIG_ERROR, msg: e.message });
+      return null;
+    }
+  }, [configData]);
 
   return (
-    <ApplicationStoreProvider store={applicationStore}>
-      <BrowserEnvironmentProvider baseUrl="/">
-        <ApplicationFrameworkProvider simple={true}>
-          {children}
-        </ApplicationFrameworkProvider>
-      </BrowserEnvironmentProvider>
-    </ApplicationStoreProvider>
+    applicationStore && (
+      <ApplicationStoreProvider store={applicationStore}>
+        <BrowserEnvironmentProvider baseUrl="/">
+          <ApplicationFrameworkProvider simple={true}>
+            {children}
+          </ApplicationFrameworkProvider>
+        </BrowserEnvironmentProvider>
+      </ApplicationStoreProvider>
+    )
   );
 };

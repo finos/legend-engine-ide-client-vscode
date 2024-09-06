@@ -358,6 +358,7 @@ export function registerCommands(context: ExtensionContext): void {
           serviceQueryEditorWebView,
           context,
           serviceId,
+          workspace.getConfiguration('legend').get('engine.server.url', ''),
           workspace.getConfiguration('legend').get('studio.forms.file', ''),
           client,
         );
