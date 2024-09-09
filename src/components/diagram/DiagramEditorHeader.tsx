@@ -44,6 +44,7 @@ import { observer } from 'mobx-react-lite';
 import { flowResult } from 'mobx';
 import { WRITE_ENTITY } from '../../utils/Const';
 import type { DiagramEditorState } from '../../stores/DiagramEditorState';
+import { postMessage } from '../../utils/VsCodeUtils';
 import type { PlainObject } from '../../utils/SerializationUtils';
 
 export const DiagramEditorHeader = observer(
