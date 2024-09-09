@@ -84,7 +84,7 @@ export const DiagramEditorCanvas = observer(
       event.preventDefault();
     });
 
-    const drop = (event: DragEvent) => {
+    const drop = (event: DragEvent): void => {
       event.preventDefault();
       const droppedEntityIds: string[] = (
         JSON.parse(
@@ -119,7 +119,7 @@ export const DiagramEditorCanvas = observer(
         });
     };
 
-    const handleKeyDown = (event: KeyboardEvent) => {
+    const handleKeyDown = (event: KeyboardEvent): void => {
       if ((event.ctrlKey || event.metaKey) && event.key === 's') {
         event.preventDefault();
 
