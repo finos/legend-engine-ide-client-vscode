@@ -164,7 +164,7 @@
           "default": "",
           "description": "Set the engine server url to eneable some features that required the remote server"
         },
-        "legend.engine.serve.remoteExecution": {
+        "legend.engine.server.remoteExecution": {
           "type": "boolean",
           "default": "true",
           "description": "Defines if executions should happen locally or remotely.  Only used if server url is provided."
