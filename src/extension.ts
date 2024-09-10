@@ -509,7 +509,12 @@ export function createReplTerminal(context: ExtensionContext): void {
   // eslint-disable-next-line no-process-env
   const coderVSCodeProxyURLTemplate = process.env.VSCODE_PROXY_URI;
 
+  const extraVmArgs = workspace
+    .getConfiguration('legend')
+    .get('language.repl.vmargs', []);
+
   const shellArgs = [
+    ...extraVmArgs,
     `-DstoragePath=${replHomeDir}`,
     coderVSCodeProxyURLTemplate
       ? `-Dlegend.repl.dataCube.urlTemplate=${coderVSCodeProxyURLTemplate}`

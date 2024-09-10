@@ -164,6 +164,11 @@
           "default": "",
           "description": "Set the engine server url to eneable some features that required the remote server"
         },
+        "legend.engine.serve.remoteExecution": {
+          "type": "boolean",
+          "default": "true",
+          "description": "Defines if executions should happen locally or remotely.  Only used if server url is provided."
+        },
         "legend.sdlc.server.url": {
           "type": "string",
           "default": "",
@@ -178,6 +183,15 @@
           },
           "description": "Specifies extra VM arguments used to launch the Legend Language Server"
         },
+        "legend.language.repl.vmargs": {
+          "type": "array",
+          "default": [],
+          "items": {
+            "type": "string",
+            "description": "Individual extra VM argument for Legend Language REPL"
+          },
+          "description": "Specifies extra VM arguments used to launch the Legend Language REPL"
+        },
         "legend.studio.forms.file": {
           "type": "string",
           "default": "",
@@ -187,6 +201,11 @@
           "type": "string",
           "default": "",
           "description": "Defines the path to the plan executor configuration JSON"
+        },
+        "legend.protocol.version": {
+          "type": "string",
+          "default": "vX_X_X",
+          "description": "Defines the protocol version to use"
         }
       }
     },
