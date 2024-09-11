@@ -34,6 +34,7 @@ import {
   WorkspaceEdit,
   EndOfLine,
   ProgressLocation,
+  type WebviewPanel,
 } from 'vscode';
 import {
   type LanguageClient,
@@ -83,6 +84,7 @@ import {
 import { renderDiagramRendererWebView } from './webviews/DiagramWebView';
 
 let client: LegendLanguageClient;
+const openedWebViews: Record<string, WebviewPanel> = {};
 
 export function createClient(context: ExtensionContext): LanguageClient {
   languages.setLanguageConfiguration(LEGEND_LANGUAGE_ID, {
@@ -197,6 +199,41 @@ export function createClient(context: ExtensionContext): LanguageClient {
   return client;
 }
 
+const showDiagramWebView = async (
+  diagramId: string,
+  context: ExtensionContext,
+): Promise<void> => {
+  let diagramRendererWebView: WebviewPanel;
+  if (openedWebViews[diagramId]) {
+    diagramRendererWebView = openedWebViews[diagramId] as WebviewPanel;
+    diagramRendererWebView.reveal();
+  } else {
+    diagramRendererWebView = window.createWebviewPanel(
+      DIAGRAM_RENDERER,
+      `Diagram Editor (${diagramId.split('::').pop()})`,
+      ViewColumn.One,
+      {
+        enableScripts: true,
+        retainContextWhenHidden: true,
+      },
+    );
+    diagramRendererWebView.onDidDispose(() => {
+      delete openedWebViews[diagramId];
+    });
+    openedWebViews[diagramId] = diagramRendererWebView;
+
+    const entities = await client.entities(new LegendEntitiesRequest([]));
+    renderDiagramRendererWebView(
+      diagramRendererWebView,
+      context,
+      diagramId,
+      entities,
+      workspace.getConfiguration('legend').get('studio.forms.file', ''),
+      client,
+    );
+  }
+};
+
 export function registerCommands(context: ExtensionContext): void {
   const functionCommand = commands.registerCommand(
     LEGEND_CLIENT_COMMAND_ID,
@@ -213,8 +250,13 @@ export function registerCommands(context: ExtensionContext): void {
           break;
         }
 
-        default: {
+        case LEGEND_SHOW_DIAGRAM: {
+          showDiagramWebView(args[2] as string, context);
           break;
+        }
+
+        default: {
+          window.showWarningMessage(`${commandId} command is not supported`);
         }
       }
     },
@@ -261,25 +303,10 @@ export function registerCommands(context: ExtensionContext): void {
 
   const showDiagram = commands.registerCommand(
     LEGEND_SHOW_DIAGRAM,
-    async (...args: unknown[]) => {
-      const diagramRendererWebView = window.createWebviewPanel(
-        DIAGRAM_RENDERER,
-        `Diagram Editor`,
-        ViewColumn.One,
-        {
-          enableScripts: true,
-          retainContextWhenHidden: true,
-        },
-      );
-
-      const entities = await client.entities(new LegendEntitiesRequest([]));
-      renderDiagramRendererWebView(
-        diagramRendererWebView,
-        context,
+    (...args: unknown[]) => {
+      showDiagramWebView(
         (args[0] as LegendConceptTreeItem).id as string,
-        entities,
-        workspace.getConfiguration('legend').get('studio.forms.file', ''),
-        client,
+        context,
       );
     },
   );
