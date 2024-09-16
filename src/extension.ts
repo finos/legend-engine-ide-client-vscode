@@ -92,8 +92,6 @@ let client: LegendLanguageClient;
 const openedWebViews: Record<string, WebviewPanel> = {};
 let legendConceptTreeProvider: LegendConceptTreeProvider;
 
-const queryBuilderPanels: Map<string, WebviewPanel> = new Map();
-
 export function createClient(context: ExtensionContext): LanguageClient {
   languages.setLanguageConfiguration(LEGEND_LANGUAGE_ID, {
     wordPattern:
@@ -163,8 +161,8 @@ export function createClient(context: ExtensionContext): LanguageClient {
     const legendItem = legendConceptTreeProvider.getConceptsFrom(
       e.uri.toString(),
     )?.[0];
-    if (legendItem && legendItem.id && queryBuilderPanels.has(legendItem.id)) {
-      queryBuilderPanels.get(legendItem.id)?.webview.postMessage({
+    if (legendItem && legendItem.id && openedWebViews[legendItem.id]) {
+      openedWebViews[legendItem.id]?.webview.postMessage({
         command: LEGEND_REFRESH_QUERY_BUILDER,
       });
     }
@@ -336,8 +334,8 @@ export function registerCommands(context: ExtensionContext): void {
       const columnToShowIn = window.activeTextEditor
         ? window.activeTextEditor.viewColumn
         : undefined;
-      if (queryBuilderPanels.has(serviceId)) {
-        queryBuilderPanels.get(serviceId)?.reveal(columnToShowIn);
+      if (openedWebViews[serviceId]) {
+        openedWebViews[serviceId]?.reveal(columnToShowIn);
       } else {
         const serviceQueryEditorWebView = window.createWebviewPanel(
           SERVICE_QUERY_EDITOR,
@@ -348,9 +346,11 @@ export function registerCommands(context: ExtensionContext): void {
             retainContextWhenHidden: true,
           },
         );
-        queryBuilderPanels.set(serviceId, serviceQueryEditorWebView);
+        openedWebViews[serviceId] = serviceQueryEditorWebView;
         serviceQueryEditorWebView.onDidDispose(
-          () => queryBuilderPanels.delete(serviceId),
+          () => {
+            delete openedWebViews[serviceId];
+          },
           null,
           context.subscriptions,
         );
