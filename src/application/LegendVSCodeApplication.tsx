@@ -19,6 +19,7 @@ import { LegendVSCodePluginManager } from './LegendVSCodePluginManager';
 import { Core_LegendVSCodeApplicationPlugin } from './Core_LegendVSCodeApplicationPlugin';
 import { postMessage } from '../utils/VsCodeUtils';
 import { QUERY_BUILDER_CONFIG_ERROR } from '../utils/Const';
+import packageJson from '../../package.json';
 
 export const LegendVSCodeApplication = (props: {
   configData: LegendVSCodeApplicationConfigurationData;
@@ -29,12 +30,9 @@ export const LegendVSCodeApplication = (props: {
   const applicationStore = useMemo(() => {
     const input: LegendApplicationConfigurationInput<LegendVSCodeApplicationConfigurationData> =
       {
-        baseAddress: '',
         configData,
         versionData: {
-          buildTime: '',
-          version: '',
-          commitSHA: '',
+          version: packageJson.version,
         },
       };
     try {
