@@ -20,7 +20,6 @@ import {
   type QueryBuilderState,
   CubesLoadingIndicator,
   CubesLoadingIndicatorIcon,
-  GraphManagerState,
   QueryBuilder,
   QueryBuilderActionConfig,
   ServiceQueryBuilderState,
@@ -36,6 +35,7 @@ import { postMessage } from '../../utils/VsCodeUtils';
 import { QueryBuilderVSCodeWorkflowState } from './QueryBuilderWorkflowState';
 import { type LegendVSCodeApplicationConfig } from '../../application/LegendVSCodeApplicationConfig';
 import { type LegendVSCodePluginManager } from '../../application/LegendVSCodePluginManager';
+import { buildGraphManagerStateFromEntities } from '../../utils/GraphUtils';
 
 export const ServiceQueryEditor: React.FC<{
   serviceId: string;
@@ -84,24 +84,9 @@ export const ServiceQueryEditor: React.FC<{
     if (entities.length && serviceId && applicationStore) {
       const initializeQuery = async (): Promise<void> => {
         try {
-          const graphManagerState = new GraphManagerState(
-            applicationStore.pluginManager,
-            applicationStore.logService,
-          );
-          await graphManagerState.graphManager.initialize({
-            env: 'dev',
-            tabSize: 2,
-            clientConfig: {
-              baseUrl: applicationStore.config.engineServerUrl,
-              enableCompression: true,
-            },
-          });
-          await graphManagerState.initializeSystem();
-          await graphManagerState.graphManager.buildGraph(
-            graphManagerState.graph,
+          const graphManagerState = await buildGraphManagerStateFromEntities(
             entities,
-            graphManagerState.graphBuildState,
-            {},
+            applicationStore,
           );
           const service = graphManagerState.graph.getService(serviceId);
           const newQueryBuilderState = new ServiceQueryBuilderState(
