@@ -23,6 +23,7 @@ const webViewConfig = {
     AgGridRenderer: './src/components/grid/AgGridRenderer.tsx',
     FunctionResultsEditorRenderer: './src/components/function/FunctionResultsEditorRenderer.tsx',
     DiagramRendererRoot: './src/components/diagram/DiagramRendererRoot.tsx',
+    ServiceQueryEditorRoot: './src/components/query/ServiceQueryEditorRoot.tsx',
   },
   externals: {
     vscode: 'commonjs vscode',
@@ -59,6 +60,9 @@ const webViewConfig = {
   plugins: [
     new webpack.ProvidePlugin({
            process: 'process/browser',
+    }),
+    new webpack.DefinePlugin({
+      AG_GRID_LICENSE: null,
     }),
   ],
   resolve: {

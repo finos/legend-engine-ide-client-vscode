@@ -51,6 +51,8 @@ export const VIRTUAL_FILE_SYSTEM_FILE_REQUEST_ID = 'legend/legendVirtualFile';
 export const LEGEND_WRITE_ENTITY = 'legend/writeEntity';
 export const GET_TDS_REQUEST_RESULTS_ID = 'getTDSRequestResultsId';
 export const LEGEND_SHOW_DIAGRAM = 'legend.show.diagram';
+export const LEGEND_EDIT_SERVICE_QUERY = 'legend.edit.service.query';
+export const LEGEND_REFRESH_QUERY_BUILDER = 'legend.refresh.query.builder';
 export const ONE_ENTITY_PER_FILE_REQUEST_ID =
   'legend/oneEntityPerFileRefactoring';
 export const ONE_ENTITY_PER_FILE_COMMAND_ID =
@@ -61,6 +63,7 @@ export const GET_PROJECT_ENTITIES = 'getProjectEntities';
 export const GET_PROJECT_ENTITIES_RESPONSE = 'getProjectEntitiesResponse';
 export const DIAGRAM_DROP_CLASS_ERROR = 'diagramDropClassError';
 export const WRITE_ENTITY = 'writeEntity';
+export const QUERY_BUILDER_CONFIG_ERROR = 'queryBuilderConfigError';
 
 // Context variables
 export const SHOW_EXECUTION_RESULTS = 'showExecutionResults';
@@ -79,6 +82,7 @@ export const AG_GRID_BALHAM_THEME = 'ag-theme-balham.min.css';
 // Webviews
 export const FUNCTION_PARAMTER_VALUES_ID = 'functionParameterValues';
 export const DIAGRAM_RENDERER = 'diagramRenderer';
+export const SERVICE_QUERY_EDITOR = 'serviceQueryEditor';
 
 // Primitive types
 export enum PRIMITIVE_TYPE {

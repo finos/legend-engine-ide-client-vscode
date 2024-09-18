@@ -80,6 +80,17 @@
         "category": "Legend"
       },
       {
+        "command": "legend.edit.service.query",
+        "title": "Edit Query",
+        "icon": "$(search)",
+        "category": "Legend"
+      },
+      {
+        "command": "legend.refresh.query.builder",
+        "title": "Refresh Query Builder",
+        "category": "Legend"
+      },
+      {
         "command": "legend.log",
         "title": "Show Legend Server logs",
         "category": "Legend"
@@ -247,6 +258,11 @@
           "command": "legend.show.diagram",
           "when": "viewItem == meta::pure::metamodel::diagram::Diagram",
           "group": "inline"
+        },
+        {
+          "command": "legend.edit.service.query",
+          "when": "viewItem == meta::legend::service::metamodel::Service",
+          "group": "inline"
         }
       ],
       "view/title": [
@@ -325,7 +341,7 @@
     "@ag-grid-enterprise/menu": "30.2.0",
     "@ag-grid-enterprise/row-grouping": "30.2.0",
     "@ag-grid-enterprise/server-side-row-model": "30.2.0",
-    "@finos/legend-vscode-extension-dependencies": "4.0.0",
+    "@finos/legend-vscode-extension-dependencies": "4.0.5",
     "@types/vscode": "1.83.0",
     "glob": "11.0.0",
     "path": "0.12.7",
@@ -339,44 +355,44 @@
   },
   "devDependencies": {
     "@types/mocha": "10.0.1",
-    "@types/node": "20.8.4",
-    "@types/react": "18.3.3",
+    "@types/node": "22.5.0",
+    "@types/react": "18.3.4",
     "@types/react-dom": "18.3.0",
     "@types/react-select": "5.0.1",
     "@types/sinon": "17.0.3",
-    "@typescript-eslint/eslint-plugin": "6.9.0",
-    "@typescript-eslint/parser": "6.9.0",
+    "@typescript-eslint/eslint-plugin": "8.3.0",
+    "@typescript-eslint/parser": "8.3.0",
     "@vscode/test-cli": "0.0.4",
     "@vscode/test-electron": "2.3.9",
     "assert": "2.1.0",
     "console-browserify": "1.2.0",
     "cross-env": "7.0.3",
     "crypto-browserify": "3.12.0",
-    "css-loader": "4.2.0",
-    "eslint": "8.52.0",
-    "eslint-config-prettier": "9.0.0",
-    "eslint-plugin-import": "2.29.0",
-    "eslint-plugin-prettier": "5.0.1",
-    "eslint-plugin-react": "7.33.2",
-    "eslint-plugin-react-hooks": "4.6.0",
+    "css-loader": "7.1.2",
+    "eslint": "8.57.0",
+    "eslint-config-prettier": "9.1.0",
+    "eslint-plugin-import": "2.29.1",
+    "eslint-plugin-prettier": "5.2.1",
+    "eslint-plugin-react": "7.35.0",
+    "eslint-plugin-react-hooks": "4.6.2",
     "license-check-and-add": "4.0.5",
     "maven": "5.0.0",
     "npm-run-all": "4.1.5",
-    "postcss": "8.4.31",
+    "postcss": "8.4.41",
     "postcss-scss": "4.0.9",
     "prettier": "3.3.3",
     "process": "0.11.10",
-    "sass": "1.70.0",
+    "sass": "1.77.8",
     "sass-loader": "14.0.0",
     "sinon": "17.0.1",
     "stream-browserify": "3.0.0",
     "style-loader": "1.2.1",
-    "stylelint": "15.11.0",
-    "stylelint-config-standard": "34.0.0",
-    "stylelint-scss": "5.2.1",
+    "stylelint": "16.8.2",
+    "stylelint-config-standard": "36.0.1",
+    "stylelint-scss": "6.5.1",
     "ts-jest": "29.1.2",
     "ts-loader": "9.5.1",
-    "typescript": "5.2.2",
+    "typescript": "5.5.4",
     "util": "0.12.5",
     "vm-browserify": "1.1.2",
     "webpack": "5.94.0",
@@ -391,5 +407,8 @@
   "overrides": {
     "react": "18.3.1",
     "react-dom": "18.3.1"
+  },
+  "extensions": {
+    "applicationVSCodePlugin": "@finos/legend-application-vs-code-plugin-core"
   }
 }

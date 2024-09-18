@@ -16,25 +16,25 @@
 
 import * as path from 'path';
 import {
-  Uri,
-  workspace,
-  type ExtensionContext,
-  languages,
-  window,
-  commands,
-  ViewColumn,
-  StatusBarAlignment,
-  ThemeIcon,
-  type TextDocumentContentProvider,
   type CancellationToken,
-  type TerminalProfile,
+  type ExtensionContext,
   type ProviderResult,
+  type TerminalProfile,
+  type TextDocumentContentProvider,
+  type WebviewPanel,
+  commands,
+  EndOfLine,
+  languages,
+  ProgressLocation,
   SnippetString,
   SnippetTextEdit,
+  StatusBarAlignment,
+  ThemeIcon,
+  Uri,
+  ViewColumn,
+  window,
+  workspace,
   WorkspaceEdit,
-  EndOfLine,
-  ProgressLocation,
-  type WebviewPanel,
 } from 'vscode';
 import {
   type LanguageClient,
@@ -60,6 +60,9 @@ import {
   LEGEND_SHOW_DIAGRAM,
   DIAGRAM_RENDERER,
   ONE_ENTITY_PER_FILE_COMMAND_ID,
+  LEGEND_EDIT_SERVICE_QUERY,
+  SERVICE_QUERY_EDITOR,
+  LEGEND_REFRESH_QUERY_BUILDER,
 } from './utils/Const';
 import { LegendWebViewProvider } from './utils/LegendWebViewProvider';
 import {
@@ -79,12 +82,15 @@ import {
 import { createTestController } from './testController';
 import {
   type LegendConceptTreeItem,
+  type LegendConceptTreeProvider,
   createLegendConceptTreeProvider,
 } from './conceptTree';
 import { renderDiagramRendererWebView } from './webviews/DiagramWebView';
+import { renderServiceQueryEditorWebView } from './webviews/ServiceQueryEditorWebView';
 
 let client: LegendLanguageClient;
 const openedWebViews: Record<string, WebviewPanel> = {};
+let legendConceptTreeProvider: LegendConceptTreeProvider;
 
 export function createClient(context: ExtensionContext): LanguageClient {
   languages.setLanguageConfiguration(LEGEND_LANGUAGE_ID, {
@@ -149,8 +155,22 @@ export function createClient(context: ExtensionContext): LanguageClient {
   // Initialize client
   client.start();
 
-  // if pom changes, ask user if we should reload extension
+  // if pom changes, ask user if we should reload extension.
+  // if query changes, we should reload any query builders that are open.
   workspace.onDidSaveTextDocument((e) => {
+    const legendItem = legendConceptTreeProvider.getConceptsFrom(
+      e.uri.toString(),
+    )?.[0];
+    if (
+      legendItem &&
+      legendItem.id &&
+      openedWebViews[legendItem.id] &&
+      openedWebViews[legendItem.id]?.viewType === SERVICE_QUERY_EDITOR
+    ) {
+      openedWebViews[legendItem.id]?.webview.postMessage({
+        command: LEGEND_REFRESH_QUERY_BUILDER,
+      });
+    }
     if (e.fileName.endsWith('pom.xml')) {
       window
         .showInformationMessage(
@@ -312,6 +332,46 @@ export function registerCommands(context: ExtensionContext): void {
   );
   context.subscriptions.push(showDiagram);
 
+  const editServiceQuery = commands.registerCommand(
+    LEGEND_EDIT_SERVICE_QUERY,
+    async (...args: unknown[]) => {
+      const serviceId = (args[0] as LegendConceptTreeItem).id as string;
+      const columnToShowIn = window.activeTextEditor
+        ? window.activeTextEditor.viewColumn
+        : undefined;
+      if (openedWebViews[serviceId]) {
+        openedWebViews[serviceId]?.reveal(columnToShowIn);
+      } else {
+        const serviceQueryEditorWebView = window.createWebviewPanel(
+          SERVICE_QUERY_EDITOR,
+          `Service Query Editor: ${(args[0] as LegendConceptTreeItem).label}`,
+          ViewColumn.One,
+          {
+            enableScripts: true,
+            retainContextWhenHidden: true,
+          },
+        );
+        openedWebViews[serviceId] = serviceQueryEditorWebView;
+        serviceQueryEditorWebView.onDidDispose(
+          () => {
+            delete openedWebViews[serviceId];
+          },
+          null,
+          context.subscriptions,
+        );
+        renderServiceQueryEditorWebView(
+          serviceQueryEditorWebView,
+          context,
+          serviceId,
+          workspace.getConfiguration('legend').get('engine.server.url', ''),
+          workspace.getConfiguration('legend').get('studio.forms.file', ''),
+          client,
+        );
+      }
+    },
+  );
+  context.subscriptions.push(editServiceQuery);
+
   const oneEntityPerFileRefactor = commands.registerCommand(
     ONE_ENTITY_PER_FILE_COMMAND_ID,
     () => {
@@ -428,7 +488,7 @@ export function registerClientViews(context: ExtensionContext): void {
           context.extensionPath,
           resultsViewprovider.getWebView(),
         );
-      } catch (e) {
+      } catch {
         if (error instanceof Error) {
           window.showErrorMessage(error.message);
         }
@@ -445,7 +505,10 @@ export function activate(context: ExtensionContext): void {
   createReplTerminal(context);
   registerLegendVirtualFilesystemProvider(context);
   context.subscriptions.push(createTestController(client));
-  context.subscriptions.push(...createLegendConceptTreeProvider(client));
+  const { disposables, treeDataProvider } =
+    createLegendConceptTreeProvider(client);
+  context.subscriptions.push(...disposables);
+  legendConceptTreeProvider = treeDataProvider;
 }
 
 export function createStatusBarItem(context: ExtensionContext): void {

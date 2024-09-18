@@ -146,7 +146,7 @@ export class LegendConceptTreeItem extends TreeItem {
   }
 }
 
-class LegendConceptTreeProvider
+export class LegendConceptTreeProvider
   implements
     TreeDataProvider<LegendConceptTreeItem>,
     TreeDragAndDropController<LegendConceptTreeItem>
@@ -294,9 +294,10 @@ class LegendConceptTreeProvider
   }
 }
 
-export function createLegendConceptTreeProvider(
-  client: LegendLanguageClient,
-): Disposable[] {
+export function createLegendConceptTreeProvider(client: LegendLanguageClient): {
+  disposables: Disposable[];
+  treeDataProvider: LegendConceptTreeProvider;
+} {
   const provider = new LegendConceptTreeProvider(client);
   const providerRegistration = window.createTreeView(TREE_ID, {
     treeDataProvider: provider,
@@ -367,5 +368,5 @@ export function createLegendConceptTreeProvider(
   );
   disposables.push(showRegistration);
 
-  return disposables;
+  return { disposables, treeDataProvider: provider };
 }

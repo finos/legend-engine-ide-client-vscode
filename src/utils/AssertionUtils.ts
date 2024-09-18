@@ -33,7 +33,7 @@ export const guaranteeNonNullable = <T>(
   return value;
 };
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/ban-types
+// eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-function-type
 export type GenericClazz<T> = { new (...args: any[]): T } | Function;
 
 // Aserts typing doesn't work with all arrow function type declaration form
