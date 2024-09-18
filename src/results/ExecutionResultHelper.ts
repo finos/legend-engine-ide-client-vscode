@@ -144,7 +144,7 @@ const renderResultMessage = (
     const json = JSON.parse(mssg) as PlainObject<TDSLegendExecutionResult>;
     const result = TDSLegendExecutionResult.serialization.fromJson(json);
     return renderTDSResultMessage(r, result, link, extensionPath, webview);
-  } catch (e) {
+  } catch {
     // do nothing
   }
   const htmlString = `<html><body><div style="white-space: pre-wrap">${mssg}</div></body></html>`;

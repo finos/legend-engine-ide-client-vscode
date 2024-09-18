@@ -71,7 +71,7 @@ export const FunctionResultsEditor: React.FC<{
             ),
           })),
         );
-      } catch (e) {
+      } catch {
         setResultMessage(mssg);
       }
       setLoading(false);
