@@ -248,7 +248,9 @@ const showDiagramWebView = async (
       context,
       diagramId,
       entities,
-      workspace.getConfiguration('legend').get('studio.forms.diagramEditorFile', ''),
+      workspace
+        .getConfiguration('legend')
+        .get('studio.forms.diagramEditorFile', ''),
       client,
     );
   }
@@ -364,7 +366,9 @@ export function registerCommands(context: ExtensionContext): void {
           context,
           serviceId,
           workspace.getConfiguration('legend').get('engine.server.url', ''),
-          workspace.getConfiguration('legend').get('studio.forms.serviceQueryBuilderFile', ''),
+          workspace
+            .getConfiguration('legend')
+            .get('studio.forms.serviceQueryBuilderFile', ''),
           client,
         );
       }
