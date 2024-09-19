@@ -203,10 +203,15 @@
           },
           "description": "Specifies extra VM arguments used to launch the Legend Language REPL"
         },
-        "legend.studio.forms.file": {
+        "legend.studio.forms.diagramEditorFile": {
           "type": "string",
           "default": "",
-          "description": "Specifies file to be used for legend studio web forms"
+          "description": "Specifies file to be used for legend studio diagram editor"
+        },
+        "legend.studio.forms.serviceQueryBuilderFile": {
+          "type": "string",
+          "default": "",
+          "description": "Specifies file to be used for legend studio service query builder"
         },
         "legend.planExecutor.configuration": {
           "type": "string",
