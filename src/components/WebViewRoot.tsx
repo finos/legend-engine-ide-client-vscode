@@ -16,10 +16,7 @@
 
 import '@finos/legend-vscode-extension-dependencies/style/index.css';
 import { createRoot } from 'react-dom/client';
-import {
-  guaranteeNonEmptyString,
-  type PlainObject,
-} from '@finos/legend-vscode-extension-dependencies';
+import { type PlainObject } from '@finos/legend-vscode-extension-dependencies';
 import { ComponentRouter } from './ComponentRouter';
 
 const rootElement = document.getElementById('root');
@@ -28,15 +25,8 @@ const inputParamtersFromHtml = rootElement
   : '';
 if (inputParamtersFromHtml) {
   const parsedParams = JSON.parse(inputParamtersFromHtml) as PlainObject;
-  const { webviewType, ...rest } = parsedParams;
 
   createRoot(rootElement as HTMLElement).render(
-    <ComponentRouter
-      webviewType={guaranteeNonEmptyString(
-        webviewType as string,
-        'webviewType is required to render a web view',
-      )}
-      {...rest}
-    />,
+    <ComponentRouter {...parsedParams} />,
   );
 }

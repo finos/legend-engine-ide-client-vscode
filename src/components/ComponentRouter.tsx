@@ -11,13 +11,9 @@ import { ServiceQueryEditor } from './query/ServiceQueryEditor';
 import { DiagramEditor } from './diagram/DiagramEditor';
 import { DiagramEditorState } from '../stores/DiagramEditorState';
 
-export const ComponentRouter = (
-  props: {
-    webviewType: string;
-  } & PlainObject,
-): React.ReactNode => {
+export const ComponentRouter = (props: PlainObject): React.ReactNode => {
   const webviewType = guaranteeNonEmptyString(
-    props.webviewType,
+    props.webviewType as string,
     'webviewType is required to render a web view',
   );
 
