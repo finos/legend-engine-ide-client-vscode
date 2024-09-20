@@ -19,11 +19,13 @@ import { Uri, type ExtensionContext, type WebviewPanel, window } from 'vscode';
 import type { LegendEntity } from '../model/LegendEntity';
 import {
   DIAGRAM_DROP_CLASS_ERROR,
+  DIAGRAM_RENDERER,
   GET_PROJECT_ENTITIES,
   GET_PROJECT_ENTITIES_RESPONSE,
   WRITE_ENTITY,
 } from '../utils/Const';
 import type { LegendLanguageClient } from '../LegendLanguageClient';
+import { type WebViewRootDataInputParams } from '../components/WebViewRoot';
 
 export const renderDiagramRendererWebView = (
   diagramRendererWebViewPanel: WebviewPanel,
@@ -33,16 +35,24 @@ export const renderDiagramRendererWebView = (
   renderFilePath: string,
   client: LegendLanguageClient,
 ): void => {
-  let diagramRendererScript;
   const { webview } = diagramRendererWebViewPanel;
+
+  // Get script to use for web view
+  let webViewRootScript;
   if (renderFilePath.length === 0) {
-    const diagramRendererScriptPath = Uri.file(
-      path.join(context.extensionPath, 'dist', 'DiagramRendererRoot.js'),
+    const webViewRootScriptPath = Uri.file(
+      path.join(context.extensionPath, 'dist', 'WebViewRoot.js'),
     );
-    diagramRendererScript = webview.asWebviewUri(diagramRendererScriptPath);
+    webViewRootScript = webview.asWebviewUri(webViewRootScriptPath);
   } else {
-    diagramRendererScript = renderFilePath;
+    webViewRootScript = renderFilePath;
   }
+
+  // Construct data input parameters
+  const dataInputParams: WebViewRootDataInputParams = {
+    webViewType: DIAGRAM_RENDERER,
+    diagramId,
+  };
 
   webview.html = `
     <!DOCTYPE html>
@@ -53,9 +63,9 @@ export const renderDiagramRendererWebView = (
       </head>
       <body>
         <div id="root" style="height: 100vh; width: 100%;" data-input-parameters=${JSON.stringify(
-          { diagramId },
+          dataInputParams,
         )}></div>
-        <script src=${diagramRendererScript}></script>
+        <script src=${webViewRootScript}></script>
         <script>
           const vscode = acquireVsCodeApi();
         </script>

@@ -20,12 +20,14 @@ import {
   GET_PROJECT_ENTITIES,
   GET_PROJECT_ENTITIES_RESPONSE,
   QUERY_BUILDER_CONFIG_ERROR,
+  SERVICE_QUERY_EDITOR,
   WRITE_ENTITY,
 } from '../utils/Const';
 import {
   type LegendLanguageClient,
   LegendEntitiesRequest,
 } from '../LegendLanguageClient';
+import { type WebViewRootDataInputParams } from '../components/WebViewRoot';
 
 export const renderServiceQueryEditorWebView = (
   serviceQueryEditorWebViewPanel: WebviewPanel,
@@ -35,18 +37,25 @@ export const renderServiceQueryEditorWebView = (
   renderFilePath: string,
   client: LegendLanguageClient,
 ): void => {
-  let serviceQueryEditorScript;
   const { webview } = serviceQueryEditorWebViewPanel;
+
+  // Get script to use for web view
+  let webViewRootScript;
   if (renderFilePath.length === 0) {
-    const serviceQueryEditorScriptPath = Uri.file(
-      path.join(context.extensionPath, 'dist', 'ServiceQueryEditorRoot.js'),
+    const webViewRootScriptPath = Uri.file(
+      path.join(context.extensionPath, 'dist', 'WebViewRoot.js'),
     );
-    serviceQueryEditorScript = webview.asWebviewUri(
-      serviceQueryEditorScriptPath,
-    );
+    webViewRootScript = webview.asWebviewUri(webViewRootScriptPath);
   } else {
-    serviceQueryEditorScript = renderFilePath;
+    webViewRootScript = renderFilePath;
   }
+
+  // Construct data input parameters
+  const dataInputParams: WebViewRootDataInputParams = {
+    webViewType: SERVICE_QUERY_EDITOR,
+    serviceId,
+    engineUrl,
+  };
 
   webview.html = `
     <!DOCTYPE html>
@@ -57,9 +66,9 @@ export const renderServiceQueryEditorWebView = (
       </head>
       <body>
         <div id="root" style="height: 100vh; width: 100%;" data-input-parameters=${JSON.stringify(
-          { serviceId, engineUrl },
+          dataInputParams,
         )}></div>
-        <script src=${serviceQueryEditorScript}></script>
+        <script src=${webViewRootScript}></script>
         <script>
           const vscode = acquireVsCodeApi();
         </script>
