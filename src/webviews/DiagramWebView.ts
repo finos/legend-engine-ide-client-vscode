@@ -14,18 +14,17 @@
  * limitations under the License.
  */
 
-import * as path from 'path';
-import { Uri, type ExtensionContext, type WebviewPanel, window } from 'vscode';
+import { type ExtensionContext, type WebviewPanel, window } from 'vscode';
 import type { LegendEntity } from '../model/LegendEntity';
 import {
   DIAGRAM_DROP_CLASS_ERROR,
-  DIAGRAM_RENDERER,
   GET_PROJECT_ENTITIES,
   GET_PROJECT_ENTITIES_RESPONSE,
   WRITE_ENTITY,
 } from '../utils/Const';
 import type { LegendLanguageClient } from '../LegendLanguageClient';
-import { type WebViewRootDataInputParams } from '../components/WebViewRoot';
+import { getWebviewHtml } from './utils';
+import { type PlainObject } from '@finos/legend-vscode-extension-dependencies';
 
 export const renderDiagramRendererWebView = (
   diagramRendererWebViewPanel: WebviewPanel,
@@ -37,41 +36,18 @@ export const renderDiagramRendererWebView = (
 ): void => {
   const { webview } = diagramRendererWebViewPanel;
 
-  // Get script to use for web view
-  let webViewRootScript;
-  if (renderFilePath.length === 0) {
-    const webViewRootScriptPath = Uri.file(
-      path.join(context.extensionPath, 'dist', 'WebViewRoot.js'),
-    );
-    webViewRootScript = webview.asWebviewUri(webViewRootScriptPath);
-  } else {
-    webViewRootScript = renderFilePath;
-  }
-
   // Construct data input parameters
-  const dataInputParams: WebViewRootDataInputParams = {
-    webViewType: DIAGRAM_RENDERER,
+  const dataInputParams: PlainObject = {
     diagramId,
   };
 
-  webview.html = `
-    <!DOCTYPE html>
-    <html lang="en">
-      <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      </head>
-      <body>
-        <div id="root" style="height: 100vh; width: 100%;" data-input-parameters=${JSON.stringify(
-          dataInputParams,
-        )}></div>
-        <script src=${webViewRootScript}></script>
-        <script>
-          const vscode = acquireVsCodeApi();
-        </script>
-      </body>
-    </html>
-  `;
+  webview.html = getWebviewHtml(
+    webview,
+    diagramRendererWebViewPanel.viewType,
+    context,
+    renderFilePath,
+    dataInputParams,
+  );
 
   webview.onDidReceiveMessage(async (message) => {
     switch (message.command) {

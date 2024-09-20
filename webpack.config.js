@@ -18,7 +18,7 @@ const { type } = require('os');
 const path = require('path');
 const webpack = require('webpack');
 
-const webViewConfig = {
+const webviewConfig = {
   entry: {
     AgGridRenderer: './src/components/grid/AgGridRenderer.tsx',
     FunctionResultsEditorRenderer: './src/components/function/FunctionResultsEditorRenderer.tsx',
@@ -130,4 +130,4 @@ const extensionConfig = {
 };
 
 
-module.exports = [webViewConfig, extensionConfig]
+module.exports = [webviewConfig, extensionConfig]
