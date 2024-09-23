@@ -14,8 +14,7 @@
  * limitations under the License.
  */
 
-import * as path from 'path';
-import { Uri, type ExtensionContext, type WebviewPanel, window } from 'vscode';
+import { type ExtensionContext, type WebviewPanel, window } from 'vscode';
 import type { LegendEntity } from '../model/LegendEntity';
 import {
   DIAGRAM_DROP_CLASS_ERROR,
@@ -24,6 +23,8 @@ import {
   WRITE_ENTITY,
 } from '../utils/Const';
 import type { LegendLanguageClient } from '../LegendLanguageClient';
+import { getWebviewHtml } from './utils';
+import { type PlainObject } from '@finos/legend-vscode-extension-dependencies';
 
 export const renderDiagramRendererWebView = (
   diagramRendererWebViewPanel: WebviewPanel,
@@ -33,35 +34,20 @@ export const renderDiagramRendererWebView = (
   renderFilePath: string,
   client: LegendLanguageClient,
 ): void => {
-  let diagramRendererScript;
   const { webview } = diagramRendererWebViewPanel;
-  if (renderFilePath.length === 0) {
-    const diagramRendererScriptPath = Uri.file(
-      path.join(context.extensionPath, 'dist', 'DiagramRendererRoot.js'),
-    );
-    diagramRendererScript = webview.asWebviewUri(diagramRendererScriptPath);
-  } else {
-    diagramRendererScript = renderFilePath;
-  }
 
-  webview.html = `
-    <!DOCTYPE html>
-    <html lang="en">
-      <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      </head>
-      <body>
-        <div id="root" style="height: 100vh; width: 100%;" data-input-parameters=${JSON.stringify(
-          { diagramId },
-        )}></div>
-        <script src=${diagramRendererScript}></script>
-        <script>
-          const vscode = acquireVsCodeApi();
-        </script>
-      </body>
-    </html>
-  `;
+  // Construct data input parameters
+  const dataInputParams: PlainObject = {
+    diagramId,
+  };
+
+  webview.html = getWebviewHtml(
+    webview,
+    diagramRendererWebViewPanel.viewType,
+    context,
+    renderFilePath,
+    dataInputParams,
+  );
 
   webview.onDidReceiveMessage(async (message) => {
     switch (message.command) {

@@ -18,12 +18,11 @@ const { type } = require('os');
 const path = require('path');
 const webpack = require('webpack');
 
-const webViewConfig = {
+const webviewConfig = {
   entry: {
     AgGridRenderer: './src/components/grid/AgGridRenderer.tsx',
     FunctionResultsEditorRenderer: './src/components/function/FunctionResultsEditorRenderer.tsx',
-    DiagramRendererRoot: './src/components/diagram/DiagramRendererRoot.tsx',
-    ServiceQueryEditorRoot: './src/components/query/ServiceQueryEditorRoot.tsx',
+    WebViewRoot: './src/components/WebViewRoot.tsx',
   },
   externals: {
     vscode: 'commonjs vscode',
@@ -131,4 +130,4 @@ const extensionConfig = {
 };
 
 
-module.exports = [webViewConfig, extensionConfig]
+module.exports = [webviewConfig, extensionConfig]
