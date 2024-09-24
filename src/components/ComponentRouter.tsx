@@ -27,6 +27,8 @@ import { ServiceQueryEditor } from './query/ServiceQueryEditor';
 import { DiagramEditor } from './diagram/DiagramEditor';
 import { DiagramEditorState } from '../stores/DiagramEditorState';
 
+declare const AG_GRID_LICENSE: string;
+
 export const ComponentRouter = (props: PlainObject): React.ReactNode => {
   const webviewType = guaranteeNonEmptyString(
     props.webviewType as string,
@@ -43,7 +45,10 @@ export const ComponentRouter = (props: PlainObject): React.ReactNode => {
         engineURL: guaranteeNonNullable(props.engineUrl as string),
         extensions: {
           queryBuilder: {
-            TEMPORARY__enableGridEnterpriseMode: props.enableGridEnterpriseMode,
+            TEMPORARY__enableGridEnterpriseMode:
+              AG_GRID_LICENSE !== null &&
+              AG_GRID_LICENSE !== undefined &&
+              AG_GRID_LICENSE !== '',
           },
         },
       };

@@ -217,11 +217,6 @@
           "type": "string",
           "default": "vX_X_X",
           "description": "Defines the protocol version to use"
-        },
-        "legend.queryBuilder.enableGridEnterpriseMode": {
-          "type": "boolean",
-          "default": false,
-          "description": "Enable AgGrid Enterprise features in the query builder (requires an AgGrid Enterprise license)"
         }
       }
     },

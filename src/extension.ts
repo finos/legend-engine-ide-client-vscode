@@ -364,9 +364,6 @@ export function registerCommands(context: ExtensionContext): void {
           context,
           serviceId,
           workspace.getConfiguration('legend').get('engine.server.url', ''),
-          workspace
-            .getConfiguration('legend')
-            .get('queryBuilder.enableGridEnterpriseMode', false),
           workspace.getConfiguration('legend').get('studio.forms.file', ''),
           client,
         );
