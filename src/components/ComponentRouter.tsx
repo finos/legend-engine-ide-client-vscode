@@ -43,7 +43,7 @@ export const ComponentRouter = (props: PlainObject): React.ReactNode => {
         engineURL: guaranteeNonNullable(props.engineUrl as string),
         extensions: {
           queryBuilder: {
-            TEMPORARY__enableGridEnterpriseMode: true,
+            TEMPORARY__enableGridEnterpriseMode: props.enableGridEnterpriseMode,
           },
         }
       };

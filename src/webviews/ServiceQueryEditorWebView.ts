@@ -33,6 +33,7 @@ export const renderServiceQueryEditorWebView = (
   context: ExtensionContext,
   serviceId: string,
   engineUrl: string,
+  enableGridEnterpriseMode: boolean,
   renderFilePath: string,
   client: LegendLanguageClient,
 ): void => {
@@ -42,6 +43,7 @@ export const renderServiceQueryEditorWebView = (
   const dataInputParams: PlainObject = {
     serviceId,
     engineUrl,
+    enableGridEnterpriseMode,
   };
 
   webview.html = getWebviewHtml(
