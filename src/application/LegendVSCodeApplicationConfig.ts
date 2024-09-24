@@ -19,6 +19,7 @@ import {
   type LegendApplicationConfigurationInput,
   guaranteeNonEmptyString,
   LegendApplicationConfig,
+  QueryBuilderConfig,
 } from '@finos/legend-vscode-extension-dependencies';
 
 export interface LegendVSCodeApplicationConfigurationData
@@ -28,6 +29,7 @@ export interface LegendVSCodeApplicationConfigurationData
 
 export class LegendVSCodeApplicationConfig extends LegendApplicationConfig {
   readonly engineServerUrl: string;
+  readonly queryBuilderConfig: QueryBuilderConfig | undefined;
 
   constructor(
     input: LegendApplicationConfigurationInput<LegendVSCodeApplicationConfigurationData>,
@@ -40,6 +42,11 @@ export class LegendVSCodeApplicationConfig extends LegendApplicationConfig {
         input.configData.engineURL,
         `Can't configure application: Engine server URL is missing in extension settings`,
       ),
+    );
+
+    // query builder
+    this.queryBuilderConfig = QueryBuilderConfig.serialization.fromJson(
+      input.configData.extensions?.queryBuilder ?? {},
     );
   }
 

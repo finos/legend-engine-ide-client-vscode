@@ -41,6 +41,11 @@ export const ComponentRouter = (props: PlainObject): React.ReactNode => {
         appName: 'legend-vs-code',
         env: 'dev',
         engineURL: guaranteeNonNullable(props.engineUrl as string),
+        extensions: {
+          queryBuilder: {
+            TEMPORARY__enableGridEnterpriseMode: true,
+          },
+        }
       };
       const serviceId = guaranteeNonNullable(props.serviceId as string);
       component = (
