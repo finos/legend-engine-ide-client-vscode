@@ -45,7 +45,7 @@ export const ComponentRouter = (props: PlainObject): React.ReactNode => {
           queryBuilder: {
             TEMPORARY__enableGridEnterpriseMode: props.enableGridEnterpriseMode,
           },
-        }
+        },
       };
       const serviceId = guaranteeNonNullable(props.serviceId as string);
       component = (
