@@ -32,7 +32,7 @@ export const TEST_PASS_COLOR = 'testing.iconPassed';
 export const TEST_FAIL_COLOR = 'testing.iconFailed';
 export const TEST_ERROR_COLOR = 'testing.iconErrored';
 
-// Commands
+// VS Code Commands
 export const SHOW_RESULTS_COMMAND_ID = 'showResults';
 export const SHOW_RESULTS_COMMAND_TITLE = 'Results';
 export const SET_CONTEXT_COMMAND_ID = 'setContext';
@@ -42,13 +42,6 @@ export const LEGEND_CLIENT_COMMAND_ID = 'legend.client.command';
 export const EXEC_FUNCTION_ID = 'legend.function.execute';
 export const ACTIVATE_FUNCTION_ID = 'legend.pure.activateFunction';
 export const SEND_TDS_REQUEST_ID = 'sendTDSRequest';
-export const TDS_JSON_REQUEST_ID = 'legend/TDSRequest';
-export const REPL_CLASSPATH_REQUEST_ID = 'legend/replClasspath';
-export const TEST_CASES_REQUEST_ID = 'legend/testCases';
-export const EXECUTE_TESTS_REQUEST_ID = 'legend/executeTests';
-export const ENTITIES_REQUEST_ID = 'legend/entities';
-export const VIRTUAL_FILE_SYSTEM_FILE_REQUEST_ID = 'legend/legendVirtualFile';
-export const LEGEND_WRITE_ENTITY = 'legend/writeEntity';
 export const GET_TDS_REQUEST_RESULTS_ID = 'getTDSRequestResultsId';
 export const LEGEND_SHOW_DIAGRAM = 'legend.show.diagram';
 export const LEGEND_EDIT_SERVICE_QUERY = 'legend.edit.service.query';
@@ -57,6 +50,17 @@ export const ONE_ENTITY_PER_FILE_REQUEST_ID =
   'legend/oneEntityPerFileRefactoring';
 export const ONE_ENTITY_PER_FILE_COMMAND_ID =
   'legend.refactor.oneEntityPerFile';
+export const ANALYZE_MAPPING_MODEL_COVERAGE_COMMAND_ID = 'legend.mapping.analyzeMappingModelCoverage';
+
+// LSP Request IDs
+export const TDS_JSON_REQUEST_ID = 'legend/TDSRequest';
+export const REPL_CLASSPATH_REQUEST_ID = 'legend/replClasspath';
+export const TEST_CASES_REQUEST_ID = 'legend/testCases';
+export const EXECUTE_TESTS_REQUEST_ID = 'legend/executeTests';
+export const ENTITIES_REQUEST_ID = 'legend/entities';
+export const VIRTUAL_FILE_SYSTEM_FILE_REQUEST_ID = 'legend/legendVirtualFile';
+export const LEGEND_WRITE_ENTITY_REQUEST_ID = 'legend/writeEntity';
+export const LEGEND_COMMAND_REQUEST_ID = 'legend/command';
 
 // Event Types
 export const GET_PROJECT_ENTITIES = 'getProjectEntities';
