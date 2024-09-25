@@ -25,7 +25,7 @@ import {
   VIRTUAL_FILE_SYSTEM_FILE_REQUEST_ID,
   ENTITIES_REQUEST_ID,
   ONE_ENTITY_PER_FILE_REQUEST_ID,
-  LEGEND_WRITE_ENTITY,
+  LEGEND_WRITE_ENTITY_REQUEST_ID,
 } from './utils/Const';
 import type { PlainObject } from './utils/SerializationUtils';
 import {
@@ -139,9 +139,9 @@ export class LegendLanguageClient extends LanguageClient {
     token?: CancellationToken,
   ): Promise<string> {
     if (token) {
-      return this.sendRequest(LEGEND_WRITE_ENTITY, request, token);
+      return this.sendRequest(LEGEND_WRITE_ENTITY_REQUEST_ID, request, token);
     } else {
-      return this.sendRequest(LEGEND_WRITE_ENTITY, request);
+      return this.sendRequest(LEGEND_WRITE_ENTITY_REQUEST_ID, request);
     }
   }
 }
