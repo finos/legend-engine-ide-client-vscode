@@ -15,25 +15,19 @@
  */
 
 import {
-  type Parameters,
   type ClassifierPathMapping,
   type ExecutionOptions,
   type ExternalFormatDescription,
   type GenerationConfigurationDescription,
   type GenerationMode,
   type GraphManagerOperationReport,
-  type PlainObject,
   type PostValidationAssertionResult,
   type PureProtocolProcessorPlugin,
   type RawLambda,
   type RawRelationalOperationElement,
-  type RequestHeaders,
-  type RequestProcessConfig,
-  type ResponseProcessConfig,
   type ServiceExecutionMode,
   type SubtypeInfo,
-  type TraceData,
-  type TracerService,
+  type TEMPORARY__EngineSetupConfig,
   type V1_ArtifactGenerationExtensionInput,
   type V1_ArtifactGenerationExtensionOutput,
   type V1_CompilationResult,
@@ -55,7 +49,6 @@ import {
   type V1_LambdaReturnTypeInput,
   type V1_LightQuery,
   type V1_MappingModelCoverageAnalysisInput,
-  type V1_MappingModelCoverageAnalysisResult,
   type V1_PureModelContext,
   type V1_PureModelContextData,
   type V1_Query,
@@ -78,14 +71,42 @@ import {
   type V1_TextCompilationResult,
   type V1_ValueSpecification,
   type V1_GraphManagerEngine,
+  TEMPORARY__AbstractEngineConfig,
+  V1_MappingModelCoverageAnalysisResult,
+} from '@finos/legend-graph';
+import {
+  type Parameters,
+  type PlainObject,
+  type RequestHeaders,
+  type RequestProcessConfig,
+  type ResponseProcessConfig,
+  type TraceData,
+  type TracerService,
 } from '@finos/legend-vscode-extension-dependencies';
+import { type LegendLanguageClient } from '../LegendLanguageClient';
+import { deserialize } from 'serializr';
+
+class V1_LSPEngine_Config extends TEMPORARY__AbstractEngineConfig {}
 
 /**
  * This class defines what the engine is capable of.
  */
 export class V1_LSPEngine implements V1_GraphManagerEngine {
+  config = new V1_LSPEngine_Config();
+  client: LegendLanguageClient;
+
+  constructor(client: LegendLanguageClient) {
+    this.client = client;
+  }
+
+  setup = (config: TEMPORARY__EngineSetupConfig): Promise<void> => {
+    this.config.setEnv(config.env);
+    this.config.setTabSize(config.tabSize);
+    return Promise.resolve();
+  };
+
   // ----------------------------------------- Server Client ----------------------------------------
-  serverClientGetCurrentUserId = (): string | undefined => {
+  getCurrentUserId = (): string | undefined => {
     throw new Error('Method not implemented');
   };
   serverClientGetBaseUrl = (): string | undefined => {
@@ -494,7 +515,10 @@ export class V1_LSPEngine implements V1_GraphManagerEngine {
   async analyzeMappingModelCoverage(
     input: V1_MappingModelCoverageAnalysisInput,
   ): Promise<V1_MappingModelCoverageAnalysisResult> {
-    throw new Error('Method not implemented');
+    return deserialize(
+      V1_MappingModelCoverageAnalysisResult,
+      await this.client.analyzeMappingModelCoverage(input),
+    );
   }
 
   async surveyDatasets(

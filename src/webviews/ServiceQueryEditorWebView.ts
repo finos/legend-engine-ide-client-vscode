@@ -16,6 +16,7 @@
 
 import { type ExtensionContext, type WebviewPanel, window } from 'vscode';
 import {
+  ANALYZE_MAPPING_MODEL_COVERAGE_COMMAND_ID,
   GET_PROJECT_ENTITIES,
   GET_PROJECT_ENTITIES_RESPONSE,
   QUERY_BUILDER_CONFIG_ERROR,
@@ -71,6 +72,10 @@ export const renderServiceQueryEditorWebView = (
           modal: true,
           detail: message.msg,
         });
+        break;
+      }
+      case ANALYZE_MAPPING_MODEL_COVERAGE_COMMAND_ID: {
+        console.log('got message:', message);
         break;
       }
       default:

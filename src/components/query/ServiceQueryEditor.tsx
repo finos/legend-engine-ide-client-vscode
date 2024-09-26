@@ -36,6 +36,7 @@ import { QueryBuilderVSCodeWorkflowState } from './QueryBuilderWorkflowState';
 import { type LegendVSCodeApplicationConfig } from '../../application/LegendVSCodeApplicationConfig';
 import { type LegendVSCodePluginManager } from '../../application/LegendVSCodePluginManager';
 import { buildGraphManagerStateFromEntities } from '../../utils/GraphUtils';
+import { V1_LSPEngine } from '../../graph/V1_LSPEngine';
 
 export const ServiceQueryEditor: React.FC<{
   serviceId: string;
@@ -84,10 +85,13 @@ export const ServiceQueryEditor: React.FC<{
     if (entities.length && serviceId && applicationStore) {
       const initializeQuery = async (): Promise<void> => {
         try {
+          const engine = new V1_LSPEngine();
           const graphManagerState = await buildGraphManagerStateFromEntities(
             entities,
             applicationStore,
+            engine,
           );
+          console.log('graphManagerState:', graphManagerState);
           const service = graphManagerState.graph.getService(serviceId);
           const newQueryBuilderState = new ServiceQueryBuilderState(
             applicationStore,
