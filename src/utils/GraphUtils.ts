@@ -16,11 +16,13 @@
 
 import {
   type ApplicationStore,
+  buildPureGraphManager,
   GraphManagerState,
 } from '@finos/legend-vscode-extension-dependencies';
 import { type LegendEntity } from '../model/LegendEntity';
 import { type LegendVSCodeApplicationConfig } from '../application/LegendVSCodeApplicationConfig';
 import { type LegendVSCodePluginManager } from '../application/LegendVSCodePluginManager';
+import { type V1_LSPEngine } from '../graph/V1_LSPEngine';
 
 export const buildGraphManagerStateFromEntities = async (
   entities: LegendEntity[],
@@ -28,10 +30,17 @@ export const buildGraphManagerStateFromEntities = async (
     LegendVSCodeApplicationConfig,
     LegendVSCodePluginManager
   >,
+  engine: V1_LSPEngine,
 ): GraphManagerState => {
+  const graphManager = buildPureGraphManager(
+    applicationStore.pluginManager,
+    applicationStore.logService,
+    engine,
+  );
   const graphManagerState = new GraphManagerState(
     applicationStore.pluginManager,
     applicationStore.logService,
+    graphManager,
   );
   await graphManagerState.graphManager.initialize({
     env: 'dev',
