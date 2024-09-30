@@ -50,6 +50,8 @@ export const ONE_ENTITY_PER_FILE_REQUEST_ID =
   'legend/oneEntityPerFileRefactoring';
 export const ONE_ENTITY_PER_FILE_COMMAND_ID =
   'legend.refactor.oneEntityPerFile';
+
+// LSP Commands
 export const ANALYZE_MAPPING_MODEL_COVERAGE_COMMAND_ID = 'legend.mapping.analyzeMappingModelCoverage';
 
 // LSP Request IDs
@@ -61,6 +63,8 @@ export const ENTITIES_REQUEST_ID = 'legend/entities';
 export const VIRTUAL_FILE_SYSTEM_FILE_REQUEST_ID = 'legend/legendVirtualFile';
 export const LEGEND_WRITE_ENTITY_REQUEST_ID = 'legend/writeEntity';
 export const LEGEND_COMMAND_REQUEST_ID = 'legend/command';
+export const GET_CLASSIFIER_PATH_MAP_REQUEST_ID = 'legend/getClassifierPathMap';
+export const GET_SUBTYPE_INFO_REQUEST_ID = 'legend/getSubtypeInfo';
 
 // Event Types
 export const GET_PROJECT_ENTITIES = 'getProjectEntities';
@@ -68,6 +72,9 @@ export const GET_PROJECT_ENTITIES_RESPONSE = 'getProjectEntitiesResponse';
 export const DIAGRAM_DROP_CLASS_ERROR = 'diagramDropClassError';
 export const WRITE_ENTITY = 'writeEntity';
 export const QUERY_BUILDER_CONFIG_ERROR = 'queryBuilderConfigError';
+export const GET_CLASSIFIER_PATH_MAP_RESPONSE = `${GET_CLASSIFIER_PATH_MAP_REQUEST_ID}/response`;
+export const GET_SUBTYPE_INFO_RESPONSE = `${GET_SUBTYPE_INFO_REQUEST_ID}/response`;
+export const ANALYZE_MAPPING_MODEL_COVERAGE_RESPONSE = `${ANALYZE_MAPPING_MODEL_COVERAGE_COMMAND_ID}/response`;
 
 // Context variables
 export const SHOW_EXECUTION_RESULTS = 'showExecutionResults';

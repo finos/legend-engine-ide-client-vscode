@@ -14,11 +14,20 @@
  * limitations under the License.
  */
 
-import { type ExtensionContext, type WebviewPanel, window } from 'vscode';
+import {
+  type ExtensionContext,
+  type WebviewPanel,
+  window,
+} from 'vscode';
 import {
   ANALYZE_MAPPING_MODEL_COVERAGE_COMMAND_ID,
+  ANALYZE_MAPPING_MODEL_COVERAGE_RESPONSE,
+  GET_CLASSIFIER_PATH_MAP_REQUEST_ID,
+  GET_CLASSIFIER_PATH_MAP_RESPONSE,
   GET_PROJECT_ENTITIES,
   GET_PROJECT_ENTITIES_RESPONSE,
+  GET_SUBTYPE_INFO_REQUEST_ID,
+  GET_SUBTYPE_INFO_RESPONSE,
   QUERY_BUILDER_CONFIG_ERROR,
   WRITE_ENTITY,
 } from '../utils/Const';
@@ -27,7 +36,9 @@ import {
   LegendEntitiesRequest,
 } from '../LegendLanguageClient';
 import { getWebviewHtml } from './utils';
-import { type PlainObject } from '@finos/legend-vscode-extension-dependencies';
+import { guaranteeNonNullable, type PlainObject } from '@finos/legend-vscode-extension-dependencies';
+import { type LegendConceptTreeProvider } from '../conceptTree';
+import { type V1_MappingModelCoverageAnalysisInput } from '@finos/legend-graph';
 
 export const renderServiceQueryEditorWebView = (
   serviceQueryEditorWebViewPanel: WebviewPanel,
@@ -36,6 +47,7 @@ export const renderServiceQueryEditorWebView = (
   engineUrl: string,
   renderFilePath: string,
   client: LegendLanguageClient,
+  legendConceptTree: LegendConceptTreeProvider,
 ): void => {
   const { webview } = serviceQueryEditorWebViewPanel;
 
@@ -74,8 +86,33 @@ export const renderServiceQueryEditorWebView = (
         });
         break;
       }
+      case GET_CLASSIFIER_PATH_MAP_REQUEST_ID: {
+        const result = await client.getClassifierPathMap();
+        webview.postMessage({
+          command: GET_CLASSIFIER_PATH_MAP_RESPONSE,
+          result,
+        });
+        break;
+      }
+      case GET_SUBTYPE_INFO_REQUEST_ID: {
+        const result = await client.getSubtypeInfo();
+        webview.postMessage({
+          command: GET_SUBTYPE_INFO_RESPONSE,
+          result,
+        });
+        break;
+      }
       case ANALYZE_MAPPING_MODEL_COVERAGE_COMMAND_ID: {
-        console.log('got message:', message);
+        const mappingId = (message.msg as V1_MappingModelCoverageAnalysisInput).mapping;
+        const mappingPath = guaranteeNonNullable(legendConceptTree.getTreeItemById(mappingId)?.location?.uri, `Can't find mapping file with ID '${mappingId}'`);
+        const result = await client.analyzeMappingModelCoverage(
+          mappingPath,
+          mappingId,
+        );
+        webview.postMessage({
+          command: ANALYZE_MAPPING_MODEL_COVERAGE_RESPONSE,
+          result,
+        });
         break;
       }
       default:
