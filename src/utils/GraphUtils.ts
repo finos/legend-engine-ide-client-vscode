@@ -15,14 +15,18 @@
  */
 
 import {
+  guaranteeType,
   type ApplicationStore,
-  buildPureGraphManager,
-  GraphManagerState,
 } from '@finos/legend-vscode-extension-dependencies';
 import { type LegendEntity } from '../model/LegendEntity';
 import { type LegendVSCodeApplicationConfig } from '../application/LegendVSCodeApplicationConfig';
 import { type LegendVSCodePluginManager } from '../application/LegendVSCodePluginManager';
 import { type V1_LSPEngine } from '../graph/V1_LSPEngine';
+import {
+  buildPureGraphManager,
+  GraphManagerState,
+  V1_PureGraphManager,
+} from '@finos/legend-graph';
 
 export const buildGraphManagerStateFromEntities = async (
   entities: LegendEntity[],
@@ -31,8 +35,8 @@ export const buildGraphManagerStateFromEntities = async (
     LegendVSCodePluginManager
   >,
   engine: V1_LSPEngine,
-): GraphManagerState => {
-  const graphManager = buildPureGraphManager(
+): Promise<GraphManagerState> => {
+  const newGraphManager = buildPureGraphManager(
     applicationStore.pluginManager,
     applicationStore.logService,
     engine,
@@ -40,16 +44,25 @@ export const buildGraphManagerStateFromEntities = async (
   const graphManagerState = new GraphManagerState(
     applicationStore.pluginManager,
     applicationStore.logService,
-    graphManager,
+    newGraphManager,
   );
-  await graphManagerState.graphManager.initialize({
-    env: 'dev',
-    tabSize: 2,
-    clientConfig: {
-      baseUrl: applicationStore.config.engineServerUrl,
-      enableCompression: true,
+  const graphManager = guaranteeType(
+    graphManagerState.graphManager,
+    V1_PureGraphManager,
+  );
+  await graphManager.initialize(
+    {
+      env: 'dev',
+      tabSize: 2,
+      clientConfig: {
+        baseUrl: applicationStore.config.engineServerUrl,
+        enableCompression: true,
+      },
     },
-  });
+    {
+      engine,
+    },
+  );
   await graphManagerState.initializeSystem();
   await graphManagerState.graphManager.buildGraph(
     graphManagerState.graph,

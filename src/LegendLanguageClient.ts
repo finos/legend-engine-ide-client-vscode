@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import type { CancellationToken, Uri } from 'vscode';
+import { commands, type CancellationToken, type Uri } from 'vscode';
 import type { FunctionTDSRequest } from './model/FunctionTDSRequest';
 import type { LegendExecutionResult } from './results/LegendExecutionResult';
 import {
@@ -26,6 +26,10 @@ import {
   ENTITIES_REQUEST_ID,
   ONE_ENTITY_PER_FILE_REQUEST_ID,
   LEGEND_WRITE_ENTITY_REQUEST_ID,
+  ANALYZE_MAPPING_MODEL_COVERAGE_COMMAND_ID,
+  GET_CLASSIFIER_PATH_MAP_REQUEST_ID,
+  GET_SUBTYPE_INFO_REQUEST_ID,
+  LEGEND_COMMAND,
 } from './utils/Const';
 import type { PlainObject } from './utils/SerializationUtils';
 import {
@@ -143,5 +147,34 @@ export class LegendLanguageClient extends LanguageClient {
     } else {
       return this.sendRequest(LEGEND_WRITE_ENTITY_REQUEST_ID, request);
     }
+  }
+
+  async getClassifierPathMap(token?: CancellationToken): Promise<string> {
+    if (token) {
+      return this.sendRequest(GET_CLASSIFIER_PATH_MAP_REQUEST_ID, token);
+    } else {
+      return this.sendRequest(GET_CLASSIFIER_PATH_MAP_REQUEST_ID);
+    }
+  }
+
+  async getSubtypeInfo(token?: CancellationToken): Promise<string> {
+    if (token) {
+      return this.sendRequest(GET_SUBTYPE_INFO_REQUEST_ID, token);
+    } else {
+      return this.sendRequest(GET_SUBTYPE_INFO_REQUEST_ID);
+    }
+  }
+
+  async analyzeMappingModelCoverage(
+    mappingFilePath: Uri,
+    mappingId: string,
+  ): Promise<string> {
+    return commands.executeCommand(
+      LEGEND_COMMAND,
+      mappingFilePath,
+      0,
+      mappingId,
+      ANALYZE_MAPPING_MODEL_COVERAGE_COMMAND_ID,
+    );
   }
 }

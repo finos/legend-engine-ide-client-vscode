@@ -63,8 +63,6 @@ import {
   LEGEND_EDIT_SERVICE_QUERY,
   SERVICE_QUERY_EDITOR,
   LEGEND_REFRESH_QUERY_BUILDER,
-  ANALYZE_MAPPING_MODEL_COVERAGE_COMMAND_ID,
-  LEGEND_COMMAND,
 } from './utils/Const';
 import { LegendWebViewProvider } from './utils/LegendWebViewProvider';
 import {
@@ -370,6 +368,7 @@ export function registerCommands(context: ExtensionContext): void {
           workspace.getConfiguration('legend').get('engine.server.url', ''),
           workspace.getConfiguration('legend').get('studio.forms.file', ''),
           client,
+          legendConceptTreeProvider,
         );
       }
     },
@@ -383,20 +382,6 @@ export function registerCommands(context: ExtensionContext): void {
     },
   );
   context.subscriptions.push(oneEntityPerFileRefactor);
-
-  const analyzeMappingModelCoverage = commands.registerCommand(
-    ANALYZE_MAPPING_MODEL_COVERAGE_COMMAND_ID,
-    (...args: unknown[]) => {
-      commands.executeCommand(
-        LEGEND_COMMAND,
-        'file:///Users/travisstebbins/projects/legend/studio-projects/legend-showcase-northwind-data/legend-showcase-northwind-data-entities/src/main/pure/showcase/northwind/mapping/NorthwindMapping.pure',
-        0,
-        'showcase::northwind::mapping::NorthwindMapping',
-        ANALYZE_MAPPING_MODEL_COVERAGE_COMMAND_ID,
-      );
-    },
-  );
-  context.subscriptions.push(analyzeMappingModelCoverage);
 }
 
 function handleExecuteFunctionCommand(

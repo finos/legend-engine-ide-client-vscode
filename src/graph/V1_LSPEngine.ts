@@ -83,8 +83,16 @@ import {
   type TraceData,
   type TracerService,
 } from '@finos/legend-vscode-extension-dependencies';
-import { type LegendLanguageClient } from '../LegendLanguageClient';
 import { deserialize } from 'serializr';
+import { postMessage } from '../utils/VsCodeUtils';
+import {
+  ANALYZE_MAPPING_MODEL_COVERAGE_COMMAND_ID,
+  ANALYZE_MAPPING_MODEL_COVERAGE_RESPONSE,
+  GET_CLASSIFIER_PATH_MAP_REQUEST_ID,
+  GET_CLASSIFIER_PATH_MAP_RESPONSE,
+  GET_SUBTYPE_INFO_REQUEST_ID,
+  GET_SUBTYPE_INFO_RESPONSE,
+} from '../utils/Const';
 
 class V1_LSPEngine_Config extends TEMPORARY__AbstractEngineConfig {}
 
@@ -93,11 +101,6 @@ class V1_LSPEngine_Config extends TEMPORARY__AbstractEngineConfig {}
  */
 export class V1_LSPEngine implements V1_GraphManagerEngine {
   config = new V1_LSPEngine_Config();
-  client: LegendLanguageClient;
-
-  constructor(client: LegendLanguageClient) {
-    this.client = client;
-  }
 
   setup = (config: TEMPORARY__EngineSetupConfig): Promise<void> => {
     this.config.setEnv(config.env);
@@ -105,54 +108,69 @@ export class V1_LSPEngine implements V1_GraphManagerEngine {
     return Promise.resolve();
   };
 
+  waitForMessage = <T>(commandId: string): Promise<T> =>
+    new Promise((resolve) => {
+      window.addEventListener(
+        'message',
+        (event: MessageEvent<{ result: T; command: string }>) => {
+          if (event.data.command === commandId) {
+            resolve(event.data.result);
+          }
+        },
+      );
+    });
+
   // ----------------------------------------- Server Client ----------------------------------------
   getCurrentUserId = (): string | undefined => {
-    throw new Error('Method not implemented');
+    throw new Error('getCurrentUserId not implemented');
   };
   serverClientGetBaseUrl = (): string | undefined => {
-    throw new Error('Method not implemented');
+    throw new Error('serverClientGetBaseUrl not implemented');
   };
   serverClientGetPureBaseUrl = (): string => {
-    throw new Error('Method not implemented');
+    throw new Error('serverClientGetPureBaseUrl not implemented');
   };
   serverClientGetTraceData = (
     name: string,
     tracingTags?: PlainObject,
   ): TraceData => {
-    throw new Error('Method not implemented');
+    throw new Error('serverClientGetTraceData not implemented');
   };
-  serverClientSetTracerService = (tracerService: TracerService): void => {
-    throw new Error('Method not implemented');
-  };
+  serverClientSetTracerService = (tracerService: TracerService): void =>
+    undefined;
   serverClientSetEnv = (val: string | undefined): void => {
-    throw new Error('Method not implemented');
+    throw new Error('serverClientSetEnv not implemented');
   };
   serverClientSetCurrentUserId = (val: string | undefined): void => {
-    throw new Error('Method not implemented');
+    throw new Error('serverClientSetCurrentUserId not implemented');
   };
   serverClientSetBaseUrl = (val: string | undefined): void => {
-    throw new Error('Method not implemented');
+    throw new Error('serverClientSetBaseUrl not implemented');
   };
   serverClientSetBaseUrlForServiceRegistration = (
     val: string | undefined,
   ): void => {
-    throw new Error('Method not implemented');
+    throw new Error(
+      'serverClientSetBaseUrlForServiceRegistration not implemented',
+    );
   };
   serverClientSetUseClientRequestPayloadCompression = (val: boolean): void => {
-    throw new Error('Method not implemented');
+    throw new Error(
+      'serverClientSetUseClientRequestPayloadCompression not implemented',
+    );
   };
   serverClientSetEnableDebuggingPayload = (val: boolean): void => {
-    throw new Error('Method not implemented');
+    throw new Error('serverClientSetEnableDebuggingPayload not implemented');
   };
   serverClientCreatePrototypeProject = (): Promise<{
     projectId: string;
     webUrl: string | undefined;
     owner: string;
   }> => {
-    throw new Error('Method not implemented');
+    throw new Error('serverClientCreatePrototypeProject not implemented');
   };
   serverClientValidUserAccessRole = (userId: string): Promise<boolean> => {
-    throw new Error('Method not implemented');
+    throw new Error('serverClientValidUserAccessRole not implemented');
   };
   serverClientPostWithTracing = <T>(
     traceData: TraceData,
@@ -164,32 +182,34 @@ export class V1_LSPEngine implements V1_GraphManagerEngine {
     requestProcessConfig?: RequestProcessConfig,
     responseProcessConfig?: ResponseProcessConfig,
   ): Promise<T> => {
-    throw new Error('Method not implemented');
+    throw new Error('serverClientPostWithTracing not implemented');
   };
 
   // ------------------------------------------- Protocol -------------------------------------------
 
   async getClassifierPathMapping(): Promise<ClassifierPathMapping[]> {
-    throw new Error('Method not implemented');
+    postMessage({
+      command: GET_CLASSIFIER_PATH_MAP_REQUEST_ID,
+    });
+    return JSON.parse(
+      await this.waitForMessage<string>(GET_CLASSIFIER_PATH_MAP_RESPONSE),
+    ) as ClassifierPathMapping[];
   }
 
   async getSubtypeInfo(): Promise<SubtypeInfo> {
-    throw new Error('Method not implemented');
+    postMessage({
+      command: GET_SUBTYPE_INFO_REQUEST_ID,
+    });
+    return this.waitForMessage<SubtypeInfo>(GET_SUBTYPE_INFO_RESPONSE);
   }
 
   // ------------------------------------------- Grammar -------------------------------------------
-
-  private extractElementSourceInformationIndexFromPureModelContextDataJSON(
-    json: PlainObject<V1_PureModelContextData>,
-  ): Map<string, V1_SourceInformation> {
-    throw new Error('Method not implemented');
-  }
 
   pureModelContextDataToPureCode(
     graph: V1_PureModelContextData,
     pretty: boolean,
   ): Promise<string> {
-    throw new Error('Method not implemented');
+    throw new Error('pureModelContextDataToPureCode not implemented');
   }
 
   async pureCodeToPureModelContextData(
@@ -199,14 +219,7 @@ export class V1_LSPEngine implements V1_GraphManagerEngine {
       onError?: () => void;
     },
   ): Promise<V1_PureModelContextData> {
-    throw new Error('Method not implemented');
-  }
-
-  private async pureCodeToPureModelContextDataJSON(
-    code: string,
-    options?: { onError?: () => void; returnSourceInformation?: boolean },
-  ): Promise<PlainObject<V1_PureModelContextData>> {
-    throw new Error('Method not implemented');
+    throw new Error('pureCodeToPureModelContextData not implemented');
   }
 
   async transformLambdasToCode(
@@ -214,33 +227,33 @@ export class V1_LSPEngine implements V1_GraphManagerEngine {
     pretty: boolean,
     plugins: PureProtocolProcessorPlugin[],
   ): Promise<Map<string, string>> {
-    throw new Error('Method not implemented');
+    throw new Error('transformLambdasToCode not implemented');
   }
 
   async transformValueSpecsToCode(
     input: Record<string, PlainObject<V1_ValueSpecification>>,
     pretty: boolean,
   ): Promise<Map<string, string>> {
-    throw new Error('Method not implemented');
+    throw new Error('transformValueSpecsToCode not implemented');
   }
 
   async transformValueSpecToCode(
     input: PlainObject<V1_ValueSpecification>,
     pretty: boolean,
   ): Promise<string> {
-    throw new Error('Method not implemented');
+    throw new Error('transformValueSpecToCode not implemented');
   }
 
   async transformCodeToValueSpeces(
     input: Record<string, V1_GrammarParserBatchInputEntry>,
   ): Promise<Map<string, PlainObject>> {
-    throw new Error('Method not implemented');
+    throw new Error('transformCodeToValueSpeces not implemented');
   }
 
   async transformCodeToValueSpec(
     input: string,
   ): Promise<PlainObject<V1_ValueSpecification>> {
-    throw new Error('Method not implemented');
+    throw new Error('transformCodeToValueSpec not implemented');
   }
 
   async transformLambdaToCode(
@@ -248,11 +261,11 @@ export class V1_LSPEngine implements V1_GraphManagerEngine {
     pretty: boolean,
     plugins: PureProtocolProcessorPlugin[],
   ): Promise<string> {
-    throw new Error('Method not implemented');
+    throw new Error('transformLambdaToCode not implemented');
   }
 
   async prettyLambdaContent(lambda: string): Promise<string> {
-    throw new Error('Method not implemented');
+    throw new Error('prettyLambdaContent not implemented');
   }
 
   async transformCodeToLambda(
@@ -262,20 +275,24 @@ export class V1_LSPEngine implements V1_GraphManagerEngine {
       pruneSourceInformation?: boolean;
     },
   ): Promise<V1_RawLambda> {
-    throw new Error('Method not implemented');
+    throw new Error('transformCodeToLambda not implemented');
   }
 
   async transformRelationalOperationElementsToPureCode(
     input: Map<string, RawRelationalOperationElement>,
   ): Promise<Map<string, string>> {
-    throw new Error('Method not implemented');
+    throw new Error(
+      'transformRelationalOperationElementsToPureCode not implemented',
+    );
   }
 
   async transformPureCodeToRelationalOperationElement(
     code: string,
     operationId: string,
   ): Promise<V1_RawRelationalOperationElement> {
-    throw new Error('Method not implemented');
+    throw new Error(
+      'transformPureCodeToRelationalOperationElement not implemented',
+    );
   }
 
   // ------------------------------------------- Compile -------------------------------------------
@@ -284,7 +301,7 @@ export class V1_LSPEngine implements V1_GraphManagerEngine {
     model: V1_PureModelContext,
     options?: { onError?: (() => void) | undefined } | undefined,
   ): Promise<V1_CompilationResult> {
-    throw new Error('Method not implemented');
+    throw new Error('compilePureModelContextData not implemented');
   }
 
   async compileText(
@@ -293,19 +310,19 @@ export class V1_LSPEngine implements V1_GraphManagerEngine {
     compileContext?: V1_PureModelContextData,
     options?: { onError?: () => void; getCompilationWarnings?: boolean },
   ): Promise<V1_TextCompilationResult> {
-    throw new Error('Method not implemented');
+    throw new Error('compileText not implemented');
   }
 
   async getLambdaReturnType(
     lambdaReturnInput: V1_LambdaReturnTypeInput,
   ): Promise<string> {
-    throw new Error('Method not implemented');
+    throw new Error('getLambdaReturnType not implemented');
   }
 
   async getLambdaReturnTypeFromRawInput(
     rawInput: PlainObject<V1_LambdaReturnTypeInput>,
   ): Promise<string> {
-    throw new Error('Method not implemented');
+    throw new Error('getLambdaReturnTypeFromRawInput not implemented');
   }
 
   // --------------------------------------------- Execution ---------------------------------------------
@@ -317,21 +334,21 @@ export class V1_LSPEngine implements V1_GraphManagerEngine {
     executionResult: V1_ExecutionResult;
     executionTraceId?: string;
   }> {
-    throw new Error('Method not implemented');
+    throw new Error('runQuery not implemented');
   }
 
   async exportData(
     input: V1_ExecuteInput,
     options?: ExecutionOptions,
   ): Promise<Response> {
-    throw new Error('Method not implemented');
+    throw new Error('exportData not implemented');
   }
 
   async runQueryAndReturnMap(
     input: V1_ExecuteInput,
     options?: ExecutionOptions,
   ): Promise<Map<string, string>> {
-    throw new Error('Method not implemented');
+    throw new Error('runQueryAndReturnMap not implemented');
   }
 
   /**
@@ -344,41 +361,41 @@ export class V1_LSPEngine implements V1_GraphManagerEngine {
     executionResultTxt: string,
     options: ExecutionOptions | undefined,
   ): PlainObject<V1_ExecutionResult> {
-    throw new Error('Method not implemented');
+    throw new Error('parseExecutionResults not implemented');
   }
 
   generateExecutionPlan(
     input: V1_ExecuteInput,
   ): Promise<PlainObject<V1_ExecutionPlan>> {
-    throw new Error('Method not implemented');
+    throw new Error('generateExecutionPlan not implemented');
   }
 
   debugExecutionPlanGeneration(
     input: V1_ExecuteInput,
   ): Promise<{ plan: PlainObject<V1_ExecutionPlan>; debug: string[] }> {
-    throw new Error('Method not implemented');
+    throw new Error('debugExecutionPlanGeneration not implemented');
   }
 
   generateExecuteTestData(
     input: V1_TestDataGenerationExecutionInput,
   ): Promise<string> {
-    throw new Error('Method not implemented');
+    throw new Error('generateExecuteTestData not implemented');
   }
 
   generateExecuteTestDataWithSeedData(
     input: V1_TestDataGenerationExecutionWithSeedInput,
   ): Promise<string> {
-    throw new Error('Method not implemented');
+    throw new Error('generateExecuteTestDataWithSeedData not implemented');
   }
 
   // --------------------------------------------- Test ---------------------------------------------
 
   async runTests(input: V1_RunTestsInput): Promise<V1_RunTestsResult> {
-    throw new Error('Method not implemented');
+    throw new Error('runTests not implemented');
   }
 
   async debugTests(input: V1_RunTestsInput): Promise<V1_DebugTestsResult> {
-    throw new Error('Method not implemented');
+    throw new Error('debugTests not implemented');
   }
 
   // -------------------------------------------  Generation -------------------------------------------
@@ -386,7 +403,7 @@ export class V1_LSPEngine implements V1_GraphManagerEngine {
   async generateArtifacts(
     input: V1_ArtifactGenerationExtensionInput,
   ): Promise<V1_ArtifactGenerationExtensionOutput> {
-    throw new Error('Method not implemented');
+    throw new Error('generateArtifacts not implemented');
   }
 
   // --------------------------------------------- Test Data Generation ---------------------------------------------
@@ -395,7 +412,7 @@ export class V1_LSPEngine implements V1_GraphManagerEngine {
     input: V1_TestDataGenerationInput,
     plugins: PureProtocolProcessorPlugin[],
   ): Promise<V1_TestDataGenerationResult> {
-    throw new Error('Method not implemented');
+    throw new Error('generateTestData not implemented');
   }
 
   // ------------------------------------------- File Generation -------------------------------------------
@@ -403,7 +420,9 @@ export class V1_LSPEngine implements V1_GraphManagerEngine {
   async getAvailableGenerationConfigurationDescriptions(): Promise<
     GenerationConfigurationDescription[]
   > {
-    throw new Error('Method not implemented');
+    throw new Error(
+      'getAvailableGenerationConfigurationDescriptions not implemented',
+    );
   }
 
   async generateFile(
@@ -412,7 +431,7 @@ export class V1_LSPEngine implements V1_GraphManagerEngine {
     generationMode: GenerationMode,
     model: V1_PureModelContextData,
   ): Promise<V1_GenerationOutput[]> {
-    throw new Error('Method not implemented');
+    throw new Error('generateFile not implemented');
   }
 
   // ------------------------------------------- External Format -----------------------------------------
@@ -420,25 +439,25 @@ export class V1_LSPEngine implements V1_GraphManagerEngine {
   async getAvailableExternalFormatsDescriptions(): Promise<
     ExternalFormatDescription[]
   > {
-    throw new Error('Method not implemented');
+    throw new Error('getAvailableExternalFormatsDescriptions not implemented');
   }
 
   async generateModel(
     input: V1_ExternalFormatModelGenerationInput,
   ): Promise<string> {
-    throw new Error('Method not implemented');
+    throw new Error('generateModel not implemented');
   }
 
   async generateSchema(
     input: V1_GenerateSchemaInput,
   ): Promise<V1_PureModelContextData> {
-    throw new Error('Method not implemented');
+    throw new Error('generateSchema not implemented');
   }
 
   // ------------------------------------------- Service -------------------------------------------
 
   async getServerServiceInfo(): Promise<V1_ServiceConfigurationInfo> {
-    throw new Error('Method not implemented');
+    throw new Error('getServerServiceInfo not implemented');
   }
 
   async registerService(
@@ -449,21 +468,21 @@ export class V1_LSPEngine implements V1_GraphManagerEngine {
     TEMPORARY__useGenerateLineage: boolean,
     TEMPORARY__useGenerateOpenApi: boolean,
   ): Promise<V1_ServiceRegistrationResult> {
-    throw new Error('Method not implemented');
+    throw new Error('registerService not implemented');
   }
 
   async getServiceVersionInfo(
     serviceUrl: string,
     serviceId: string,
   ): Promise<V1_ServiceStorage> {
-    throw new Error('Method not implemented');
+    throw new Error('getServiceVersionInfo not implemented');
   }
 
   async activateServiceGeneration(
     serviceUrl: string,
     generationId: string,
   ): Promise<void> {
-    throw new Error('Method not implemented');
+    throw new Error('activateServiceGeneration not implemented');
   }
 
   async runServicePostVal(
@@ -471,7 +490,7 @@ export class V1_LSPEngine implements V1_GraphManagerEngine {
     input: V1_PureModelContext,
     assertionId: string,
   ): Promise<PostValidationAssertionResult> {
-    throw new Error('Method not implemented');
+    throw new Error('runServicePostVal not implemented');
   }
 
   // ------------------------------------------- Query -------------------------------------------
@@ -479,35 +498,35 @@ export class V1_LSPEngine implements V1_GraphManagerEngine {
   async searchQueries(
     searchSpecification: V1_QuerySearchSpecification,
   ): Promise<V1_LightQuery[]> {
-    throw new Error('Method not implemented');
+    throw new Error('searchQueries not implemented');
   }
 
   async getQueries(queryIds: string[]): Promise<V1_LightQuery[]> {
-    throw new Error('Method not implemented');
+    throw new Error('getQueries not implemented');
   }
 
   async getQuery(queryId: string): Promise<V1_Query> {
-    throw new Error('Method not implemented');
+    throw new Error('getQuery not implemented');
   }
 
   async createQuery(query: V1_Query): Promise<V1_Query> {
-    throw new Error('Method not implemented');
+    throw new Error('createQuery not implemented');
   }
 
   async updateQuery(query: V1_Query): Promise<V1_Query> {
-    throw new Error('Method not implemented');
+    throw new Error('updateQuery not implemented');
   }
 
   async patchQuery(query: Partial<V1_Query>): Promise<V1_Query> {
-    throw new Error('Method not implemented');
+    throw new Error('patchQuery not implemented');
   }
 
   async deleteQuery(queryId: string): Promise<void> {
-    throw new Error('Method not implemented');
+    throw new Error('deleteQuery not implemented');
   }
 
   async cancelUserExecutions(broadcastToCluster: boolean): Promise<string> {
-    throw new Error('Method not implemented');
+    throw new Error('cancelUserExecutions not implemented');
   }
 
   // ------------------------------------------ Analysis ------------------------------------------
@@ -515,56 +534,62 @@ export class V1_LSPEngine implements V1_GraphManagerEngine {
   async analyzeMappingModelCoverage(
     input: V1_MappingModelCoverageAnalysisInput,
   ): Promise<V1_MappingModelCoverageAnalysisResult> {
-    return deserialize(
-      V1_MappingModelCoverageAnalysisResult,
-      await this.client.analyzeMappingModelCoverage(input),
+    console.log('V1_LSPEngine analyzeMappingModelCoverage input', input);
+    postMessage({
+      command: ANALYZE_MAPPING_MODEL_COVERAGE_COMMAND_ID,
+      msg: input,
+    });
+    const response = await this.waitForMessage<string>(
+      ANALYZE_MAPPING_MODEL_COVERAGE_RESPONSE,
     );
+    console.log('V1_LSPEngine analyzeMappingModelCoverage response', response);
+    return deserialize(V1_MappingModelCoverageAnalysisResult, response);
   }
 
   async surveyDatasets(
     input: V1_StoreEntitlementAnalysisInput,
     plugins: PureProtocolProcessorPlugin[],
   ): Promise<V1_DatasetSpecification[]> {
-    throw new Error('Method not implemented');
+    throw new Error('surveyDatasets not implemented');
   }
 
   async checkDatasetEntitlements(
     input: V1_EntitlementReportAnalyticsInput,
     plugins: PureProtocolProcessorPlugin[],
   ): Promise<V1_DatasetEntitlementReport[]> {
-    throw new Error('Method not implemented');
+    throw new Error('checkDatasetEntitlements not implemented');
   }
 
   async buildDatabase(
     input: V1_DatabaseBuilderInput,
     plugins: PureProtocolProcessorPlugin[],
   ): Promise<V1_PureModelContextData> {
-    throw new Error('Method not implemented');
+    throw new Error('buildDatabase not implemented');
   }
 
   async executeRawSQL(
     input: V1_RawSQLExecuteInput,
     plugins: PureProtocolProcessorPlugin[],
   ): Promise<string> {
-    throw new Error('Method not implemented');
+    throw new Error('executeRawSQL not implemented');
   }
 
   // ------------------------------------------- Function -------------------------------------------
 
   async getAvailableFunctionActivators(): Promise<V1_FunctionActivatorInfo[]> {
-    throw new Error('Method not implemented');
+    throw new Error('getAvailableFunctionActivators not implemented');
   }
 
   async validateFunctionActivator(
     input: V1_FunctionActivatorInput,
   ): Promise<void> {
-    throw new Error('Method not implemented');
+    throw new Error('validateFunctionActivator not implemented');
   }
 
   async publishFunctionActivatorToSandbox(
     input: V1_FunctionActivatorInput,
   ): Promise<void> {
-    throw new Error('Method not implemented');
+    throw new Error('publishFunctionActivatorToSandbox not implemented');
   }
 
   // ------------------------------------------- Relational -------------------------------------------
@@ -572,12 +597,14 @@ export class V1_LSPEngine implements V1_GraphManagerEngine {
   async generateModelsFromDatabaseSpecification(
     input: V1_DatabaseToModelGenerationInput,
   ): Promise<V1_PureModelContextData> {
-    throw new Error('Method not implemented');
+    throw new Error('generateModelsFromDatabaseSpecification not implemented');
   }
 
   async getAvailableRelationalDatabaseTypeConfigurations(): Promise<
     V1_RelationalConnectionBuilder[]
   > {
-    throw new Error('Method not implemented');
+    throw new Error(
+      'getAvailableRelationalDatabaseTypeConfigurations not implemented',
+    );
   }
 }
