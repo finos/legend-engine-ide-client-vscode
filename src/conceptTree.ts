@@ -275,7 +275,8 @@ export class LegendConceptTreeProvider
     } else {
       return treeItem
         .children()
-        .flatMap((v) => this.getTreeItemById_recursive(v, id))?.[0];
+        .flatMap((v) => this.getTreeItemById_recursive(v, id))
+        .find((v) => v !== undefined);
     }
   }
 
