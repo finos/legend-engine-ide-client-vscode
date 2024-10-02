@@ -15,12 +15,12 @@
  */
 import {
   type Diagram,
-  DIAGRAM_INTERACTION_MODE,
   type DiagramRenderer,
+  type Entity,
   type GeneratorFn,
   type Point,
   type PureModel,
-  type Entity,
+  DIAGRAM_INTERACTION_MODE,
 } from '@finos/legend-vscode-extension-dependencies';
 import { action, computed, flow, makeObservable, observable } from 'mobx';
 import { guaranteeNonNullable } from '../utils/AssertionUtils';
