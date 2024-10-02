@@ -27,6 +27,7 @@ import {
   AlignTopIcon,
   CaretDownIcon,
   ControlledDropdownMenu,
+  CORE_PURE_PATH,
   DistributeHorizontalIcon,
   DistributeVerticalIcon,
   MenuContent,
@@ -34,7 +35,6 @@ import {
   MenuContentItem,
   SaveIcon,
   Point,
-  CORE_PURE_PATH,
   CustomSelectorInput,
   compareLabelFn,
 } from '@finos/legend-vscode-extension-dependencies';
