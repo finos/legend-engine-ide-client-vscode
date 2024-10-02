@@ -14,11 +14,7 @@
  * limitations under the License.
  */
 
-import {
-  type ExtensionContext,
-  type WebviewPanel,
-  window,
-} from 'vscode';
+import { type ExtensionContext, type WebviewPanel, window } from 'vscode';
 import {
   ANALYZE_MAPPING_MODEL_COVERAGE_COMMAND_ID,
   ANALYZE_MAPPING_MODEL_COVERAGE_RESPONSE,
@@ -36,9 +32,12 @@ import {
   LegendEntitiesRequest,
 } from '../LegendLanguageClient';
 import { getWebviewHtml } from './utils';
-import { guaranteeNonNullable, type PlainObject } from '@finos/legend-vscode-extension-dependencies';
+import {
+  type PlainObject,
+  type V1_MappingModelCoverageAnalysisInput,
+  guaranteeNonNullable,
+} from '@finos/legend-vscode-extension-dependencies';
 import { type LegendConceptTreeProvider } from '../conceptTree';
-import { type V1_MappingModelCoverageAnalysisInput } from '@finos/legend-graph';
 
 export const renderServiceQueryEditorWebView = (
   serviceQueryEditorWebViewPanel: WebviewPanel,
@@ -103,8 +102,12 @@ export const renderServiceQueryEditorWebView = (
         break;
       }
       case ANALYZE_MAPPING_MODEL_COVERAGE_COMMAND_ID: {
-        const mappingId = (message.msg as V1_MappingModelCoverageAnalysisInput).mapping;
-        const mappingPath = guaranteeNonNullable(legendConceptTree.getTreeItemById(mappingId)?.location?.uri, `Can't find mapping file with ID '${mappingId}'`);
+        const mappingId = (message.msg as V1_MappingModelCoverageAnalysisInput)
+          .mapping;
+        const mappingPath = guaranteeNonNullable(
+          legendConceptTree.getTreeItemById(mappingId)?.location?.uri,
+          `Can't find mapping file with ID '${mappingId}'`,
+        );
         const result = await client.analyzeMappingModelCoverage(
           mappingPath,
           mappingId,
