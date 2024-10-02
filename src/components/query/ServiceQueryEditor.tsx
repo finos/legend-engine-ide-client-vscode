@@ -29,8 +29,11 @@ import {
   useApplicationStore,
 } from '@finos/legend-vscode-extension-dependencies';
 import {
+  ANALYZE_MAPPING_MODEL_COVERAGE_RESPONSE,
+  GET_CLASSIFIER_PATH_MAP_RESPONSE,
   GET_PROJECT_ENTITIES,
   GET_PROJECT_ENTITIES_RESPONSE,
+  GET_SUBTYPE_INFO_RESPONSE,
   LEGEND_REFRESH_QUERY_BUILDER,
 } from '../../utils/Const';
 import { postMessage } from '../../utils/VsCodeUtils';
@@ -77,6 +80,10 @@ export const ServiceQueryEditor: React.FC<{
           });
           break;
         }
+        case GET_CLASSIFIER_PATH_MAP_RESPONSE:
+        case GET_SUBTYPE_INFO_RESPONSE:
+        case ANALYZE_MAPPING_MODEL_COVERAGE_RESPONSE:
+          break;
         default:
           throw new Error(`Unsupported request ${message.command}`);
       }
@@ -93,9 +100,11 @@ export const ServiceQueryEditor: React.FC<{
             applicationStore,
             engine,
           );
-          console.log('graphManagerState:', graphManagerState);
           const service = graphManagerState.graph.getService(serviceId);
-          const serviceExecution = guaranteeType<PureExecution>(service.execution, PureExecution);
+          const serviceExecution = guaranteeType<PureExecution>(
+            service.execution,
+            PureExecution,
+          );
           const newQueryBuilderState = new ServiceQueryBuilderState(
             applicationStore,
             graphManagerState,
