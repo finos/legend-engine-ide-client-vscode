@@ -32,12 +32,9 @@ import {
   LegendEntitiesRequest,
 } from '../LegendLanguageClient';
 import { getWebviewHtml } from './utils';
-import {
-  type PlainObject,
-  type V1_MappingModelCoverageAnalysisInput,
-  guaranteeNonNullable,
-} from '@finos/legend-vscode-extension-dependencies';
 import { type LegendConceptTreeProvider } from '../conceptTree';
+import { type PlainObject } from '../utils/SerializationUtils';
+import { guaranteeNonNullable } from '../utils/AssertionUtils';
 
 export const renderServiceQueryEditorWebView = (
   serviceQueryEditorWebViewPanel: WebviewPanel,
@@ -102,10 +99,9 @@ export const renderServiceQueryEditorWebView = (
         break;
       }
       case ANALYZE_MAPPING_MODEL_COVERAGE_COMMAND_ID: {
-        const mappingId = (message.msg as V1_MappingModelCoverageAnalysisInput)
-          .mapping;
+        const mappingId = (message.msg as { mapping: string }).mapping;
         const mappingPath = guaranteeNonNullable(
-          legendConceptTree.getTreeItemById(mappingId)?.location?.uri,
+          legendConceptTree.getTreeItemById(mappingId)?.location?.uri.toString(),
           `Can't find mapping file with ID '${mappingId}'`,
         );
         const result = await client.analyzeMappingModelCoverage(

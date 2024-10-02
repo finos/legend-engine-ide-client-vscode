@@ -97,9 +97,6 @@ const extensionConfig = {
     extensions: ['.tsx', '.ts', '.js', '.css', '.scss'],
     fallback: {
       // see https://webpack.js.org/configuration/resolve/#resolvefallback
-      stream: require.resolve("stream-browserify"),
-      crypto: require.resolve("crypto-browserify"),
-      vm: require.resolve("vm-browserify"),
       console: require.resolve('console-browserify'),
       assert: require.resolve('assert'),
     },
