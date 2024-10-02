@@ -21,13 +21,20 @@ import {
   type GenerationConfigurationDescription,
   type GenerationMode,
   type GraphManagerOperationReport,
+  type Parameters,
+  type PlainObject,
   type PostValidationAssertionResult,
   type PureProtocolProcessorPlugin,
   type RawLambda,
   type RawRelationalOperationElement,
+  type RequestHeaders,
+  type RequestProcessConfig,
+  type ResponseProcessConfig,
   type ServiceExecutionMode,
   type SubtypeInfo,
   type TEMPORARY__EngineSetupConfig,
+  type TraceData,
+  type TracerService,
   type V1_ArtifactGenerationExtensionInput,
   type V1_ArtifactGenerationExtensionOutput,
   type V1_CompilationResult,
@@ -46,6 +53,7 @@ import {
   type V1_GenerateSchemaInput,
   type V1_GenerationOutput,
   type V1_GrammarParserBatchInputEntry,
+  type V1_GraphManagerEngine,
   type V1_LambdaReturnTypeInput,
   type V1_LightQuery,
   type V1_MappingModelCoverageAnalysisInput,
@@ -70,18 +78,8 @@ import {
   type V1_TestDataGenerationResult,
   type V1_TextCompilationResult,
   type V1_ValueSpecification,
-  type V1_GraphManagerEngine,
   TEMPORARY__AbstractEngineConfig,
   V1_MappingModelCoverageAnalysisResult,
-} from '@finos/legend-graph';
-import {
-  type Parameters,
-  type PlainObject,
-  type RequestHeaders,
-  type RequestProcessConfig,
-  type ResponseProcessConfig,
-  type TraceData,
-  type TracerService,
 } from '@finos/legend-vscode-extension-dependencies';
 import { deserialize } from 'serializr';
 import { postMessage } from '../utils/VsCodeUtils';
@@ -102,11 +100,8 @@ class V1_LSPEngine_Config extends TEMPORARY__AbstractEngineConfig {}
 export class V1_LSPEngine implements V1_GraphManagerEngine {
   config = new V1_LSPEngine_Config();
 
-  setup = (config: TEMPORARY__EngineSetupConfig): Promise<void> => {
-    this.config.setEnv(config.env);
-    this.config.setTabSize(config.tabSize);
-    return Promise.resolve();
-  };
+  setup = (config: TEMPORARY__EngineSetupConfig): Promise<void> =>
+    Promise.resolve();
 
   waitForMessage = <T>(commandId: string): Promise<T> =>
     new Promise((resolve) => {
