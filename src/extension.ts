@@ -197,7 +197,8 @@ export function createClient(context: ExtensionContext): LanguageClient {
       e.affectsConfiguration('legend.sdlc.server.url') ||
       e.affectsConfiguration('legend.extensions.other.dependencies') ||
       e.affectsConfiguration('legend.extensions.dependencies.pom') ||
-      e.affectsConfiguration('legend.language.server.vmargs')
+      e.affectsConfiguration('legend.language.server.vmargs') ||
+      e.affectsConfiguration('legend.engine.server.remoteExecution')
     ) {
       window
         .showInformationMessage(
