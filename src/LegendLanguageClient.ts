@@ -166,7 +166,7 @@ export class LegendLanguageClient extends LanguageClient {
   }
 
   async analyzeMappingModelCoverage(
-    mappingFilePath: Uri,
+    mappingFilePath: string,
     mappingId: string,
   ): Promise<string> {
     return commands.executeCommand(

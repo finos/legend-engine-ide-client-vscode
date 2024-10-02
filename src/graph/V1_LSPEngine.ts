@@ -78,6 +78,7 @@ import {
   type V1_TestDataGenerationResult,
   type V1_TextCompilationResult,
   type V1_ValueSpecification,
+  guaranteeNonNullable,
   TEMPORARY__AbstractEngineConfig,
   V1_MappingModelCoverageAnalysisResult,
 } from '@finos/legend-vscode-extension-dependencies';
@@ -91,6 +92,7 @@ import {
   GET_SUBTYPE_INFO_REQUEST_ID,
   GET_SUBTYPE_INFO_RESPONSE,
 } from '../utils/Const';
+import { type LegendExecutionResult } from '../results/LegendExecutionResult';
 
 class V1_LSPEngine_Config extends TEMPORARY__AbstractEngineConfig {}
 
@@ -529,16 +531,17 @@ export class V1_LSPEngine implements V1_GraphManagerEngine {
   async analyzeMappingModelCoverage(
     input: V1_MappingModelCoverageAnalysisInput,
   ): Promise<V1_MappingModelCoverageAnalysisResult> {
-    console.log('V1_LSPEngine analyzeMappingModelCoverage input', input);
     postMessage({
       command: ANALYZE_MAPPING_MODEL_COVERAGE_COMMAND_ID,
       msg: input,
     });
-    const response = await this.waitForMessage<string>(
+    const response = await this.waitForMessage<LegendExecutionResult[]>(
       ANALYZE_MAPPING_MODEL_COVERAGE_RESPONSE,
     );
-    console.log('V1_LSPEngine analyzeMappingModelCoverage response', response);
-    return deserialize(V1_MappingModelCoverageAnalysisResult, response);
+    return deserialize(
+      V1_MappingModelCoverageAnalysisResult,
+      JSON.parse(guaranteeNonNullable(response?.[0]?.message)),
+    );
   }
 
   async surveyDatasets(
