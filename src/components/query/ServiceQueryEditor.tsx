@@ -17,9 +17,12 @@
 import { useEffect, useState } from 'react';
 import { flowResult } from 'mobx';
 import {
+  type Entity,
   type QueryBuilderState,
   CubesLoadingIndicator,
   CubesLoadingIndicatorIcon,
+  guaranteeType,
+  PureExecution,
   QueryBuilder,
   QueryBuilderActionConfig,
   ServiceQueryBuilderState,
@@ -30,7 +33,6 @@ import {
   GET_PROJECT_ENTITIES_RESPONSE,
   LEGEND_REFRESH_QUERY_BUILDER,
 } from '../../utils/Const';
-import { type LegendEntity } from '../../model/LegendEntity';
 import { postMessage } from '../../utils/VsCodeUtils';
 import { QueryBuilderVSCodeWorkflowState } from './QueryBuilderWorkflowState';
 import { type LegendVSCodeApplicationConfig } from '../../application/LegendVSCodeApplicationConfig';
@@ -47,7 +49,7 @@ export const ServiceQueryEditor: React.FC<{
   >();
   const [queryBuilderState, setQueryBuilderState] =
     useState<QueryBuilderState | null>(null);
-  const [entities, setEntities] = useState<LegendEntity[]>([]);
+  const [entities, setEntities] = useState<Entity[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -60,11 +62,11 @@ export const ServiceQueryEditor: React.FC<{
 
   window.addEventListener(
     'message',
-    (event: MessageEvent<{ result: LegendEntity[]; command: string }>) => {
+    (event: MessageEvent<{ result: Entity[]; command: string }>) => {
       const message = event.data;
       switch (message.command) {
         case GET_PROJECT_ENTITIES_RESPONSE: {
-          const es: LegendEntity[] = message.result;
+          const es: Entity[] = message.result;
           setEntities(es);
           break;
         }
@@ -93,6 +95,7 @@ export const ServiceQueryEditor: React.FC<{
           );
           console.log('graphManagerState:', graphManagerState);
           const service = graphManagerState.graph.getService(serviceId);
+          const serviceExecution = guaranteeType<PureExecution>(service.execution, PureExecution);
           const newQueryBuilderState = new ServiceQueryBuilderState(
             applicationStore,
             graphManagerState,
@@ -108,7 +111,7 @@ export const ServiceQueryEditor: React.FC<{
               service: service.path,
             },
           );
-          newQueryBuilderState.initializeWithQuery(service.execution.func);
+          newQueryBuilderState.initializeWithQuery(serviceExecution.func);
           await flowResult(
             newQueryBuilderState.explorerState.analyzeMappingModelCoverage(),
           ).catch(applicationStore.alertUnhandledError);
