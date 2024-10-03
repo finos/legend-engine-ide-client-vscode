@@ -101,7 +101,9 @@ export const renderServiceQueryEditorWebView = (
       case ANALYZE_MAPPING_MODEL_COVERAGE_COMMAND_ID: {
         const mappingId = (message.msg as { mapping: string }).mapping;
         const mappingPath = guaranteeNonNullable(
-          legendConceptTree.getTreeItemById(mappingId)?.location?.uri.toString(),
+          legendConceptTree
+            .getTreeItemById(mappingId)
+            ?.location?.uri.toString(),
           `Can't find mapping file with ID '${mappingId}'`,
         );
         const result = await client.analyzeMappingModelCoverage(
