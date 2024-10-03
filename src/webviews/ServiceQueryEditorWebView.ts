@@ -14,7 +14,12 @@
  * limitations under the License.
  */
 
-import { type ExtensionContext, type WebviewPanel, window } from 'vscode';
+import {
+  type ExtensionContext,
+  type WebviewPanel,
+  window,
+  workspace,
+} from 'vscode';
 import {
   ANALYZE_MAPPING_MODEL_COVERAGE_COMMAND_ID,
   ANALYZE_MAPPING_MODEL_COVERAGE_RESPONSE,
@@ -72,7 +77,14 @@ export const renderServiceQueryEditorWebView = (
         break;
       }
       case WRITE_ENTITY: {
-        client.writeEntity({ content: message.msg });
+        await client.writeEntity({ content: message.msg });
+        await workspace.textDocuments.filter(
+          (doc) =>
+            doc.uri.toString() ===
+            legendConceptTree
+              .getTreeItemById(message.entityPath)
+              ?.location?.uri?.toString(),
+        )?.[0]?.save();
         break;
       }
       case QUERY_BUILDER_CONFIG_ERROR: {
