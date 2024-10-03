@@ -49,7 +49,11 @@ export const buildGraphManagerStateFromEntities = async (
     V1_PureGraphManager,
   );
   await graphManager.initialize(
-    {},
+    {
+      env: 'dev',
+      tabSize: 2,
+      clientConfig: {},
+    },
     {
       engine,
     },
