@@ -71,6 +71,7 @@ export class Core_LegendVSCodeApplicationPlugin extends LegendVSCodeApplicationP
                     );
                   postMessage({
                     command: WRITE_ENTITY,
+                    entityPath: service.path,
                     msg: V1_serializePackageableElement(
                       serviceProtocol,
                       queryBuilderState.graphManagerState.pluginManager.getPureProtocolProcessorPlugins(),
