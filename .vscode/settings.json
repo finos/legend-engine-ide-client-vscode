@@ -12,5 +12,6 @@
   "typescript.preferences.includePackageJsonAutoImports": "on",
   "javascript.preferences.quoteStyle": "single",
   "typescript.preferences.quoteStyle": "single",
-  "typescript.tsdk": "node_modules/typescript/lib"
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "prettier.configPath": ".prettierrc.json"
 }

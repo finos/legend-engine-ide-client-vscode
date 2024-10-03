@@ -14,10 +14,21 @@
  * limitations under the License.
  */
 
-import { type ExtensionContext, type WebviewPanel, window } from 'vscode';
 import {
+  type ExtensionContext,
+  type WebviewPanel,
+  window,
+  workspace,
+} from 'vscode';
+import {
+  ANALYZE_MAPPING_MODEL_COVERAGE_COMMAND_ID,
+  ANALYZE_MAPPING_MODEL_COVERAGE_RESPONSE,
+  GET_CLASSIFIER_PATH_MAP_REQUEST_ID,
+  GET_CLASSIFIER_PATH_MAP_RESPONSE,
   GET_PROJECT_ENTITIES,
   GET_PROJECT_ENTITIES_RESPONSE,
+  GET_SUBTYPE_INFO_REQUEST_ID,
+  GET_SUBTYPE_INFO_RESPONSE,
   QUERY_BUILDER_CONFIG_ERROR,
   WRITE_ENTITY,
 } from '../utils/Const';
@@ -26,7 +37,9 @@ import {
   LegendEntitiesRequest,
 } from '../LegendLanguageClient';
 import { getWebviewHtml } from './utils';
-import { type PlainObject } from '@finos/legend-vscode-extension-dependencies';
+import { type LegendConceptTreeProvider } from '../conceptTree';
+import { type PlainObject } from '../utils/SerializationUtils';
+import { guaranteeNonNullable } from '../utils/AssertionUtils';
 
 export const renderServiceQueryEditorWebView = (
   serviceQueryEditorWebViewPanel: WebviewPanel,
@@ -35,6 +48,7 @@ export const renderServiceQueryEditorWebView = (
   engineUrl: string,
   renderFilePath: string,
   client: LegendLanguageClient,
+  legendConceptTree: LegendConceptTreeProvider,
 ): void => {
   const { webview } = serviceQueryEditorWebViewPanel;
 
@@ -63,13 +77,54 @@ export const renderServiceQueryEditorWebView = (
         break;
       }
       case WRITE_ENTITY: {
-        client.writeEntity({ content: message.msg });
+        await client.writeEntity({ content: message.msg });
+        await workspace.textDocuments.filter(
+          (doc) =>
+            doc.uri.toString() ===
+            legendConceptTree
+              .getTreeItemById(message.entityPath)
+              ?.location?.uri?.toString(),
+        )?.[0]?.save();
         break;
       }
       case QUERY_BUILDER_CONFIG_ERROR: {
         window.showErrorMessage('Error setting up Query Builder', {
           modal: true,
           detail: message.msg,
+        });
+        break;
+      }
+      case GET_CLASSIFIER_PATH_MAP_REQUEST_ID: {
+        const result = await client.getClassifierPathMap();
+        webview.postMessage({
+          command: GET_CLASSIFIER_PATH_MAP_RESPONSE,
+          result,
+        });
+        break;
+      }
+      case GET_SUBTYPE_INFO_REQUEST_ID: {
+        const result = await client.getSubtypeInfo();
+        webview.postMessage({
+          command: GET_SUBTYPE_INFO_RESPONSE,
+          result,
+        });
+        break;
+      }
+      case ANALYZE_MAPPING_MODEL_COVERAGE_COMMAND_ID: {
+        const mappingId = (message.msg as { mapping: string }).mapping;
+        const mappingPath = guaranteeNonNullable(
+          legendConceptTree
+            .getTreeItemById(mappingId)
+            ?.location?.uri.toString(),
+          `Can't find mapping file with ID '${mappingId}'`,
+        );
+        const result = await client.analyzeMappingModelCoverage(
+          mappingPath,
+          mappingId,
+        );
+        webview.postMessage({
+          command: ANALYZE_MAPPING_MODEL_COVERAGE_RESPONSE,
+          result,
         });
         break;
       }

@@ -15,6 +15,7 @@
  */
 
 import {
+  type LegendApplicationConfigurationData,
   type LegendApplicationConfigurationInput,
   ApplicationFrameworkProvider,
   ApplicationStore,
@@ -29,7 +30,6 @@ import {
 import { useMemo } from 'react';
 import {
   LegendVSCodeApplicationConfig,
-  type LegendVSCodeApplicationConfigurationData,
 } from './LegendVSCodeApplicationConfig';
 import { LegendVSCodePluginManager } from './LegendVSCodePluginManager';
 import { Core_LegendVSCodeApplicationPlugin } from './Core_LegendVSCodeApplicationPlugin';
@@ -38,13 +38,13 @@ import { QUERY_BUILDER_CONFIG_ERROR } from '../utils/Const';
 import packageJson from '../../package.json';
 
 export const LegendVSCodeApplication = (props: {
-  configData: LegendVSCodeApplicationConfigurationData;
+  configData: LegendApplicationConfigurationData;
   children: React.ReactNode;
 }): React.ReactNode => {
   const { configData, children } = props;
 
   const applicationStore = useMemo(() => {
-    const input: LegendApplicationConfigurationInput<LegendVSCodeApplicationConfigurationData> =
+    const input: LegendApplicationConfigurationInput<LegendApplicationConfigurationData> =
       {
         configData,
         versionData: {
