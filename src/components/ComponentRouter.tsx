@@ -35,13 +35,14 @@ export const ComponentRouter = (props: PlainObject): React.ReactNode => {
 
   let component: React.ReactNode = null;
 
+  const configData: LegendVSCodeApplicationConfigurationData = {
+    appName: 'legend-vs-code',
+    env: 'dev',
+    engineURL: guaranteeNonNullable(props.engineUrl as string),
+  };
+
   switch (webviewType) {
     case SERVICE_QUERY_EDITOR: {
-      const configData: LegendVSCodeApplicationConfigurationData = {
-        appName: 'legend-vs-code',
-        env: 'dev',
-        engineURL: guaranteeNonNullable(props.engineUrl as string),
-      };
       const serviceId = guaranteeNonNullable(props.serviceId as string);
       component = (
         <LegendVSCodeApplication configData={configData}>
@@ -54,7 +55,11 @@ export const ComponentRouter = (props: PlainObject): React.ReactNode => {
     case DIAGRAM_RENDERER: {
       const diagramId = guaranteeNonNullable(props.diagramId as string);
       component = (
-        <DiagramEditor diagramEditorState={new DiagramEditorState(diagramId)} />
+        <LegendVSCodeApplication configData={configData}>
+          <DiagramEditor
+            diagramEditorState={new DiagramEditorState(diagramId)}
+          />
+        </LegendVSCodeApplication>
       );
       break;
     }
