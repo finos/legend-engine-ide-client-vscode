@@ -50,7 +50,7 @@ export class Core_LegendVSCodeApplicationPlugin extends LegendVSCodeApplicationP
             queryBuilderState.applicationStore.guardUnhandledError(async () => {
               try {
                 if (queryBuilderState instanceof ServiceQueryBuilderState) {
-                  const graphManager = guaranteeType(
+                  const graphManager = guaranteeType<V1_PureGraphManager>(
                     queryBuilderState.graphManagerState.graphManager,
                     V1_PureGraphManager,
                     'Graph manager must be a V1_PureGraphManager',

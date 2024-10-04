@@ -15,18 +15,17 @@
  */
 
 import '@finos/legend-vscode-extension-dependencies/style/index.css';
-import { createRoot } from 'react-dom/client';
 import { type PlainObject } from '@finos/legend-vscode-extension-dependencies';
-import { ComponentRouter } from './ComponentRouter';
+import { LegendVSCodeWebviewApplication } from '../application/LegendVSCodeWebviewApplication';
 
 const rootElement = document.getElementById('root');
 const inputParamtersFromHtml = rootElement
   ? rootElement.getAttribute('data-input-parameters')
   : '';
 if (inputParamtersFromHtml) {
-  const parsedParams = JSON.parse(inputParamtersFromHtml) as PlainObject;
+  const { engineUrl, ...restParsedParams } = JSON.parse(
+    inputParamtersFromHtml,
+  ) as PlainObject;
 
-  createRoot(rootElement as HTMLElement).render(
-    <ComponentRouter {...parsedParams} />,
-  );
+  LegendVSCodeWebviewApplication.run('/', engineUrl as string, restParsedParams);
 }
