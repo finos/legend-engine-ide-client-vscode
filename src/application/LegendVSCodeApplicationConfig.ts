@@ -17,6 +17,7 @@
 import {
   type LegendApplicationConfigurationData,
   type LegendApplicationConfigurationInput,
+  type QueryBuilderConfig,
   guaranteeNonEmptyString,
   LegendApplicationConfig,
 } from '@finos/legend-vscode-extension-dependencies';
@@ -24,10 +25,15 @@ import {
 export interface LegendVSCodeApplicationConfigurationData
   extends LegendApplicationConfigurationData {
   engineURL: string;
+  queryBuilderConfig?: QueryBuilderConfig;
 }
 
 export class LegendVSCodeApplicationConfig extends LegendApplicationConfig {
   readonly engineServerUrl: string;
+  /**
+   * Config specific to query builder
+   */
+  readonly queryBuilderConfig: QueryBuilderConfig | undefined;
 
   constructor(
     input: LegendApplicationConfigurationInput<LegendVSCodeApplicationConfigurationData>,
@@ -41,6 +47,8 @@ export class LegendVSCodeApplicationConfig extends LegendApplicationConfig {
         `Can't configure application: Engine server URL is missing in extension settings`,
       ),
     );
+
+    this.queryBuilderConfig = input.configData.queryBuilderConfig;
   }
 
   override getDefaultApplicationStorageKey(): string {

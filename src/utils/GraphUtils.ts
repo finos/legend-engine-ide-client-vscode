@@ -16,14 +16,14 @@
 
 import {
   type ApplicationStore,
+  type Entity,
   GraphManagerState,
 } from '@finos/legend-vscode-extension-dependencies';
-import { type LegendEntity } from '../model/LegendEntity';
 import { type LegendVSCodeApplicationConfig } from '../application/LegendVSCodeApplicationConfig';
 import { type LegendVSCodePluginManager } from '../application/LegendVSCodePluginManager';
 
 export const buildGraphManagerStateFromEntities = async (
-  entities: LegendEntity[],
+  entities: Entity[],
   applicationStore: ApplicationStore<
     LegendVSCodeApplicationConfig,
     LegendVSCodePluginManager
