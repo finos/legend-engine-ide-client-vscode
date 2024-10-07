@@ -44,7 +44,8 @@ export const ComponentRouter = (props: PlainObject): React.ReactNode => {
       TEMPORARY__enableGridEnterpriseMode: true,
       legendAIServiceURL: '',
       zipkinTraceBaseURL: '',
-      disableEditViewPure: true,
+      disableEditPure: true,
+      disableShowPure: true,
     },
   };
 
