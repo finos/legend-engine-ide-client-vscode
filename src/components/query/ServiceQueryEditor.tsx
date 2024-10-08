@@ -106,7 +106,7 @@ export const ServiceQueryEditor: React.FC<{
               service: service.path,
             },
           );
-          const serviceExecution = guaranteeType(
+          const serviceExecution = guaranteeType<PureExecution>(
             service.execution,
             PureExecution,
           );

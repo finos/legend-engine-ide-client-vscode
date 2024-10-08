@@ -16,13 +16,11 @@
 
 import React from 'react';
 import { DIAGRAM_RENDERER, SERVICE_QUERY_EDITOR } from '../utils/Const';
-import { type LegendVSCodeApplicationConfigurationData } from '../application/LegendVSCodeApplicationConfig';
 import {
   type PlainObject,
   guaranteeNonEmptyString,
   guaranteeNonNullable,
 } from '@finos/legend-vscode-extension-dependencies';
-import { LegendVSCodeApplication } from '../application/LegendVSCodeApplication';
 import { ServiceQueryEditor } from './query/ServiceQueryEditor';
 import { DiagramEditor } from './diagram/DiagramEditor';
 import { DiagramEditorState } from '../stores/DiagramEditorState';
@@ -35,31 +33,17 @@ export const ComponentRouter = (props: PlainObject): React.ReactNode => {
 
   let component: React.ReactNode = null;
 
-  const configData: LegendVSCodeApplicationConfigurationData = {
-    appName: 'legend-vs-code',
-    env: 'dev',
-    engineURL: guaranteeNonNullable(props.engineUrl as string),
-  };
-
   switch (webviewType) {
     case SERVICE_QUERY_EDITOR: {
       const serviceId = guaranteeNonNullable(props.serviceId as string);
-      component = (
-        <LegendVSCodeApplication configData={configData}>
-          <ServiceQueryEditor serviceId={serviceId} />
-        </LegendVSCodeApplication>
-      );
+      component = <ServiceQueryEditor serviceId={serviceId} />;
 
       break;
     }
     case DIAGRAM_RENDERER: {
       const diagramId = guaranteeNonNullable(props.diagramId as string);
       component = (
-        <LegendVSCodeApplication configData={configData}>
-          <DiagramEditor
-            diagramEditorState={new DiagramEditorState(diagramId)}
-          />
-        </LegendVSCodeApplication>
+        <DiagramEditor diagramEditorState={new DiagramEditorState(diagramId)} />
       );
       break;
     }

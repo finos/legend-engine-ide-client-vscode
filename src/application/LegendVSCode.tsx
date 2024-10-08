@@ -15,8 +15,10 @@
  */
 
 import {
-  Core_GraphManagerPreset,
+  type ExtensionsConfigurationData,
   type PlainObject,
+  Core_GraphManagerPreset,
+  guaranteeNonNullable,
   QueryBuilder_GraphManagerPreset,
   QueryBuilder_LegendApplicationPlugin,
 } from '@finos/legend-vscode-extension-dependencies';
@@ -39,10 +41,12 @@ import { Core_LegendVSCodeApplicationPlugin } from './Core_LegendVSCodeApplicati
 import { createRoot } from 'react-dom/client';
 import { ComponentRouter } from '../components/ComponentRouter';
 import { getApplicationRootElement } from './LegendVSCodeWebviewApplication';
+import packageJson from '../../package.json';
 
 export class LegendVSCode extends LegendApplication {
   declare config: LegendVSCodeApplicationConfig;
   declare pluginManager: LegendVSCodePluginManager;
+  engineUrl: string | undefined;
   componentRouterProps: PlainObject | undefined;
 
   static create(): LegendVSCode {
@@ -63,6 +67,47 @@ export class LegendVSCode extends LegendApplication {
     input: LegendApplicationConfigurationInput<LegendVSCodeApplicationConfigurationData>,
   ): Promise<LegendApplicationConfig> {
     return new LegendVSCodeApplicationConfig(input);
+  }
+
+  override async fetchApplicationConfiguration(): Promise<
+    [LegendApplicationConfig, ExtensionsConfigurationData]
+  > {
+    return [
+      await this.configureApplication({
+        configData: {
+          appName: 'legend-vs-code',
+          env: 'dev',
+          engineURL: guaranteeNonNullable(this.engineUrl),
+          documentation: {
+            url: 'https://legend.finos.org',
+            registry: [
+              {
+                url: 'https://legend.finos.org/resource/studio/documentation/shared.json',
+                simple: true,
+              },
+              {
+                url: 'https://legend.finos.org/resource/studio/documentation/query.json',
+                simple: true,
+              },
+              {
+                url: 'https://legend.finos.org/resource/studio/documentation/studio.json',
+                simple: true,
+              },
+            ],
+          },
+        },
+        versionData: {
+          version: packageJson.version,
+        },
+        baseAddress: this.baseAddress,
+      }),
+      {},
+    ];
+  }
+
+  withEngineUrl(engineUrl: string): LegendVSCode {
+    this.engineUrl = engineUrl;
+    return this;
   }
 
   withComponentRouterProps(props: PlainObject): LegendVSCode {

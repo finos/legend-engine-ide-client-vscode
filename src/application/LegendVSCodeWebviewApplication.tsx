@@ -28,39 +28,6 @@ import { type LegendApplicationVersionData } from '@finos/legend-application';
 import packageJson from '../../package.json';
 
 export class LegendVSCodeWebviewApplication {
-  static getConfigData(engineUrl: string): {
-    configData: LegendVSCodeApplicationConfigurationData;
-    versionData: LegendApplicationVersionData;
-  } {
-    return {
-      configData: {
-        appName: 'legend-vs-code',
-        env: 'dev',
-        engineURL: guaranteeNonNullable(engineUrl),
-        documentation: {
-          url: 'https://legend.finos.org',
-          registry: [
-            {
-              url: 'https://legend.finos.org/resource/studio/documentation/shared.json',
-              simple: true,
-            },
-            {
-              url: 'https://legend.finos.org/resource/studio/documentation/query.json',
-              simple: true,
-            },
-            {
-              url: 'https://legend.finos.org/resource/studio/documentation/studio.json',
-              simple: true,
-            },
-          ],
-        },
-      },
-      versionData: {
-        version: packageJson.version,
-      },
-    };
-  }
-
   static getPresetCollection(): AbstractPreset[] {
     return [];
   }
@@ -75,11 +42,12 @@ export class LegendVSCodeWebviewApplication {
     componentRouterProps: PlainObject,
   ): void {
     LegendVSCode.create()
+      .withEngineUrl(engineUrl)
       .withComponentRouterProps(componentRouterProps)
       .setup({ baseAddress: baseUrl })
       .withPresets(LegendVSCodeWebviewApplication.getPresetCollection())
       .withPlugins(LegendVSCodeWebviewApplication.getPluginCollection())
-      .start(this.getConfigData(engineUrl))
+      .start()
       .catch((e: unknown) => {
         assertErrorThrown(e);
         postMessage({ command: QUERY_BUILDER_CONFIG_ERROR, msg: e.message });
