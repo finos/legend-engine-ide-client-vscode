@@ -85,6 +85,30 @@
   }
 }
 
+.diagram-editor__error {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &__details {
+    border-bottom: 1px dotted white;
+    cursor: help;
+    margin-left: 5px;
+  }
+}
+
+.diagram-editor__header__search__action {
+  width: 40rem;
+  flex-grow: 1;
+  justify-content: flex-start;
+  margin-left: 4.3rem;
+
+  .selector-input--dark__control {
+    width: inherit;
+  }
+}
+
 @keyframes panel-loading-indicator__loading {
   0% {
     left: 0;

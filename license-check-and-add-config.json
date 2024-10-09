@@ -1,0 +1,36 @@
+{
+  "ignore": ["*.json", "icons/*.svg", "build", ".vscode-test", "lib", ".github", "*.vsix", "server", "*"],
+  "license": "./scripts/copyright/COPYRIGHT_HEADER.txt",
+  "licenseFormats": {
+    "ts": {
+      "prepend": "/**",
+      "append": " */",
+      "eachLine": {
+        "prepend": " * "
+      }
+    },
+    "tsx": {
+      "prepend": "/**",
+      "append": " */",
+      "eachLine": {
+        "prepend": " * "
+      }
+    },
+    "js": {
+      "prepend": "/**",
+      "append": " */",
+      "eachLine": {
+        "prepend": " * "
+      }
+    },
+    "scss": {
+      "prepend": "/**",
+      "append": " */",
+      "eachLine": {
+        "prepend": " * "
+      }
+    }
+  },
+  "regexIdentifier": "##",
+  "trailingWhitespace": "TRIM"
+}

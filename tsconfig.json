@@ -3,15 +3,17 @@
     "jsx": "react-jsx",
     "module": "CommonJS",
     "target": "es2020",
-    "lib": ["es2020", "dom"],
+    "lib": ["es2021", "dom"],
     "outDir": "lib",
     "rootDir": "src",
-    "sourceMap": true,
+		"sourceMap": true,
     "strict": true,
     "noImplicitOverride": true,
     "noUncheckedIndexedAccess": true,
     "declaration": true,
     "declarationMap": true,
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
     // ---exactOptionalPropertyTypes specifies that optional property types should be interpreted exactly as
     // written, meaning that `| undefined` is not added to the type.
     // This makes it possible to ensure that optional properties are never `undefined` when they're present
@@ -20,11 +22,12 @@
     // See https://github.com/microsoft/TypeScript/pull/43947
     "exactOptionalPropertyTypes": true,
     "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true
+    "forceConsistentCasingInFileNames": true,
+    "useDefineForClassFields": true,
   },
   "include": [
-    "src"
-    // "./.eslintrc.cjs",
+    "src",
+    "./.eslintrc.cjs",
   ],
   "exclude": ["node_modules", ".vscode-test"]
 }

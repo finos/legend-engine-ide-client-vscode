@@ -14,21 +14,25 @@
  * limitations under the License.
  */
 
+const { type } = require('os');
 const path = require('path');
+const webpack = require('webpack');
 
-module.exports = {
+const webviewConfig = {
   entry: {
     AgGridRenderer: './src/components/grid/AgGridRenderer.tsx',
     FunctionResultsEditorRenderer: './src/components/function/FunctionResultsEditorRenderer.tsx',
-    // Add more entry points as needed
+    WebViewRoot: './src/components/WebViewRoot.tsx',
   },
   externals: {
     vscode: 'commonjs vscode',
   },
   output: {
     filename: '[name].js',
-    path: path.resolve(__dirname, 'lib', 'components'),
+    path: path.resolve(__dirname, 'dist'),
+    assetModuleFilename: 'assets/[hash][ext][query]'
   },
+  devtool: 'nosources-source-map',
   module: {
     rules: [
       {
@@ -36,9 +40,8 @@ module.exports = {
         use: 'ts-loader',
         exclude: /node_modules/,
       },
-      // Allow importing CSS modules:
       {
-        test: /\.s(a|c)ss$/,
+        test: /\.s?(a|c)ss$/,
         use: [
           'style-loader',
           'css-loader',
@@ -46,11 +49,85 @@ module.exports = {
             loader: 'sass-loader',
           },
         ],
-        exclude: /node_modules/,
       },
+      {
+        test: /\.(woff|woff2|eot|ttf|otf)$/i,
+        type: 'asset',
+      }
     ],
   },
+  plugins: [
+    new webpack.ProvidePlugin({
+           process: 'process/browser',
+    }),
+    new webpack.DefinePlugin({
+      AG_GRID_LICENSE: null,
+    }),
+  ],
   resolve: {
     extensions: ['.tsx', '.ts', '.js', '.css', '.scss'],
+    fallback: {
+      stream: require.resolve("stream-browserify"),
+      crypto: require.resolve("crypto-browserify"),
+      vm: require.resolve("vm-browserify")
+    },
+    alias: {
+      react: path.resolve('./node_modules/react'),
+      process: "process/browser"
+    }
   },
 };
+
+const extensionConfig = {
+  target: 'webworker',
+  entry: './src/extension.ts',
+  output: {
+    path: path.resolve(__dirname, 'dist'),
+    filename: 'extension.js',
+    libraryTarget: 'commonjs2',
+    devtoolModuleFilenameTemplate: '../[resource-path]'
+  },
+  devtool: 'nosources-source-map',
+  externals: {
+    vscode: 'commonjs vscode',
+    'vscode-languageclient/node': 'vscode-languageclient/node'
+  },
+  resolve: {
+    mainFields: ['browser', 'module', 'main'],
+    extensions: ['.tsx', '.ts', '.js', '.css', '.scss'],
+    fallback: {
+      // see https://webpack.js.org/configuration/resolve/#resolvefallback
+      console: require.resolve('console-browserify'),
+      assert: require.resolve('assert'),
+    },
+    alias: {
+      react: path.resolve('./node_modules/react')
+    }
+  },
+  module: {
+    rules: [
+      {
+        test: /\.tsx?$/,
+        exclude: /node_modules/,
+        use: [
+          {
+            loader: 'ts-loader'
+          }
+        ]
+      },
+      {
+        test: /\.s?(a|c)ss$/,
+        use: [
+          'style-loader',
+          'css-loader',
+          {
+            loader: 'sass-loader',
+          },
+        ],
+      },
+    ]
+  }
+};
+
+
+module.exports = [webviewConfig, extensionConfig]

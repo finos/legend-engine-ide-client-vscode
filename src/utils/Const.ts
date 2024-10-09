@@ -14,6 +14,10 @@
  * limitations under the License.
  */
 
+export const LEGEND_LANGUAGE_ID = 'legend';
+
+export const LEGEND_VIRTUAL_FS_SCHEME = 'legend-vfs';
+
 // Views
 export const EXECUTION_TREE_VIEW = 'executionView';
 export const RESULTS_WEB_VIEW = 'resultsView';
@@ -35,12 +39,31 @@ export const SET_CONTEXT_COMMAND_ID = 'setContext';
 export const LEGEND_COMMAND = 'legend.command';
 export const LEGEND_EXECUTE_COMMAND = 'legend.executeCommand';
 export const LEGEND_CLIENT_COMMAND_ID = 'legend.client.command';
-export const EXEC_FUNCTION_WITH_PARAMETERS_ID =
-  'legend.pure.executeFunctionWithParameters';
-export const EXEC_FUNCTION_ID = 'legend.pure.executeFunction';
+export const EXEC_FUNCTION_ID = 'legend.function.execute';
+export const ACTIVATE_FUNCTION_ID = 'legend.pure.activateFunction';
 export const SEND_TDS_REQUEST_ID = 'sendTDSRequest';
-export const TDS_JSON_REQUEST_ID = 'textDocument/TDSRequest';
+export const TDS_JSON_REQUEST_ID = 'legend/TDSRequest';
+export const REPL_CLASSPATH_REQUEST_ID = 'legend/replClasspath';
+export const TEST_CASES_REQUEST_ID = 'legend/testCases';
+export const EXECUTE_TESTS_REQUEST_ID = 'legend/executeTests';
+export const ENTITIES_REQUEST_ID = 'legend/entities';
+export const VIRTUAL_FILE_SYSTEM_FILE_REQUEST_ID = 'legend/legendVirtualFile';
+export const LEGEND_WRITE_ENTITY = 'legend/writeEntity';
 export const GET_TDS_REQUEST_RESULTS_ID = 'getTDSRequestResultsId';
+export const LEGEND_SHOW_DIAGRAM = 'legend.show.diagram';
+export const LEGEND_EDIT_SERVICE_QUERY = 'legend.edit.service.query';
+export const LEGEND_REFRESH_QUERY_BUILDER = 'legend.refresh.query.builder';
+export const ONE_ENTITY_PER_FILE_REQUEST_ID =
+  'legend/oneEntityPerFileRefactoring';
+export const ONE_ENTITY_PER_FILE_COMMAND_ID =
+  'legend.refactor.oneEntityPerFile';
+
+// Event Types
+export const GET_PROJECT_ENTITIES = 'getProjectEntities';
+export const GET_PROJECT_ENTITIES_RESPONSE = 'getProjectEntitiesResponse';
+export const DIAGRAM_DROP_CLASS_ERROR = 'diagramDropClassError';
+export const WRITE_ENTITY = 'writeEntity';
+export const QUERY_BUILDER_CONFIG_ERROR = 'queryBuilderConfigError';
 
 // Context variables
 export const SHOW_EXECUTION_RESULTS = 'showExecutionResults';
@@ -58,6 +81,8 @@ export const AG_GRID_BALHAM_THEME = 'ag-theme-balham.min.css';
 
 // Webviews
 export const FUNCTION_PARAMTER_VALUES_ID = 'functionParameterValues';
+export const DIAGRAM_RENDERER = 'diagramRenderer';
+export const SERVICE_QUERY_EDITOR = 'serviceQueryEditor';
 
 // Primitive types
 export enum PRIMITIVE_TYPE {

@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+/* eslint-env node */
+
 const OFF = 0;
 const WARN = 1;
 const ERROR = 2;
@@ -159,7 +161,9 @@ const REACT_RULES = {
 };
 
 const TYPESCRIPT_RULES = {
-  '@typescript-eslint/ban-types': WARN,
+  '@typescript-eslint/no-empty-object-type': WARN,
+  '@typescript-eslint/no-unsafe-function-type': WARN,
+  '@typescript-eslint/no-wrapper-object-types': WARN,
   '@typescript-eslint/consistent-type-imports': WARN,
   '@typescript-eslint/explicit-function-return-type': [
     WARN,
@@ -173,8 +177,7 @@ const TYPESCRIPT_RULES = {
     { args: 'none', ignoreRestSiblings: true },
   ],
 
-  // NOTE: the following rules are stylisticc only
-  '@typescript-eslint/no-extra-semi': WARN,
+  // NOTE: the following rules are stylistic only
   '@typescript-eslint/no-shadow': WARN,
   // NOTE: since functions are hoisted in ES6, it is then advisable to enable this rule so that we can have functions that depend on each other and not causing
   // circular module dependency. It is also said to be safe to use
@@ -184,7 +187,6 @@ const TYPESCRIPT_RULES = {
 };
 
 module.exports = {
-  extends: ['eslint:recommended', 'plugin:@typescript-eslint/recommended'],
   parser: '@typescript-eslint/parser',
   plugins: ['prettier', 'react-hooks', '@typescript-eslint'],
   parserOptions: {
