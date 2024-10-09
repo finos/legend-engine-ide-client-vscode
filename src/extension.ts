@@ -87,6 +87,7 @@ import {
 } from './conceptTree';
 import { renderDiagramRendererWebView } from './webviews/DiagramWebView';
 import { renderServiceQueryEditorWebView } from './webviews/ServiceQueryEditorWebView';
+import { enableLegendBook } from './purebook/purebook';
 
 let client: LegendLanguageClient;
 const openedWebViews: Record<string, WebviewPanel> = {};
@@ -143,6 +144,7 @@ export function createClient(context: ExtensionContext): LanguageClient {
     documentSelector: [
       { scheme: 'file', language: LEGEND_LANGUAGE_ID },
       { scheme: LEGEND_VIRTUAL_FS_SCHEME, language: LEGEND_LANGUAGE_ID },
+      { scheme: 'vscode-notebook-cell', language: LEGEND_LANGUAGE_ID },
     ],
     synchronize: { fileEvents: workspace.createFileSystemWatcher('**/*.pure') },
   };
@@ -509,6 +511,7 @@ export function activate(context: ExtensionContext): void {
     createLegendConceptTreeProvider(client);
   context.subscriptions.push(...disposables);
   legendConceptTreeProvider = treeDataProvider;
+  enableLegendBook(context);
 }
 
 export function createStatusBarItem(context: ExtensionContext): void {

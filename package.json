@@ -303,7 +303,18 @@
         "key": "ctrl+shift+l",
         "mac": "shift+cmd+l"
       }
-    ]
+    ],
+    "notebooks": [
+            {
+                "type": "legend-book",
+                "displayName": "Legend Notebook",
+                "selector": [
+                    {
+                        "filenamePattern": "*.purebook"
+                    }
+                ]
+            }
+        ]
   },
   "scripts": {
     "test": "npm run build && node ./lib/tests/runTest.js",
