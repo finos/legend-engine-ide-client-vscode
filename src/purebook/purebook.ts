@@ -15,43 +15,25 @@
  */
 
 import {
-  CancellationToken,
+  type CancellationToken,
   commands,
-  ExtensionContext,
-  NotebookCell,
+  type ExtensionContext,
+  type NotebookCell,
+  type NotebookDocument,
   NotebookCellData,
   NotebookCellKind,
   NotebookCellOutput,
   NotebookCellOutputItem,
-  NotebookController,
+  type NotebookController,
   NotebookData,
-  NotebookDocument,
   notebooks,
-  NotebookSerializer,
+  type NotebookSerializer,
   workspace,
 } from 'vscode';
 import { LEGEND_COMMAND, LEGEND_LANGUAGE_ID } from '../utils/Const';
-import { PlainObject } from '@finos/legend-vscode-extension-dependencies';
+import type { PlainObject } from '@finos/legend-vscode-extension-dependencies';
 import { LegendExecutionResult } from '../results/LegendExecutionResult';
 import { LegendExecutionResultType } from '../results/LegendExecutionResultType';
-
-export function enableLegendBook(context: ExtensionContext) {
-  context.subscriptions.push(
-    workspace.registerNotebookSerializer(
-      'legend-book',
-      new LegendBookSerializer(),
-    ),
-  );
-
-  const controller = notebooks.createNotebookController(
-    'legend-book-controller-id',
-    'legend-book',
-    'Legend Notebook',
-    (cells, _document, controller) => executeCells(cells, controller),
-  );
-
-  context.subscriptions.push(controller);
-}
 
 interface RawNotebookCell {
   source: string[];
@@ -59,11 +41,14 @@ interface RawNotebookCell {
 }
 
 class LegendBookSerializer implements NotebookSerializer {
+  private encoder: TextEncoder = new TextEncoder();
+  private decoder: TextDecoder = new TextDecoder();
+
   async deserializeNotebook(
     content: Uint8Array,
     _token: CancellationToken,
   ): Promise<NotebookData> {
-    var contents = new TextDecoder().decode(content);
+    const contents = this.decoder.decode(content);
 
     let raw: RawNotebookCell[];
     try {
@@ -90,7 +75,7 @@ class LegendBookSerializer implements NotebookSerializer {
     data: NotebookData,
     _token: CancellationToken,
   ): Promise<Uint8Array> {
-    let contents: RawNotebookCell[] = [];
+    const contents: RawNotebookCell[] = [];
 
     for (const cell of data.cells) {
       contents.push({
@@ -99,12 +84,31 @@ class LegendBookSerializer implements NotebookSerializer {
       });
     }
 
-    return new TextEncoder().encode(JSON.stringify(contents, undefined, 1));
+    return this.encoder.encode(JSON.stringify(contents, undefined, 1));
   }
+}
+
+export function enableLegendBook(context: ExtensionContext): void {
+  context.subscriptions.push(
+    workspace.registerNotebookSerializer(
+      'legend-book',
+      new LegendBookSerializer(),
+    ),
+  );
+
+  const controller = notebooks.createNotebookController(
+    'legend-book-controller-id',
+    'legend-book',
+    'Legend Notebook',
+    executeCells,
+  );
+
+  context.subscriptions.push(controller);
 }
 
 async function executeCells(
   cells: NotebookCell[],
+  _document: NotebookDocument,
   controller: NotebookController,
 ): Promise<void> {
   await Promise.all(cells.map((cell) => executeCell(cell, controller)));
