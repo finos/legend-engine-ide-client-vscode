@@ -16,44 +16,13 @@
 
 import {
   type PlainObject,
-  type AbstractPlugin,
-  type AbstractPreset,
-  assertErrorThrown,
-  guaranteeNonNullable,
 } from '@finos/legend-vscode-extension-dependencies';
-import { LegendVSCode } from './LegendVSCode';
-import { QUERY_BUILDER_CONFIG_ERROR } from '../utils/Const';
-import { type LegendVSCodeApplicationConfigurationData } from './LegendVSCodeApplicationConfig';
-import { type LegendApplicationVersionData } from '@finos/legend-application';
-import packageJson from '../../package.json';
-
-export class LegendVSCodeWebviewApplication {
-  static getPresetCollection(): AbstractPreset[] {
-    return [];
-  }
-
-  static getPluginCollection(): AbstractPlugin[] {
-    return [];
-  }
-
-  static run(
-    baseUrl: string,
-    engineUrl: string,
-    componentRouterProps: PlainObject,
-  ): void {
-    LegendVSCode.create()
-      .withEngineUrl(engineUrl)
-      .withComponentRouterProps(componentRouterProps)
-      .setup({ baseAddress: baseUrl })
-      .withPresets(LegendVSCodeWebviewApplication.getPresetCollection())
-      .withPlugins(LegendVSCodeWebviewApplication.getPluginCollection())
-      .start()
-      .catch((e: unknown) => {
-        assertErrorThrown(e);
-        postMessage({ command: QUERY_BUILDER_CONFIG_ERROR, msg: e.message });
-      });
-  }
-}
+import {
+  ApplicationFrameworkProvider,
+  BrowserEnvironmentProvider,
+} from '@finos/legend-application';
+import { observer } from 'mobx-react-lite';
+import { ComponentRouter } from '../components/ComponentRouter';
 
 export const LEGEND_WEBVIEW_APPLICATION_ROOT_ELEMENT_ID = 'root';
 
@@ -68,3 +37,20 @@ export const getApplicationRootElement = (): Element => {
   }
   return rootEl;
 };
+
+export const LegendVSCodeWebviewApplication = observer(
+  (props: {
+    baseUrl: string;
+    componentRouterProps: PlainObject | undefined;
+  }) => {
+    const { baseUrl, componentRouterProps } = props;
+
+    return (
+      <BrowserEnvironmentProvider baseUrl={baseUrl}>
+        <ApplicationFrameworkProvider>
+          <ComponentRouter {...componentRouterProps} />
+        </ApplicationFrameworkProvider>
+      </BrowserEnvironmentProvider>
+    );
+  },
+);

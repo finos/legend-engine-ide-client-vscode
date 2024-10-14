@@ -24,10 +24,8 @@ import {
 } from '@finos/legend-vscode-extension-dependencies';
 import {
   type LegendApplicationConfigurationInput,
-  ApplicationFrameworkProvider,
   type ApplicationStore,
   ApplicationStoreProvider,
-  BrowserEnvironmentProvider,
   Core_LegendApplicationPlugin,
   LegendApplication,
   type LegendApplicationConfig,
@@ -39,8 +37,10 @@ import {
 import { LegendVSCodePluginManager } from './LegendVSCodePluginManager';
 import { Core_LegendVSCodeApplicationPlugin } from './Core_LegendVSCodeApplicationPlugin';
 import { createRoot } from 'react-dom/client';
-import { ComponentRouter } from '../components/ComponentRouter';
-import { getApplicationRootElement } from './LegendVSCodeWebviewApplication';
+import {
+  getApplicationRootElement,
+  LegendVSCodeWebviewApplication,
+} from './LegendVSCodeWebviewApplication';
 import packageJson from '../../package.json';
 
 export class LegendVSCode extends LegendApplication {
@@ -123,11 +123,10 @@ export class LegendVSCode extends LegendApplication {
   ): Promise<void> {
     createRoot(getApplicationRootElement()).render(
       <ApplicationStoreProvider store={applicationStore}>
-        <BrowserEnvironmentProvider baseUrl={this.baseAddress}>
-          <ApplicationFrameworkProvider>
-            <ComponentRouter {...this.componentRouterProps} />
-          </ApplicationFrameworkProvider>
-        </BrowserEnvironmentProvider>
+        <LegendVSCodeWebviewApplication
+          baseUrl={this.baseAddress}
+          componentRouterProps={this.componentRouterProps}
+        />
       </ApplicationStoreProvider>,
     );
   }

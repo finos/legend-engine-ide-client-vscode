@@ -26,7 +26,7 @@ import {
   LegendEntitiesRequest,
 } from '../LegendLanguageClient';
 import { getWebviewHtml } from './utils';
-import { type PlainObject } from '@finos/legend-vscode-extension-dependencies';
+import { PlainObject } from '../utils/SerializationUtils';
 
 export const renderServiceQueryEditorWebView = (
   serviceQueryEditorWebViewPanel: WebviewPanel,

@@ -37,7 +37,6 @@ export const ComponentRouter = (props: PlainObject): React.ReactNode => {
     case SERVICE_QUERY_EDITOR: {
       const serviceId = guaranteeNonNullable(props.serviceId as string);
       component = <ServiceQueryEditor serviceId={serviceId} />;
-
       break;
     }
     case DIAGRAM_RENDERER: {

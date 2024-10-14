@@ -16,7 +16,7 @@
 
 import '@finos/legend-vscode-extension-dependencies/style/index.css';
 import { type PlainObject } from '@finos/legend-vscode-extension-dependencies';
-import { LegendVSCodeWebviewApplication } from '../application/LegendVSCodeWebviewApplication';
+import { LegendVSCodeBootstrap } from '../application/LegendVSCodeBootstrap';
 
 const rootElement = document.getElementById('root');
 const inputParamtersFromHtml = rootElement
@@ -27,5 +27,5 @@ if (inputParamtersFromHtml) {
     inputParamtersFromHtml,
   ) as PlainObject;
 
-  LegendVSCodeWebviewApplication.run('/', engineUrl as string, restParsedParams);
+  LegendVSCodeBootstrap.run('/', engineUrl as string, restParsedParams);
 }
