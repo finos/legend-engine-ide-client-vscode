@@ -16,6 +16,7 @@
 
 import {
   type ClassifierPathMapping,
+  type CodeCompletionResult,
   type ExecutionOptions,
   type ExternalFormatDescription,
   type GenerationConfigurationDescription,
@@ -27,6 +28,7 @@ import {
   type PureProtocolProcessorPlugin,
   type RawLambda,
   type RawRelationalOperationElement,
+  type RelationTypeMetadata,
   type RequestHeaders,
   type RequestProcessConfig,
   type ResponseProcessConfig,
@@ -38,6 +40,7 @@ import {
   type V1_ArtifactGenerationExtensionInput,
   type V1_ArtifactGenerationExtensionOutput,
   type V1_CompilationResult,
+  type V1_CompleteCodeInput,
   type V1_DatabaseBuilderInput,
   type V1_DatabaseToModelGenerationInput,
   type V1_DatasetEntitlementReport,
@@ -78,21 +81,30 @@ import {
   type V1_TestDataGenerationResult,
   type V1_TextCompilationResult,
   type V1_ValueSpecification,
+  assertErrorThrown,
   guaranteeNonNullable,
+  isLossSafeNumber,
+  parseLosslessJSON,
+  returnUndefOnError,
   TEMPORARY__AbstractEngineConfig,
+  V1_EXECUTION_RESULT,
   V1_MappingModelCoverageAnalysisResult,
+  V1_serializeExecutionResult,
 } from '@finos/legend-vscode-extension-dependencies';
 import { deserialize } from 'serializr';
 import { postMessage } from '../utils/VsCodeUtils';
 import {
   ANALYZE_MAPPING_MODEL_COVERAGE_COMMAND_ID,
   ANALYZE_MAPPING_MODEL_COVERAGE_RESPONSE,
+  EXECUTE_QUERY_COMMAND_ID,
+  EXECUTE_QUERY_RESPONSE,
   GET_CLASSIFIER_PATH_MAP_REQUEST_ID,
   GET_CLASSIFIER_PATH_MAP_RESPONSE,
   GET_SUBTYPE_INFO_REQUEST_ID,
   GET_SUBTYPE_INFO_RESPONSE,
 } from '../utils/Const';
 import { type LegendExecutionResult } from '../results/LegendExecutionResult';
+import { ExecuteQueryInput } from '../model/ExecuteQueryInput';
 
 class V1_LSPEngine_Config extends TEMPORARY__AbstractEngineConfig {}
 
@@ -322,6 +334,18 @@ export class V1_LSPEngine implements V1_GraphManagerEngine {
     throw new Error('getLambdaReturnTypeFromRawInput not implemented');
   }
 
+  async getLambdaRelationTypeFromRawInput(
+    rawInput: V1_LambdaReturnTypeInput,
+  ): Promise<RelationTypeMetadata> {
+    throw new Error('getLambdaRelationTypeFromRawInput not implemented');
+  }
+
+  async getCodeCompletion(
+    rawInput: V1_CompleteCodeInput,
+  ): Promise<CodeCompletionResult> {
+    throw new Error('getCodeCompletion not implemented');
+  }
+
   // --------------------------------------------- Execution ---------------------------------------------
 
   async runQuery(
@@ -331,7 +355,23 @@ export class V1_LSPEngine implements V1_GraphManagerEngine {
     executionResult: V1_ExecutionResult;
     executionTraceId?: string;
   }> {
-    throw new Error('runQuery not implemented');
+    try {
+      const executionResultMap = await this.runQueryAndReturnMap(
+        input,
+        options,
+      );
+      const executionResultInText =
+        executionResultMap.get(V1_EXECUTION_RESULT) ?? '';
+      const rawExecutionResult =
+        returnUndefOnError(() =>
+          this.parseExecutionResults(executionResultInText, options),
+        ) ?? executionResultInText;
+      const executionResult = V1_serializeExecutionResult(rawExecutionResult);
+      return { executionResult };
+    } catch (error) {
+      assertErrorThrown(error);
+      throw error;
+    }
   }
 
   async exportData(
@@ -345,7 +385,22 @@ export class V1_LSPEngine implements V1_GraphManagerEngine {
     input: V1_ExecuteInput,
     options?: ExecutionOptions,
   ): Promise<Map<string, string>> {
-    throw new Error('runQueryAndReturnMap not implemented');
+    const result = new Map<string, string>();
+    postMessage({
+      command: EXECUTE_QUERY_COMMAND_ID,
+      msg: ExecuteQueryInput.serialization.toJson({
+        lambda: input.function,
+        mapping: input.mapping,
+        runtime: input.runtime,
+        context: input.context,
+        parameterValues: input.parameterValues,
+      }),
+    });
+    const response = await this.waitForMessage<LegendExecutionResult[]>(
+      EXECUTE_QUERY_RESPONSE,
+    );
+    result.set(V1_EXECUTION_RESULT, JSON.parse(guaranteeNonNullable(response?.[0]?.message)));
+    return result;
   }
 
   /**
@@ -358,7 +413,30 @@ export class V1_LSPEngine implements V1_GraphManagerEngine {
     executionResultTxt: string,
     options: ExecutionOptions | undefined,
   ): PlainObject<V1_ExecutionResult> {
-    throw new Error('parseExecutionResults not implemented');
+    if (options?.useLosslessParse) {
+      return parseLosslessJSON(
+        executionResultTxt,
+      ) as PlainObject<V1_ExecutionResult>;
+    }
+    if (!options?.convertUnsafeNumbersToString) {
+      return JSON.parse(executionResultTxt);
+    }
+    try {
+      const customNumParser = (numVal: string): number | string => {
+        if (isLossSafeNumber(numVal)) {
+          return Number(numVal);
+        }
+        return numVal;
+      };
+      return parseLosslessJSON(
+        executionResultTxt,
+        undefined,
+        customNumParser,
+      ) as PlainObject<V1_ExecutionResult>;
+    } catch {
+      // fall back to regular parse if any issue with the custom number parsing
+      return JSON.parse(executionResultTxt);
+    }
   }
 
   generateExecutionPlan(
