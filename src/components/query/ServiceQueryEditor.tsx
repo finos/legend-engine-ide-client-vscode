@@ -36,6 +36,7 @@ import {
 import {
   ANALYZE_MAPPING_MODEL_COVERAGE_RESPONSE,
   EXECUTE_QUERY_RESPONSE,
+  GENERATE_EXECUTION_PLAN_RESPONSE,
   GET_CLASSIFIER_PATH_MAP_RESPONSE,
   GET_PROJECT_ENTITIES,
   GET_PROJECT_ENTITIES_RESPONSE,
@@ -91,6 +92,7 @@ export const ServiceQueryEditor: React.FC<{
         case GET_SUBTYPE_INFO_RESPONSE:
         case ANALYZE_MAPPING_MODEL_COVERAGE_RESPONSE:
         case EXECUTE_QUERY_RESPONSE:
+        case GENERATE_EXECUTION_PLAN_RESPONSE:
           break;
         default:
           throw new Error(`Unsupported request ${message.command}`);

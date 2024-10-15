@@ -25,6 +25,8 @@ import {
   ANALYZE_MAPPING_MODEL_COVERAGE_RESPONSE,
   EXECUTE_QUERY_COMMAND_ID,
   EXECUTE_QUERY_RESPONSE,
+  GENERATE_EXECUTION_PLAN_COMMAND_ID,
+  GENERATE_EXECUTION_PLAN_RESPONSE,
   GET_CLASSIFIER_PATH_MAP_REQUEST_ID,
   GET_CLASSIFIER_PATH_MAP_RESPONSE,
   GET_PROJECT_ENTITIES,
@@ -139,6 +141,19 @@ export const renderServiceQueryEditorWebView = (
         const result = await client.executeQuery(servicePath, serviceId, lambda, mapping, runtime, context, parameterValues ?? []);
         webview.postMessage({
           command: EXECUTE_QUERY_RESPONSE,
+          result,
+        });
+        break;
+      }
+      case GENERATE_EXECUTION_PLAN_COMMAND_ID: {
+        const { lambda, mapping, runtime, context, parameterValues } = message.msg;
+        const servicePath = guaranteeNonNullable(
+          legendConceptTree.getTreeItemById(serviceId)?.location?.uri.toString(),
+          `Can't find service file with ID '${serviceId}'`,
+        );
+        const result = await client.generateExecutionPlan(servicePath, serviceId, lambda, mapping, runtime, context, parameterValues ?? []);
+        webview.postMessage({
+          command: GENERATE_EXECUTION_PLAN_RESPONSE,
           result,
         });
         break;

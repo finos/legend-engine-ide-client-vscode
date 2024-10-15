@@ -31,6 +31,7 @@ import {
   GET_SUBTYPE_INFO_REQUEST_ID,
   LEGEND_COMMAND,
   EXECUTE_QUERY_COMMAND_ID,
+  GENERATE_EXECUTION_PLAN_COMMAND_ID,
 } from './utils/Const';
 import type { PlainObject } from './utils/SerializationUtils';
 import {
@@ -200,6 +201,31 @@ export class LegendLanguageClient extends LanguageClient {
       0,
       serviceId,
       EXECUTE_QUERY_COMMAND_ID,
+      {
+        lambda: JSON.stringify(lambda),
+        mapping,
+        runtime: JSON.stringify(runtime),
+        context: JSON.stringify(context),
+      },
+      parameterValues,
+    );
+  }
+
+  async generateExecutionPlan(
+    serviceFilePath: string,
+    serviceId: string,
+    lambda: V1_RawLambda,
+    mapping: string | undefined,
+    runtime: V1_Runtime | undefined,
+    context: V1_RawExecutionContext,
+    parameterValues: V1_ParameterValue[],
+  ): Promise<string> {
+    return commands.executeCommand(
+      LEGEND_COMMAND,
+      serviceFilePath,
+      0,
+      serviceId,
+      GENERATE_EXECUTION_PLAN_COMMAND_ID,
       {
         lambda: JSON.stringify(lambda),
         mapping,

@@ -98,6 +98,8 @@ import {
   ANALYZE_MAPPING_MODEL_COVERAGE_RESPONSE,
   EXECUTE_QUERY_COMMAND_ID,
   EXECUTE_QUERY_RESPONSE,
+  GENERATE_EXECUTION_PLAN_COMMAND_ID,
+  GENERATE_EXECUTION_PLAN_RESPONSE,
   GET_CLASSIFIER_PATH_MAP_REQUEST_ID,
   GET_CLASSIFIER_PATH_MAP_RESPONSE,
   GET_SUBTYPE_INFO_REQUEST_ID,
@@ -439,10 +441,23 @@ export class V1_LSPEngine implements V1_GraphManagerEngine {
     }
   }
 
-  generateExecutionPlan(
+  async generateExecutionPlan(
     input: V1_ExecuteInput,
   ): Promise<PlainObject<V1_ExecutionPlan>> {
-    throw new Error('generateExecutionPlan not implemented');
+    postMessage({
+      command: GENERATE_EXECUTION_PLAN_COMMAND_ID,
+      msg: ExecuteQueryInput.serialization.toJson({
+        lambda: input.function,
+        mapping: input.mapping,
+        runtime: input.runtime,
+        context: input.context,
+        parameterValues: input.parameterValues,
+      }),
+    });
+    const response = await this.waitForMessage<LegendExecutionResult[]>(
+      GENERATE_EXECUTION_PLAN_RESPONSE,
+    );
+    return JSON.parse(guaranteeNonNullable(response?.[0]?.message));
   }
 
   debugExecutionPlanGeneration(
