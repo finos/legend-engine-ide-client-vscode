@@ -53,6 +53,7 @@ export const ONE_ENTITY_PER_FILE_COMMAND_ID =
 
 // LSP Commands
 export const ANALYZE_MAPPING_MODEL_COVERAGE_COMMAND_ID = 'legend.mapping.analyzeMappingModelCoverage';
+export const EXECUTE_QUERY_COMMAND_ID = 'legend.query.execute';
 
 // LSP Request IDs
 export const TDS_JSON_REQUEST_ID = 'legend/TDSRequest';
@@ -75,6 +76,7 @@ export const QUERY_BUILDER_CONFIG_ERROR = 'queryBuilderConfigError';
 export const GET_CLASSIFIER_PATH_MAP_RESPONSE = `${GET_CLASSIFIER_PATH_MAP_REQUEST_ID}/response`;
 export const GET_SUBTYPE_INFO_RESPONSE = `${GET_SUBTYPE_INFO_REQUEST_ID}/response`;
 export const ANALYZE_MAPPING_MODEL_COVERAGE_RESPONSE = `${ANALYZE_MAPPING_MODEL_COVERAGE_COMMAND_ID}/response`;
+export const EXECUTE_QUERY_RESPONSE = `${EXECUTE_QUERY_COMMAND_ID}/response`;
 
 // Context variables
 export const SHOW_EXECUTION_RESULTS = 'showExecutionResults';

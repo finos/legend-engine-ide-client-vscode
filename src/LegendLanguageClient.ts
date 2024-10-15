@@ -30,6 +30,7 @@ import {
   GET_CLASSIFIER_PATH_MAP_REQUEST_ID,
   GET_SUBTYPE_INFO_REQUEST_ID,
   LEGEND_COMMAND,
+  EXECUTE_QUERY_COMMAND_ID,
 } from './utils/Const';
 import type { PlainObject } from './utils/SerializationUtils';
 import {
@@ -40,6 +41,12 @@ import type { LegendTest } from './model/LegendTest';
 import type { ExecuteTestRequest } from './model/ExecuteTestRequest';
 import type { LegendTestExecutionResult } from './model/LegendTestExecutionResult';
 import { LegendEntity } from './model/LegendEntity';
+import {
+  V1_ParameterValue,
+  V1_RawExecutionContext,
+  V1_RawLambda,
+  V1_Runtime,
+} from '@finos/legend-vscode-extension-dependencies';
 
 export class LegendEntitiesRequest {
   private textDocuments!: TextDocumentIdentifier[];
@@ -175,6 +182,31 @@ export class LegendLanguageClient extends LanguageClient {
       0,
       mappingId,
       ANALYZE_MAPPING_MODEL_COVERAGE_COMMAND_ID,
+    );
+  }
+
+  async executeQuery(
+    serviceFilePath: string,
+    serviceId: string,
+    lambda: V1_RawLambda,
+    mapping: string | undefined,
+    runtime: V1_Runtime | undefined,
+    context: V1_RawExecutionContext,
+    parameterValues: V1_ParameterValue[],
+  ): Promise<string> {
+    return commands.executeCommand(
+      LEGEND_COMMAND,
+      serviceFilePath,
+      0,
+      serviceId,
+      EXECUTE_QUERY_COMMAND_ID,
+      {
+        lambda: JSON.stringify(lambda),
+        mapping,
+        runtime: JSON.stringify(runtime),
+        context: JSON.stringify(context),
+      },
+      parameterValues,
     );
   }
 }
