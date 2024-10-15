@@ -23,6 +23,8 @@ import {
 import {
   ANALYZE_MAPPING_MODEL_COVERAGE_COMMAND_ID,
   ANALYZE_MAPPING_MODEL_COVERAGE_RESPONSE,
+  DEBUG_GENERATE_EXECUTION_PLAN_COMMAND_ID,
+  DEBUG_GENERATE_EXECUTION_PLAN_RESPONSE,
   EXECUTE_QUERY_COMMAND_ID,
   EXECUTE_QUERY_RESPONSE,
   GENERATE_EXECUTION_PLAN_COMMAND_ID,
@@ -154,6 +156,19 @@ export const renderServiceQueryEditorWebView = (
         const result = await client.generateExecutionPlan(servicePath, serviceId, lambda, mapping, runtime, context, parameterValues ?? []);
         webview.postMessage({
           command: GENERATE_EXECUTION_PLAN_RESPONSE,
+          result,
+        });
+        break;
+      }
+      case DEBUG_GENERATE_EXECUTION_PLAN_COMMAND_ID: {
+        const { lambda, mapping, runtime, context, parameterValues } = message.msg;
+        const servicePath = guaranteeNonNullable(
+          legendConceptTree.getTreeItemById(serviceId)?.location?.uri.toString(),
+          `Can't find service file with ID '${serviceId}'`,
+        );
+        const result = await client.debugGenerateExecutionPlan(servicePath, serviceId, lambda, mapping, runtime, context, parameterValues ?? []);
+        webview.postMessage({
+          command: DEBUG_GENERATE_EXECUTION_PLAN_RESPONSE,
           result,
         });
         break;
