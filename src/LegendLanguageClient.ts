@@ -235,4 +235,30 @@ export class LegendLanguageClient extends LanguageClient {
       parameterValues,
     );
   }
+
+  async debugGenerateExecutionPlan(
+    serviceFilePath: string,
+    serviceId: string,
+    lambda: V1_RawLambda,
+    mapping: string | undefined,
+    runtime: V1_Runtime | undefined,
+    context: V1_RawExecutionContext,
+    parameterValues: V1_ParameterValue[],
+  ): Promise<string> {
+    return commands.executeCommand(
+      LEGEND_COMMAND,
+      serviceFilePath,
+      0,
+      serviceId,
+      GENERATE_EXECUTION_PLAN_COMMAND_ID,
+      {
+        lambda: JSON.stringify(lambda),
+        mapping,
+        runtime: JSON.stringify(runtime),
+        context: JSON.stringify(context),
+        debug: true,
+      },
+      parameterValues,
+    );
+  }
 }

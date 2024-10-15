@@ -96,6 +96,8 @@ import { postMessage } from '../utils/VsCodeUtils';
 import {
   ANALYZE_MAPPING_MODEL_COVERAGE_COMMAND_ID,
   ANALYZE_MAPPING_MODEL_COVERAGE_RESPONSE,
+  DEBUG_GENERATE_EXECUTION_PLAN_COMMAND_ID,
+  DEBUG_GENERATE_EXECUTION_PLAN_RESPONSE,
   EXECUTE_QUERY_COMMAND_ID,
   EXECUTE_QUERY_RESPONSE,
   GENERATE_EXECUTION_PLAN_COMMAND_ID,
@@ -460,10 +462,23 @@ export class V1_LSPEngine implements V1_GraphManagerEngine {
     return JSON.parse(guaranteeNonNullable(response?.[0]?.message));
   }
 
-  debugExecutionPlanGeneration(
+  async debugExecutionPlanGeneration(
     input: V1_ExecuteInput,
   ): Promise<{ plan: PlainObject<V1_ExecutionPlan>; debug: string[] }> {
-    throw new Error('debugExecutionPlanGeneration not implemented');
+    postMessage({
+      command: DEBUG_GENERATE_EXECUTION_PLAN_COMMAND_ID,
+      msg: ExecuteQueryInput.serialization.toJson({
+        lambda: input.function,
+        mapping: input.mapping,
+        runtime: input.runtime,
+        context: input.context,
+        parameterValues: input.parameterValues,
+      }),
+    });
+    const response = await this.waitForMessage<LegendExecutionResult[]>(
+      DEBUG_GENERATE_EXECUTION_PLAN_RESPONSE,
+    );
+    return JSON.parse(guaranteeNonNullable(response?.[0]?.message));
   }
 
   generateExecuteTestData(
