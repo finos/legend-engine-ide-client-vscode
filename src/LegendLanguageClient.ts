@@ -32,6 +32,8 @@ import {
   LEGEND_COMMAND,
   EXECUTE_QUERY_COMMAND_ID,
   GENERATE_EXECUTION_PLAN_COMMAND_ID,
+  GET_LAMBDA_RETURN_TYPE_COMMAND_ID,
+  GRAMMAR_TO_JSON_LAMBDA_COMMAND_ID,
 } from './utils/Const';
 import type { PlainObject } from './utils/SerializationUtils';
 import {
@@ -259,6 +261,48 @@ export class LegendLanguageClient extends LanguageClient {
         debug: true,
       },
       parameterValues,
+    );
+  }
+
+  async grammarToJson_lambda(
+    serviceFilePath: string,
+    serviceId: string,
+    code: string,
+    sourceId?: string | undefined,
+    lineOffset?: number | undefined,
+    columnOffset?: number | undefined,
+    returnSourceInformation?: boolean | undefined,
+  ): Promise<string> {
+    return commands.executeCommand(
+      LEGEND_COMMAND,
+      serviceFilePath,
+      0,
+      serviceId,
+      GRAMMAR_TO_JSON_LAMBDA_COMMAND_ID,
+      {
+        code,
+        sourceId,
+        lineOffset,
+        columnOffset,
+        returnSourceInformation,
+      },
+    );
+  }
+
+  async getLambdaReturnType(
+    serviceFilePath: string,
+    serviceId: string,
+    lambda: V1_RawLambda,
+  ): Promise<string> {
+    return commands.executeCommand(
+      LEGEND_COMMAND,
+      serviceFilePath,
+      0,
+      serviceId,
+      GET_LAMBDA_RETURN_TYPE_COMMAND_ID,
+      {
+        lambda: JSON.stringify(lambda),
+      },
     );
   }
 }

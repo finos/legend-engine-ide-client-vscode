@@ -51,7 +51,6 @@ import {
   type V1_GenerationOutput,
   type V1_GrammarParserBatchInputEntry,
   type V1_GraphManagerEngine,
-  type V1_LambdaReturnTypeInput,
   type V1_LightQuery,
   type V1_PureModelContext,
   type V1_PureModelContextData,
@@ -81,6 +80,8 @@ import {
   returnUndefOnError,
   TEMPORARY__AbstractEngineConfig,
   V1_EXECUTION_RESULT,
+  V1_LambdaReturnTypeInput,
+  V1_LambdaReturnTypeResult,
   V1_MappingModelCoverageAnalysisInput,
   V1_MappingModelCoverageAnalysisResult,
   V1_serializeExecutionResult,
@@ -98,8 +99,12 @@ import {
   GENERATE_EXECUTION_PLAN_RESPONSE,
   GET_CLASSIFIER_PATH_MAP_REQUEST_ID,
   GET_CLASSIFIER_PATH_MAP_RESPONSE,
+  GET_LAMBDA_RETURN_TYPE_COMMAND_ID,
+  GET_LAMBDA_RETURN_TYPE_RESPONSE,
   GET_SUBTYPE_INFO_REQUEST_ID,
   GET_SUBTYPE_INFO_RESPONSE,
+  GRAMMAR_TO_JSON_LAMBDA_COMMAND_ID,
+  GRAMMAR_TO_JSON_LAMBDA_RESPONSE,
 } from '../utils/Const';
 import { LegendExecutionResult } from '../results/LegendExecutionResult';
 import { ExecuteQueryInput } from '../model/ExecuteQueryInput';
@@ -225,7 +230,23 @@ export class V1_LSPEngine implements V1_GraphManagerEngine {
       pruneSourceInformation?: boolean;
     },
   ): Promise<V1_RawLambda> {
-    throw new Error('transformCodeToLambda not implemented');
+    try {
+      const response = await this.postAndWaitForMessage<LegendExecutionResult[]>(
+        {
+          command: GRAMMAR_TO_JSON_LAMBDA_COMMAND_ID,
+          msg: {
+            code,
+            lambdaId: lambdaId ?? '',
+            options,
+          },
+        },
+        GRAMMAR_TO_JSON_LAMBDA_RESPONSE,
+      );
+      return JSON.parse(guaranteeNonNullable(response?.[0]?.message));
+    } catch (error) {
+      assertErrorThrown(error);
+      throw error;
+    }
   }
 
   async transformRelationalOperationElementsToPureCode(
@@ -266,13 +287,34 @@ export class V1_LSPEngine implements V1_GraphManagerEngine {
   async getLambdaReturnType(
     lambdaReturnInput: V1_LambdaReturnTypeInput,
   ): Promise<string> {
-    throw new Error('getLambdaReturnType not implemented');
+    const returnType = await this.getLambdaReturnTypeFromRawInput(
+      V1_LambdaReturnTypeInput.serialization.toJson(lambdaReturnInput),
+    );
+    return returnType;
   }
 
   async getLambdaReturnTypeFromRawInput(
     rawInput: PlainObject<V1_LambdaReturnTypeInput>,
   ): Promise<string> {
-    throw new Error('getLambdaReturnTypeFromRawInput not implemented');
+    try {
+      const response = await this.postAndWaitForMessage<
+        LegendExecutionResult[]
+      >(
+        {
+          command: GET_LAMBDA_RETURN_TYPE_COMMAND_ID,
+          msg: rawInput,
+        },
+        GET_LAMBDA_RETURN_TYPE_RESPONSE,
+      );
+      return (
+        JSON.parse(
+          guaranteeNonNullable(response?.[0]?.message),
+        ) as V1_LambdaReturnTypeResult
+      ).returnType;
+    } catch (error) {
+      assertErrorThrown(error);
+      throw error;
+    }
   }
 
   async getLambdaRelationTypeFromRawInput(

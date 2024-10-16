@@ -56,6 +56,8 @@ export const ANALYZE_MAPPING_MODEL_COVERAGE_COMMAND_ID = 'legend.mapping.analyze
 export const EXECUTE_QUERY_COMMAND_ID = 'legend.query.execute';
 export const GENERATE_EXECUTION_PLAN_COMMAND_ID = 'legend.executionPlan.generate';
 export const DEBUG_GENERATE_EXECUTION_PLAN_COMMAND_ID = 'legend.executionPlan.generate.debug';
+export const GRAMMAR_TO_JSON_LAMBDA_COMMAND_ID = 'legend.grammarToJson.lambda';
+export const GET_LAMBDA_RETURN_TYPE_COMMAND_ID = 'legend.lambda.returnType';
 
 // LSP Request IDs
 export const TDS_JSON_REQUEST_ID = 'legend/TDSRequest';
@@ -81,6 +83,8 @@ export const ANALYZE_MAPPING_MODEL_COVERAGE_RESPONSE = `${ANALYZE_MAPPING_MODEL_
 export const EXECUTE_QUERY_RESPONSE = `${EXECUTE_QUERY_COMMAND_ID}/response`;
 export const GENERATE_EXECUTION_PLAN_RESPONSE = `${GENERATE_EXECUTION_PLAN_COMMAND_ID}/response`;
 export const DEBUG_GENERATE_EXECUTION_PLAN_RESPONSE = `${DEBUG_GENERATE_EXECUTION_PLAN_COMMAND_ID}/response`;
+export const GRAMMAR_TO_JSON_LAMBDA_RESPONSE = `${GRAMMAR_TO_JSON_LAMBDA_COMMAND_ID}/response`;
+export const GET_LAMBDA_RETURN_TYPE_RESPONSE = `${GET_LAMBDA_RETURN_TYPE_COMMAND_ID}/response`;
 
 // Context variables
 export const SHOW_EXECUTION_RESULTS = 'showExecutionResults';
