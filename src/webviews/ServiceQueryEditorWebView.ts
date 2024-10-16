@@ -31,10 +31,14 @@ import {
   GENERATE_EXECUTION_PLAN_RESPONSE,
   GET_CLASSIFIER_PATH_MAP_REQUEST_ID,
   GET_CLASSIFIER_PATH_MAP_RESPONSE,
+  GET_LAMBDA_RETURN_TYPE_COMMAND_ID,
+  GET_LAMBDA_RETURN_TYPE_RESPONSE,
   GET_PROJECT_ENTITIES,
   GET_PROJECT_ENTITIES_RESPONSE,
   GET_SUBTYPE_INFO_REQUEST_ID,
   GET_SUBTYPE_INFO_RESPONSE,
+  GRAMMAR_TO_JSON_LAMBDA_COMMAND_ID,
+  GRAMMAR_TO_JSON_LAMBDA_RESPONSE,
   QUERY_BUILDER_CONFIG_ERROR,
   WRITE_ENTITY,
 } from '../utils/Const';
@@ -57,6 +61,11 @@ export const renderServiceQueryEditorWebView = (
   legendConceptTree: LegendConceptTreeProvider,
 ): void => {
   const { webview } = serviceQueryEditorWebViewPanel;
+
+  const servicePath = guaranteeNonNullable(
+    legendConceptTree.getTreeItemById(serviceId)?.location?.uri.toString(),
+    `Can't find service file with ID '${serviceId}'`,
+  );
 
   // Construct data input parameters
   const dataInputParams: PlainObject = {
@@ -84,13 +93,15 @@ export const renderServiceQueryEditorWebView = (
       }
       case WRITE_ENTITY: {
         await client.writeEntity({ content: message.msg });
-        await workspace.textDocuments.filter(
-          (doc) =>
-            doc.uri.toString() ===
-            legendConceptTree
-              .getTreeItemById(message.entityPath)
-              ?.location?.uri?.toString(),
-        )?.[0]?.save();
+        await workspace.textDocuments
+          .filter(
+            (doc) =>
+              doc.uri.toString() ===
+              legendConceptTree
+                .getTreeItemById(message.entityPath)
+                ?.location?.uri?.toString(),
+          )?.[0]
+          ?.save();
         break;
       }
       case QUERY_BUILDER_CONFIG_ERROR: {
@@ -135,12 +146,17 @@ export const renderServiceQueryEditorWebView = (
         break;
       }
       case EXECUTE_QUERY_COMMAND_ID: {
-        const { lambda, mapping, runtime, context, parameterValues } = message.msg;
-        const servicePath = guaranteeNonNullable(
-          legendConceptTree.getTreeItemById(serviceId)?.location?.uri.toString(),
-          `Can't find service file with ID '${serviceId}'`,
+        const { lambda, mapping, runtime, context, parameterValues } =
+          message.msg;
+        const result = await client.executeQuery(
+          servicePath,
+          serviceId,
+          lambda,
+          mapping,
+          runtime,
+          context,
+          parameterValues ?? [],
         );
-        const result = await client.executeQuery(servicePath, serviceId, lambda, mapping, runtime, context, parameterValues ?? []);
         webview.postMessage({
           command: EXECUTE_QUERY_RESPONSE,
           result,
@@ -148,12 +164,17 @@ export const renderServiceQueryEditorWebView = (
         break;
       }
       case GENERATE_EXECUTION_PLAN_COMMAND_ID: {
-        const { lambda, mapping, runtime, context, parameterValues } = message.msg;
-        const servicePath = guaranteeNonNullable(
-          legendConceptTree.getTreeItemById(serviceId)?.location?.uri.toString(),
-          `Can't find service file with ID '${serviceId}'`,
+        const { lambda, mapping, runtime, context, parameterValues } =
+          message.msg;
+        const result = await client.generateExecutionPlan(
+          servicePath,
+          serviceId,
+          lambda,
+          mapping,
+          runtime,
+          context,
+          parameterValues ?? [],
         );
-        const result = await client.generateExecutionPlan(servicePath, serviceId, lambda, mapping, runtime, context, parameterValues ?? []);
         webview.postMessage({
           command: GENERATE_EXECUTION_PLAN_RESPONSE,
           result,
@@ -161,14 +182,51 @@ export const renderServiceQueryEditorWebView = (
         break;
       }
       case DEBUG_GENERATE_EXECUTION_PLAN_COMMAND_ID: {
-        const { lambda, mapping, runtime, context, parameterValues } = message.msg;
-        const servicePath = guaranteeNonNullable(
-          legendConceptTree.getTreeItemById(serviceId)?.location?.uri.toString(),
-          `Can't find service file with ID '${serviceId}'`,
+        const { lambda, mapping, runtime, context, parameterValues } =
+          message.msg;
+        const result = await client.debugGenerateExecutionPlan(
+          servicePath,
+          serviceId,
+          lambda,
+          mapping,
+          runtime,
+          context,
+          parameterValues ?? [],
         );
-        const result = await client.debugGenerateExecutionPlan(servicePath, serviceId, lambda, mapping, runtime, context, parameterValues ?? []);
         webview.postMessage({
           command: DEBUG_GENERATE_EXECUTION_PLAN_RESPONSE,
+          result,
+        });
+        break;
+      }
+      case GRAMMAR_TO_JSON_LAMBDA_COMMAND_ID: {
+        const { code, lambdaId, options } = message.msg;
+        const result = await client.grammarToJson_lambda(
+          servicePath,
+          serviceId,
+          code,
+          lambdaId,
+          undefined,
+          undefined,
+          options?.pruneSourceInformation !== undefined
+            ? !options.pruneSourceInformation
+            : true,
+        );
+        webview.postMessage({
+          command: GRAMMAR_TO_JSON_LAMBDA_RESPONSE,
+          result,
+        });
+        break;
+      }
+      case GET_LAMBDA_RETURN_TYPE_COMMAND_ID: {
+        const { lambda } = message.msg;
+        const result = await client.getLambdaReturnType(
+          servicePath,
+          serviceId,
+          lambda,
+        );
+        webview.postMessage({
+          command: GET_LAMBDA_RETURN_TYPE_RESPONSE,
           result,
         });
         break;
