@@ -22,21 +22,15 @@ import {
   type GenerationConfigurationDescription,
   type GenerationMode,
   type GraphManagerOperationReport,
-  type Parameters,
   type PlainObject,
   type PostValidationAssertionResult,
   type PureProtocolProcessorPlugin,
   type RawLambda,
   type RawRelationalOperationElement,
   type RelationTypeMetadata,
-  type RequestHeaders,
-  type RequestProcessConfig,
-  type ResponseProcessConfig,
   type ServiceExecutionMode,
   type SubtypeInfo,
   type TEMPORARY__EngineSetupConfig,
-  type TraceData,
-  type TracerService,
   type V1_ArtifactGenerationExtensionInput,
   type V1_ArtifactGenerationExtensionOutput,
   type V1_CompilationResult,
@@ -59,7 +53,6 @@ import {
   type V1_GraphManagerEngine,
   type V1_LambdaReturnTypeInput,
   type V1_LightQuery,
-  type V1_MappingModelCoverageAnalysisInput,
   type V1_PureModelContext,
   type V1_PureModelContextData,
   type V1_Query,
@@ -88,6 +81,7 @@ import {
   returnUndefOnError,
   TEMPORARY__AbstractEngineConfig,
   V1_EXECUTION_RESULT,
+  V1_MappingModelCoverageAnalysisInput,
   V1_MappingModelCoverageAnalysisResult,
   V1_serializeExecutionResult,
 } from '@finos/legend-vscode-extension-dependencies';
@@ -107,7 +101,7 @@ import {
   GET_SUBTYPE_INFO_REQUEST_ID,
   GET_SUBTYPE_INFO_RESPONSE,
 } from '../utils/Const';
-import { type LegendExecutionResult } from '../results/LegendExecutionResult';
+import { LegendExecutionResult } from '../results/LegendExecutionResult';
 import { ExecuteQueryInput } from '../model/ExecuteQueryInput';
 
 class V1_LSPEngine_Config extends TEMPORARY__AbstractEngineConfig {}
@@ -121,34 +115,42 @@ export class V1_LSPEngine implements V1_GraphManagerEngine {
   setup = (config: TEMPORARY__EngineSetupConfig): Promise<void> =>
     Promise.resolve();
 
-  waitForMessage = <T>(commandId: string): Promise<T> =>
-    new Promise((resolve) => {
-      window.addEventListener(
-        'message',
-        (event: MessageEvent<{ result: T; command: string }>) => {
-          if (event.data.command === commandId) {
-            resolve(event.data.result);
-          }
-        },
-      );
+  private postAndWaitForMessage = <T>(
+    requestMessage: { command: string; msg?: PlainObject },
+    responseCommandId: string,
+  ): Promise<T> => {
+    postMessage({
+      command: requestMessage.command,
+      msg: requestMessage.msg,
     });
+    return new Promise((resolve) => {
+      const handleMessage = (
+        event: MessageEvent<{ result: T; command: string }>,
+      ) => {
+        if (event.data.command === responseCommandId) {
+          window.removeEventListener('message', handleMessage);
+          resolve(event.data.result);
+        }
+      };
+      window.addEventListener('message', handleMessage);
+    });
+  };
 
   // ------------------------------------------- Protocol -------------------------------------------
 
   async getClassifierPathMapping(): Promise<ClassifierPathMapping[]> {
-    postMessage({
-      command: GET_CLASSIFIER_PATH_MAP_REQUEST_ID,
-    });
-    return JSON.parse(
-      await this.waitForMessage<string>(GET_CLASSIFIER_PATH_MAP_RESPONSE),
-    ) as ClassifierPathMapping[];
+    const response = await this.postAndWaitForMessage<string>(
+      { command: GET_CLASSIFIER_PATH_MAP_REQUEST_ID },
+      GET_CLASSIFIER_PATH_MAP_RESPONSE,
+    );
+    return JSON.parse(response) as ClassifierPathMapping[];
   }
 
   async getSubtypeInfo(): Promise<SubtypeInfo> {
-    postMessage({
-      command: GET_SUBTYPE_INFO_REQUEST_ID,
-    });
-    return this.waitForMessage<SubtypeInfo>(GET_SUBTYPE_INFO_RESPONSE);
+    return this.postAndWaitForMessage<SubtypeInfo>(
+      { command: GET_SUBTYPE_INFO_REQUEST_ID },
+      GET_SUBTYPE_INFO_RESPONSE,
+    );
   }
 
   // ------------------------------------------- Grammar -------------------------------------------
@@ -325,20 +327,23 @@ export class V1_LSPEngine implements V1_GraphManagerEngine {
     options?: ExecutionOptions,
   ): Promise<Map<string, string>> {
     const result = new Map<string, string>();
-    postMessage({
-      command: EXECUTE_QUERY_COMMAND_ID,
-      msg: ExecuteQueryInput.serialization.toJson({
-        lambda: input.function,
-        mapping: input.mapping,
-        runtime: input.runtime,
-        context: input.context,
-        parameterValues: input.parameterValues,
-      }),
-    });
-    const response = await this.waitForMessage<LegendExecutionResult[]>(
+    const response = await this.postAndWaitForMessage<LegendExecutionResult[]>(
+      {
+        command: EXECUTE_QUERY_COMMAND_ID,
+        msg: ExecuteQueryInput.serialization.toJson({
+          lambda: input.function,
+          mapping: input.mapping,
+          runtime: input.runtime,
+          context: input.context,
+          parameterValues: input.parameterValues,
+        }),
+      },
       EXECUTE_QUERY_RESPONSE,
     );
-    result.set(V1_EXECUTION_RESULT, JSON.parse(guaranteeNonNullable(response?.[0]?.message)));
+    result.set(
+      V1_EXECUTION_RESULT,
+      JSON.parse(guaranteeNonNullable(response?.[0]?.message)),
+    );
     return result;
   }
 
@@ -381,17 +386,17 @@ export class V1_LSPEngine implements V1_GraphManagerEngine {
   async generateExecutionPlan(
     input: V1_ExecuteInput,
   ): Promise<PlainObject<V1_ExecutionPlan>> {
-    postMessage({
-      command: GENERATE_EXECUTION_PLAN_COMMAND_ID,
-      msg: ExecuteQueryInput.serialization.toJson({
-        lambda: input.function,
-        mapping: input.mapping,
-        runtime: input.runtime,
-        context: input.context,
-        parameterValues: input.parameterValues,
-      }),
-    });
-    const response = await this.waitForMessage<LegendExecutionResult[]>(
+    const response = await this.postAndWaitForMessage<LegendExecutionResult[]>(
+      {
+        command: GENERATE_EXECUTION_PLAN_COMMAND_ID,
+        msg: ExecuteQueryInput.serialization.toJson({
+          lambda: input.function,
+          mapping: input.mapping,
+          runtime: input.runtime,
+          context: input.context,
+          parameterValues: input.parameterValues,
+        }),
+      },
       GENERATE_EXECUTION_PLAN_RESPONSE,
     );
     return JSON.parse(guaranteeNonNullable(response?.[0]?.message));
@@ -400,17 +405,17 @@ export class V1_LSPEngine implements V1_GraphManagerEngine {
   async debugExecutionPlanGeneration(
     input: V1_ExecuteInput,
   ): Promise<{ plan: PlainObject<V1_ExecutionPlan>; debug: string[] }> {
-    postMessage({
-      command: DEBUG_GENERATE_EXECUTION_PLAN_COMMAND_ID,
-      msg: ExecuteQueryInput.serialization.toJson({
-        lambda: input.function,
-        mapping: input.mapping,
-        runtime: input.runtime,
-        context: input.context,
-        parameterValues: input.parameterValues,
-      }),
-    });
-    const response = await this.waitForMessage<LegendExecutionResult[]>(
+    const response = await this.postAndWaitForMessage<LegendExecutionResult[]>(
+      {
+        command: DEBUG_GENERATE_EXECUTION_PLAN_COMMAND_ID,
+        msg: ExecuteQueryInput.serialization.toJson({
+          lambda: input.function,
+          mapping: input.mapping,
+          runtime: input.runtime,
+          context: input.context,
+          parameterValues: input.parameterValues,
+        }),
+      },
       DEBUG_GENERATE_EXECUTION_PLAN_RESPONSE,
     );
     return JSON.parse(guaranteeNonNullable(response?.[0]?.message));
@@ -574,11 +579,11 @@ export class V1_LSPEngine implements V1_GraphManagerEngine {
   async analyzeMappingModelCoverage(
     input: V1_MappingModelCoverageAnalysisInput,
   ): Promise<V1_MappingModelCoverageAnalysisResult> {
-    postMessage({
-      command: ANALYZE_MAPPING_MODEL_COVERAGE_COMMAND_ID,
-      msg: input,
-    });
-    const response = await this.waitForMessage<LegendExecutionResult[]>(
+    const response = await this.postAndWaitForMessage<LegendExecutionResult[]>(
+      {
+        command: ANALYZE_MAPPING_MODEL_COVERAGE_COMMAND_ID,
+        msg: V1_MappingModelCoverageAnalysisInput.serialization.toJson(input),
+      },
       ANALYZE_MAPPING_MODEL_COVERAGE_RESPONSE,
     );
     return deserialize(
