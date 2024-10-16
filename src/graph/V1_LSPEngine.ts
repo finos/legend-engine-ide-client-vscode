@@ -74,17 +74,22 @@ import {
   type V1_TextCompilationResult,
   type V1_ValueSpecification,
   assertErrorThrown,
+  deserializeMap,
   guaranteeNonNullable,
   isLossSafeNumber,
   parseLosslessJSON,
   returnUndefOnError,
   TEMPORARY__AbstractEngineConfig,
   V1_EXECUTION_RESULT,
+  V1_GraphTransformerContextBuilder,
   V1_LambdaReturnTypeInput,
   V1_LambdaReturnTypeResult,
   V1_MappingModelCoverageAnalysisInput,
   V1_MappingModelCoverageAnalysisResult,
+  V1_RenderStyle,
   V1_serializeExecutionResult,
+  V1_serializeRawValueSpecification,
+  V1_transformRawLambda,
 } from '@finos/legend-vscode-extension-dependencies';
 import { deserialize } from 'serializr';
 import { postMessage } from '../utils/VsCodeUtils';
@@ -105,6 +110,10 @@ import {
   GET_SUBTYPE_INFO_RESPONSE,
   GRAMMAR_TO_JSON_LAMBDA_COMMAND_ID,
   GRAMMAR_TO_JSON_LAMBDA_RESPONSE,
+  JSON_TO_GRAMMAR_LAMBDA_BATCH_COMMAND_ID,
+  JSON_TO_GRAMMAR_LAMBDA_BATCH_RESPONSE,
+  JSON_TO_GRAMMAR_LAMBDA_COMMAND_ID,
+  JSON_TO_GRAMMAR_LAMBDA_RESPONSE,
 } from '../utils/Const';
 import { LegendExecutionResult } from '../results/LegendExecutionResult';
 import { ExecuteQueryInput } from '../model/ExecuteQueryInput';
@@ -182,7 +191,33 @@ export class V1_LSPEngine implements V1_GraphManagerEngine {
     pretty: boolean,
     plugins: PureProtocolProcessorPlugin[],
   ): Promise<Map<string, string>> {
-    throw new Error('transformLambdasToCode not implemented');
+    const lambdas: Record<string, PlainObject<V1_RawLambda>> = {};
+    input.forEach((inputLambda, key) => {
+      lambdas[key] = V1_serializeRawValueSpecification(
+        V1_transformRawLambda(
+          inputLambda,
+          new V1_GraphTransformerContextBuilder(plugins).build(),
+        ),
+      );
+    });
+    const response = await this.postAndWaitForMessage<LegendExecutionResult[]>(
+      {
+        command: JSON_TO_GRAMMAR_LAMBDA_BATCH_COMMAND_ID,
+        msg: {
+          lambdas,
+          renderStyle: pretty ? V1_RenderStyle.PRETTY : V1_RenderStyle.STANDARD,
+        },
+      },
+      JSON_TO_GRAMMAR_LAMBDA_BATCH_RESPONSE,
+    );
+    const result = deserializeMap(
+      JSON.parse(guaranteeNonNullable(response?.[0]?.message)) as Record<
+        string,
+        string
+      >,
+      (v) => v,
+    );
+    return result;
   }
 
   async transformValueSpecsToCode(
@@ -216,7 +251,22 @@ export class V1_LSPEngine implements V1_GraphManagerEngine {
     pretty: boolean,
     plugins: PureProtocolProcessorPlugin[],
   ): Promise<string> {
-    throw new Error('transformLambdaToCode not implemented');
+    const response = await this.postAndWaitForMessage<LegendExecutionResult[]>(
+      {
+        command: JSON_TO_GRAMMAR_LAMBDA_COMMAND_ID,
+        msg: {
+          lambda: V1_serializeRawValueSpecification(
+            V1_transformRawLambda(
+              lambda,
+              new V1_GraphTransformerContextBuilder(plugins).build(),
+            ),
+          ),
+          renderStyle: pretty ? V1_RenderStyle.PRETTY : V1_RenderStyle.STANDARD,
+        },
+      },
+      JSON_TO_GRAMMAR_LAMBDA_RESPONSE,
+    );
+    return guaranteeNonNullable(response?.[0]?.message);
   }
 
   async prettyLambdaContent(lambda: string): Promise<string> {
@@ -231,7 +281,9 @@ export class V1_LSPEngine implements V1_GraphManagerEngine {
     },
   ): Promise<V1_RawLambda> {
     try {
-      const response = await this.postAndWaitForMessage<LegendExecutionResult[]>(
+      const response = await this.postAndWaitForMessage<
+        LegendExecutionResult[]
+      >(
         {
           command: GRAMMAR_TO_JSON_LAMBDA_COMMAND_ID,
           msg: {

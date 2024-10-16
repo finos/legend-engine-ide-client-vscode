@@ -39,6 +39,10 @@ import {
   GET_SUBTYPE_INFO_RESPONSE,
   GRAMMAR_TO_JSON_LAMBDA_COMMAND_ID,
   GRAMMAR_TO_JSON_LAMBDA_RESPONSE,
+  JSON_TO_GRAMMAR_LAMBDA_BATCH_COMMAND_ID,
+  JSON_TO_GRAMMAR_LAMBDA_BATCH_RESPONSE,
+  JSON_TO_GRAMMAR_LAMBDA_COMMAND_ID,
+  JSON_TO_GRAMMAR_LAMBDA_RESPONSE,
   QUERY_BUILDER_CONFIG_ERROR,
   WRITE_ENTITY,
 } from '../utils/Const';
@@ -214,6 +218,34 @@ export const renderServiceQueryEditorWebView = (
         );
         webview.postMessage({
           command: GRAMMAR_TO_JSON_LAMBDA_RESPONSE,
+          result,
+        });
+        break;
+      }
+      case JSON_TO_GRAMMAR_LAMBDA_COMMAND_ID: {
+        const { lambda, renderStyle } = message.msg;
+        const result = await client.jsonToGrammar_lambda(
+          servicePath,
+          serviceId,
+          lambda,
+          renderStyle,
+        );
+        webview.postMessage({
+          command: JSON_TO_GRAMMAR_LAMBDA_RESPONSE,
+          result,
+        });
+        break;
+      }
+      case JSON_TO_GRAMMAR_LAMBDA_BATCH_COMMAND_ID: {
+        const { lambdas, renderStyle } = message.msg;
+        const result = await client.jsonToGrammar_lambda_batch(
+          servicePath,
+          serviceId,
+          lambdas,
+          renderStyle,
+        );
+        webview.postMessage({
+          command: JSON_TO_GRAMMAR_LAMBDA_BATCH_RESPONSE,
           result,
         });
         break;
