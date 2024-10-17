@@ -79,7 +79,7 @@ export const LegendVSCodeApplication = (props: {
     applicationStore && (
       <ApplicationStoreProvider store={applicationStore}>
         <BrowserEnvironmentProvider baseUrl="/">
-          <ApplicationFrameworkProvider simple={true}>
+          <ApplicationFrameworkProvider>
             {children}
           </ApplicationFrameworkProvider>
         </BrowserEnvironmentProvider>
