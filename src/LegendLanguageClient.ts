@@ -46,7 +46,7 @@ import type { LegendTest } from './model/LegendTest';
 import type { ExecuteTestRequest } from './model/ExecuteTestRequest';
 import type { LegendTestExecutionResult } from './model/LegendTestExecutionResult';
 import { LegendEntity } from './model/LegendEntity';
-import {
+import type {
   V1_ParameterValue,
   V1_RawExecutionContext,
   V1_RawLambda,
