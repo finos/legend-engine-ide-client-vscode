@@ -81,11 +81,13 @@ import {
   parseLosslessJSON,
   returnUndefOnError,
   TEMPORARY__AbstractEngineConfig,
+  V1_buildParserError,
   V1_EXECUTION_RESULT,
   V1_GraphTransformerContextBuilder,
   V1_LambdaReturnTypeInput,
   V1_MappingModelCoverageAnalysisInput,
   V1_MappingModelCoverageAnalysisResult,
+  V1_ParserError,
   V1_RenderStyle,
   V1_serializeExecutionResult,
   V1_serializeRawValueSpecification,
@@ -117,6 +119,8 @@ import {
 } from '../utils/Const';
 import { type LegendExecutionResult } from '../results/LegendExecutionResult';
 import { ExecuteQueryInput } from '../model/ExecuteQueryInput';
+import { LegendExecutionResultType } from '../results/LegendExecutionResultType';
+import { textLocationToSourceInformation } from '../utils/SourceInformationUtils';
 
 class V1_LSPEngine_Config extends TEMPORARY__AbstractEngineConfig {}
 
@@ -294,6 +298,17 @@ export class V1_LSPEngine implements V1_GraphManagerEngine {
         },
         GRAMMAR_TO_JSON_LAMBDA_RESPONSE,
       );
+      if (response?.[0]?.type === LegendExecutionResultType.ERROR) {
+        const sourceInformation = response[0].location
+          ? textLocationToSourceInformation(response[0].location)
+          : undefined;
+        throw V1_buildParserError(
+          V1_ParserError.serialization.fromJson({
+            message: response[0].message,
+            sourceInformation,
+          }),
+        );
+      }
       return JSON.parse(guaranteeNonNullable(response?.[0]?.message));
     } catch (error) {
       assertErrorThrown(error);
