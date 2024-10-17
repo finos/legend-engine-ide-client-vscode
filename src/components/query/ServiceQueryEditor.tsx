@@ -53,7 +53,6 @@ export const ServiceQueryEditor: React.FC<{
     LegendVSCodeApplicationConfig,
     LegendVSCodePluginManager
   >();
-  const [initialized, setInitialized] = useState(false);
   const [queryBuilderState, setQueryBuilderState] =
     useState<QueryBuilderState | null>(null);
   const [entities, setEntities] = useState<Entity[]>([]);
@@ -129,7 +128,6 @@ export const ServiceQueryEditor: React.FC<{
           newQueryBuilderState.explorerState.analyzeMappingModelCoverage(),
         ).catch(applicationStore.alertUnhandledError);
         setQueryBuilderState(newQueryBuilderState);
-        setInitialized(true);
       };
 
     const updateExistingQuery = (): void => {
@@ -161,7 +159,7 @@ export const ServiceQueryEditor: React.FC<{
     };
     if (entities.length && serviceId && applicationStore) {
       try {
-        if (!initialized) {
+        if (queryBuilderState === null) {
           buildGraphManagerStateAndInitializeQuery();
         } else {
           updateExistingQuery();
@@ -176,7 +174,7 @@ export const ServiceQueryEditor: React.FC<{
     } else {
       setIsLoading(false);
     }
-  }, [serviceId, applicationStore, entities, initialized]);
+  }, [serviceId, applicationStore, entities, queryBuilderState]);
 
   return (
     <>
