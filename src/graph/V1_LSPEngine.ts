@@ -81,8 +81,12 @@ import {
   parseLosslessJSON,
   returnUndefOnError,
   TEMPORARY__AbstractEngineConfig,
+  V1_buildCompilationError,
+  V1_buildExecutionError,
   V1_buildParserError,
+  V1_CompilationError,
   V1_EXECUTION_RESULT,
+  V1_ExecutionError,
   V1_GraphTransformerContextBuilder,
   V1_LambdaReturnTypeInput,
   V1_MappingModelCoverageAnalysisInput,
@@ -373,6 +377,17 @@ export class V1_LSPEngine implements V1_GraphManagerEngine {
         },
         GET_LAMBDA_RETURN_TYPE_RESPONSE,
       );
+      if (response?.[0]?.type === LegendExecutionResultType.ERROR) {
+        const sourceInformation = response[0].location
+          ? textLocationToSourceInformation(response[0].location)
+          : undefined;
+        throw V1_buildCompilationError(
+          V1_CompilationError.serialization.fromJson({
+            message: response[0].message,
+            sourceInformation,
+          }),
+        );
+      }
       return (
         JSON.parse(
           guaranteeNonNullable(response?.[0]?.message),
@@ -449,6 +464,13 @@ export class V1_LSPEngine implements V1_GraphManagerEngine {
       },
       EXECUTE_QUERY_RESPONSE,
     );
+    if (response?.[0]?.type === LegendExecutionResultType.ERROR) {
+      throw V1_buildExecutionError(
+        V1_ExecutionError.serialization.fromJson({
+          message: response[0].message,
+        }),
+      );
+    }
     result.set(
       V1_EXECUTION_RESULT,
       JSON.parse(guaranteeNonNullable(response?.[0]?.message)),
