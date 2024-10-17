@@ -52,13 +52,17 @@ export const ONE_ENTITY_PER_FILE_COMMAND_ID =
   'legend.refactor.oneEntityPerFile';
 
 // LSP Commands
-export const ANALYZE_MAPPING_MODEL_COVERAGE_COMMAND_ID = 'legend.mapping.analyzeMappingModelCoverage';
+export const ANALYZE_MAPPING_MODEL_COVERAGE_COMMAND_ID =
+  'legend.mapping.analyzeMappingModelCoverage';
 export const EXECUTE_QUERY_COMMAND_ID = 'legend.query.execute';
-export const GENERATE_EXECUTION_PLAN_COMMAND_ID = 'legend.executionPlan.generate';
-export const DEBUG_GENERATE_EXECUTION_PLAN_COMMAND_ID = 'legend.executionPlan.generate.debug';
+export const GENERATE_EXECUTION_PLAN_COMMAND_ID =
+  'legend.executionPlan.generate';
+export const DEBUG_GENERATE_EXECUTION_PLAN_COMMAND_ID =
+  'legend.executionPlan.generate.debug';
 export const GRAMMAR_TO_JSON_LAMBDA_COMMAND_ID = 'legend.grammarToJson.lambda';
 export const JSON_TO_GRAMMAR_LAMBDA_COMMAND_ID = 'legend.jsonToGrammar.lambda';
-export const JSON_TO_GRAMMAR_LAMBDA_BATCH_COMMAND_ID = 'legend.jsonToGrammar.lambda.batch';
+export const JSON_TO_GRAMMAR_LAMBDA_BATCH_COMMAND_ID =
+  'legend.jsonToGrammar.lambda.batch';
 export const GET_LAMBDA_RETURN_TYPE_COMMAND_ID = 'legend.lambda.returnType';
 
 // LSP Request IDs
