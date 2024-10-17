@@ -51,6 +51,7 @@ import {
   type V1_GenerationOutput,
   type V1_GrammarParserBatchInputEntry,
   type V1_GraphManagerEngine,
+  type V1_LambdaReturnTypeResult,
   type V1_LightQuery,
   type V1_PureModelContext,
   type V1_PureModelContextData,
@@ -83,7 +84,6 @@ import {
   V1_EXECUTION_RESULT,
   V1_GraphTransformerContextBuilder,
   V1_LambdaReturnTypeInput,
-  V1_LambdaReturnTypeResult,
   V1_MappingModelCoverageAnalysisInput,
   V1_MappingModelCoverageAnalysisResult,
   V1_RenderStyle,
@@ -115,7 +115,7 @@ import {
   JSON_TO_GRAMMAR_LAMBDA_COMMAND_ID,
   JSON_TO_GRAMMAR_LAMBDA_RESPONSE,
 } from '../utils/Const';
-import { LegendExecutionResult } from '../results/LegendExecutionResult';
+import { type LegendExecutionResult } from '../results/LegendExecutionResult';
 import { ExecuteQueryInput } from '../model/ExecuteQueryInput';
 
 class V1_LSPEngine_Config extends TEMPORARY__AbstractEngineConfig {}
@@ -140,7 +140,7 @@ export class V1_LSPEngine implements V1_GraphManagerEngine {
     return new Promise((resolve) => {
       const handleMessage = (
         event: MessageEvent<{ result: T; command: string }>,
-      ) => {
+      ): void => {
         if (event.data.command === responseCommandId) {
           window.removeEventListener('message', handleMessage);
           resolve(event.data.result);

@@ -53,6 +53,7 @@ export const ServiceQueryEditor: React.FC<{
     LegendVSCodeApplicationConfig,
     LegendVSCodePluginManager
   >();
+  const [initialized, setInitialized] = useState(false);
   const [queryBuilderState, setQueryBuilderState] =
     useState<QueryBuilderState | null>(null);
   const [entities, setEntities] = useState<Entity[]>([]);
@@ -66,9 +67,10 @@ export const ServiceQueryEditor: React.FC<{
     });
   }, [serviceId]);
 
-  window.addEventListener(
-    'message',
-    (event: MessageEvent<{ result: Entity[]; command: string }>) => {
+  useEffect(() => {
+    const handleMessage = (
+      event: MessageEvent<{ result: Entity[]; command: string }>,
+    ): void => {
       const message = event.data;
       switch (message.command) {
         case GET_PROJECT_ENTITIES_RESPONSE: {
@@ -86,8 +88,12 @@ export const ServiceQueryEditor: React.FC<{
         default:
           break;
       }
-    },
-  );
+    };
+    window.addEventListener('message', handleMessage);
+    return () => {
+      window.removeEventListener('message', handleMessage);
+    };
+  }, []);
 
   useEffect(() => {
     const buildGraphManagerStateAndInitializeQuery =
@@ -123,6 +129,7 @@ export const ServiceQueryEditor: React.FC<{
           newQueryBuilderState.explorerState.analyzeMappingModelCoverage(),
         ).catch(applicationStore.alertUnhandledError);
         setQueryBuilderState(newQueryBuilderState);
+        setInitialized(true);
       };
 
     const updateExistingQuery = (): void => {
@@ -154,7 +161,7 @@ export const ServiceQueryEditor: React.FC<{
     };
     if (entities.length && serviceId && applicationStore) {
       try {
-        if (queryBuilderState === null) {
+        if (!initialized) {
           buildGraphManagerStateAndInitializeQuery();
         } else {
           updateExistingQuery();
@@ -169,7 +176,7 @@ export const ServiceQueryEditor: React.FC<{
     } else {
       setIsLoading(false);
     }
-  }, [serviceId, applicationStore, entities, queryBuilderState]);
+  }, [serviceId, applicationStore, entities, initialized]);
 
   return (
     <>

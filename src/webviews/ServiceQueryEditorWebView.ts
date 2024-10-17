@@ -150,7 +150,7 @@ export const renderServiceQueryEditorWebView = (
         break;
       }
       case EXECUTE_QUERY_COMMAND_ID: {
-        const { lambda, mapping, runtime, context, parameterValues } =
+        const { lambda, mapping, runtime, context: executionContext, parameterValues } =
           message.msg;
         const result = await client.executeQuery(
           servicePath,
@@ -158,7 +158,7 @@ export const renderServiceQueryEditorWebView = (
           lambda,
           mapping,
           runtime,
-          context,
+          executionContext,
           parameterValues ?? [],
         );
         webview.postMessage({
@@ -168,7 +168,7 @@ export const renderServiceQueryEditorWebView = (
         break;
       }
       case GENERATE_EXECUTION_PLAN_COMMAND_ID: {
-        const { lambda, mapping, runtime, context, parameterValues } =
+        const { lambda, mapping, runtime, context: executionContext, parameterValues } =
           message.msg;
         const result = await client.generateExecutionPlan(
           servicePath,
@@ -176,7 +176,7 @@ export const renderServiceQueryEditorWebView = (
           lambda,
           mapping,
           runtime,
-          context,
+          executionContext,
           parameterValues ?? [],
         );
         webview.postMessage({
@@ -186,7 +186,7 @@ export const renderServiceQueryEditorWebView = (
         break;
       }
       case DEBUG_GENERATE_EXECUTION_PLAN_COMMAND_ID: {
-        const { lambda, mapping, runtime, context, parameterValues } =
+        const { lambda, mapping, runtime, context: executionContext, parameterValues } =
           message.msg;
         const result = await client.debugGenerateExecutionPlan(
           servicePath,
@@ -194,7 +194,7 @@ export const renderServiceQueryEditorWebView = (
           lambda,
           mapping,
           runtime,
-          context,
+          executionContext,
           parameterValues ?? [],
         );
         webview.postMessage({
