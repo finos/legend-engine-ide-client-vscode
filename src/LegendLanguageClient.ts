@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { commands, type CancellationToken, type Uri } from 'vscode';
+import { commands, Uri, window, workspace, type CancellationToken } from 'vscode';
 import type { FunctionTDSRequest } from './model/FunctionTDSRequest';
 import type { LegendExecutionResult } from './results/LegendExecutionResult';
 import {
@@ -47,12 +47,14 @@ import type { ExecuteTestRequest } from './model/ExecuteTestRequest';
 import type { LegendTestExecutionResult } from './model/LegendTestExecutionResult';
 import { LegendEntity } from './model/LegendEntity';
 import type {
+  EXECUTION_SERIALIZATION_FORMAT,
   V1_ParameterValue,
   V1_RawExecutionContext,
   V1_RawLambda,
   V1_RenderStyle,
   V1_Runtime,
 } from '@finos/legend-vscode-extension-dependencies';
+import { LegendExecutionResultType } from './results/LegendExecutionResultType';
 
 export class LegendEntitiesRequest {
   private textDocuments!: TextDocumentIdentifier[];
@@ -199,6 +201,7 @@ export class LegendLanguageClient extends LanguageClient {
     runtime: V1_Runtime | undefined,
     context: V1_RawExecutionContext,
     parameterValues: V1_ParameterValue[],
+    serializationFormat?: EXECUTION_SERIALIZATION_FORMAT | undefined,
   ): Promise<string> {
     return commands.executeCommand(
       LEGEND_COMMAND,
@@ -211,9 +214,55 @@ export class LegendLanguageClient extends LanguageClient {
         mapping,
         runtime: JSON.stringify(runtime),
         context: JSON.stringify(context),
+        serializationFormat,
       },
       parameterValues,
     );
+  }
+
+  async exportData(
+    serviceFilePath: string,
+    serviceId: string,
+    lambda: V1_RawLambda,
+    mapping: string | undefined,
+    runtime: V1_Runtime | undefined,
+    context: V1_RawExecutionContext,
+    parameterValues: V1_ParameterValue[],
+    serializationFormat?: EXECUTION_SERIALIZATION_FORMAT | undefined,
+  ): Promise<string> {
+    const response = await commands.executeCommand(
+      LEGEND_COMMAND,
+      serviceFilePath,
+      0,
+      serviceId,
+      EXECUTE_QUERY_COMMAND_ID,
+      {
+        lambda: JSON.stringify(lambda),
+        mapping,
+        runtime: JSON.stringify(runtime),
+        context: JSON.stringify(context),
+        serializationFormat,
+      },
+      parameterValues,
+    ) as LegendExecutionResult[];
+    if (!response[0] || response[0].type === LegendExecutionResultType.ERROR) {
+      return 'ERROR';
+    }
+    const content = response[0].message;
+    const fileName = 'result.csv';
+    const uri = await window.showSaveDialog({
+      defaultUri: Uri.file(fileName),
+      saveLabel: 'Save',
+    });
+
+    if (uri) {
+      await workspace.fs.writeFile(uri, Buffer.from(content, 'utf8'));
+      window.showInformationMessage(`File ${fileName} saved successfully!`);
+    } else {
+      window.showErrorMessage('File save cancelled');
+    }
+
+    return 'SUCCESS';
   }
 
   async generateExecutionPlan(

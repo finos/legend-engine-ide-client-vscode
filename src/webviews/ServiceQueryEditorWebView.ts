@@ -27,6 +27,8 @@ import {
   DEBUG_GENERATE_EXECUTION_PLAN_RESPONSE,
   EXECUTE_QUERY_COMMAND_ID,
   EXECUTE_QUERY_RESPONSE,
+  EXPORT_DATA_COMMAND_ID,
+  EXPORT_DATA_RESPONSE,
   GENERATE_EXECUTION_PLAN_COMMAND_ID,
   GENERATE_EXECUTION_PLAN_RESPONSE,
   GET_CLASSIFIER_PATH_MAP_REQUEST_ID,
@@ -150,7 +152,7 @@ export const renderServiceQueryEditorWebView = (
         break;
       }
       case EXECUTE_QUERY_COMMAND_ID: {
-        const { lambda, mapping, runtime, context: executionContext, parameterValues } =
+        const { lambda, mapping, runtime, context: executionContext, parameterValues, serializationFormat } =
           message.msg;
         const result = await client.executeQuery(
           servicePath,
@@ -160,9 +162,29 @@ export const renderServiceQueryEditorWebView = (
           runtime,
           executionContext,
           parameterValues ?? [],
+          serializationFormat,
         );
         webview.postMessage({
           command: EXECUTE_QUERY_RESPONSE,
+          result,
+        });
+        break;
+      }
+      case EXPORT_DATA_COMMAND_ID: {
+        const { lambda, mapping, runtime, context: executionContext, parameterValues, serializationFormat } =
+          message.msg;
+        const result = await client.exportData(
+          servicePath,
+          serviceId,
+          lambda,
+          mapping,
+          runtime,
+          executionContext,
+          parameterValues ?? [],
+          serializationFormat,
+        );
+        webview.postMessage({
+          command: EXPORT_DATA_RESPONSE,
           result,
         });
         break;

@@ -8,8 +8,9 @@ import {
   V1_rawLambdaModelSchema,
   type V1_Runtime,
   V1_serializeRuntime,
-  V1_RawExecutionContext,
+  type V1_RawExecutionContext,
   V1_rawBaseExecutionContextModelSchema,
+  type EXECUTION_SERIALIZATION_FORMAT,
 } from '@finos/legend-vscode-extension-dependencies';
 import {
   createModelSchema,
@@ -25,6 +26,7 @@ export class ExecuteQueryInput {
   runtime: V1_Runtime | undefined;
   context!: V1_RawExecutionContext;
   parameterValues: V1_ParameterValue[] = [];
+  serializationFormat: EXECUTION_SERIALIZATION_FORMAT | undefined;
 
   static readonly serialization = new SerializationFactory(
     createModelSchema(ExecuteQueryInput, {
@@ -36,6 +38,7 @@ export class ExecuteQueryInput {
       ),
       context: usingModelSchema(V1_rawBaseExecutionContextModelSchema),
       parameterValues: customListWithSchema(V1_parameterValueModelSchema),
+      serializationFormat: optional(primitive()),
     }),
   );
 }
