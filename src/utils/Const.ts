@@ -83,6 +83,9 @@ export const GET_PROJECT_ENTITIES_RESPONSE = 'getProjectEntitiesResponse';
 export const DIAGRAM_DROP_CLASS_ERROR = 'diagramDropClassError';
 export const WRITE_ENTITY = 'writeEntity';
 export const QUERY_BUILDER_CONFIG_ERROR = 'queryBuilderConfigError';
+export const EXPORT_DATA_COMMAND_ID = 'legend.query.exportData';
+
+// Response events
 export const GET_CLASSIFIER_PATH_MAP_RESPONSE = `${GET_CLASSIFIER_PATH_MAP_REQUEST_ID}/response`;
 export const GET_SUBTYPE_INFO_RESPONSE = `${GET_SUBTYPE_INFO_REQUEST_ID}/response`;
 export const ANALYZE_MAPPING_MODEL_COVERAGE_RESPONSE = `${ANALYZE_MAPPING_MODEL_COVERAGE_COMMAND_ID}/response`;
@@ -93,6 +96,7 @@ export const GRAMMAR_TO_JSON_LAMBDA_RESPONSE = `${GRAMMAR_TO_JSON_LAMBDA_COMMAND
 export const JSON_TO_GRAMMAR_LAMBDA_RESPONSE = `${JSON_TO_GRAMMAR_LAMBDA_COMMAND_ID}/response`;
 export const JSON_TO_GRAMMAR_LAMBDA_BATCH_RESPONSE = `${JSON_TO_GRAMMAR_LAMBDA_BATCH_COMMAND_ID}/response`;
 export const GET_LAMBDA_RETURN_TYPE_RESPONSE = `${GET_LAMBDA_RETURN_TYPE_COMMAND_ID}/response`;
+export const EXPORT_DATA_RESPONSE = `${EXPORT_DATA_COMMAND_ID}/response`;
 
 // Context variables
 export const SHOW_EXECUTION_RESULTS = 'showExecutionResults';

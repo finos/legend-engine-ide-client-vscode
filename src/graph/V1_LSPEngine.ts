@@ -106,6 +106,8 @@ import {
   DEBUG_GENERATE_EXECUTION_PLAN_RESPONSE,
   EXECUTE_QUERY_COMMAND_ID,
   EXECUTE_QUERY_RESPONSE,
+  EXPORT_DATA_COMMAND_ID,
+  EXPORT_DATA_RESPONSE,
   GENERATE_EXECUTION_PLAN_COMMAND_ID,
   GENERATE_EXECUTION_PLAN_RESPONSE,
   GET_CLASSIFIER_PATH_MAP_REQUEST_ID,
@@ -443,7 +445,36 @@ export class V1_LSPEngine implements V1_GraphManagerEngine {
     input: V1_ExecuteInput,
     options?: ExecutionOptions,
   ): Promise<Response> {
-    throw new Error('exportData not implemented');
+    try {
+      const response = guaranteeNonNullable(
+        await this.postAndWaitForMessage<string>(
+          {
+            command: EXPORT_DATA_COMMAND_ID,
+            msg: ExecuteQueryInput.serialization.toJson({
+              lambda: input.function,
+              mapping: input.mapping,
+              runtime: input.runtime,
+              context: input.context,
+              parameterValues: input.parameterValues,
+              serializationFormat: options?.serializationFormat,
+            }),
+          },
+          EXPORT_DATA_RESPONSE,
+        ),
+      );
+      console.log('response:', response);
+      return new Response();
+      // if (response?.[0]?.type === LegendExecutionResultType.ERROR) {
+      //   throw V1_buildExecutionError(
+      //     V1_ExecutionError.serialization.fromJson({
+      //       message: response[0].message,
+      //     }),
+      //   );
+      // }
+    } catch (error) {
+      assertErrorThrown(error);
+      throw error;
+    }
   }
 
   async runQueryAndReturnMap(
@@ -460,6 +491,7 @@ export class V1_LSPEngine implements V1_GraphManagerEngine {
           runtime: input.runtime,
           context: input.context,
           parameterValues: input.parameterValues,
+          serializationFormat: options?.serializationFormat,
         }),
       },
       EXECUTE_QUERY_RESPONSE,
