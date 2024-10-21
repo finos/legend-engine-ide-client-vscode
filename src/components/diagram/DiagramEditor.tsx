@@ -15,9 +15,9 @@
  */
 import {
   getDiagram,
-  getPureGraph,
   type Entity,
   LegendStyleProvider,
+  useApplicationStore,
 } from '@finos/legend-vscode-extension-dependencies';
 import { useRef, useState, useEffect } from 'react';
 import {
@@ -31,9 +31,16 @@ import type { DiagramEditorState } from '../../stores/DiagramEditorState';
 import { DiagramEditorHeader } from './DiagramEditorHeader';
 import { DiagramEditorToolPanel } from './DiagramEditorToolPanel';
 import { DiagramEditorCanvas } from './DiagramEditorCanvas';
+import { buildGraphManagerStateFromEntities } from '../../utils/GraphUtils';
+import { type LegendVSCodeApplicationConfig } from '../../application/LegendVSCodeApplicationConfig';
+import { type LegendVSCodePluginManager } from '../../application/LegendVSCodePluginManager';
 
 export const DiagramEditor = observer(
   ({ diagramEditorState }: { diagramEditorState: DiagramEditorState }) => {
+    const applicationStore = useApplicationStore<
+      LegendVSCodeApplicationConfig,
+      LegendVSCodePluginManager
+    >();
     const diagramCanvasRef = useRef<HTMLDivElement>(null);
     const { diagramId } = diagramEditorState;
     const [entities, setEntities] = useState<Entity[]>([]);
@@ -59,18 +66,18 @@ export const DiagramEditor = observer(
 
     useEffect(() => {
       if (entities.length && diagramId) {
-        getPureGraph(entities, [])
-          .then((pureModel) => {
-            const diagram = getDiagram(diagramId, pureModel);
+        buildGraphManagerStateFromEntities(entities, applicationStore)
+          .then((graphManagerState) => {
+            const diagram = getDiagram(diagramId, graphManagerState.graph);
             diagramEditorState.setDiagram(diagram);
-            diagramEditorState.setGraph(pureModel);
+            diagramEditorState.setGraph(graphManagerState.graph);
             setError(null);
           })
           .catch((e) => {
             setError(e.message);
           });
       }
-    }, [entities, diagramId, diagramEditorState]);
+    }, [entities, diagramId, diagramEditorState, applicationStore]);
 
     return (
       <LegendStyleProvider>
