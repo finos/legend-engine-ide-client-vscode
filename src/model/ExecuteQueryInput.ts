@@ -38,7 +38,10 @@ export class ExecuteQueryInput {
       ),
       context: usingModelSchema(V1_rawBaseExecutionContextModelSchema),
       parameterValues: customListWithSchema(V1_parameterValueModelSchema),
-      serializationFormat: optional(primitive()),
+      serializationFormat: custom(
+        (val) => val ? val : undefined,
+        () => SKIP,
+      ),
     }),
   );
 }
