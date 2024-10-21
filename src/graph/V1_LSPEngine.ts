@@ -74,7 +74,6 @@ import {
   type V1_TestDataGenerationResult,
   type V1_TextCompilationResult,
   type V1_ValueSpecification,
-  assertErrorThrown,
   deserializeMap,
   guaranteeNonNullable,
   isLossSafeNumber,
@@ -290,36 +289,29 @@ export class V1_LSPEngine implements V1_GraphManagerEngine {
       pruneSourceInformation?: boolean;
     },
   ): Promise<V1_RawLambda> {
-    try {
-      const response = await this.postAndWaitForMessage<
-        LegendExecutionResult[]
-      >(
-        {
-          command: GRAMMAR_TO_JSON_LAMBDA_COMMAND_ID,
-          msg: {
-            code,
-            lambdaId: lambdaId ?? '',
-            options,
-          },
+    const response = await this.postAndWaitForMessage<LegendExecutionResult[]>(
+      {
+        command: GRAMMAR_TO_JSON_LAMBDA_COMMAND_ID,
+        msg: {
+          code,
+          lambdaId: lambdaId ?? '',
+          options,
         },
-        GRAMMAR_TO_JSON_LAMBDA_RESPONSE,
+      },
+      GRAMMAR_TO_JSON_LAMBDA_RESPONSE,
+    );
+    if (response?.[0]?.type === LegendExecutionResultType.ERROR) {
+      const sourceInformation = response[0].location
+        ? textLocationToSourceInformation(response[0].location)
+        : undefined;
+      throw V1_buildParserError(
+        V1_ParserError.serialization.fromJson({
+          message: response[0].message,
+          sourceInformation,
+        }),
       );
-      if (response?.[0]?.type === LegendExecutionResultType.ERROR) {
-        const sourceInformation = response[0].location
-          ? textLocationToSourceInformation(response[0].location)
-          : undefined;
-        throw V1_buildParserError(
-          V1_ParserError.serialization.fromJson({
-            message: response[0].message,
-            sourceInformation,
-          }),
-        );
-      }
-      return JSON.parse(guaranteeNonNullable(response?.[0]?.message));
-    } catch (error) {
-      assertErrorThrown(error);
-      throw error;
     }
+    return JSON.parse(guaranteeNonNullable(response?.[0]?.message));
   }
 
   async transformRelationalOperationElementsToPureCode(
@@ -369,36 +361,29 @@ export class V1_LSPEngine implements V1_GraphManagerEngine {
   async getLambdaReturnTypeFromRawInput(
     rawInput: PlainObject<V1_LambdaReturnTypeInput>,
   ): Promise<string> {
-    try {
-      const response = await this.postAndWaitForMessage<
-        LegendExecutionResult[]
-      >(
-        {
-          command: GET_LAMBDA_RETURN_TYPE_COMMAND_ID,
-          msg: rawInput,
-        },
-        GET_LAMBDA_RETURN_TYPE_RESPONSE,
+    const response = await this.postAndWaitForMessage<LegendExecutionResult[]>(
+      {
+        command: GET_LAMBDA_RETURN_TYPE_COMMAND_ID,
+        msg: rawInput,
+      },
+      GET_LAMBDA_RETURN_TYPE_RESPONSE,
+    );
+    if (response?.[0]?.type === LegendExecutionResultType.ERROR) {
+      const sourceInformation = response[0].location
+        ? textLocationToSourceInformation(response[0].location)
+        : undefined;
+      throw V1_buildCompilationError(
+        V1_CompilationError.serialization.fromJson({
+          message: response[0].message,
+          sourceInformation,
+        }),
       );
-      if (response?.[0]?.type === LegendExecutionResultType.ERROR) {
-        const sourceInformation = response[0].location
-          ? textLocationToSourceInformation(response[0].location)
-          : undefined;
-        throw V1_buildCompilationError(
-          V1_CompilationError.serialization.fromJson({
-            message: response[0].message,
-            sourceInformation,
-          }),
-        );
-      }
-      return (
-        JSON.parse(
-          guaranteeNonNullable(response?.[0]?.message),
-        ) as V1_LambdaReturnTypeResult
-      ).returnType;
-    } catch (error) {
-      assertErrorThrown(error);
-      throw error;
     }
+    return (
+      JSON.parse(
+        guaranteeNonNullable(response?.[0]?.message),
+      ) as V1_LambdaReturnTypeResult
+    ).returnType;
   }
 
   async getLambdaRelationTypeFromRawInput(
@@ -422,59 +407,45 @@ export class V1_LSPEngine implements V1_GraphManagerEngine {
     executionResult: V1_ExecutionResult;
     executionTraceId?: string;
   }> {
-    try {
-      const executionResultMap = await this.runQueryAndReturnMap(
-        input,
-        options,
-      );
-      const executionResultInText =
-        executionResultMap.get(V1_EXECUTION_RESULT) ?? '';
-      const rawExecutionResult =
-        returnUndefOnError(() =>
-          this.parseExecutionResults(executionResultInText, options),
-        ) ?? executionResultInText;
-      const executionResult = V1_serializeExecutionResult(rawExecutionResult);
-      return { executionResult };
-    } catch (error) {
-      assertErrorThrown(error);
-      throw error;
-    }
+    const executionResultMap = await this.runQueryAndReturnMap(input, options);
+    const executionResultInText =
+      executionResultMap.get(V1_EXECUTION_RESULT) ?? '';
+    const rawExecutionResult =
+      returnUndefOnError(() =>
+        this.parseExecutionResults(executionResultInText, options),
+      ) ?? executionResultInText;
+    const executionResult = V1_serializeExecutionResult(rawExecutionResult);
+    return { executionResult };
   }
 
   async exportData(
     input: V1_ExecuteInput,
     options?: ExecutionOptions,
   ): Promise<Response> {
-    try {
-      const response = guaranteeNonNullable(
-        await this.postAndWaitForMessage<string>(
-          {
-            command: EXPORT_DATA_COMMAND_ID,
-            msg: ExecuteQueryInput.serialization.toJson({
-              lambda: input.function,
-              mapping: input.mapping,
-              runtime: input.runtime,
-              context: input.context,
-              parameterValues: input.parameterValues,
-              serializationFormat: options?.serializationFormat,
-            }),
-          },
-          EXPORT_DATA_RESPONSE,
-        ),
-      );
-      console.log('response:', response);
-      return new Response();
-      // if (response?.[0]?.type === LegendExecutionResultType.ERROR) {
-      //   throw V1_buildExecutionError(
-      //     V1_ExecutionError.serialization.fromJson({
-      //       message: response[0].message,
-      //     }),
-      //   );
-      // }
-    } catch (error) {
-      assertErrorThrown(error);
-      throw error;
-    }
+    const response = guaranteeNonNullable(
+      await this.postAndWaitForMessage<string>(
+        {
+          command: EXPORT_DATA_COMMAND_ID,
+          msg: ExecuteQueryInput.serialization.toJson({
+            lambda: input.function,
+            mapping: input.mapping,
+            runtime: input.runtime,
+            context: input.context,
+            parameterValues: input.parameterValues,
+            serializationFormat: options?.serializationFormat,
+          }),
+        },
+        EXPORT_DATA_RESPONSE,
+      ),
+    );
+    return new Response();
+    // if (response?.[0]?.type === LegendExecutionResultType.ERROR) {
+    //   throw V1_buildExecutionError(
+    //     V1_ExecutionError.serialization.fromJson({
+    //       message: response[0].message,
+    //     }),
+    //   );
+    // }
   }
 
   async runQueryAndReturnMap(
