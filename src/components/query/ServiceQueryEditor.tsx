@@ -99,7 +99,7 @@ export const ServiceQueryEditor: React.FC<{
             undefined,
             undefined,
             undefined,
-            undefined,
+            applicationStore.config.queryBuilderConfig,
             {
               service: service.path,
             },
