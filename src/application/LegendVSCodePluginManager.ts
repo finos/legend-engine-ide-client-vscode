@@ -15,11 +15,11 @@
  */
 
 import {
-  LegendApplicationPluginManager,
   type GraphManagerPluginManager,
   type PureGraphManagerPlugin,
   type PureGraphPlugin,
   type PureProtocolProcessorPlugin,
+  LegendApplicationPluginManager,
 } from '@finos/legend-vscode-extension-dependencies';
 import { type LegendVSCodeApplicationPlugin } from './LegendVSCodeApplicationPlugin';
 

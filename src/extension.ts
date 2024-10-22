@@ -195,7 +195,8 @@ export function createClient(context: ExtensionContext): LanguageClient {
       e.affectsConfiguration('legend.sdlc.server.url') ||
       e.affectsConfiguration('legend.extensions.other.dependencies') ||
       e.affectsConfiguration('legend.extensions.dependencies.pom') ||
-      e.affectsConfiguration('legend.language.server.vmargs')
+      e.affectsConfiguration('legend.language.server.vmargs') ||
+      e.affectsConfiguration('legend.engine.server.remoteExecution')
     ) {
       window
         .showInformationMessage(
@@ -366,6 +367,7 @@ export function registerCommands(context: ExtensionContext): void {
           workspace.getConfiguration('legend').get('engine.server.url', ''),
           workspace.getConfiguration('legend').get('studio.forms.file', ''),
           client,
+          legendConceptTreeProvider,
         );
       }
     },

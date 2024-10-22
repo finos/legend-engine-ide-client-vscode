@@ -17,25 +17,34 @@
 import { useEffect, useState } from 'react';
 import { flowResult } from 'mobx';
 import {
+  type Entity,
   type QueryBuilderState,
   CubesLoadingIndicator,
   CubesLoadingIndicatorIcon,
+  guaranteeNonNullable,
+  guaranteeType,
+  pureExecution_setFunction,
+  PureExecution,
   QueryBuilder,
   QueryBuilderActionConfig,
+  RawLambda,
   ServiceQueryBuilderState,
   useApplicationStore,
+  V1_PureExecution,
+  V1_serviceModelSchema,
 } from '@finos/legend-vscode-extension-dependencies';
 import {
   GET_PROJECT_ENTITIES,
   GET_PROJECT_ENTITIES_RESPONSE,
   LEGEND_REFRESH_QUERY_BUILDER,
 } from '../../utils/Const';
-import { type LegendEntity } from '../../model/LegendEntity';
 import { postMessage } from '../../utils/VsCodeUtils';
 import { QueryBuilderVSCodeWorkflowState } from './QueryBuilderWorkflowState';
 import { type LegendVSCodeApplicationConfig } from '../../application/LegendVSCodeApplicationConfig';
 import { type LegendVSCodePluginManager } from '../../application/LegendVSCodePluginManager';
 import { buildGraphManagerStateFromEntities } from '../../utils/GraphUtils';
+import { V1_LSPEngine } from '../../graph/V1_LSPEngine';
+import { deserialize } from 'serializr';
 
 export const ServiceQueryEditor: React.FC<{
   serviceId: string;
@@ -46,7 +55,7 @@ export const ServiceQueryEditor: React.FC<{
   >();
   const [queryBuilderState, setQueryBuilderState] =
     useState<QueryBuilderState | null>(null);
-  const [entities, setEntities] = useState<LegendEntity[]>([]);
+  const [entities, setEntities] = useState<Entity[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -57,13 +66,14 @@ export const ServiceQueryEditor: React.FC<{
     });
   }, [serviceId]);
 
-  window.addEventListener(
-    'message',
-    (event: MessageEvent<{ result: LegendEntity[]; command: string }>) => {
+  useEffect(() => {
+    const handleMessage = (
+      event: MessageEvent<{ result: Entity[]; command: string }>,
+    ): void => {
       const message = event.data;
       switch (message.command) {
         case GET_PROJECT_ENTITIES_RESPONSE: {
-          const es: LegendEntity[] = message.result;
+          const es: Entity[] = message.result;
           setEntities(es);
           break;
         }
@@ -75,53 +85,96 @@ export const ServiceQueryEditor: React.FC<{
           break;
         }
         default:
-          throw new Error(`Unsupported request ${message.command}`);
+          break;
       }
-    },
-  );
+    };
+    window.addEventListener('message', handleMessage);
+    return () => {
+      window.removeEventListener('message', handleMessage);
+    };
+  }, []);
 
   useEffect(() => {
-    if (entities.length && serviceId && applicationStore) {
-      const initializeQuery = async (): Promise<void> => {
-        try {
-          const graphManagerState = await buildGraphManagerStateFromEntities(
-            entities,
-            applicationStore,
-          );
-          const service = graphManagerState.graph.getService(serviceId);
-          const newQueryBuilderState = new ServiceQueryBuilderState(
-            applicationStore,
-            graphManagerState,
-            QueryBuilderVSCodeWorkflowState.INSTANCE,
-            QueryBuilderActionConfig.INSTANCE,
-            service,
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-            undefined,
-            {
-              service: service.path,
-            },
-          );
-          newQueryBuilderState.initializeWithQuery(service.execution.func);
-          await flowResult(
-            newQueryBuilderState.explorerState.analyzeMappingModelCoverage(),
-          ).catch(applicationStore.alertUnhandledError);
-          setQueryBuilderState(newQueryBuilderState);
-        } catch (e) {
-          if (e instanceof Error) {
-            setError(e.message);
-          }
-        } finally {
-          setIsLoading(false);
-        }
+    const buildGraphManagerStateAndInitializeQuery =
+      async (): Promise<void> => {
+        const engine = new V1_LSPEngine();
+        const graphManagerState = await buildGraphManagerStateFromEntities(
+          entities,
+          applicationStore,
+          engine,
+        );
+        const service = graphManagerState.graph.getService(serviceId);
+        const serviceExecution = guaranteeType(
+          service.execution,
+          PureExecution,
+        );
+        const newQueryBuilderState = new ServiceQueryBuilderState(
+          applicationStore,
+          graphManagerState,
+          QueryBuilderVSCodeWorkflowState.INSTANCE,
+          QueryBuilderActionConfig.INSTANCE,
+          service,
+          undefined,
+          undefined,
+          undefined,
+          undefined,
+          undefined,
+          {
+            service: service.path,
+          },
+        );
+        newQueryBuilderState.initializeWithQuery(serviceExecution.func);
+        await flowResult(
+          newQueryBuilderState.explorerState.analyzeMappingModelCoverage(),
+        ).catch(applicationStore.alertUnhandledError);
+        setQueryBuilderState(newQueryBuilderState);
       };
-      initializeQuery();
+
+    const updateExistingQuery = (): void => {
+      const nonNullQueryBuilderState = guaranteeNonNullable(queryBuilderState);
+      const V1_newExecution = guaranteeType<V1_PureExecution>(
+        deserialize(
+          V1_serviceModelSchema(
+            applicationStore.pluginManager.getPureProtocolProcessorPlugins(),
+          ),
+          guaranteeNonNullable(
+            entities.find((entity) => entity.path === serviceId)?.content,
+          ),
+        ).execution,
+        V1_PureExecution,
+      );
+      const newFunc = new RawLambda(
+        V1_newExecution.func.parameters,
+        V1_newExecution.func.body,
+      );
+      const existingService = guaranteeNonNullable(
+        nonNullQueryBuilderState.graphManagerState.graph.getService(serviceId),
+      );
+      const existingExecution = guaranteeType(
+        existingService.execution,
+        PureExecution,
+      );
+      pureExecution_setFunction(existingExecution, newFunc);
+      nonNullQueryBuilderState.initializeWithQuery(newFunc);
+    };
+    if (entities.length && serviceId && applicationStore) {
+      try {
+        if (queryBuilderState === null) {
+          buildGraphManagerStateAndInitializeQuery();
+        } else {
+          updateExistingQuery();
+        }
+      } catch (e) {
+        if (e instanceof Error) {
+          setError(e.message);
+        }
+      } finally {
+        setIsLoading(false);
+      }
     } else {
       setIsLoading(false);
     }
-  }, [serviceId, applicationStore, entities]);
+  }, [serviceId, applicationStore, entities, queryBuilderState]);
 
   return (
     <>

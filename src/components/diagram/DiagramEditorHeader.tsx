@@ -27,6 +27,7 @@ import {
   AlignTopIcon,
   CaretDownIcon,
   ControlledDropdownMenu,
+  CORE_PURE_PATH,
   DistributeHorizontalIcon,
   DistributeVerticalIcon,
   MenuContent,
@@ -34,7 +35,6 @@ import {
   MenuContentItem,
   SaveIcon,
   Point,
-  CORE_PURE_PATH,
   CustomSelectorInput,
   compareLabelFn,
 } from '@finos/legend-vscode-extension-dependencies';
@@ -92,12 +92,11 @@ export const DiagramEditorHeader = observer(
               (error: unknown) => console.error(error),
             );
           }}
-          value={''}
+          value={{ label: '', value: '' }}
           placeholder="Search for a Class..."
           isClearable={true}
           escapeClearsValue={true}
           darkMode={true}
-          formatOptionLabel={{}}
           optionCustomization={{
             rowHeight: window.innerHeight * 0.03,
           }}

@@ -14,7 +14,13 @@
  * limitations under the License.
  */
 
-import type { CancellationToken, Uri } from 'vscode';
+import {
+  commands,
+  Uri,
+  window,
+  workspace,
+  type CancellationToken,
+} from 'vscode';
 import type { FunctionTDSRequest } from './model/FunctionTDSRequest';
 import type { LegendExecutionResult } from './results/LegendExecutionResult';
 import {
@@ -25,7 +31,17 @@ import {
   VIRTUAL_FILE_SYSTEM_FILE_REQUEST_ID,
   ENTITIES_REQUEST_ID,
   ONE_ENTITY_PER_FILE_REQUEST_ID,
-  LEGEND_WRITE_ENTITY,
+  LEGEND_WRITE_ENTITY_REQUEST_ID,
+  ANALYZE_MAPPING_MODEL_COVERAGE_COMMAND_ID,
+  GET_CLASSIFIER_PATH_MAP_REQUEST_ID,
+  GET_SUBTYPE_INFO_REQUEST_ID,
+  LEGEND_COMMAND,
+  EXECUTE_QUERY_COMMAND_ID,
+  GENERATE_EXECUTION_PLAN_COMMAND_ID,
+  GET_LAMBDA_RETURN_TYPE_COMMAND_ID,
+  GRAMMAR_TO_JSON_LAMBDA_COMMAND_ID,
+  JSON_TO_GRAMMAR_LAMBDA_COMMAND_ID,
+  JSON_TO_GRAMMAR_LAMBDA_BATCH_COMMAND_ID,
 } from './utils/Const';
 import type { PlainObject } from './utils/SerializationUtils';
 import {
@@ -36,6 +52,15 @@ import type { LegendTest } from './model/LegendTest';
 import type { ExecuteTestRequest } from './model/ExecuteTestRequest';
 import type { LegendTestExecutionResult } from './model/LegendTestExecutionResult';
 import { LegendEntity } from './model/LegendEntity';
+import type {
+  EXECUTION_SERIALIZATION_FORMAT,
+  V1_ParameterValue,
+  V1_RawExecutionContext,
+  V1_RawLambda,
+  V1_RenderStyle,
+  V1_Runtime,
+} from '@finos/legend-vscode-extension-dependencies';
+import { LegendExecutionResultType } from './results/LegendExecutionResultType';
 
 export class LegendEntitiesRequest {
   private textDocuments!: TextDocumentIdentifier[];
@@ -139,9 +164,241 @@ export class LegendLanguageClient extends LanguageClient {
     token?: CancellationToken,
   ): Promise<string> {
     if (token) {
-      return this.sendRequest(LEGEND_WRITE_ENTITY, request, token);
+      return this.sendRequest(LEGEND_WRITE_ENTITY_REQUEST_ID, request, token);
     } else {
-      return this.sendRequest(LEGEND_WRITE_ENTITY, request);
+      return this.sendRequest(LEGEND_WRITE_ENTITY_REQUEST_ID, request);
     }
+  }
+
+  async getClassifierPathMap(token?: CancellationToken): Promise<string> {
+    if (token) {
+      return this.sendRequest(GET_CLASSIFIER_PATH_MAP_REQUEST_ID, token);
+    } else {
+      return this.sendRequest(GET_CLASSIFIER_PATH_MAP_REQUEST_ID);
+    }
+  }
+
+  async getSubtypeInfo(token?: CancellationToken): Promise<string> {
+    if (token) {
+      return this.sendRequest(GET_SUBTYPE_INFO_REQUEST_ID, token);
+    } else {
+      return this.sendRequest(GET_SUBTYPE_INFO_REQUEST_ID);
+    }
+  }
+
+  async analyzeMappingModelCoverage(
+    mappingFilePath: string,
+    mappingId: string,
+  ): Promise<string> {
+    return commands.executeCommand(
+      LEGEND_COMMAND,
+      mappingFilePath,
+      0,
+      mappingId,
+      ANALYZE_MAPPING_MODEL_COVERAGE_COMMAND_ID,
+    );
+  }
+
+  async executeQuery(
+    serviceFilePath: string,
+    serviceId: string,
+    lambda: V1_RawLambda,
+    mapping: string | undefined,
+    runtime: V1_Runtime | undefined,
+    context: V1_RawExecutionContext,
+    parameterValues: { [key: string]: unknown },
+    serializationFormat?: EXECUTION_SERIALIZATION_FORMAT | undefined,
+  ): Promise<string> {
+    return commands.executeCommand(
+      LEGEND_COMMAND,
+      serviceFilePath,
+      0,
+      serviceId,
+      EXECUTE_QUERY_COMMAND_ID,
+      {
+        lambda: JSON.stringify(lambda),
+        mapping,
+        runtime: JSON.stringify(runtime),
+        context: JSON.stringify(context),
+        serializationFormat,
+      },
+      parameterValues,
+    );
+  }
+
+  async exportData(
+    serviceFilePath: string,
+    serviceId: string,
+    lambda: V1_RawLambda,
+    mapping: string | undefined,
+    runtime: V1_Runtime | undefined,
+    context: V1_RawExecutionContext,
+    parameterValues: V1_ParameterValue[],
+    serializationFormat?: EXECUTION_SERIALIZATION_FORMAT | undefined,
+  ): Promise<string> {
+    const response = (await commands.executeCommand(
+      LEGEND_COMMAND,
+      serviceFilePath,
+      0,
+      serviceId,
+      EXECUTE_QUERY_COMMAND_ID,
+      {
+        lambda: JSON.stringify(lambda),
+        mapping,
+        runtime: JSON.stringify(runtime),
+        context: JSON.stringify(context),
+        serializationFormat,
+      },
+      parameterValues,
+    )) as LegendExecutionResult[];
+    if (!response[0] || response[0].type === LegendExecutionResultType.ERROR) {
+      return 'ERROR';
+    }
+    const content = response[0].message;
+    const fileName = 'result.csv';
+    const uri = await window.showSaveDialog({
+      defaultUri: Uri.file(fileName),
+      saveLabel: 'Save',
+    });
+
+    if (uri) {
+      await workspace.fs.writeFile(uri, Buffer.from(content, 'utf8'));
+      window.showInformationMessage(`File ${fileName} saved successfully!`);
+    } else {
+      window.showErrorMessage('File save cancelled');
+    }
+
+    return 'SUCCESS';
+  }
+
+  async generateExecutionPlan(
+    serviceFilePath: string,
+    serviceId: string,
+    lambda: V1_RawLambda,
+    mapping: string | undefined,
+    runtime: V1_Runtime | undefined,
+    context: V1_RawExecutionContext,
+    parameterValues: V1_ParameterValue[],
+  ): Promise<string> {
+    return commands.executeCommand(
+      LEGEND_COMMAND,
+      serviceFilePath,
+      0,
+      serviceId,
+      GENERATE_EXECUTION_PLAN_COMMAND_ID,
+      {
+        lambda: JSON.stringify(lambda),
+        mapping,
+        runtime: JSON.stringify(runtime),
+        context: JSON.stringify(context),
+      },
+      parameterValues,
+    );
+  }
+
+  async debugGenerateExecutionPlan(
+    serviceFilePath: string,
+    serviceId: string,
+    lambda: V1_RawLambda,
+    mapping: string | undefined,
+    runtime: V1_Runtime | undefined,
+    context: V1_RawExecutionContext,
+    parameterValues: V1_ParameterValue[],
+  ): Promise<string> {
+    return commands.executeCommand(
+      LEGEND_COMMAND,
+      serviceFilePath,
+      0,
+      serviceId,
+      GENERATE_EXECUTION_PLAN_COMMAND_ID,
+      {
+        lambda: JSON.stringify(lambda),
+        mapping,
+        runtime: JSON.stringify(runtime),
+        context: JSON.stringify(context),
+        debug: true,
+      },
+      parameterValues,
+    );
+  }
+
+  async grammarToJson_lambda(
+    serviceFilePath: string,
+    serviceId: string,
+    code: string,
+    sourceId?: string | undefined,
+    lineOffset?: number | undefined,
+    columnOffset?: number | undefined,
+    returnSourceInformation?: boolean | undefined,
+  ): Promise<string> {
+    return commands.executeCommand(
+      LEGEND_COMMAND,
+      serviceFilePath,
+      0,
+      serviceId,
+      GRAMMAR_TO_JSON_LAMBDA_COMMAND_ID,
+      {
+        code,
+        sourceId,
+        lineOffset,
+        columnOffset,
+        returnSourceInformation,
+      },
+    );
+  }
+
+  async jsonToGrammar_lambda(
+    serviceFilePath: string,
+    serviceId: string,
+    lambda: PlainObject<V1_RawLambda>,
+    renderStyle?: V1_RenderStyle | undefined,
+  ): Promise<string> {
+    return commands.executeCommand(
+      LEGEND_COMMAND,
+      serviceFilePath,
+      0,
+      serviceId,
+      JSON_TO_GRAMMAR_LAMBDA_COMMAND_ID,
+      {
+        lambda: JSON.stringify(lambda),
+        renderStyle,
+      },
+    );
+  }
+
+  async jsonToGrammar_lambda_batch(
+    serviceFilePath: string,
+    serviceId: string,
+    lambdas: Record<string, PlainObject<V1_RawLambda>>,
+    renderStyle?: V1_RenderStyle | undefined,
+  ): Promise<string> {
+    return commands.executeCommand(
+      LEGEND_COMMAND,
+      serviceFilePath,
+      0,
+      serviceId,
+      JSON_TO_GRAMMAR_LAMBDA_BATCH_COMMAND_ID,
+      {
+        lambdas: JSON.stringify(lambdas),
+        renderStyle,
+      },
+    );
+  }
+
+  async getLambdaReturnType(
+    serviceFilePath: string,
+    serviceId: string,
+    lambda: V1_RawLambda,
+  ): Promise<string> {
+    return commands.executeCommand(
+      LEGEND_COMMAND,
+      serviceFilePath,
+      0,
+      serviceId,
+      GET_LAMBDA_RETURN_TYPE_COMMAND_ID,
+      {
+        lambda: JSON.stringify(lambda),
+      },
+    );
   }
 }

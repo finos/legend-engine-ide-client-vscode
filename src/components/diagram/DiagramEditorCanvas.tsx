@@ -15,13 +15,13 @@
  */
 import {
   type Diagram,
-  V1_diagramModelSchema,
-  V1_transformDiagram,
+  Class,
+  clsx,
   DiagramRenderer,
   Point,
-  Class,
   useResizeDetector,
-  clsx,
+  V1_diagramModelSchema,
+  V1_transformDiagram,
 } from '@finos/legend-vscode-extension-dependencies';
 import {
   forwardRef,
