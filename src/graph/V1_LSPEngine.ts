@@ -123,9 +123,9 @@ import {
   JSON_TO_GRAMMAR_LAMBDA_RESPONSE,
 } from '../utils/Const';
 import { type LegendExecutionResult } from '../results/LegendExecutionResult';
-import { ExecuteQueryInput } from '../model/ExecuteQueryInput';
 import { LegendExecutionResultType } from '../results/LegendExecutionResultType';
 import { textLocationToSourceInformation } from '../utils/SourceInformationUtils';
+import { executeInputToLSPExecuteInput } from '../utils/GraphUtils';
 
 class V1_LSPEngine_Config extends TEMPORARY__AbstractEngineConfig {}
 
@@ -426,14 +426,7 @@ export class V1_LSPEngine implements V1_GraphManagerEngine {
       await this.postAndWaitForMessage<string>(
         {
           command: EXPORT_DATA_COMMAND_ID,
-          msg: ExecuteQueryInput.serialization.toJson({
-            lambda: input.function,
-            mapping: input.mapping,
-            runtime: input.runtime,
-            context: input.context,
-            parameterValues: input.parameterValues,
-            serializationFormat: options?.serializationFormat,
-          }),
+          msg: executeInputToLSPExecuteInput(input, options),
         },
         EXPORT_DATA_RESPONSE,
       ),
@@ -456,14 +449,7 @@ export class V1_LSPEngine implements V1_GraphManagerEngine {
     const response = await this.postAndWaitForMessage<LegendExecutionResult[]>(
       {
         command: EXECUTE_QUERY_COMMAND_ID,
-        msg: ExecuteQueryInput.serialization.toJson({
-          lambda: input.function,
-          mapping: input.mapping,
-          runtime: input.runtime,
-          context: input.context,
-          parameterValues: input.parameterValues,
-          serializationFormat: options?.serializationFormat,
-        }),
+        msg: executeInputToLSPExecuteInput(input, options),
       },
       EXECUTE_QUERY_RESPONSE,
     );
@@ -523,13 +509,7 @@ export class V1_LSPEngine implements V1_GraphManagerEngine {
     const response = await this.postAndWaitForMessage<LegendExecutionResult[]>(
       {
         command: GENERATE_EXECUTION_PLAN_COMMAND_ID,
-        msg: ExecuteQueryInput.serialization.toJson({
-          lambda: input.function,
-          mapping: input.mapping,
-          runtime: input.runtime,
-          context: input.context,
-          parameterValues: input.parameterValues,
-        }),
+        msg: executeInputToLSPExecuteInput(input),
       },
       GENERATE_EXECUTION_PLAN_RESPONSE,
     );
@@ -542,13 +522,7 @@ export class V1_LSPEngine implements V1_GraphManagerEngine {
     const response = await this.postAndWaitForMessage<LegendExecutionResult[]>(
       {
         command: DEBUG_GENERATE_EXECUTION_PLAN_COMMAND_ID,
-        msg: ExecuteQueryInput.serialization.toJson({
-          lambda: input.function,
-          mapping: input.mapping,
-          runtime: input.runtime,
-          context: input.context,
-          parameterValues: input.parameterValues,
-        }),
+        msg: executeInputToLSPExecuteInput(input),
       },
       DEBUG_GENERATE_EXECUTION_PLAN_RESPONSE,
     );

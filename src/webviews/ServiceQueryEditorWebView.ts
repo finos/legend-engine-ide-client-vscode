@@ -161,7 +161,7 @@ export const renderServiceQueryEditorWebView = (
           mapping,
           runtime,
           executionContext,
-          parameterValues ?? [],
+          parameterValues ?? {},
           serializationFormat,
         );
         webview.postMessage({

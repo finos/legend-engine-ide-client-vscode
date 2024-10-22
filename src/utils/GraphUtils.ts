@@ -17,6 +17,9 @@
 import {
   type ApplicationStore,
   type Entity,
+  type ExecutionOptions,
+  type PlainObject,
+  type V1_ExecuteInput,
   buildPureGraphManager,
   GraphManagerState,
   guaranteeType,
@@ -25,6 +28,7 @@ import {
 import { type LegendVSCodeApplicationConfig } from '../application/LegendVSCodeApplicationConfig';
 import { type LegendVSCodePluginManager } from '../application/LegendVSCodePluginManager';
 import { type V1_LSPEngine } from '../graph/V1_LSPEngine';
+import { V1_LSPExecuteInput } from '../model/ExecuteQueryInput';
 
 export const buildGraphManagerStateFromEntities = async (
   entities: Entity[],
@@ -67,3 +71,22 @@ export const buildGraphManagerStateFromEntities = async (
   );
   return graphManagerState;
 };
+
+export const executeInputToLSPExecuteInput = (
+  input: V1_ExecuteInput,
+  options?: ExecutionOptions,
+): PlainObject<V1_LSPExecuteInput> =>
+  V1_LSPExecuteInput.serialization.toJson({
+    lambda: input.function,
+    mapping: input.mapping,
+    runtime: input.runtime,
+    context: input.context,
+    parameterValues: input.parameterValues.reduce(
+      (acc, val) => ({
+        ...acc,
+        [val.name]: (val.value as { _type: string; value: unknown }).value,
+      }),
+      {},
+    ),
+    serializationFormat: options?.serializationFormat,
+  });

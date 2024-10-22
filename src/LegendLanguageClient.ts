@@ -14,7 +14,13 @@
  * limitations under the License.
  */
 
-import { commands, Uri, window, workspace, type CancellationToken } from 'vscode';
+import {
+  commands,
+  Uri,
+  window,
+  workspace,
+  type CancellationToken,
+} from 'vscode';
 import type { FunctionTDSRequest } from './model/FunctionTDSRequest';
 import type { LegendExecutionResult } from './results/LegendExecutionResult';
 import {
@@ -200,7 +206,7 @@ export class LegendLanguageClient extends LanguageClient {
     mapping: string | undefined,
     runtime: V1_Runtime | undefined,
     context: V1_RawExecutionContext,
-    parameterValues: V1_ParameterValue[],
+    parameterValues: { [key: string]: unknown },
     serializationFormat?: EXECUTION_SERIALIZATION_FORMAT | undefined,
   ): Promise<string> {
     return commands.executeCommand(
@@ -230,7 +236,7 @@ export class LegendLanguageClient extends LanguageClient {
     parameterValues: V1_ParameterValue[],
     serializationFormat?: EXECUTION_SERIALIZATION_FORMAT | undefined,
   ): Promise<string> {
-    const response = await commands.executeCommand(
+    const response = (await commands.executeCommand(
       LEGEND_COMMAND,
       serviceFilePath,
       0,
@@ -244,7 +250,7 @@ export class LegendLanguageClient extends LanguageClient {
         serializationFormat,
       },
       parameterValues,
-    ) as LegendExecutionResult[];
+    )) as LegendExecutionResult[];
     if (!response[0] || response[0].type === LegendExecutionResultType.ERROR) {
       return 'ERROR';
     }

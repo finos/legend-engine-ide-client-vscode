@@ -1,9 +1,6 @@
 import {
-  customListWithSchema,
   SerializationFactory,
   usingModelSchema,
-  type V1_ParameterValue,
-  V1_parameterValueModelSchema,
   type V1_RawLambda,
   V1_rawLambdaModelSchema,
   type V1_Runtime,
@@ -15,21 +12,23 @@ import {
 import {
   createModelSchema,
   custom,
+  map,
   optional,
   primitive,
+  raw,
   SKIP,
 } from 'serializr';
 
-export class ExecuteQueryInput {
+export class V1_LSPExecuteInput {
   lambda!: V1_RawLambda;
   mapping: string | undefined;
   runtime: V1_Runtime | undefined;
   context!: V1_RawExecutionContext;
-  parameterValues: V1_ParameterValue[] = [];
+  parameterValues: { [key: string]: unknown } = {};
   serializationFormat: EXECUTION_SERIALIZATION_FORMAT | undefined;
 
   static readonly serialization = new SerializationFactory(
-    createModelSchema(ExecuteQueryInput, {
+    createModelSchema(V1_LSPExecuteInput, {
       lambda: usingModelSchema(V1_rawLambdaModelSchema),
       mapping: optional(primitive()),
       runtime: custom(
@@ -37,9 +36,9 @@ export class ExecuteQueryInput {
         () => SKIP,
       ),
       context: usingModelSchema(V1_rawBaseExecutionContextModelSchema),
-      parameterValues: customListWithSchema(V1_parameterValueModelSchema),
+      parameterValues: map(raw()),
       serializationFormat: custom(
-        (val) => val ? val : undefined,
+        (val) => (val ? val : undefined),
         () => SKIP,
       ),
     }),
