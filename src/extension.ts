@@ -550,7 +550,7 @@ export function createStatusBarItem(context: ExtensionContext): void {
           command: 'legend.log',
         },
         {
-          label: '$(go-to-file) Show Report',
+          label: '$(go-to-file) View Pure Compatibility Testing (PCT) Report',
           command: 'legend.report',
         },
         {
