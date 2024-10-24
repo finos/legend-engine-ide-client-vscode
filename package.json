@@ -97,7 +97,7 @@
       },
       {
         "command": "legend.report",
-        "title": "Show Report",
+        "title": "View Pure Compatibility Testing (PCT) Report",
         "category": "Legend"
       },
       {
