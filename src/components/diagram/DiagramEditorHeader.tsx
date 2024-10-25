@@ -92,12 +92,11 @@ export const DiagramEditorHeader = observer(
               (error: unknown) => console.error(error),
             );
           }}
-          value={''}
+          value={{ label: '', value: '' }}
           placeholder="Search for a Class..."
           isClearable={true}
           escapeClearsValue={true}
           darkMode={true}
-          formatOptionLabel={{}}
           optionCustomization={{
             rowHeight: window.innerHeight * 0.03,
           }}

@@ -24,7 +24,7 @@ import {
 } from '../utils/Const';
 import type { LegendLanguageClient } from '../LegendLanguageClient';
 import { getWebviewHtml } from './utils';
-import { type PlainObject } from '@finos/legend-vscode-extension-dependencies';
+import { type PlainObject } from '../utils/SerializationUtils';
 
 export const renderDiagramRendererWebView = (
   diagramRendererWebViewPanel: WebviewPanel,

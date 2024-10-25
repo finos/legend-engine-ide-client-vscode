@@ -16,7 +16,7 @@
 
 import { type ExtensionContext, Uri, type Webview } from 'vscode';
 import * as path from 'path';
-import { type PlainObject } from '@finos/legend-vscode-extension-dependencies';
+import { type PlainObject } from '../utils/SerializationUtils';
 
 export const getWebviewHtml = (
   webview: Webview,

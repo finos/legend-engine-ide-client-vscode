@@ -22,6 +22,7 @@ import {
   assertErrorThrown,
   Button,
   guaranteeType,
+  PureExecution,
   pureExecution_setFunction,
   SaveCurrIcon,
   ServiceQueryBuilderState,
@@ -49,19 +50,21 @@ export class Core_LegendVSCodeApplicationPlugin extends LegendVSCodeApplicationP
             queryBuilderState.applicationStore.guardUnhandledError(async () => {
               try {
                 if (queryBuilderState instanceof ServiceQueryBuilderState) {
-                  guaranteeType(
+                  const graphManager = guaranteeType<V1_PureGraphManager>(
                     queryBuilderState.graphManagerState.graphManager,
                     V1_PureGraphManager,
                     'Graph manager must be a V1_PureGraphManager',
                   );
                   const rawLambda = queryBuilderState.buildQuery();
-                  const service =
-                    queryBuilderState.graphManagerState.graph.getElement(
+                  const serviceExecution = guaranteeType(
+                    queryBuilderState.graphManagerState.graph.getService(
                       queryBuilderState.service.path,
-                    );
-                  pureExecution_setFunction(service.execution, rawLambda);
+                    ).execution,
+                    PureExecution,
+                  );
+                  pureExecution_setFunction(serviceExecution, rawLambda);
                   const serviceProtocol =
-                    queryBuilderState.graphManagerState.graphManager.elementToProtocol<V1_Service>(
+                    graphManager.elementToProtocol<V1_Service>(
                       queryBuilderState.graphManagerState.graph.getElement(
                         queryBuilderState.service.path,
                       ),
