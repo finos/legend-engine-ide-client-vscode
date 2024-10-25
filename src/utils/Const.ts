@@ -60,7 +60,6 @@ export const GENERATE_EXECUTION_PLAN_COMMAND_ID =
 export const DEBUG_GENERATE_EXECUTION_PLAN_COMMAND_ID =
   'legend.executionPlan.generate.debug';
 export const GRAMMAR_TO_JSON_LAMBDA_COMMAND_ID = 'legend.grammarToJson.lambda';
-export const JSON_TO_GRAMMAR_LAMBDA_COMMAND_ID = 'legend.jsonToGrammar.lambda';
 export const JSON_TO_GRAMMAR_LAMBDA_BATCH_COMMAND_ID =
   'legend.jsonToGrammar.lambda.batch';
 export const GET_LAMBDA_RETURN_TYPE_COMMAND_ID = 'legend.lambda.returnType';
@@ -93,7 +92,6 @@ export const EXECUTE_QUERY_RESPONSE = `${EXECUTE_QUERY_COMMAND_ID}/response`;
 export const GENERATE_EXECUTION_PLAN_RESPONSE = `${GENERATE_EXECUTION_PLAN_COMMAND_ID}/response`;
 export const DEBUG_GENERATE_EXECUTION_PLAN_RESPONSE = `${DEBUG_GENERATE_EXECUTION_PLAN_COMMAND_ID}/response`;
 export const GRAMMAR_TO_JSON_LAMBDA_RESPONSE = `${GRAMMAR_TO_JSON_LAMBDA_COMMAND_ID}/response`;
-export const JSON_TO_GRAMMAR_LAMBDA_RESPONSE = `${JSON_TO_GRAMMAR_LAMBDA_COMMAND_ID}/response`;
 export const JSON_TO_GRAMMAR_LAMBDA_BATCH_RESPONSE = `${JSON_TO_GRAMMAR_LAMBDA_BATCH_COMMAND_ID}/response`;
 export const GET_LAMBDA_RETURN_TYPE_RESPONSE = `${GET_LAMBDA_RETURN_TYPE_COMMAND_ID}/response`;
 export const EXPORT_DATA_RESPONSE = `${EXPORT_DATA_COMMAND_ID}/response`;

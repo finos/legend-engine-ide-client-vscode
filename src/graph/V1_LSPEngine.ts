@@ -119,8 +119,6 @@ import {
   GRAMMAR_TO_JSON_LAMBDA_RESPONSE,
   JSON_TO_GRAMMAR_LAMBDA_BATCH_COMMAND_ID,
   JSON_TO_GRAMMAR_LAMBDA_BATCH_RESPONSE,
-  JSON_TO_GRAMMAR_LAMBDA_COMMAND_ID,
-  JSON_TO_GRAMMAR_LAMBDA_RESPONSE,
 } from '../utils/Const';
 import { type LegendExecutionResult } from '../results/LegendExecutionResult';
 import { LegendExecutionResultType } from '../results/LegendExecutionResultType';
@@ -260,22 +258,10 @@ export class V1_LSPEngine implements V1_GraphManagerEngine {
     pretty: boolean,
     plugins: PureProtocolProcessorPlugin[],
   ): Promise<string> {
-    const response = await this.postAndWaitForMessage<LegendExecutionResult[]>(
-      {
-        command: JSON_TO_GRAMMAR_LAMBDA_COMMAND_ID,
-        msg: {
-          lambda: V1_serializeRawValueSpecification(
-            V1_transformRawLambda(
-              lambda,
-              new V1_GraphTransformerContextBuilder(plugins).build(),
-            ),
-          ),
-          renderStyle: pretty ? V1_RenderStyle.PRETTY : V1_RenderStyle.STANDARD,
-        },
-      },
-      JSON_TO_GRAMMAR_LAMBDA_RESPONSE,
-    );
-    return guaranteeNonNullable(response?.[0]?.message);
+    const lambdas: Map<string, RawLambda> = new Map();
+    lambdas.set('lambda', lambda);
+    const result = await this.transformLambdasToCode(lambdas, pretty, plugins);
+    return guaranteeNonNullable(result.get('lambda'));
   }
 
   async prettyLambdaContent(lambda: string): Promise<string> {

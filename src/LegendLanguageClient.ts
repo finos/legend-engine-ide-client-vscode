@@ -40,7 +40,6 @@ import {
   GENERATE_EXECUTION_PLAN_COMMAND_ID,
   GET_LAMBDA_RETURN_TYPE_COMMAND_ID,
   GRAMMAR_TO_JSON_LAMBDA_COMMAND_ID,
-  JSON_TO_GRAMMAR_LAMBDA_COMMAND_ID,
   JSON_TO_GRAMMAR_LAMBDA_BATCH_COMMAND_ID,
 } from './utils/Const';
 import type { PlainObject } from './utils/SerializationUtils';
@@ -343,25 +342,6 @@ export class LegendLanguageClient extends LanguageClient {
         lineOffset,
         columnOffset,
         returnSourceInformation,
-      },
-    );
-  }
-
-  async jsonToGrammar_lambda(
-    serviceFilePath: string,
-    serviceId: string,
-    lambda: PlainObject<V1_RawLambda>,
-    renderStyle?: V1_RenderStyle | undefined,
-  ): Promise<string> {
-    return commands.executeCommand(
-      LEGEND_COMMAND,
-      serviceFilePath,
-      0,
-      serviceId,
-      JSON_TO_GRAMMAR_LAMBDA_COMMAND_ID,
-      {
-        lambda: JSON.stringify(lambda),
-        renderStyle,
       },
     );
   }
