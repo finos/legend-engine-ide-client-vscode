@@ -17,7 +17,6 @@
 import {
   type ClassifierPathMapping,
   type CodeCompletionResult,
-  type ContentType,
   type DeploymentResult,
   type ExecutionOptions,
   type ExternalFormatDescription,
@@ -76,7 +75,9 @@ import {
   type V1_TestDataGenerationResult,
   type V1_TextCompilationResult,
   type V1_ValueSpecification,
+  ContentType,
   deserializeMap,
+  getContentTypeFileExtension,
   guaranteeNonNullable,
   isLossSafeNumber,
   parseLosslessJSON,
@@ -412,13 +413,14 @@ export class V1_LSPEngine implements V1_GraphManagerEngine {
     options?: ExecutionOptions,
     contentType?: ContentType,
   ): Promise<Response> {
+    const downloadFileName = `result.${getContentTypeFileExtension(contentType ?? ContentType.TEXT_CSV)}`;
     const response = guaranteeNonNullable(
       await this.postAndWaitForMessage<LegendExecutionResult>(
         {
           command: EXPORT_DATA_COMMAND_ID,
           msg: {
             ...executeInputToLSPExecuteInput(input, options),
-            contentType,
+            downloadFileName,
           },
         },
         EXPORT_DATA_RESPONSE,

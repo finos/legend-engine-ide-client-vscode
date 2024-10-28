@@ -58,8 +58,6 @@ import {
   type V1_RawLambda,
   type V1_RenderStyle,
   type V1_Runtime,
-  ContentType,
-  getContentTypeFileExtension,
 } from '@finos/legend-vscode-extension-dependencies';
 import { LegendExecutionResultType } from './results/LegendExecutionResultType';
 
@@ -235,8 +233,8 @@ export class LegendLanguageClient extends LanguageClient {
     runtime: V1_Runtime | undefined,
     context: V1_RawExecutionContext,
     parameterValues: V1_ParameterValue[],
+    downloadFileName: string,
     serializationFormat?: EXECUTION_SERIALIZATION_FORMAT | undefined,
-    contentType?: ContentType | undefined,
   ): Promise<LegendExecutionResult> {
     const response = (await commands.executeCommand(
       LEGEND_COMMAND,
@@ -262,15 +260,14 @@ export class LegendLanguageClient extends LanguageClient {
       );
     }
     const content = response[0].message;
-    const fileName = `result.${getContentTypeFileExtension(contentType ?? ContentType.TEXT_CSV)}`;
     const uri = await window.showSaveDialog({
-      defaultUri: Uri.file(fileName),
+      defaultUri: Uri.file(downloadFileName),
       saveLabel: 'Save',
     });
 
     if (uri) {
       await workspace.fs.writeFile(uri, Buffer.from(content, 'utf8'));
-      window.showInformationMessage(`File ${fileName} saved successfully!`);
+      window.showInformationMessage(`File ${downloadFileName} saved successfully!`);
     } else {
       window.showErrorMessage('File save cancelled');
     }
