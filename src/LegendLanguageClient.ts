@@ -22,7 +22,7 @@ import {
   type CancellationToken,
 } from 'vscode';
 import type { FunctionTDSRequest } from './model/FunctionTDSRequest';
-import type { LegendExecutionResult } from './results/LegendExecutionResult';
+import { LegendExecutionResult } from './results/LegendExecutionResult';
 import {
   REPL_CLASSPATH_REQUEST_ID,
   TDS_JSON_REQUEST_ID,
@@ -51,13 +51,15 @@ import type { LegendTest } from './model/LegendTest';
 import type { ExecuteTestRequest } from './model/ExecuteTestRequest';
 import type { LegendTestExecutionResult } from './model/LegendTestExecutionResult';
 import { LegendEntity } from './model/LegendEntity';
-import type {
-  EXECUTION_SERIALIZATION_FORMAT,
-  V1_ParameterValue,
-  V1_RawExecutionContext,
-  V1_RawLambda,
-  V1_RenderStyle,
-  V1_Runtime,
+import {
+  type EXECUTION_SERIALIZATION_FORMAT,
+  type V1_ParameterValue,
+  type V1_RawExecutionContext,
+  type V1_RawLambda,
+  type V1_RenderStyle,
+  type V1_Runtime,
+  ContentType,
+  getContentTypeFileExtension,
 } from '@finos/legend-vscode-extension-dependencies';
 import { LegendExecutionResultType } from './results/LegendExecutionResultType';
 
@@ -234,7 +236,8 @@ export class LegendLanguageClient extends LanguageClient {
     context: V1_RawExecutionContext,
     parameterValues: V1_ParameterValue[],
     serializationFormat?: EXECUTION_SERIALIZATION_FORMAT | undefined,
-  ): Promise<string> {
+    contentType?: ContentType | undefined,
+  ): Promise<LegendExecutionResult> {
     const response = (await commands.executeCommand(
       LEGEND_COMMAND,
       serviceFilePath,
@@ -251,10 +254,15 @@ export class LegendLanguageClient extends LanguageClient {
       parameterValues,
     )) as LegendExecutionResult[];
     if (!response[0] || response[0].type === LegendExecutionResultType.ERROR) {
-      return 'ERROR';
+      return (
+        response[0] ??
+        LegendExecutionResult.serialization.fromJson({
+          type: LegendExecutionResultType.ERROR,
+        })
+      );
     }
     const content = response[0].message;
-    const fileName = 'result.csv';
+    const fileName = `result.${getContentTypeFileExtension(contentType ?? ContentType.TEXT_CSV)}`;
     const uri = await window.showSaveDialog({
       defaultUri: Uri.file(fileName),
       saveLabel: 'Save',
@@ -267,7 +275,7 @@ export class LegendLanguageClient extends LanguageClient {
       window.showErrorMessage('File save cancelled');
     }
 
-    return 'SUCCESS';
+    return response[0];
   }
 
   async generateExecutionPlan(

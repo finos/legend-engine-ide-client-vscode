@@ -17,6 +17,8 @@
 import {
   type ClassifierPathMapping,
   type CodeCompletionResult,
+  type ContentType,
+  type DeploymentResult,
   type ExecutionOptions,
   type ExternalFormatDescription,
   type GenerationConfigurationDescription,
@@ -84,6 +86,7 @@ import {
   V1_buildExecutionError,
   V1_buildParserError,
   V1_CompilationError,
+  V1_DELEGATED_EXPORT_HEADER,
   V1_EXECUTION_RESULT,
   V1_ExecutionError,
   V1_GraphTransformerContextBuilder,
@@ -407,24 +410,31 @@ export class V1_LSPEngine implements V1_GraphManagerEngine {
   async exportData(
     input: V1_ExecuteInput,
     options?: ExecutionOptions,
+    contentType?: ContentType,
   ): Promise<Response> {
     const response = guaranteeNonNullable(
-      await this.postAndWaitForMessage<string>(
+      await this.postAndWaitForMessage<LegendExecutionResult>(
         {
           command: EXPORT_DATA_COMMAND_ID,
-          msg: executeInputToLSPExecuteInput(input, options),
+          msg: {
+            ...executeInputToLSPExecuteInput(input, options),
+            contentType,
+          },
         },
         EXPORT_DATA_RESPONSE,
       ),
     );
-    return new Response();
-    // if (response?.[0]?.type === LegendExecutionResultType.ERROR) {
-    //   throw V1_buildExecutionError(
-    //     V1_ExecutionError.serialization.fromJson({
-    //       message: response[0].message,
-    //     }),
-    //   );
-    // }
+    if (response.type === LegendExecutionResultType.SUCCESS) {
+      return new Response(null, {
+        status: 200,
+        headers: { [V1_DELEGATED_EXPORT_HEADER]: 'true' },
+      });
+    } else {
+      return new Response(response.message, {
+        status: 500,
+        headers: { [V1_DELEGATED_EXPORT_HEADER]: 'true' },
+      });
+    }
   }
 
   async runQueryAndReturnMap(
@@ -728,7 +738,7 @@ export class V1_LSPEngine implements V1_GraphManagerEngine {
 
   async publishFunctionActivatorToSandbox(
     input: V1_FunctionActivatorInput,
-  ): Promise<void> {
+  ): Promise<DeploymentResult> {
     throw new Error('publishFunctionActivatorToSandbox not implemented');
   }
 

@@ -169,7 +169,7 @@ export const renderServiceQueryEditorWebView = (
         break;
       }
       case EXPORT_DATA_COMMAND_ID: {
-        const { lambda, mapping, runtime, context: executionContext, parameterValues, serializationFormat } =
+        const { lambda, mapping, runtime, context: executionContext, parameterValues, serializationFormat, contentType } =
           message.msg;
         const result = await client.exportData(
           servicePath,
@@ -180,6 +180,7 @@ export const renderServiceQueryEditorWebView = (
           executionContext,
           parameterValues ?? [],
           serializationFormat,
+          contentType,
         );
         webview.postMessage({
           command: EXPORT_DATA_RESPONSE,
