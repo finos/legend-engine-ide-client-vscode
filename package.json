@@ -11,7 +11,7 @@
   "icon": "icons/legend_full.png",
   "homepage": "https://legend.finos.org/",
   "publisher": "FINOS",
-  "version": "0.16.0",
+  "version": "0.17.0",
   "type": "commonjs",
   "repository": {
     "type": "git",
@@ -305,16 +305,16 @@
       }
     ],
     "notebooks": [
-            {
-                "type": "legend-book",
-                "displayName": "Legend Notebook",
-                "selector": [
-                    {
-                        "filenamePattern": "*.purebook"
-                    }
-                ]
-            }
+      {
+        "type": "legend-book",
+        "displayName": "Legend Notebook",
+        "selector": [
+          {
+            "filenamePattern": "*.purebook"
+          }
         ]
+      }
+    ]
   },
   "scripts": {
     "test": "npm run build && node ./lib/tests/runTest.js",
