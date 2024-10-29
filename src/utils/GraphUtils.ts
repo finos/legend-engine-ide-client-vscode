@@ -26,6 +26,7 @@ import {
   PureProtocolProcessorPlugin,
   V1_EntitlementReportAnalyticsInput,
   V1_PureGraphManager,
+  V1_StoreEntitlementAnalysisInput,
 } from '@finos/legend-vscode-extension-dependencies';
 import { type LegendVSCodeApplicationConfig } from '../application/LegendVSCodeApplicationConfig';
 import { type LegendVSCodePluginManager } from '../application/LegendVSCodePluginManager';
@@ -36,6 +37,7 @@ import {
   V1_LSPEntitlementReportAnallyticsInputModelSchema,
 } from '../model/engine/EntitlementReportAnalyticsInput';
 import { serialize } from 'serializr';
+import { V1_LSPStoreEntitlementAnalysisInput } from '../model/engine/StoreEntitlementAnalysisInput';
 
 export const buildGraphManagerStateFromEntities = async (
   entities: Entity[],
@@ -96,6 +98,15 @@ export const executeInputToLSPExecuteInput = (
       {},
     ),
     serializationFormat: options?.serializationFormat,
+  });
+
+export const surveyDatasetsInputToLSPInput = (
+  input: V1_StoreEntitlementAnalysisInput,
+): PlainObject<V1_LSPStoreEntitlementAnalysisInput> =>
+  V1_LSPStoreEntitlementAnalysisInput.serialization.toJson({
+    lambda: input.query,
+    runtime: input.runtime,
+    mapping: input.mapping,
   });
 
 export const entitlementReportAnalyticsInputToLSPInput = (

@@ -89,6 +89,7 @@ import {
   V1_CompilationError,
   V1_DELEGATED_EXPORT_HEADER,
   V1_deserializeDatasetEntitlementReport,
+  V1_deserializeDatasetSpecification,
   V1_EXECUTION_RESULT,
   V1_ExecutionError,
   V1_GraphTransformerContextBuilder,
@@ -126,6 +127,8 @@ import {
   GRAMMAR_TO_JSON_LAMBDA_RESPONSE,
   JSON_TO_GRAMMAR_LAMBDA_BATCH_COMMAND_ID,
   JSON_TO_GRAMMAR_LAMBDA_BATCH_RESPONSE,
+  SURVEY_DATASETS_COMMAND_ID,
+  SURVEY_DATASETS_RESPONSE,
 } from '../utils/Const';
 import { type LegendExecutionResult } from '../results/LegendExecutionResult';
 import { LegendExecutionResultType } from '../results/LegendExecutionResultType';
@@ -133,6 +136,7 @@ import { textLocationToSourceInformation } from '../utils/SourceInformationUtils
 import {
   entitlementReportAnalyticsInputToLSPInput,
   executeInputToLSPExecuteInput,
+  surveyDatasetsInputToLSPInput,
 } from '../utils/GraphUtils';
 
 class V1_LSPEngine_Config extends TEMPORARY__AbstractEngineConfig {}
@@ -708,7 +712,24 @@ export class V1_LSPEngine implements V1_GraphManagerEngine {
     input: V1_StoreEntitlementAnalysisInput,
     plugins: PureProtocolProcessorPlugin[],
   ): Promise<V1_DatasetSpecification[]> {
-    throw new Error('surveyDatasets not implemented');
+    const response = await this.postAndWaitForMessage<LegendExecutionResult[]>(
+      {
+        command: SURVEY_DATASETS_COMMAND_ID,
+        msg: surveyDatasetsInputToLSPInput(input),
+      },
+      SURVEY_DATASETS_RESPONSE,
+    );
+    if (response?.[0]?.type === LegendExecutionResultType.ERROR) {
+      throw V1_buildExecutionError(
+        V1_ExecutionError.serialization.fromJson({
+          message: response[0].message,
+        }),
+      );
+    }
+    return JSON.parse(guaranteeNonNullable(response?.[0]?.message)).map(
+      (specification: PlainObject<V1_DatasetSpecification>) =>
+        V1_deserializeDatasetSpecification(specification, plugins),
+    );
   }
 
   async checkDatasetEntitlements(
@@ -730,8 +751,8 @@ export class V1_LSPEngine implements V1_GraphManagerEngine {
       );
     }
     return JSON.parse(guaranteeNonNullable(response?.[0]?.message)).map(
-      (report: V1_DatasetEntitlementReport) =>
-        deserialize(V1_deserializeDatasetEntitlementReport(plugins), report),
+      (report: PlainObject<V1_DatasetEntitlementReport>) =>
+        V1_deserializeDatasetEntitlementReport(report, plugins),
     );
   }
 

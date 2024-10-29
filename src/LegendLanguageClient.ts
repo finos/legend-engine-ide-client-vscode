@@ -42,6 +42,7 @@ import {
   GRAMMAR_TO_JSON_LAMBDA_COMMAND_ID,
   JSON_TO_GRAMMAR_LAMBDA_BATCH_COMMAND_ID,
   CHECK_DATASET_ENTITLEMENTS_COMMAND_ID,
+  SURVEY_DATASETS_COMMAND_ID,
 } from './utils/Const';
 import type { PlainObject } from './utils/SerializationUtils';
 import {
@@ -385,6 +386,27 @@ export class LegendLanguageClient extends LanguageClient {
       serviceId,
       GET_LAMBDA_RETURN_TYPE_COMMAND_ID,
       {
+        lambda: JSON.stringify(lambda),
+      },
+    );
+  }
+
+  async generateDatasetSpecifications(
+    serviceFilePath: string,
+    serviceId: string,
+    mapping: string,
+    runtime: string,
+    lambda: V1_RawLambda,
+  ): Promise<string> {
+    return commands.executeCommand(
+      LEGEND_COMMAND,
+      serviceFilePath,
+      0,
+      serviceId,
+      SURVEY_DATASETS_COMMAND_ID,
+      {
+        mapping,
+        runtime,
         lambda: JSON.stringify(lambda),
       },
     );

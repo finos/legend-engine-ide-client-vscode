@@ -46,6 +46,8 @@ import {
   JSON_TO_GRAMMAR_LAMBDA_BATCH_COMMAND_ID,
   JSON_TO_GRAMMAR_LAMBDA_BATCH_RESPONSE,
   QUERY_BUILDER_CONFIG_ERROR,
+  SURVEY_DATASETS_COMMAND_ID,
+  SURVEY_DATASETS_RESPONSE,
   WRITE_ENTITY,
 } from '../utils/Const';
 import {
@@ -152,8 +154,14 @@ export const renderServiceQueryEditorWebView = (
         break;
       }
       case EXECUTE_QUERY_COMMAND_ID: {
-        const { lambda, mapping, runtime, context: executionContext, parameterValues, serializationFormat } =
-          message.msg;
+        const {
+          lambda,
+          mapping,
+          runtime,
+          context: executionContext,
+          parameterValues,
+          serializationFormat,
+        } = message.msg;
         const result = await client.executeQuery(
           servicePath,
           serviceId,
@@ -171,8 +179,15 @@ export const renderServiceQueryEditorWebView = (
         break;
       }
       case EXPORT_DATA_COMMAND_ID: {
-        const { lambda, mapping, runtime, context: executionContext, parameterValues, serializationFormat, downloadFileName } =
-          message.msg;
+        const {
+          lambda,
+          mapping,
+          runtime,
+          context: executionContext,
+          parameterValues,
+          serializationFormat,
+          downloadFileName,
+        } = message.msg;
         const result = await client.exportData(
           servicePath,
           serviceId,
@@ -191,8 +206,13 @@ export const renderServiceQueryEditorWebView = (
         break;
       }
       case GENERATE_EXECUTION_PLAN_COMMAND_ID: {
-        const { lambda, mapping, runtime, context: executionContext, parameterValues } =
-          message.msg;
+        const {
+          lambda,
+          mapping,
+          runtime,
+          context: executionContext,
+          parameterValues,
+        } = message.msg;
         const result = await client.generateExecutionPlan(
           servicePath,
           serviceId,
@@ -209,8 +229,13 @@ export const renderServiceQueryEditorWebView = (
         break;
       }
       case DEBUG_GENERATE_EXECUTION_PLAN_COMMAND_ID: {
-        const { lambda, mapping, runtime, context: executionContext, parameterValues } =
-          message.msg;
+        const {
+          lambda,
+          mapping,
+          runtime,
+          context: executionContext,
+          parameterValues,
+        } = message.msg;
         const result = await client.debugGenerateExecutionPlan(
           servicePath,
           serviceId,
@@ -272,6 +297,21 @@ export const renderServiceQueryEditorWebView = (
         });
         break;
       }
+      case SURVEY_DATASETS_COMMAND_ID: {
+        const { mapping, runtime, lambda } = message.msg;
+        const result = await client.generateDatasetSpecifications(
+          servicePath,
+          serviceId,
+          mapping,
+          runtime,
+          lambda,
+        );
+        webview.postMessage({
+          command: SURVEY_DATASETS_RESPONSE,
+          result,
+        });
+        break;
+      }
       case CHECK_DATASET_ENTITLEMENTS_COMMAND_ID: {
         const { mapping, runtime, lambda, reports } = message.msg;
         const result = await client.generateEntitlementReports(
@@ -280,7 +320,7 @@ export const renderServiceQueryEditorWebView = (
           mapping,
           runtime,
           lambda,
-          reports
+          reports,
         );
         webview.postMessage({
           command: CHECK_DATASET_ENTITLEMENTS_RESPONSE,

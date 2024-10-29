@@ -17,7 +17,7 @@ import {
 } from 'serializr';
 
 export class V1_LSPEntitlementReportAnallyticsInput {
-  lambda!: V1_RawLambda;
+  lambda?: V1_RawLambda | undefined;
   mapping!: string;
   runtime!: string;
   reports: V1_DatasetSpecification[] = [];
