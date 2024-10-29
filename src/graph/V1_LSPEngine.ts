@@ -88,6 +88,7 @@ import {
   V1_buildParserError,
   V1_CompilationError,
   V1_DELEGATED_EXPORT_HEADER,
+  V1_deserializeDatasetEntitlementReport,
   V1_EXECUTION_RESULT,
   V1_ExecutionError,
   V1_GraphTransformerContextBuilder,
@@ -105,6 +106,8 @@ import { postMessage } from '../utils/VsCodeUtils';
 import {
   ANALYZE_MAPPING_MODEL_COVERAGE_COMMAND_ID,
   ANALYZE_MAPPING_MODEL_COVERAGE_RESPONSE,
+  CHECK_DATASET_ENTITLEMENTS_COMMAND_ID,
+  CHECK_DATASET_ENTITLEMENTS_RESPONSE,
   DEBUG_GENERATE_EXECUTION_PLAN_COMMAND_ID,
   DEBUG_GENERATE_EXECUTION_PLAN_RESPONSE,
   EXECUTE_QUERY_COMMAND_ID,
@@ -127,7 +130,10 @@ import {
 import { type LegendExecutionResult } from '../results/LegendExecutionResult';
 import { LegendExecutionResultType } from '../results/LegendExecutionResultType';
 import { textLocationToSourceInformation } from '../utils/SourceInformationUtils';
-import { executeInputToLSPExecuteInput } from '../utils/GraphUtils';
+import {
+  entitlementReportAnalyticsInputToLSPInput,
+  executeInputToLSPExecuteInput,
+} from '../utils/GraphUtils';
 
 class V1_LSPEngine_Config extends TEMPORARY__AbstractEngineConfig {}
 
@@ -709,7 +715,24 @@ export class V1_LSPEngine implements V1_GraphManagerEngine {
     input: V1_EntitlementReportAnalyticsInput,
     plugins: PureProtocolProcessorPlugin[],
   ): Promise<V1_DatasetEntitlementReport[]> {
-    throw new Error('checkDatasetEntitlements not implemented');
+    const response = await this.postAndWaitForMessage<LegendExecutionResult[]>(
+      {
+        command: CHECK_DATASET_ENTITLEMENTS_COMMAND_ID,
+        msg: entitlementReportAnalyticsInputToLSPInput(input, plugins),
+      },
+      CHECK_DATASET_ENTITLEMENTS_RESPONSE,
+    );
+    if (response?.[0]?.type === LegendExecutionResultType.ERROR) {
+      throw V1_buildExecutionError(
+        V1_ExecutionError.serialization.fromJson({
+          message: response[0].message,
+        }),
+      );
+    }
+    return JSON.parse(guaranteeNonNullable(response?.[0]?.message)).map(
+      (report: V1_DatasetEntitlementReport) =>
+        deserialize(V1_deserializeDatasetEntitlementReport(plugins), report),
+    );
   }
 
   async buildDatabase(

@@ -23,12 +23,19 @@ import {
   buildPureGraphManager,
   GraphManagerState,
   guaranteeType,
+  PureProtocolProcessorPlugin,
+  V1_EntitlementReportAnalyticsInput,
   V1_PureGraphManager,
 } from '@finos/legend-vscode-extension-dependencies';
 import { type LegendVSCodeApplicationConfig } from '../application/LegendVSCodeApplicationConfig';
 import { type LegendVSCodePluginManager } from '../application/LegendVSCodePluginManager';
 import { type V1_LSPEngine } from '../graph/V1_LSPEngine';
-import { V1_LSPExecuteInput } from '../model/ExecuteQueryInput';
+import { V1_LSPExecuteInput } from '../model/engine/ExecuteQueryInput';
+import {
+  V1_LSPEntitlementReportAnallyticsInput,
+  V1_LSPEntitlementReportAnallyticsInputModelSchema,
+} from '../model/engine/EntitlementReportAnalyticsInput';
+import { serialize } from 'serializr';
 
 export const buildGraphManagerStateFromEntities = async (
   entities: Entity[],
@@ -89,4 +96,15 @@ export const executeInputToLSPExecuteInput = (
       {},
     ),
     serializationFormat: options?.serializationFormat,
+  });
+
+export const entitlementReportAnalyticsInputToLSPInput = (
+  input: V1_EntitlementReportAnalyticsInput,
+  plugins: PureProtocolProcessorPlugin[],
+): PlainObject<V1_LSPEntitlementReportAnallyticsInput> =>
+  serialize(V1_LSPEntitlementReportAnallyticsInputModelSchema(plugins), {
+    lambda: input.storeEntitlementAnalyticsInput.query,
+    runtime: input.storeEntitlementAnalyticsInput.runtime,
+    mapping: input.storeEntitlementAnalyticsInput.mapping,
+    reports: input.reports,
   });

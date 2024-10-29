@@ -23,6 +23,8 @@ import {
 import {
   ANALYZE_MAPPING_MODEL_COVERAGE_COMMAND_ID,
   ANALYZE_MAPPING_MODEL_COVERAGE_RESPONSE,
+  CHECK_DATASET_ENTITLEMENTS_COMMAND_ID,
+  CHECK_DATASET_ENTITLEMENTS_RESPONSE,
   DEBUG_GENERATE_EXECUTION_PLAN_COMMAND_ID,
   DEBUG_GENERATE_EXECUTION_PLAN_RESPONSE,
   EXECUTE_QUERY_COMMAND_ID,
@@ -266,6 +268,22 @@ export const renderServiceQueryEditorWebView = (
         );
         webview.postMessage({
           command: GET_LAMBDA_RETURN_TYPE_RESPONSE,
+          result,
+        });
+        break;
+      }
+      case CHECK_DATASET_ENTITLEMENTS_COMMAND_ID: {
+        const { mapping, runtime, lambda, reports } = message.msg;
+        const result = await client.generateEntitlementReports(
+          servicePath,
+          serviceId,
+          mapping,
+          runtime,
+          lambda,
+          reports
+        );
+        webview.postMessage({
+          command: CHECK_DATASET_ENTITLEMENTS_RESPONSE,
           result,
         });
         break;

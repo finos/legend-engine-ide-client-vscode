@@ -41,6 +41,7 @@ import {
   GET_LAMBDA_RETURN_TYPE_COMMAND_ID,
   GRAMMAR_TO_JSON_LAMBDA_COMMAND_ID,
   JSON_TO_GRAMMAR_LAMBDA_BATCH_COMMAND_ID,
+  CHECK_DATASET_ENTITLEMENTS_COMMAND_ID,
 } from './utils/Const';
 import type { PlainObject } from './utils/SerializationUtils';
 import {
@@ -267,7 +268,9 @@ export class LegendLanguageClient extends LanguageClient {
 
     if (uri) {
       await workspace.fs.writeFile(uri, Buffer.from(content, 'utf8'));
-      window.showInformationMessage(`File ${downloadFileName} saved successfully!`);
+      window.showInformationMessage(
+        `File ${downloadFileName} saved successfully!`,
+      );
     } else {
       window.showErrorMessage('File save cancelled');
     }
@@ -383,6 +386,29 @@ export class LegendLanguageClient extends LanguageClient {
       GET_LAMBDA_RETURN_TYPE_COMMAND_ID,
       {
         lambda: JSON.stringify(lambda),
+      },
+    );
+  }
+
+  async generateEntitlementReports(
+    serviceFilePath: string,
+    serviceId: string,
+    mapping: string,
+    runtime: string,
+    lambda: V1_RawLambda,
+    reports: { name: string; type: string }[],
+  ): Promise<string> {
+    return commands.executeCommand(
+      LEGEND_COMMAND,
+      serviceFilePath,
+      0,
+      serviceId,
+      CHECK_DATASET_ENTITLEMENTS_COMMAND_ID,
+      {
+        mapping,
+        runtime,
+        lambda: JSON.stringify(lambda),
+        reports: JSON.stringify(reports),
       },
     );
   }
