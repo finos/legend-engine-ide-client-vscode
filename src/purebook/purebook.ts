@@ -29,6 +29,9 @@ import {
   notebooks,
   type NotebookSerializer,
   workspace,
+  window,
+  WorkspaceEdit,
+  Uri,
 } from 'vscode';
 import { LEGEND_COMMAND, LEGEND_LANGUAGE_ID } from '../utils/Const';
 import type { PlainObject } from '@finos/legend-vscode-extension-dependencies';
@@ -103,7 +106,14 @@ export function enableLegendBook(context: ExtensionContext): void {
     executeCells,
   );
 
+  controller.supportsExecutionOrder = true;
+  controller.description = 'Legend Notebook REPL';
+
   context.subscriptions.push(controller);
+
+  context.subscriptions.push(
+    commands.registerCommand('legend.createNotebook', createNotebook),
+  );
 }
 
 async function executeCells(
@@ -149,11 +159,23 @@ async function executeCell(
           execution.end(false, Date.now());
         } else {
           try {
-            execution.replaceOutput([
-              new NotebookCellOutput([
-                NotebookCellOutputItem.json(JSON.parse(funcResult.message)),
-              ]),
-            ]);
+            let output: NotebookCellOutputItem;
+            switch (funcResult.messageType) {
+              case 'text':
+                output = NotebookCellOutputItem.text(funcResult.message);
+                break;
+              case 'json':
+                output = NotebookCellOutputItem.json(
+                  JSON.parse(funcResult.message),
+                );
+                break;
+              default:
+                output = NotebookCellOutputItem.stderr(
+                  `Not supported ${funcResult.messageType}`,
+                );
+            }
+
+            execution.replaceOutput([new NotebookCellOutput([output])]);
             execution.end(true, Date.now());
           } catch (e) {
             execution.replaceOutput([
@@ -173,4 +195,30 @@ async function executeCell(
         execution.end(false, Date.now());
       },
     );
+}
+
+async function createNotebook(): Promise<void> {
+  if (workspace.workspaceFolders) {
+    window
+      .showInputBox({
+        prompt: 'Name for purebook to create',
+      })
+      .then((name) => {
+        if (name) {
+          const wsPath = workspace.workspaceFolders![0]!.uri.fsPath;
+          const filePath = Uri.file(`${wsPath}/${name}.purebook`);
+          const wsedit = new WorkspaceEdit();
+          wsedit.createFile(filePath);
+          workspace.applyEdit(wsedit).then((applied) => {
+            if (applied) {
+              workspace.openNotebookDocument(filePath).then((doc) => {
+                window.showNotebookDocument(doc);
+              });
+            } else {
+              window.showWarningMessage(`Failed to create ${filePath.fsPath}`);
+            }
+          });
+        }
+      });
+  }
 }

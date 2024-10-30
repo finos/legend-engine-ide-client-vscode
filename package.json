@@ -134,6 +134,13 @@
         "command": "legend.refactor.oneEntityPerFile",
         "title": "One Entity Per File Refactoring",
         "icon": "$(type-hierarchy)"
+      },
+      {
+        "command": "legend.createNotebook",
+        "title": "Create Legend REPL Notebook",
+        "icon": "$(repl)",
+        "enablement": "workspaceFolderCount > 0",
+        "category": "Legend"
       }
     ],
     "configuration": {

@@ -535,6 +535,14 @@ export function createStatusBarItem(context: ExtensionContext): void {
     'legend.showCommands.shorcut',
     async () => {
       const items = [];
+
+      if (workspace.workspaceFolders) {
+        items.push({
+          label: '$(repl) Create Legend REPL Notebook',
+          command: 'legend.createNotebook',
+        });
+      }
+
       items.push(
         {
           label: '$(list-tree) Show Legend Concept Tree',
