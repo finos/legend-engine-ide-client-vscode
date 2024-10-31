@@ -119,6 +119,8 @@ import {
   GENERATE_EXECUTION_PLAN_RESPONSE,
   GET_CLASSIFIER_PATH_MAP_REQUEST_ID,
   GET_CLASSIFIER_PATH_MAP_RESPONSE,
+  GET_CURRENT_USER_ID_REQUEST_ID,
+  GET_CURRENT_USER_ID_RESPONSE,
   GET_LAMBDA_RETURN_TYPE_COMMAND_ID,
   GET_LAMBDA_RETURN_TYPE_RESPONSE,
   GET_SUBTYPE_INFO_REQUEST_ID,
@@ -146,9 +148,16 @@ class V1_LSPEngine_Config extends TEMPORARY__AbstractEngineConfig {}
  */
 export class V1_LSPEngine implements V1_GraphManagerEngine {
   config = new V1_LSPEngine_Config();
+  currentUserId: string | undefined = undefined;
 
-  setup = (config: TEMPORARY__EngineSetupConfig): Promise<void> =>
-    Promise.resolve();
+  setup = async (_: TEMPORARY__EngineSetupConfig): Promise<void> => {
+    this.currentUserId = await this.postAndWaitForMessage<string>(
+      {
+        command: GET_CURRENT_USER_ID_REQUEST_ID,
+      },
+      GET_CURRENT_USER_ID_RESPONSE,
+    );
+  };
 
   private postAndWaitForMessage = <T>(
     requestMessage: { command: string; msg?: PlainObject },
@@ -688,6 +697,10 @@ export class V1_LSPEngine implements V1_GraphManagerEngine {
 
   async cancelUserExecutions(broadcastToCluster: boolean): Promise<string> {
     throw new Error('cancelUserExecutions not implemented');
+  }
+
+  getCurrentUserId(): string | undefined {
+    return this.currentUserId;
   }
 
   // ------------------------------------------ Analysis ------------------------------------------

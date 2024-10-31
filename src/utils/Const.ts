@@ -67,6 +67,7 @@ export const SURVEY_DATASETS_COMMAND_ID = 'legend.entitlements.surveyDatasets';
 export const CHECK_DATASET_ENTITLEMENTS_COMMAND_ID = 'legend.entitlements.checkDatasetEntitlements';
 
 // LSP Request IDs
+export const GET_CURRENT_USER_ID_REQUEST_ID = 'legend/getCurrentUserId';
 export const TDS_JSON_REQUEST_ID = 'legend/TDSRequest';
 export const REPL_CLASSPATH_REQUEST_ID = 'legend/replClasspath';
 export const TEST_CASES_REQUEST_ID = 'legend/testCases';
@@ -87,6 +88,7 @@ export const QUERY_BUILDER_CONFIG_ERROR = 'queryBuilderConfigError';
 export const EXPORT_DATA_COMMAND_ID = 'legend.query.exportData';
 
 // Response events
+export const GET_CURRENT_USER_ID_RESPONSE = `${GET_CURRENT_USER_ID_REQUEST_ID}/response`;
 export const GET_CLASSIFIER_PATH_MAP_RESPONSE = `${GET_CLASSIFIER_PATH_MAP_REQUEST_ID}/response`;
 export const GET_SUBTYPE_INFO_RESPONSE = `${GET_SUBTYPE_INFO_REQUEST_ID}/response`;
 export const ANALYZE_MAPPING_MODEL_COVERAGE_RESPONSE = `${ANALYZE_MAPPING_MODEL_COVERAGE_COMMAND_ID}/response`;

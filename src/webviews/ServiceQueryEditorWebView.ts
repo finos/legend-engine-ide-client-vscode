@@ -35,6 +35,8 @@ import {
   GENERATE_EXECUTION_PLAN_RESPONSE,
   GET_CLASSIFIER_PATH_MAP_REQUEST_ID,
   GET_CLASSIFIER_PATH_MAP_RESPONSE,
+  GET_CURRENT_USER_ID_REQUEST_ID,
+  GET_CURRENT_USER_ID_RESPONSE,
   GET_LAMBDA_RETURN_TYPE_COMMAND_ID,
   GET_LAMBDA_RETURN_TYPE_RESPONSE,
   GET_PROJECT_ENTITIES,
@@ -116,6 +118,14 @@ export const renderServiceQueryEditorWebView = (
         window.showErrorMessage('Error setting up Query Builder', {
           modal: true,
           detail: message.msg,
+        });
+        break;
+      }
+      case GET_CURRENT_USER_ID_REQUEST_ID: {
+        const result = await client.getCurrentUserId();
+        webview.postMessage({
+          command: GET_CURRENT_USER_ID_RESPONSE,
+          result,
         });
         break;
       }

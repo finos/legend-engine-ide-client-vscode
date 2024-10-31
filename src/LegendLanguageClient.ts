@@ -43,6 +43,7 @@ import {
   JSON_TO_GRAMMAR_LAMBDA_BATCH_COMMAND_ID,
   CHECK_DATASET_ENTITLEMENTS_COMMAND_ID,
   SURVEY_DATASETS_COMMAND_ID,
+  GET_CURRENT_USER_ID_REQUEST_ID,
 } from './utils/Const';
 import type { PlainObject } from './utils/SerializationUtils';
 import {
@@ -168,6 +169,14 @@ export class LegendLanguageClient extends LanguageClient {
       return this.sendRequest(LEGEND_WRITE_ENTITY_REQUEST_ID, request, token);
     } else {
       return this.sendRequest(LEGEND_WRITE_ENTITY_REQUEST_ID, request);
+    }
+  }
+
+  async getCurrentUserId(token?: CancellationToken): Promise<string> {
+    if (token) {
+      return this.sendRequest(GET_CURRENT_USER_ID_REQUEST_ID, token);
+    } else {
+      return this.sendRequest(GET_CURRENT_USER_ID_REQUEST_ID);
     }
   }
 
