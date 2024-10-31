@@ -19,21 +19,21 @@ import {
   type Entity,
   type ExecutionOptions,
   type PlainObject,
+  type PureProtocolProcessorPlugin,
+  type V1_EntitlementReportAnalyticsInput,
   type V1_ExecuteInput,
+  type V1_StoreEntitlementAnalysisInput,
   buildPureGraphManager,
   GraphManagerState,
   guaranteeType,
-  PureProtocolProcessorPlugin,
-  V1_EntitlementReportAnalyticsInput,
   V1_PureGraphManager,
-  V1_StoreEntitlementAnalysisInput,
 } from '@finos/legend-vscode-extension-dependencies';
 import { type LegendVSCodeApplicationConfig } from '../application/LegendVSCodeApplicationConfig';
 import { type LegendVSCodePluginManager } from '../application/LegendVSCodePluginManager';
 import { type V1_LSPEngine } from '../graph/V1_LSPEngine';
 import { V1_LSPExecuteInput } from '../model/engine/ExecuteQueryInput';
 import {
-  V1_LSPEntitlementReportAnallyticsInput,
+  type V1_LSPEntitlementReportAnallyticsInput,
   V1_LSPEntitlementReportAnallyticsInputModelSchema,
 } from '../model/engine/EntitlementReportAnalyticsInput';
 import { serialize } from 'serializr';
@@ -81,7 +81,7 @@ export const buildGraphManagerStateFromEntities = async (
   return graphManagerState;
 };
 
-export const executeInputToLSPExecuteInput = (
+export const executeInputToLSPInput = (
   input: V1_ExecuteInput,
   options?: ExecutionOptions,
 ): PlainObject<V1_LSPExecuteInput> =>

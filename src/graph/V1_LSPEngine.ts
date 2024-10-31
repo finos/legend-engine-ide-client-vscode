@@ -137,7 +137,7 @@ import { LegendExecutionResultType } from '../results/LegendExecutionResultType'
 import { textLocationToSourceInformation } from '../utils/SourceInformationUtils';
 import {
   entitlementReportAnalyticsInputToLSPInput,
-  executeInputToLSPExecuteInput,
+  executeInputToLSPInput,
   surveyDatasetsInputToLSPInput,
 } from '../utils/GraphUtils';
 
@@ -438,7 +438,7 @@ export class V1_LSPEngine implements V1_GraphManagerEngine {
         {
           command: EXPORT_DATA_COMMAND_ID,
           msg: {
-            ...executeInputToLSPExecuteInput(input, options),
+            ...executeInputToLSPInput(input, options),
             downloadFileName,
           },
         },
@@ -466,7 +466,7 @@ export class V1_LSPEngine implements V1_GraphManagerEngine {
     const response = await this.postAndWaitForMessage<LegendExecutionResult[]>(
       {
         command: EXECUTE_QUERY_COMMAND_ID,
-        msg: executeInputToLSPExecuteInput(input, options),
+        msg: executeInputToLSPInput(input, options),
       },
       EXECUTE_QUERY_RESPONSE,
     );
@@ -526,7 +526,7 @@ export class V1_LSPEngine implements V1_GraphManagerEngine {
     const response = await this.postAndWaitForMessage<LegendExecutionResult[]>(
       {
         command: GENERATE_EXECUTION_PLAN_COMMAND_ID,
-        msg: executeInputToLSPExecuteInput(input),
+        msg: executeInputToLSPInput(input),
       },
       GENERATE_EXECUTION_PLAN_RESPONSE,
     );
@@ -539,7 +539,7 @@ export class V1_LSPEngine implements V1_GraphManagerEngine {
     const response = await this.postAndWaitForMessage<LegendExecutionResult[]>(
       {
         command: DEBUG_GENERATE_EXECUTION_PLAN_COMMAND_ID,
-        msg: executeInputToLSPExecuteInput(input),
+        msg: executeInputToLSPInput(input),
       },
       DEBUG_GENERATE_EXECUTION_PLAN_RESPONSE,
     );
