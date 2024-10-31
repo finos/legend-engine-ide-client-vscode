@@ -28,6 +28,7 @@ export class LegendExecutionResult {
   message!: string;
   logMessage?: string | undefined;
   location?: TextLocation | undefined;
+  messageType?: string | undefined;
 
   static readonly serialization = new SerializationFactory(
     createModelSchema(LegendExecutionResult, {
@@ -36,6 +37,7 @@ export class LegendExecutionResult {
       message: primitive(),
       logMessage: optional(primitive()),
       location: usingModelSchema(TextLocation.serialization.schema),
+      messageType: optional(primitive()),
     }),
   );
 }
