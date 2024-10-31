@@ -43,7 +43,6 @@ import {
   JSON_TO_GRAMMAR_LAMBDA_BATCH_COMMAND_ID,
   CHECK_DATASET_ENTITLEMENTS_COMMAND_ID,
   SURVEY_DATASETS_COMMAND_ID,
-  GET_CURRENT_USER_ID_REQUEST_ID,
 } from './utils/Const';
 import type { PlainObject } from './utils/SerializationUtils';
 import {
@@ -172,11 +171,25 @@ export class LegendLanguageClient extends LanguageClient {
     }
   }
 
-  async getCurrentUserId(token?: CancellationToken): Promise<string> {
-    if (token) {
-      return this.sendRequest(GET_CURRENT_USER_ID_REQUEST_ID, token);
-    } else {
-      return this.sendRequest(GET_CURRENT_USER_ID_REQUEST_ID);
+  getCurrentUserId(): string | undefined {
+    try {
+      const envVars = workspace
+        .getConfiguration('legend')
+        .get('userNameEnvVariables', []);
+      for (const envVar of envVars) {
+        // eslint-disable-next-line no-process-env
+        const userId = process.env[envVar];
+        if (userId) {
+          return userId;
+        }
+      }
+      return undefined;
+    } catch (error) {
+      window.showErrorMessage(
+        'Failed to get current user id',
+        error instanceof Error ? error.message : String(error),
+      );
+      throw error;
     }
   }
 

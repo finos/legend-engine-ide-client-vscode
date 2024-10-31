@@ -148,7 +148,7 @@ class V1_LSPEngine_Config extends TEMPORARY__AbstractEngineConfig {}
  */
 export class V1_LSPEngine implements V1_GraphManagerEngine {
   config = new V1_LSPEngine_Config();
-  currentUserId: string | undefined = undefined;
+  currentUserId: string | undefined;
 
   setup = async (_: TEMPORARY__EngineSetupConfig): Promise<void> => {
     this.currentUserId = await this.postAndWaitForMessage<string>(

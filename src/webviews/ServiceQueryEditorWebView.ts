@@ -122,7 +122,7 @@ export const renderServiceQueryEditorWebView = (
         break;
       }
       case GET_CURRENT_USER_ID_REQUEST_ID: {
-        const result = await client.getCurrentUserId();
+        const result = client.getCurrentUserId();
         webview.postMessage({
           command: GET_CURRENT_USER_ID_RESPONSE,
           result,
