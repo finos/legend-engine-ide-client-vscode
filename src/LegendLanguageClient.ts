@@ -171,28 +171,6 @@ export class LegendLanguageClient extends LanguageClient {
     }
   }
 
-  getCurrentUserId(): string | undefined {
-    try {
-      const envVars = workspace
-        .getConfiguration('legend')
-        .get('userNameEnvVariables', []);
-      for (const envVar of envVars) {
-        // eslint-disable-next-line no-process-env
-        const userId = process.env[envVar];
-        if (userId) {
-          return userId;
-        }
-      }
-      return undefined;
-    } catch (error) {
-      window.showErrorMessage(
-        'Failed to get current user id',
-        error instanceof Error ? error.message : String(error),
-      );
-      throw error;
-    }
-  }
-
   async getClassifierPathMap(token?: CancellationToken): Promise<string> {
     if (token) {
       return this.sendRequest(GET_CLASSIFIER_PATH_MAP_REQUEST_ID, token);

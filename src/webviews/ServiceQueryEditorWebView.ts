@@ -56,7 +56,7 @@ import {
   type LegendLanguageClient,
   LegendEntitiesRequest,
 } from '../LegendLanguageClient';
-import { getWebviewHtml } from './utils';
+import { getCurrentUserId, getWebviewHtml } from './utils';
 import { type LegendConceptTreeProvider } from '../conceptTree';
 import { type PlainObject } from '../utils/SerializationUtils';
 import { guaranteeNonNullable } from '../utils/AssertionUtils';
@@ -122,7 +122,7 @@ export const renderServiceQueryEditorWebView = (
         break;
       }
       case GET_CURRENT_USER_ID_REQUEST_ID: {
-        const result = client.getCurrentUserId();
+        const result = getCurrentUserId(context);
         webview.postMessage({
           command: GET_CURRENT_USER_ID_RESPONSE,
           result,

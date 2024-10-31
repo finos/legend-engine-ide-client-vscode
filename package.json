@@ -162,15 +162,6 @@
           "default": "",
           "description": "Set the AgGrid License to enable enterprise features.  Without a licence, only community features are available"
         },
-        "legend.userNameEnvVariables": {
-          "type": "array",
-          "default": ["USER"],
-          "items": {
-            "type": "string",
-            "description": "Environment variable to use for getting the current user's username"
-          },
-          "description": "Specifices the environment variables to use to get the current user's username. The first one that is found will be used."
-        },
         "legend.extensions.dependencies.pom": {
           "type": "string",
           "default": "",

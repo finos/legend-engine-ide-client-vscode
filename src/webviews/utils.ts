@@ -55,3 +55,7 @@ export const getWebviewHtml = (
     </html>
   `;
 };
+
+export const getCurrentUserId = (
+  context: ExtensionContext,
+): string | undefined => context.globalState.get('currentUserId');
