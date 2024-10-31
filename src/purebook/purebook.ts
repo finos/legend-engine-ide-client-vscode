@@ -106,6 +106,7 @@ export function enableLegendBook(context: ExtensionContext): void {
     executeCells,
   );
 
+  controller.supportedLanguages = [ LEGEND_LANGUAGE_ID ];
   controller.supportsExecutionOrder = true;
   controller.description = 'Legend Notebook REPL';
 
