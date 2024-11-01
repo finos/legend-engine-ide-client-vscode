@@ -21,42 +21,16 @@ import {
   workspace,
 } from 'vscode';
 import {
-  ANALYZE_MAPPING_MODEL_COVERAGE_COMMAND_ID,
-  ANALYZE_MAPPING_MODEL_COVERAGE_RESPONSE,
-  CHECK_DATASET_ENTITLEMENTS_COMMAND_ID,
-  CHECK_DATASET_ENTITLEMENTS_RESPONSE,
-  DEBUG_GENERATE_EXECUTION_PLAN_COMMAND_ID,
-  DEBUG_GENERATE_EXECUTION_PLAN_RESPONSE,
-  EXECUTE_QUERY_COMMAND_ID,
-  EXECUTE_QUERY_RESPONSE,
-  EXPORT_DATA_COMMAND_ID,
-  EXPORT_DATA_RESPONSE,
-  GENERATE_EXECUTION_PLAN_COMMAND_ID,
-  GENERATE_EXECUTION_PLAN_RESPONSE,
-  GET_CLASSIFIER_PATH_MAP_REQUEST_ID,
-  GET_CLASSIFIER_PATH_MAP_RESPONSE,
-  GET_CURRENT_USER_ID_REQUEST_ID,
-  GET_CURRENT_USER_ID_RESPONSE,
-  GET_LAMBDA_RETURN_TYPE_COMMAND_ID,
-  GET_LAMBDA_RETURN_TYPE_RESPONSE,
   GET_PROJECT_ENTITIES,
   GET_PROJECT_ENTITIES_RESPONSE,
-  GET_SUBTYPE_INFO_REQUEST_ID,
-  GET_SUBTYPE_INFO_RESPONSE,
-  GRAMMAR_TO_JSON_LAMBDA_COMMAND_ID,
-  GRAMMAR_TO_JSON_LAMBDA_RESPONSE,
-  JSON_TO_GRAMMAR_LAMBDA_BATCH_COMMAND_ID,
-  JSON_TO_GRAMMAR_LAMBDA_BATCH_RESPONSE,
   QUERY_BUILDER_CONFIG_ERROR,
-  SURVEY_DATASETS_COMMAND_ID,
-  SURVEY_DATASETS_RESPONSE,
   WRITE_ENTITY,
 } from '../utils/Const';
 import {
   type LegendLanguageClient,
   LegendEntitiesRequest,
 } from '../LegendLanguageClient';
-import { getCurrentUserId, getWebviewHtml } from './utils';
+import { getWebviewHtml, handleV1LSPEngineMessage } from './utils';
 import { type LegendConceptTreeProvider } from '../conceptTree';
 import { type PlainObject } from '../utils/SerializationUtils';
 import { guaranteeNonNullable } from '../utils/AssertionUtils';
@@ -92,6 +66,19 @@ export const renderServiceQueryEditorWebView = (
   );
 
   webview.onDidReceiveMessage(async (message) => {
+    if (
+      await handleV1LSPEngineMessage(
+        webview,
+        servicePath,
+        serviceId,
+        client,
+        context,
+        legendConceptTree,
+        message,
+      )
+    ) {
+      return;
+    }
     switch (message.command) {
       case GET_PROJECT_ENTITIES: {
         const entities = await client.entities(new LegendEntitiesRequest([]));
@@ -118,223 +105,6 @@ export const renderServiceQueryEditorWebView = (
         window.showErrorMessage('Error setting up Query Builder', {
           modal: true,
           detail: message.msg,
-        });
-        break;
-      }
-      case GET_CURRENT_USER_ID_REQUEST_ID: {
-        const result = getCurrentUserId(context);
-        webview.postMessage({
-          command: GET_CURRENT_USER_ID_RESPONSE,
-          result,
-        });
-        break;
-      }
-      case GET_CLASSIFIER_PATH_MAP_REQUEST_ID: {
-        const result = await client.getClassifierPathMap();
-        webview.postMessage({
-          command: GET_CLASSIFIER_PATH_MAP_RESPONSE,
-          result,
-        });
-        break;
-      }
-      case GET_SUBTYPE_INFO_REQUEST_ID: {
-        const result = await client.getSubtypeInfo();
-        webview.postMessage({
-          command: GET_SUBTYPE_INFO_RESPONSE,
-          result,
-        });
-        break;
-      }
-      case ANALYZE_MAPPING_MODEL_COVERAGE_COMMAND_ID: {
-        const mappingId = (message.msg as { mapping: string }).mapping;
-        const mappingPath = guaranteeNonNullable(
-          legendConceptTree
-            .getTreeItemById(mappingId)
-            ?.location?.uri.toString(),
-          `Can't find mapping file with ID '${mappingId}'`,
-        );
-        const result = await client.analyzeMappingModelCoverage(
-          mappingPath,
-          mappingId,
-        );
-        webview.postMessage({
-          command: ANALYZE_MAPPING_MODEL_COVERAGE_RESPONSE,
-          result,
-        });
-        break;
-      }
-      case EXECUTE_QUERY_COMMAND_ID: {
-        const {
-          lambda,
-          mapping,
-          runtime,
-          context: executionContext,
-          parameterValues,
-          serializationFormat,
-        } = message.msg;
-        const result = await client.executeQuery(
-          servicePath,
-          serviceId,
-          lambda,
-          mapping,
-          runtime,
-          executionContext,
-          parameterValues ?? {},
-          serializationFormat,
-        );
-        webview.postMessage({
-          command: EXECUTE_QUERY_RESPONSE,
-          result,
-        });
-        break;
-      }
-      case EXPORT_DATA_COMMAND_ID: {
-        const {
-          lambda,
-          mapping,
-          runtime,
-          context: executionContext,
-          parameterValues,
-          serializationFormat,
-          downloadFileName,
-        } = message.msg;
-        const result = await client.exportData(
-          servicePath,
-          serviceId,
-          lambda,
-          mapping,
-          runtime,
-          executionContext,
-          parameterValues ?? [],
-          downloadFileName,
-          serializationFormat,
-        );
-        webview.postMessage({
-          command: EXPORT_DATA_RESPONSE,
-          result,
-        });
-        break;
-      }
-      case GENERATE_EXECUTION_PLAN_COMMAND_ID: {
-        const {
-          lambda,
-          mapping,
-          runtime,
-          context: executionContext,
-          parameterValues,
-        } = message.msg;
-        const result = await client.generateExecutionPlan(
-          servicePath,
-          serviceId,
-          lambda,
-          mapping,
-          runtime,
-          executionContext,
-          parameterValues ?? [],
-        );
-        webview.postMessage({
-          command: GENERATE_EXECUTION_PLAN_RESPONSE,
-          result,
-        });
-        break;
-      }
-      case DEBUG_GENERATE_EXECUTION_PLAN_COMMAND_ID: {
-        const {
-          lambda,
-          mapping,
-          runtime,
-          context: executionContext,
-          parameterValues,
-        } = message.msg;
-        const result = await client.debugGenerateExecutionPlan(
-          servicePath,
-          serviceId,
-          lambda,
-          mapping,
-          runtime,
-          executionContext,
-          parameterValues ?? [],
-        );
-        webview.postMessage({
-          command: DEBUG_GENERATE_EXECUTION_PLAN_RESPONSE,
-          result,
-        });
-        break;
-      }
-      case GRAMMAR_TO_JSON_LAMBDA_COMMAND_ID: {
-        const { code, lambdaId, options } = message.msg;
-        const result = await client.grammarToJson_lambda(
-          servicePath,
-          serviceId,
-          code,
-          lambdaId,
-          undefined,
-          undefined,
-          options?.pruneSourceInformation !== undefined
-            ? !options.pruneSourceInformation
-            : true,
-        );
-        webview.postMessage({
-          command: GRAMMAR_TO_JSON_LAMBDA_RESPONSE,
-          result,
-        });
-        break;
-      }
-      case JSON_TO_GRAMMAR_LAMBDA_BATCH_COMMAND_ID: {
-        const { lambdas, renderStyle } = message.msg;
-        const result = await client.jsonToGrammar_lambda_batch(
-          servicePath,
-          serviceId,
-          lambdas,
-          renderStyle,
-        );
-        webview.postMessage({
-          command: JSON_TO_GRAMMAR_LAMBDA_BATCH_RESPONSE,
-          result,
-        });
-        break;
-      }
-      case GET_LAMBDA_RETURN_TYPE_COMMAND_ID: {
-        const { lambda } = message.msg;
-        const result = await client.getLambdaReturnType(
-          servicePath,
-          serviceId,
-          lambda,
-        );
-        webview.postMessage({
-          command: GET_LAMBDA_RETURN_TYPE_RESPONSE,
-          result,
-        });
-        break;
-      }
-      case SURVEY_DATASETS_COMMAND_ID: {
-        const { mapping, runtime, lambda } = message.msg;
-        const result = await client.generateDatasetSpecifications(
-          servicePath,
-          serviceId,
-          mapping,
-          runtime,
-          lambda,
-        );
-        webview.postMessage({
-          command: SURVEY_DATASETS_RESPONSE,
-          result,
-        });
-        break;
-      }
-      case CHECK_DATASET_ENTITLEMENTS_COMMAND_ID: {
-        const { mapping, runtime, lambda, reports } = message.msg;
-        const result = await client.generateEntitlementReports(
-          servicePath,
-          serviceId,
-          mapping,
-          runtime,
-          lambda,
-          reports,
-        );
-        webview.postMessage({
-          command: CHECK_DATASET_ENTITLEMENTS_RESPONSE,
-          result,
         });
         break;
       }

@@ -253,6 +253,7 @@ const showDiagramWebView = async (
       entities,
       workspace.getConfiguration('legend').get('studio.forms.file', ''),
       client,
+      legendConceptTreeProvider,
     );
   }
 };

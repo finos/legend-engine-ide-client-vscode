@@ -23,8 +23,10 @@ import {
   WRITE_ENTITY,
 } from '../utils/Const';
 import type { LegendLanguageClient } from '../LegendLanguageClient';
-import { getWebviewHtml } from './utils';
+import { getWebviewHtml, handleV1LSPEngineMessage } from './utils';
 import { type PlainObject } from '@finos/legend-vscode-extension-dependencies';
+import { guaranteeNonNullable } from '../utils/AssertionUtils';
+import { type LegendConceptTreeProvider } from '../conceptTree';
 
 export const renderDiagramRendererWebView = (
   diagramRendererWebViewPanel: WebviewPanel,
@@ -33,8 +35,14 @@ export const renderDiagramRendererWebView = (
   entities: LegendEntity[],
   renderFilePath: string,
   client: LegendLanguageClient,
+  legendConceptTree: LegendConceptTreeProvider,
 ): void => {
   const { webview } = diagramRendererWebViewPanel;
+
+  const diagramPath = guaranteeNonNullable(
+    legendConceptTree.getTreeItemById(diagramId)?.location?.uri.toString(),
+    `Can't find diagram file with ID '${diagramId}'`,
+  );
 
   // Construct data input parameters
   const dataInputParams: PlainObject = {
@@ -50,6 +58,19 @@ export const renderDiagramRendererWebView = (
   );
 
   webview.onDidReceiveMessage(async (message) => {
+    if (
+      await handleV1LSPEngineMessage(
+        webview,
+        diagramPath,
+        diagramId,
+        client,
+        context,
+        legendConceptTree,
+        message,
+      )
+    ) {
+      return;
+    }
     switch (message.command) {
       case GET_PROJECT_ENTITIES: {
         webview.postMessage({
