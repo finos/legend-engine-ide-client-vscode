@@ -24,6 +24,7 @@ import {
   BrowserEnvironmentProvider,
   Core_GraphManagerPreset,
   Core_LegendApplicationPlugin,
+  DSL_Diagram_GraphManagerPreset,
   QueryBuilder_GraphManagerPreset,
   QueryBuilder_LegendApplicationPlugin,
 } from '@finos/legend-vscode-extension-dependencies';
@@ -58,6 +59,7 @@ export const LegendVSCodeApplication = (props: {
         .usePresets([
           new Core_GraphManagerPreset(),
           new QueryBuilder_GraphManagerPreset(),
+          new DSL_Diagram_GraphManagerPreset(),
         ])
         .usePlugins([
           new Core_LegendApplicationPlugin(),
