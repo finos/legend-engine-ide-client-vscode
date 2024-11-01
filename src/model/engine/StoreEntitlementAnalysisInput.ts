@@ -4,11 +4,7 @@ import {
   usingModelSchema,
   V1_rawLambdaModelSchema,
 } from '@finos/legend-vscode-extension-dependencies';
-import {
-  createModelSchema,
-  optional,
-  primitive,
-} from 'serializr';
+import { createModelSchema, optional, primitive } from 'serializr';
 
 export class V1_LSPStoreEntitlementAnalysisInput {
   lambda?: V1_RawLambda | undefined;

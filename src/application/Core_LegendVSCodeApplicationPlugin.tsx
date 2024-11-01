@@ -27,7 +27,7 @@ import {
   SaveCurrIcon,
   ServiceQueryBuilderState,
   V1_PureGraphManager,
-  V1_serializePackageableElement
+  V1_serializePackageableElement,
 } from '@finos/legend-vscode-extension-dependencies';
 import { LegendVSCodeApplicationPlugin } from './LegendVSCodeApplicationPlugin';
 import { postMessage } from '../utils/VsCodeUtils';
@@ -60,7 +60,10 @@ export class Core_LegendVSCodeApplicationPlugin extends LegendVSCodeApplicationP
                     queryBuilderState.graphManagerState.graph.getService(
                       queryBuilderState.service.path,
                     );
-                  const serviceExecution = guaranteeType(service.execution, PureExecution);
+                  const serviceExecution = guaranteeType(
+                    service.execution,
+                    PureExecution,
+                  );
                   pureExecution_setFunction(serviceExecution, rawLambda);
                   const serviceProtocol =
                     graphManager.elementToProtocol<V1_Service>(

@@ -64,7 +64,8 @@ export const JSON_TO_GRAMMAR_LAMBDA_BATCH_COMMAND_ID =
   'legend.jsonToGrammar.lambda.batch';
 export const GET_LAMBDA_RETURN_TYPE_COMMAND_ID = 'legend.lambda.returnType';
 export const SURVEY_DATASETS_COMMAND_ID = 'legend.entitlements.surveyDatasets';
-export const CHECK_DATASET_ENTITLEMENTS_COMMAND_ID = 'legend.entitlements.checkDatasetEntitlements';
+export const CHECK_DATASET_ENTITLEMENTS_COMMAND_ID =
+  'legend.entitlements.checkDatasetEntitlements';
 
 // LSP Request IDs
 export const GET_CURRENT_USER_ID_REQUEST_ID = 'legend/getCurrentUserId';

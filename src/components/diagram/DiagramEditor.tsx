@@ -39,9 +39,9 @@ import { V1_LSPEngine } from '../../graph/V1_LSPEngine';
 export const DiagramEditor = observer(
   ({ diagramEditorState }: { diagramEditorState: DiagramEditorState }) => {
     const applicationStore = useApplicationStore<
-    LegendVSCodeApplicationConfig,
-    LegendVSCodePluginManager
-  >();
+      LegendVSCodeApplicationConfig,
+      LegendVSCodePluginManager
+    >();
     const diagramCanvasRef = useRef<HTMLDivElement>(null);
     const { diagramId } = diagramEditorState;
     const [entities, setEntities] = useState<Entity[]>([]);
@@ -67,7 +67,11 @@ export const DiagramEditor = observer(
 
     useEffect(() => {
       if (entities.length && diagramId) {
-        buildGraphManagerStateFromEntities(entities, applicationStore, new V1_LSPEngine())
+        buildGraphManagerStateFromEntities(
+          entities,
+          applicationStore,
+          new V1_LSPEngine(),
+        )
           .then((graphManager) => {
             const diagram = getDiagram(diagramId, graphManager.graph);
             diagramEditorState.setDiagram(diagram);

@@ -514,8 +514,11 @@ export function activate(context: ExtensionContext): void {
   context.subscriptions.push(...disposables);
   legendConceptTreeProvider = treeDataProvider;
   enableLegendBook(context);
-  // eslint-disable-next-line no-process-env
-  context.globalState.update('currentUserId', process.env.CODER_USERNAME || process.env.USER);
+  context.globalState.update(
+    'currentUserId',
+    // eslint-disable-next-line no-process-env
+    process.env.CODER_USERNAME || process.env.USER,
+  );
 }
 
 export function createStatusBarItem(context: ExtensionContext): void {

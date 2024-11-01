@@ -28,9 +28,7 @@ import {
   QueryBuilder_LegendApplicationPlugin,
 } from '@finos/legend-vscode-extension-dependencies';
 import { useMemo } from 'react';
-import {
-  LegendVSCodeApplicationConfig,
-} from './LegendVSCodeApplicationConfig';
+import { LegendVSCodeApplicationConfig } from './LegendVSCodeApplicationConfig';
 import { LegendVSCodePluginManager } from './LegendVSCodePluginManager';
 import { Core_LegendVSCodeApplicationPlugin } from './Core_LegendVSCodeApplicationPlugin';
 import { postMessage } from '../utils/VsCodeUtils';
