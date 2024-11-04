@@ -201,7 +201,6 @@ export class LegendLanguageClient extends LanguageClient {
 
   async executeQuery(
     entityTextLocation: TextLocation,
-    entityId: string,
     lambda: V1_RawLambda,
     mapping: string | undefined,
     runtime: V1_Runtime | undefined,
@@ -226,7 +225,6 @@ export class LegendLanguageClient extends LanguageClient {
 
   async exportData(
     entityTextLocation: TextLocation,
-    entityId: string,
     lambda: V1_RawLambda,
     mapping: string | undefined,
     runtime: V1_Runtime | undefined,
@@ -276,7 +274,6 @@ export class LegendLanguageClient extends LanguageClient {
 
   async generateExecutionPlan(
     entityTextLocation: TextLocation,
-    entityId: string,
     lambda: V1_RawLambda,
     mapping: string | undefined,
     runtime: V1_Runtime | undefined,
@@ -299,7 +296,6 @@ export class LegendLanguageClient extends LanguageClient {
 
   async debugGenerateExecutionPlan(
     entityTextLocation: TextLocation,
-    entityId: string,
     lambda: V1_RawLambda,
     mapping: string | undefined,
     runtime: V1_Runtime | undefined,
@@ -323,7 +319,6 @@ export class LegendLanguageClient extends LanguageClient {
 
   async grammarToJson_lambda(
     entityTextLocation: TextLocation,
-    entityId: string,
     code: string,
     sourceId?: string | undefined,
     lineOffset?: number | undefined,
@@ -346,7 +341,6 @@ export class LegendLanguageClient extends LanguageClient {
 
   async jsonToGrammar_lambda_batch(
     entityTextLocation: TextLocation,
-    entityId: string,
     lambdas: Record<string, PlainObject<V1_RawLambda>>,
     renderStyle?: V1_RenderStyle | undefined,
   ): Promise<string> {
@@ -363,7 +357,6 @@ export class LegendLanguageClient extends LanguageClient {
 
   async getLambdaReturnType(
     entityTextLocation: TextLocation,
-    entityId: string,
     lambda: V1_RawLambda,
   ): Promise<string> {
     return commands.executeCommand(
@@ -378,7 +371,6 @@ export class LegendLanguageClient extends LanguageClient {
 
   async generateDatasetSpecifications(
     entityTextLocation: TextLocation,
-    entityId: string,
     mapping: string,
     runtime: string,
     lambda: V1_RawLambda,
@@ -397,7 +389,6 @@ export class LegendLanguageClient extends LanguageClient {
 
   async generateEntitlementReports(
     entityTextLocation: TextLocation,
-    entityId: string,
     mapping: string,
     runtime: string,
     lambda: V1_RawLambda,

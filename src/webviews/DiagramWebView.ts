@@ -81,7 +81,6 @@ export const renderDiagramRendererWebView = (
       await handleV1LSPEngineMessage(
         webview,
         diagramTextLocation,
-        diagramId,
         client,
         context,
         legendConceptTree,

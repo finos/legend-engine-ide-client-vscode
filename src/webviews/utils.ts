@@ -99,8 +99,7 @@ export const getCurrentUserId = (
  * if needed).
  *
  * @param webview the webview handling the message
- * @param entityPath the entity path of the entity for the webview
- * @param entityId the ID of the entity for the webview
+ * @param entityTextLocation the text location of the entity used in the webview
  * @param client LegendLanguageClient instance
  * @param context extension context
  * @param message the message being handled
@@ -109,7 +108,6 @@ export const getCurrentUserId = (
 export const handleV1LSPEngineMessage = async (
   webview: Webview,
   entityTextLocation: TextLocation,
-  entityId: string,
   client: LegendLanguageClient,
   context: ExtensionContext,
   legendConceptTree: LegendConceptTreeProvider,
@@ -180,7 +178,6 @@ export const handleV1LSPEngineMessage = async (
       } = message.msg;
       const result = await client.executeQuery(
         entityTextLocation,
-        entityId,
         lambda,
         mapping,
         runtime,
@@ -206,7 +203,6 @@ export const handleV1LSPEngineMessage = async (
       } = message.msg;
       const result = await client.exportData(
         entityTextLocation,
-        entityId,
         lambda,
         mapping,
         runtime,
@@ -231,7 +227,6 @@ export const handleV1LSPEngineMessage = async (
       } = message.msg;
       const result = await client.generateExecutionPlan(
         entityTextLocation,
-        entityId,
         lambda,
         mapping,
         runtime,
@@ -254,7 +249,6 @@ export const handleV1LSPEngineMessage = async (
       } = message.msg;
       const result = await client.debugGenerateExecutionPlan(
         entityTextLocation,
-        entityId,
         lambda,
         mapping,
         runtime,
@@ -271,7 +265,6 @@ export const handleV1LSPEngineMessage = async (
       const { code, lambdaId, options } = message.msg;
       const result = await client.grammarToJson_lambda(
         entityTextLocation,
-        entityId,
         code,
         lambdaId,
         undefined,
@@ -290,7 +283,6 @@ export const handleV1LSPEngineMessage = async (
       const { lambdas, renderStyle } = message.msg;
       const result = await client.jsonToGrammar_lambda_batch(
         entityTextLocation,
-        entityId,
         lambdas,
         renderStyle,
       );
@@ -304,7 +296,6 @@ export const handleV1LSPEngineMessage = async (
       const { lambda } = message.msg;
       const result = await client.getLambdaReturnType(
         entityTextLocation,
-        entityId,
         lambda,
       );
       webview.postMessage({
@@ -317,7 +308,6 @@ export const handleV1LSPEngineMessage = async (
       const { mapping, runtime, lambda } = message.msg;
       const result = await client.generateDatasetSpecifications(
         entityTextLocation,
-        entityId,
         mapping,
         runtime,
         lambda,
@@ -332,7 +322,6 @@ export const handleV1LSPEngineMessage = async (
       const { mapping, runtime, lambda, reports } = message.msg;
       const result = await client.generateEntitlementReports(
         entityTextLocation,
-        entityId,
         mapping,
         runtime,
         lambda,

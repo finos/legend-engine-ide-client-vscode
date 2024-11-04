@@ -85,7 +85,6 @@ export const renderServiceQueryEditorWebView = (
       await handleV1LSPEngineMessage(
         webview,
         serviceTextLocation,
-        serviceId,
         client,
         context,
         legendConceptTree,
