@@ -102,6 +102,7 @@ export const getCurrentUserId = (
  * @param entityTextLocation the text location of the entity used in the webview
  * @param client LegendLanguageClient instance
  * @param context extension context
+ * @param legendConceptTree concept tree provider
  * @param message the message being handled
  * @returns true if the message is handled, false otherwise
  */
