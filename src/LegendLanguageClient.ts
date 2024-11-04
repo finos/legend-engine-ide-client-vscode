@@ -43,6 +43,7 @@ import {
   JSON_TO_GRAMMAR_LAMBDA_BATCH_COMMAND_ID,
   CHECK_DATASET_ENTITLEMENTS_COMMAND_ID,
   SURVEY_DATASETS_COMMAND_ID,
+  GET_SECTION_INDEX_FROM_TEXT_LOCATION_ID,
 } from './utils/Const';
 import type { PlainObject } from './utils/SerializationUtils';
 import {
@@ -62,6 +63,7 @@ import {
   type V1_Runtime,
 } from '@finos/legend-vscode-extension-dependencies';
 import { LegendExecutionResultType } from './results/LegendExecutionResultType';
+import { type TextLocation } from './model/TextLocation';
 
 export class LegendEntitiesRequest {
   private textDocuments!: TextDocumentIdentifier[];
@@ -76,6 +78,17 @@ interface LegendWriteEntityRequest {
 }
 
 export class LegendLanguageClient extends LanguageClient {
+  private async getSectionIndexFromTextLocation(
+    textLocation: TextLocation,
+    token?: CancellationToken,
+  ): Promise<number> {
+    if (token) {
+      return this.sendRequest(GET_SECTION_INDEX_FROM_TEXT_LOCATION_ID, textLocation, token);
+    } else {
+      return this.sendRequest(GET_SECTION_INDEX_FROM_TEXT_LOCATION_ID, textLocation);
+    }
+  }
+
   async sendTDSRequest(
     request: FunctionTDSRequest,
   ): Promise<PlainObject<LegendExecutionResult>> {
@@ -201,8 +214,8 @@ export class LegendLanguageClient extends LanguageClient {
   }
 
   async executeQuery(
-    serviceFilePath: string,
-    serviceId: string,
+    entityTextLocation: TextLocation,
+    entityId: string,
     lambda: V1_RawLambda,
     mapping: string | undefined,
     runtime: V1_Runtime | undefined,
@@ -210,11 +223,12 @@ export class LegendLanguageClient extends LanguageClient {
     parameterValues: { [key: string]: unknown },
     serializationFormat?: EXECUTION_SERIALIZATION_FORMAT | undefined,
   ): Promise<string> {
+    const sectionIndex = await this.getSectionIndexFromTextLocation(entityTextLocation);
     return commands.executeCommand(
       LEGEND_COMMAND,
-      serviceFilePath,
-      0,
-      serviceId,
+      entityTextLocation.documentId,
+      sectionIndex,
+      entityId,
       EXECUTE_QUERY_COMMAND_ID,
       {
         lambda: JSON.stringify(lambda),
@@ -228,8 +242,8 @@ export class LegendLanguageClient extends LanguageClient {
   }
 
   async exportData(
-    serviceFilePath: string,
-    serviceId: string,
+    entityTextLocation: TextLocation,
+    entityId: string,
     lambda: V1_RawLambda,
     mapping: string | undefined,
     runtime: V1_Runtime | undefined,
@@ -238,11 +252,12 @@ export class LegendLanguageClient extends LanguageClient {
     downloadFileName: string,
     serializationFormat?: EXECUTION_SERIALIZATION_FORMAT | undefined,
   ): Promise<LegendExecutionResult> {
+    const sectionIndex = await this.getSectionIndexFromTextLocation(entityTextLocation);
     const response = (await commands.executeCommand(
       LEGEND_COMMAND,
-      serviceFilePath,
-      0,
-      serviceId,
+      entityTextLocation.documentId,
+      sectionIndex,
+      entityId,
       EXECUTE_QUERY_COMMAND_ID,
       {
         lambda: JSON.stringify(lambda),
@@ -280,19 +295,20 @@ export class LegendLanguageClient extends LanguageClient {
   }
 
   async generateExecutionPlan(
-    serviceFilePath: string,
-    serviceId: string,
+    entityTextLocation: TextLocation,
+    entityId: string,
     lambda: V1_RawLambda,
     mapping: string | undefined,
     runtime: V1_Runtime | undefined,
     context: V1_RawExecutionContext,
     parameterValues: V1_ParameterValue[],
   ): Promise<string> {
+    const sectionIndex = await this.getSectionIndexFromTextLocation(entityTextLocation);
     return commands.executeCommand(
       LEGEND_COMMAND,
-      serviceFilePath,
-      0,
-      serviceId,
+      entityTextLocation.documentId,
+      sectionIndex,
+      entityId,
       GENERATE_EXECUTION_PLAN_COMMAND_ID,
       {
         lambda: JSON.stringify(lambda),
@@ -305,19 +321,20 @@ export class LegendLanguageClient extends LanguageClient {
   }
 
   async debugGenerateExecutionPlan(
-    serviceFilePath: string,
-    serviceId: string,
+    entityTextLocation: TextLocation,
+    entityId: string,
     lambda: V1_RawLambda,
     mapping: string | undefined,
     runtime: V1_Runtime | undefined,
     context: V1_RawExecutionContext,
     parameterValues: V1_ParameterValue[],
   ): Promise<string> {
+    const sectionIndex = await this.getSectionIndexFromTextLocation(entityTextLocation);
     return commands.executeCommand(
       LEGEND_COMMAND,
-      serviceFilePath,
-      0,
-      serviceId,
+      entityTextLocation.documentId,
+      sectionIndex,
+      entityId,
       GENERATE_EXECUTION_PLAN_COMMAND_ID,
       {
         lambda: JSON.stringify(lambda),
@@ -331,19 +348,20 @@ export class LegendLanguageClient extends LanguageClient {
   }
 
   async grammarToJson_lambda(
-    serviceFilePath: string,
-    serviceId: string,
+    entityTextLocation: TextLocation,
+    entityId: string,
     code: string,
     sourceId?: string | undefined,
     lineOffset?: number | undefined,
     columnOffset?: number | undefined,
     returnSourceInformation?: boolean | undefined,
   ): Promise<string> {
+    const sectionIndex = await this.getSectionIndexFromTextLocation(entityTextLocation);
     return commands.executeCommand(
       LEGEND_COMMAND,
-      serviceFilePath,
-      0,
-      serviceId,
+      entityTextLocation.documentId,
+      sectionIndex,
+      entityId,
       GRAMMAR_TO_JSON_LAMBDA_COMMAND_ID,
       {
         code,
@@ -356,16 +374,17 @@ export class LegendLanguageClient extends LanguageClient {
   }
 
   async jsonToGrammar_lambda_batch(
-    serviceFilePath: string,
-    serviceId: string,
+    entityTextLocation: TextLocation,
+    entityId: string,
     lambdas: Record<string, PlainObject<V1_RawLambda>>,
     renderStyle?: V1_RenderStyle | undefined,
   ): Promise<string> {
+    const sectionIndex = await this.getSectionIndexFromTextLocation(entityTextLocation);
     return commands.executeCommand(
       LEGEND_COMMAND,
-      serviceFilePath,
-      0,
-      serviceId,
+      entityTextLocation.documentId,
+      sectionIndex,
+      entityId,
       JSON_TO_GRAMMAR_LAMBDA_BATCH_COMMAND_ID,
       {
         lambdas: JSON.stringify(lambdas),
@@ -375,15 +394,16 @@ export class LegendLanguageClient extends LanguageClient {
   }
 
   async getLambdaReturnType(
-    serviceFilePath: string,
-    serviceId: string,
+    entityTextLocation: TextLocation,
+    entityId: string,
     lambda: V1_RawLambda,
   ): Promise<string> {
+    const sectionIndex = await this.getSectionIndexFromTextLocation(entityTextLocation);
     return commands.executeCommand(
       LEGEND_COMMAND,
-      serviceFilePath,
-      0,
-      serviceId,
+      entityTextLocation.documentId,
+      sectionIndex,
+      entityId,
       GET_LAMBDA_RETURN_TYPE_COMMAND_ID,
       {
         lambda: JSON.stringify(lambda),
@@ -392,17 +412,18 @@ export class LegendLanguageClient extends LanguageClient {
   }
 
   async generateDatasetSpecifications(
-    serviceFilePath: string,
-    serviceId: string,
+    entityTextLocation: TextLocation,
+    entityId: string,
     mapping: string,
     runtime: string,
     lambda: V1_RawLambda,
   ): Promise<string> {
+    const sectionIndex = await this.getSectionIndexFromTextLocation(entityTextLocation);
     return commands.executeCommand(
       LEGEND_COMMAND,
-      serviceFilePath,
-      0,
-      serviceId,
+      entityTextLocation.documentId,
+      sectionIndex,
+      entityId,
       SURVEY_DATASETS_COMMAND_ID,
       {
         mapping,
@@ -413,18 +434,19 @@ export class LegendLanguageClient extends LanguageClient {
   }
 
   async generateEntitlementReports(
-    serviceFilePath: string,
-    serviceId: string,
+    entityTextLocation: TextLocation,
+    entityId: string,
     mapping: string,
     runtime: string,
     lambda: V1_RawLambda,
     reports: { name: string; type: string }[],
   ): Promise<string> {
+    const sectionIndex = await this.getSectionIndexFromTextLocation(entityTextLocation);
     return commands.executeCommand(
       LEGEND_COMMAND,
-      serviceFilePath,
-      0,
-      serviceId,
+      entityTextLocation.documentId,
+      sectionIndex,
+      entityId,
       CHECK_DATASET_ENTITLEMENTS_COMMAND_ID,
       {
         mapping,

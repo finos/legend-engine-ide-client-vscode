@@ -48,6 +48,7 @@ import {
 import { type LegendLanguageClient } from '../LegendLanguageClient';
 import { type LegendConceptTreeProvider } from '../conceptTree';
 import { guaranteeNonNullable } from '../utils/AssertionUtils';
+import { type TextLocation } from '../model/TextLocation';
 
 export const getWebviewHtml = (
   webview: Webview,
@@ -107,7 +108,7 @@ export const getCurrentUserId = (
  */
 export const handleV1LSPEngineMessage = async (
   webview: Webview,
-  entityPath: string,
+  entityTextLocation: TextLocation,
   entityId: string,
   client: LegendLanguageClient,
   context: ExtensionContext,
@@ -166,7 +167,7 @@ export const handleV1LSPEngineMessage = async (
         serializationFormat,
       } = message.msg;
       const result = await client.executeQuery(
-        entityPath,
+        entityTextLocation,
         entityId,
         lambda,
         mapping,
@@ -192,7 +193,7 @@ export const handleV1LSPEngineMessage = async (
         downloadFileName,
       } = message.msg;
       const result = await client.exportData(
-        entityPath,
+        entityTextLocation,
         entityId,
         lambda,
         mapping,
@@ -217,7 +218,7 @@ export const handleV1LSPEngineMessage = async (
         parameterValues,
       } = message.msg;
       const result = await client.generateExecutionPlan(
-        entityPath,
+        entityTextLocation,
         entityId,
         lambda,
         mapping,
@@ -240,7 +241,7 @@ export const handleV1LSPEngineMessage = async (
         parameterValues,
       } = message.msg;
       const result = await client.debugGenerateExecutionPlan(
-        entityPath,
+        entityTextLocation,
         entityId,
         lambda,
         mapping,
@@ -257,7 +258,7 @@ export const handleV1LSPEngineMessage = async (
     case GRAMMAR_TO_JSON_LAMBDA_COMMAND_ID: {
       const { code, lambdaId, options } = message.msg;
       const result = await client.grammarToJson_lambda(
-        entityPath,
+        entityTextLocation,
         entityId,
         code,
         lambdaId,
@@ -276,7 +277,7 @@ export const handleV1LSPEngineMessage = async (
     case JSON_TO_GRAMMAR_LAMBDA_BATCH_COMMAND_ID: {
       const { lambdas, renderStyle } = message.msg;
       const result = await client.jsonToGrammar_lambda_batch(
-        entityPath,
+        entityTextLocation,
         entityId,
         lambdas,
         renderStyle,
@@ -290,7 +291,7 @@ export const handleV1LSPEngineMessage = async (
     case GET_LAMBDA_RETURN_TYPE_COMMAND_ID: {
       const { lambda } = message.msg;
       const result = await client.getLambdaReturnType(
-        entityPath,
+        entityTextLocation,
         entityId,
         lambda,
       );
@@ -303,7 +304,7 @@ export const handleV1LSPEngineMessage = async (
     case SURVEY_DATASETS_COMMAND_ID: {
       const { mapping, runtime, lambda } = message.msg;
       const result = await client.generateDatasetSpecifications(
-        entityPath,
+        entityTextLocation,
         entityId,
         mapping,
         runtime,
@@ -318,7 +319,7 @@ export const handleV1LSPEngineMessage = async (
     case CHECK_DATASET_ENTITLEMENTS_COMMAND_ID: {
       const { mapping, runtime, lambda, reports } = message.msg;
       const result = await client.generateEntitlementReports(
-        entityPath,
+        entityTextLocation,
         entityId,
         mapping,
         runtime,

@@ -16,6 +16,7 @@
 
 import {
   type ExtensionContext,
+  type Location,
   type WebviewPanel,
   window,
   workspace,
@@ -34,6 +35,7 @@ import { getWebviewHtml, handleV1LSPEngineMessage } from './utils';
 import { type LegendConceptTreeProvider } from '../conceptTree';
 import { type PlainObject } from '../utils/SerializationUtils';
 import { guaranteeNonNullable } from '../utils/AssertionUtils';
+import { TextLocation } from '../model/TextLocation';
 
 export const renderServiceQueryEditorWebView = (
   serviceQueryEditorWebViewPanel: WebviewPanel,
@@ -46,10 +48,23 @@ export const renderServiceQueryEditorWebView = (
 ): void => {
   const { webview } = serviceQueryEditorWebViewPanel;
 
-  const servicePath = guaranteeNonNullable(
-    legendConceptTree.getTreeItemById(serviceId)?.location?.uri.toString(),
+  const serviceLocation: Location = guaranteeNonNullable(
+    legendConceptTree.getTreeItemById(serviceId)?.location,
     `Can't find service file with ID '${serviceId}'`,
   );
+  const serviceTextLocation = TextLocation.serialization.fromJson({
+    documentId: serviceLocation.uri.toString(),
+    textInterval: {
+      start: {
+        line: serviceLocation.range.start.line,
+        column: serviceLocation.range.start.character,
+      },
+      end: {
+        line: serviceLocation.range.end.line,
+        column: serviceLocation.range.end.character,
+      },
+    },
+  });
 
   // Construct data input parameters
   const dataInputParams: PlainObject = {
@@ -69,7 +84,7 @@ export const renderServiceQueryEditorWebView = (
     if (
       await handleV1LSPEngineMessage(
         webview,
-        servicePath,
+        serviceTextLocation,
         serviceId,
         client,
         context,
@@ -109,7 +124,7 @@ export const renderServiceQueryEditorWebView = (
         break;
       }
       default:
-        throw new Error(`Unsupported request ${message.command}`);
+        break;
     }
   }, undefined);
 };
