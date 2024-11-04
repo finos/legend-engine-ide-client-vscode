@@ -79,7 +79,6 @@ export const LEGEND_WRITE_ENTITY_REQUEST_ID = 'legend/writeEntity';
 export const LEGEND_COMMAND_REQUEST_ID = 'legend/command';
 export const GET_CLASSIFIER_PATH_MAP_REQUEST_ID = 'legend/getClassifierPathMap';
 export const GET_SUBTYPE_INFO_REQUEST_ID = 'legend/getSubtypeInfo';
-export const GET_SECTION_INDEX_FROM_TEXT_LOCATION_ID = 'legend/getSectionIndexFromTextLocation';
 
 // Event Types
 export const GET_PROJECT_ENTITIES = 'getProjectEntities';

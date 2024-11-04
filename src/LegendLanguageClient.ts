@@ -43,7 +43,6 @@ import {
   JSON_TO_GRAMMAR_LAMBDA_BATCH_COMMAND_ID,
   CHECK_DATASET_ENTITLEMENTS_COMMAND_ID,
   SURVEY_DATASETS_COMMAND_ID,
-  GET_SECTION_INDEX_FROM_TEXT_LOCATION_ID,
 } from './utils/Const';
 import type { PlainObject } from './utils/SerializationUtils';
 import {
