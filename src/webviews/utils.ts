@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { type ExtensionContext, type Webview, Uri } from 'vscode';
+import { type ExtensionContext, type Webview, Location, Uri } from 'vscode';
 import * as path from 'path';
 import { type PlainObject } from '@finos/legend-vscode-extension-dependencies';
 import {
@@ -48,7 +48,7 @@ import {
 import { type LegendLanguageClient } from '../LegendLanguageClient';
 import { type LegendConceptTreeProvider } from '../conceptTree';
 import { guaranteeNonNullable } from '../utils/AssertionUtils';
-import { type TextLocation } from '../model/TextLocation';
+import { TextLocation } from '../model/TextLocation';
 
 export const getWebviewHtml = (
   webview: Webview,
@@ -143,14 +143,26 @@ export const handleV1LSPEngineMessage = async (
     }
     case ANALYZE_MAPPING_MODEL_COVERAGE_COMMAND_ID: {
       const mappingId = (message.msg as { mapping: string }).mapping;
-      const mappingPath = guaranteeNonNullable(
-        legendConceptTree.getTreeItemById(mappingId)?.location?.uri.toString(),
+      const mappingLocation: Location = guaranteeNonNullable(
+        legendConceptTree.getTreeItemById(mappingId)?.location,
         `Can't find mapping file with ID '${mappingId}'`,
       );
-      const result = await client.analyzeMappingModelCoverage(
-        mappingPath,
-        mappingId,
-      );
+      const mappingTextLocation = TextLocation.serialization.fromJson({
+        documentId: mappingLocation.uri.toString(),
+        textInterval: {
+          start: {
+            line: mappingLocation.range.start.line,
+            column: mappingLocation.range.start.character,
+          },
+          end: {
+            line: mappingLocation.range.end.line,
+            column: mappingLocation.range.end.character,
+          },
+        },
+      });
+
+      const result =
+        await client.analyzeMappingModelCoverage(mappingTextLocation);
       webview.postMessage({
         command: ANALYZE_MAPPING_MODEL_COVERAGE_RESPONSE,
         result,

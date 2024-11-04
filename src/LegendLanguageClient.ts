@@ -78,17 +78,6 @@ interface LegendWriteEntityRequest {
 }
 
 export class LegendLanguageClient extends LanguageClient {
-  private async getSectionIndexFromTextLocation(
-    textLocation: TextLocation,
-    token?: CancellationToken,
-  ): Promise<number> {
-    if (token) {
-      return this.sendRequest(GET_SECTION_INDEX_FROM_TEXT_LOCATION_ID, textLocation, token);
-    } else {
-      return this.sendRequest(GET_SECTION_INDEX_FROM_TEXT_LOCATION_ID, textLocation);
-    }
-  }
-
   async sendTDSRequest(
     request: FunctionTDSRequest,
   ): Promise<PlainObject<LegendExecutionResult>> {
@@ -201,15 +190,12 @@ export class LegendLanguageClient extends LanguageClient {
   }
 
   async analyzeMappingModelCoverage(
-    mappingFilePath: string,
-    mappingId: string,
+    mappingTextLocation: TextLocation,
   ): Promise<string> {
     return commands.executeCommand(
       LEGEND_COMMAND,
-      mappingFilePath,
-      0,
-      mappingId,
       ANALYZE_MAPPING_MODEL_COVERAGE_COMMAND_ID,
+      mappingTextLocation,
     );
   }
 
@@ -223,13 +209,10 @@ export class LegendLanguageClient extends LanguageClient {
     parameterValues: { [key: string]: unknown },
     serializationFormat?: EXECUTION_SERIALIZATION_FORMAT | undefined,
   ): Promise<string> {
-    const sectionIndex = await this.getSectionIndexFromTextLocation(entityTextLocation);
     return commands.executeCommand(
       LEGEND_COMMAND,
-      entityTextLocation.documentId,
-      sectionIndex,
-      entityId,
       EXECUTE_QUERY_COMMAND_ID,
+      entityTextLocation,
       {
         lambda: JSON.stringify(lambda),
         mapping,
@@ -252,13 +235,10 @@ export class LegendLanguageClient extends LanguageClient {
     downloadFileName: string,
     serializationFormat?: EXECUTION_SERIALIZATION_FORMAT | undefined,
   ): Promise<LegendExecutionResult> {
-    const sectionIndex = await this.getSectionIndexFromTextLocation(entityTextLocation);
     const response = (await commands.executeCommand(
       LEGEND_COMMAND,
-      entityTextLocation.documentId,
-      sectionIndex,
-      entityId,
       EXECUTE_QUERY_COMMAND_ID,
+      entityTextLocation,
       {
         lambda: JSON.stringify(lambda),
         mapping,
@@ -303,13 +283,10 @@ export class LegendLanguageClient extends LanguageClient {
     context: V1_RawExecutionContext,
     parameterValues: V1_ParameterValue[],
   ): Promise<string> {
-    const sectionIndex = await this.getSectionIndexFromTextLocation(entityTextLocation);
     return commands.executeCommand(
       LEGEND_COMMAND,
-      entityTextLocation.documentId,
-      sectionIndex,
-      entityId,
       GENERATE_EXECUTION_PLAN_COMMAND_ID,
+      entityTextLocation,
       {
         lambda: JSON.stringify(lambda),
         mapping,
@@ -329,13 +306,10 @@ export class LegendLanguageClient extends LanguageClient {
     context: V1_RawExecutionContext,
     parameterValues: V1_ParameterValue[],
   ): Promise<string> {
-    const sectionIndex = await this.getSectionIndexFromTextLocation(entityTextLocation);
     return commands.executeCommand(
       LEGEND_COMMAND,
-      entityTextLocation.documentId,
-      sectionIndex,
-      entityId,
       GENERATE_EXECUTION_PLAN_COMMAND_ID,
+      entityTextLocation,
       {
         lambda: JSON.stringify(lambda),
         mapping,
@@ -356,13 +330,10 @@ export class LegendLanguageClient extends LanguageClient {
     columnOffset?: number | undefined,
     returnSourceInformation?: boolean | undefined,
   ): Promise<string> {
-    const sectionIndex = await this.getSectionIndexFromTextLocation(entityTextLocation);
     return commands.executeCommand(
       LEGEND_COMMAND,
-      entityTextLocation.documentId,
-      sectionIndex,
-      entityId,
       GRAMMAR_TO_JSON_LAMBDA_COMMAND_ID,
+      entityTextLocation,
       {
         code,
         sourceId,
@@ -379,13 +350,10 @@ export class LegendLanguageClient extends LanguageClient {
     lambdas: Record<string, PlainObject<V1_RawLambda>>,
     renderStyle?: V1_RenderStyle | undefined,
   ): Promise<string> {
-    const sectionIndex = await this.getSectionIndexFromTextLocation(entityTextLocation);
     return commands.executeCommand(
       LEGEND_COMMAND,
-      entityTextLocation.documentId,
-      sectionIndex,
-      entityId,
       JSON_TO_GRAMMAR_LAMBDA_BATCH_COMMAND_ID,
+      entityTextLocation,
       {
         lambdas: JSON.stringify(lambdas),
         renderStyle,
@@ -398,13 +366,10 @@ export class LegendLanguageClient extends LanguageClient {
     entityId: string,
     lambda: V1_RawLambda,
   ): Promise<string> {
-    const sectionIndex = await this.getSectionIndexFromTextLocation(entityTextLocation);
     return commands.executeCommand(
       LEGEND_COMMAND,
-      entityTextLocation.documentId,
-      sectionIndex,
-      entityId,
       GET_LAMBDA_RETURN_TYPE_COMMAND_ID,
+      entityTextLocation,
       {
         lambda: JSON.stringify(lambda),
       },
@@ -418,13 +383,10 @@ export class LegendLanguageClient extends LanguageClient {
     runtime: string,
     lambda: V1_RawLambda,
   ): Promise<string> {
-    const sectionIndex = await this.getSectionIndexFromTextLocation(entityTextLocation);
     return commands.executeCommand(
       LEGEND_COMMAND,
-      entityTextLocation.documentId,
-      sectionIndex,
-      entityId,
       SURVEY_DATASETS_COMMAND_ID,
+      entityTextLocation,
       {
         mapping,
         runtime,
@@ -441,13 +403,10 @@ export class LegendLanguageClient extends LanguageClient {
     lambda: V1_RawLambda,
     reports: { name: string; type: string }[],
   ): Promise<string> {
-    const sectionIndex = await this.getSectionIndexFromTextLocation(entityTextLocation);
     return commands.executeCommand(
       LEGEND_COMMAND,
-      entityTextLocation.documentId,
-      sectionIndex,
-      entityId,
       CHECK_DATASET_ENTITLEMENTS_COMMAND_ID,
+      entityTextLocation,
       {
         mapping,
         runtime,
