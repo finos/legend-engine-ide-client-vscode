@@ -166,11 +166,15 @@ export function createClient(context: ExtensionContext): LanguageClient {
     const legendItem = legendConceptTreeProvider.getConceptsFrom(
       e.uri.toString(),
     )?.[0];
+    const queryBuilderWebviewTypes = [
+      SERVICE_QUERY_EDITOR,
+      FUNCTION_QUERY_EDITOR,
+    ];
     if (
       legendItem &&
       legendItem.id &&
       openedWebViews[legendItem.id] &&
-      openedWebViews[legendItem.id]?.viewType === SERVICE_QUERY_EDITOR
+      queryBuilderWebviewTypes.includes(openedWebViews[legendItem.id]?.viewType ?? '')
     ) {
       openedWebViews[legendItem.id]?.webview.postMessage({
         command: LEGEND_REFRESH_QUERY_BUILDER,
