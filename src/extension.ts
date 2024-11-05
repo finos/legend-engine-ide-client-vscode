@@ -63,6 +63,8 @@ import {
   LEGEND_EDIT_SERVICE_QUERY,
   SERVICE_QUERY_EDITOR,
   LEGEND_REFRESH_QUERY_BUILDER,
+  LEGEND_EDIT_FUNCTION_QUERY,
+  FUNCTION_QUERY_EDITOR,
 } from './utils/Const';
 import { LegendWebViewProvider } from './utils/LegendWebViewProvider';
 import {
@@ -88,6 +90,7 @@ import {
 import { renderDiagramRendererWebView } from './webviews/DiagramWebView';
 import { renderServiceQueryEditorWebView } from './webviews/ServiceQueryEditorWebView';
 import { enableLegendBook } from './purebook/purebook';
+import { renderFunctionQueryEditorWebView } from './webviews/FunctionQueryEditorWebView';
 
 let client: LegendLanguageClient;
 const openedWebViews: Record<string, WebviewPanel> = {};
@@ -376,6 +379,46 @@ export function registerCommands(context: ExtensionContext): void {
     },
   );
   context.subscriptions.push(editServiceQuery);
+
+  const editFunctionQuery = commands.registerCommand(
+    LEGEND_EDIT_FUNCTION_QUERY,
+    async (...args: unknown[]) => {
+      const functionId = (args[0] as LegendConceptTreeItem).id as string;
+      const columnToShowIn = window.activeTextEditor
+        ? window.activeTextEditor.viewColumn
+        : undefined;
+      if (openedWebViews[functionId]) {
+        openedWebViews[functionId]?.reveal(columnToShowIn);
+      } else {
+        const functionQueryEditorWebView = window.createWebviewPanel(
+          FUNCTION_QUERY_EDITOR,
+          `Function Query Editor: ${(args[0] as LegendConceptTreeItem).label}`,
+          ViewColumn.One,
+          {
+            enableScripts: true,
+            retainContextWhenHidden: true,
+          },
+        );
+        openedWebViews[functionId] = functionQueryEditorWebView;
+        functionQueryEditorWebView.onDidDispose(
+          () => {
+            delete openedWebViews[functionId];
+          },
+          null,
+          context.subscriptions,
+        );
+        renderFunctionQueryEditorWebView(
+          functionQueryEditorWebView,
+          context,
+          functionId,
+          workspace.getConfiguration('legend').get('engine.server.url', ''),
+          workspace.getConfiguration('legend').get('studio.forms.file', ''),
+          client,
+        );
+      }
+    },
+  );
+  context.subscriptions.push(editFunctionQuery);
 
   const oneEntityPerFileRefactor = commands.registerCommand(
     ONE_ENTITY_PER_FILE_COMMAND_ID,

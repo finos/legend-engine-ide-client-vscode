@@ -15,7 +15,11 @@
  */
 
 import React from 'react';
-import { DIAGRAM_RENDERER, SERVICE_QUERY_EDITOR } from '../utils/Const';
+import {
+  DIAGRAM_RENDERER,
+  FUNCTION_QUERY_EDITOR,
+  SERVICE_QUERY_EDITOR,
+} from '../utils/Const';
 import {
   type LegendApplicationConfigurationData,
   type PlainObject,
@@ -26,6 +30,7 @@ import { LegendVSCodeApplication } from '../application/LegendVSCodeApplication'
 import { ServiceQueryEditor } from './query/ServiceQueryEditor';
 import { DiagramEditor } from './diagram/DiagramEditor';
 import { DiagramEditorState } from '../stores/DiagramEditorState';
+import { FunctionQueryEditor } from './query/FunctionQueryEditor';
 
 export const ComponentRouter = (props: PlainObject): React.ReactNode => {
   const webviewType = guaranteeNonEmptyString(
@@ -46,6 +51,16 @@ export const ComponentRouter = (props: PlainObject): React.ReactNode => {
       component = (
         <LegendVSCodeApplication configData={configData}>
           <ServiceQueryEditor serviceId={serviceId} />
+        </LegendVSCodeApplication>
+      );
+
+      break;
+    }
+    case FUNCTION_QUERY_EDITOR: {
+      const functionId = guaranteeNonNullable(props.functionId as string);
+      component = (
+        <LegendVSCodeApplication configData={configData}>
+          <FunctionQueryEditor functionId={functionId} />
         </LegendVSCodeApplication>
       );
 
