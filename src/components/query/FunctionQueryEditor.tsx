@@ -23,9 +23,17 @@ import {
   CubesLoadingIndicatorIcon,
   Entity,
   FunctionQueryBuilderState,
+  guaranteeNonNullable,
+  guaranteeType,
+  PackageableElementExplicitReference,
   QueryBuilder,
   RawLambda,
   useApplicationStore,
+  V1_buildVariable,
+  V1_ConcreteFunctionDefinition,
+  V1_deserializePackageableElement,
+  V1_GraphBuilderContextBuilder,
+  V1_PureGraphManager,
 } from '@finos/legend-vscode-extension-dependencies';
 import {
   GET_PROJECT_ENTITIES,
@@ -87,57 +95,121 @@ export const FunctionQueryEditor: React.FC<{
   }, []);
 
   useEffect(() => {
-    if (entities.length && functionId && applicationStore) {
-      const initializeQuery = async (): Promise<void> => {
-        try {
-          const graphManagerState = await buildGraphManagerStateFromEntities(
-            entities,
-            applicationStore,
-          );
-          const functionElement =
-            graphManagerState.graph.getFunction(functionId);
-          const newQueryBuilderState = new FunctionQueryBuilderState(
-            applicationStore,
-            graphManagerState,
-            QueryBuilderVSCodeWorkflowState.INSTANCE,
-            functionElement,
-            undefined,
-          );
-          newQueryBuilderState.initializeWithQuery(
-            new RawLambda(
-              functionElement.parameters.map((_param) =>
-                graphManagerState.graphManager.serializeRawValueSpecification(
-                  _param,
-                ),
+    const buildGraphManagerStateAndInitializeQuery =
+      async (): Promise<void> => {
+        const graphManagerState = await buildGraphManagerStateFromEntities(
+          entities,
+          applicationStore,
+        );
+        const functionElement = graphManagerState.graph.getFunction(functionId);
+        const newQueryBuilderState = new FunctionQueryBuilderState(
+          applicationStore,
+          graphManagerState,
+          QueryBuilderVSCodeWorkflowState.INSTANCE,
+          functionElement,
+          undefined,
+        );
+        newQueryBuilderState.initializeWithQuery(
+          new RawLambda(
+            functionElement.parameters.map((_param) =>
+              graphManagerState.graphManager.serializeRawValueSpecification(
+                _param,
               ),
-              functionElement.expressionSequence,
             ),
-          );
-          assertTrue(
-            Boolean(
-              newQueryBuilderState.isQuerySupported &&
-                newQueryBuilderState.executionContextState.mapping &&
-                newQueryBuilderState.executionContextState.runtimeValue,
-            ),
-            `Only functions returning TDS/graph fetch using the from() function can be edited via query builder`,
-          );
-          await flowResult(
-            newQueryBuilderState.explorerState.analyzeMappingModelCoverage(),
-          ).catch(applicationStore.alertUnhandledError);
-          setQueryBuilderState(newQueryBuilderState);
-        } catch (e) {
-          if (e instanceof Error) {
-            setError(e.message);
-          }
-        } finally {
-          setIsLoading(false);
-        }
+            functionElement.expressionSequence,
+          ),
+        );
+        assertTrue(
+          Boolean(
+            newQueryBuilderState.isQuerySupported &&
+              newQueryBuilderState.executionContextState.mapping &&
+              newQueryBuilderState.executionContextState.runtimeValue,
+          ),
+          `Only functions returning TDS/graph fetch using the from() function can be edited via query builder`,
+        );
+        await flowResult(
+          newQueryBuilderState.explorerState.analyzeMappingModelCoverage(),
+        ).catch(applicationStore.alertUnhandledError);
+        setQueryBuilderState(newQueryBuilderState);
       };
-      initializeQuery();
+
+    const updateExistingQuery = (): void => {
+      const nonNullQueryBuilderState = guaranteeNonNullable(queryBuilderState);
+      const graphManager = guaranteeType(
+        nonNullQueryBuilderState.graphManagerState.graphManager,
+        V1_PureGraphManager,
+        'Graph manager must be a V1_PureGraphManager',
+      );
+
+      // Get updated function entity
+      const V1_functionDefinition = guaranteeType(
+        V1_deserializePackageableElement(
+          guaranteeNonNullable(
+            entities.find((entity) => entity.path === functionId)?.content,
+          ),
+          applicationStore.pluginManager.getPureProtocolProcessorPlugins(),
+        ),
+        V1_ConcreteFunctionDefinition,
+      );
+
+      // Get existing function element
+      const existingFunctionElement =
+        nonNullQueryBuilderState.graphManagerState.graph.getFunction(
+          functionId,
+        );
+
+      // Update existing function element
+      existingFunctionElement.name = V1_functionDefinition.name;
+      existingFunctionElement.returnType =
+        PackageableElementExplicitReference.create(
+          nonNullQueryBuilderState.graphManagerState.graph.getType(
+            V1_functionDefinition.returnType,
+          ),
+        );
+      existingFunctionElement.returnMultiplicity =
+        V1_functionDefinition.returnMultiplicity;
+      existingFunctionElement.expressionSequence =
+        V1_functionDefinition.body as object[];
+      const context = new V1_GraphBuilderContextBuilder(
+        nonNullQueryBuilderState.graphManagerState.graph,
+        nonNullQueryBuilderState.graphManagerState.graph,
+        graphManager.graphBuilderExtensions,
+        graphManager.logService,
+      ).build();
+      existingFunctionElement.parameters = V1_functionDefinition.parameters.map(
+        (e) => V1_buildVariable(e, context),
+      );
+
+      // Re-initialize query builder
+      nonNullQueryBuilderState.initializeWithQuery(
+        new RawLambda(
+          existingFunctionElement.parameters.map((_param) =>
+            nonNullQueryBuilderState.graphManagerState.graphManager.serializeRawValueSpecification(
+              _param,
+            ),
+          ),
+          existingFunctionElement.expressionSequence,
+        ),
+      );
+    };
+    if (entities.length && functionId && applicationStore) {
+      try {
+        if (queryBuilderState === null) {
+          buildGraphManagerStateAndInitializeQuery();
+        } else {
+          updateExistingQuery();
+        }
+      } catch (e) {
+        if (e instanceof Error) {
+          setError(e.message);
+        }
+      } finally {
+        setIsLoading(false);
+      }
     } else {
       setIsLoading(false);
     }
-  }, [functionId, applicationStore, entities]);
+  }, [functionId, applicationStore, entities, queryBuilderState]);
 
   return (
     <>
