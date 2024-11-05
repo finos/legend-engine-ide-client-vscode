@@ -20,15 +20,19 @@ import {
   type QueryBuilderState,
   type V1_Service,
   assertErrorThrown,
+  assertTrue,
   Button,
+  FunctionQueryBuilderState,
   guaranteeType,
   PureExecution,
   pureExecution_setFunction,
   PureExecution,
   SaveCurrIcon,
   ServiceQueryBuilderState,
+  V1_ConcreteFunctionDefinition,
   V1_PureGraphManager,
   V1_serializePackageableElement,
+  RawVariableExpression,
 } from '@finos/legend-vscode-extension-dependencies';
 import { LegendVSCodeApplicationPlugin } from './LegendVSCodeApplicationPlugin';
 import { postMessage } from '../utils/VsCodeUtils';
@@ -83,6 +87,53 @@ export class Core_LegendVSCodeApplicationPlugin extends LegendVSCodeApplicationP
                   });
                   queryBuilderState.applicationStore.notificationService.notifySuccess(
                     `Service query is updated`,
+                  );
+                } else if (
+                  queryBuilderState instanceof FunctionQueryBuilderState
+                ) {
+                  const graphManager = guaranteeType(
+                    queryBuilderState.graphManagerState.graphManager,
+                    V1_PureGraphManager,
+                    'Graph manager must be a V1_PureGraphManager',
+                  );
+                  const rawLambda = queryBuilderState.buildQuery();
+                  const functionElement =
+                    queryBuilderState.graphManagerState.graph.getFunction(
+                      queryBuilderState.functionElement.path,
+                    );
+                  const lambdaParam = rawLambda.parameters
+                    ? (rawLambda.parameters as object[])
+                    : [];
+                  const parameters = lambdaParam
+                    .map((param) =>
+                      graphManager.buildRawValueSpecification(
+                        param,
+                        queryBuilderState.graphManagerState.graph,
+                      ),
+                    )
+                    .map((rawValueSpec) =>
+                      guaranteeType(rawValueSpec, RawVariableExpression),
+                    );
+                  assertTrue(
+                    Array.isArray(rawLambda.body),
+                    `Query body expected to be a list of expressions`,
+                  );
+                  functionElement.expressionSequence =
+                    rawLambda.body as object[];
+                  functionElement.parameters = parameters;
+                  const functionProtocol = graphManager.elementToProtocol<V1_ConcreteFunctionDefinition>(
+                    functionElement,
+                    { keepSourceInformation: false },
+                  );
+                  postMessage({
+                    command: WRITE_ENTITY,
+                    msg: V1_serializePackageableElement(
+                      functionProtocol,
+                      queryBuilderState.graphManagerState.pluginManager.getPureProtocolProcessorPlugins(),
+                    )
+                  });
+                  queryBuilderState.applicationStore.notificationService.notifySuccess(
+                    `Function query is updated`,
                   );
                 }
               } catch (error) {
