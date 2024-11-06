@@ -53,6 +53,7 @@ export const FunctionQueryEditor: React.FC<{
     LegendVSCodeApplicationConfig,
     LegendVSCodePluginManager
   >();
+  const [previousFunctionId, setPreviousFunctionId] = useState(functionId);
   const [currentFunctionId, setCurrentFunctionId] = useState(functionId);
   const [queryBuilderState, setQueryBuilderState] =
     useState<QueryBuilderState | null>(null);
@@ -65,7 +66,7 @@ export const FunctionQueryEditor: React.FC<{
     postMessage({
       command: GET_PROJECT_ENTITIES,
     });
-  }, [currentFunctionId]);
+  }, [functionId]);
 
   useEffect(() => {
     const handleMessage = (
@@ -80,16 +81,18 @@ export const FunctionQueryEditor: React.FC<{
         case GET_PROJECT_ENTITIES_RESPONSE: {
           const es: Entity[] = message.result;
           setEntities(es);
+          if (message.updatedEntityId) {
+            setPreviousFunctionId(currentFunctionId);
+            setCurrentFunctionId(message.updatedEntityId);
+          }
           break;
         }
         case LEGEND_REFRESH_QUERY_BUILDER: {
           setIsLoading(true);
           postMessage({
             command: GET_PROJECT_ENTITIES,
+            updatedEntityId: message.updatedEntityId,
           });
-          if (message.updatedEntityId) {
-            setCurrentFunctionId(message.updatedEntityId);
-          }
           break;
         }
         default:
@@ -166,7 +169,7 @@ export const FunctionQueryEditor: React.FC<{
       // Get existing function element
       const existingFunctionElement =
         nonNullQueryBuilderState.graphManagerState.graph.getFunction(
-          currentFunctionId,
+          previousFunctionId,
         );
 
       // Update existing function element

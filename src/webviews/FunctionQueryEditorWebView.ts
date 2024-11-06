@@ -59,6 +59,7 @@ export const renderFunctionQueryEditorWebView = (
         webview.postMessage({
           command: GET_PROJECT_ENTITIES_RESPONSE,
           result: entities,
+          updatedEntityId: message.updatedEntityId,
         });
         break;
       }
