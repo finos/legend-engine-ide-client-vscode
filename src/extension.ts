@@ -207,6 +207,7 @@ export function createClient(context: ExtensionContext): LanguageClient {
     ) {
       openedWebViews[normalizedEntityId]?.webview.postMessage({
         command: LEGEND_REFRESH_QUERY_BUILDER,
+        updatedEntityId: legendItem.id,
       });
     }
     if (e.fileName.endsWith('pom.xml')) {

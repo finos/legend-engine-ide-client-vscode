@@ -69,7 +69,11 @@ export const FunctionQueryEditor: React.FC<{
 
   useEffect(() => {
     const handleMessage = (
-      event: MessageEvent<{ result: Entity[]; command: string }>,
+      event: MessageEvent<{
+        command: string;
+        result: Entity[];
+        updatedEntityId?: string;
+      }>,
     ): void => {
       const message = event.data;
       switch (message.command) {
@@ -83,6 +87,9 @@ export const FunctionQueryEditor: React.FC<{
           postMessage({
             command: GET_PROJECT_ENTITIES,
           });
+          if (message.updatedEntityId) {
+            setCurrentFunctionId(message.updatedEntityId);
+          }
           break;
         }
         default:
@@ -102,7 +109,8 @@ export const FunctionQueryEditor: React.FC<{
           entities,
           applicationStore,
         );
-        const functionElement = graphManagerState.graph.getFunction(currentFunctionId);
+        const functionElement =
+          graphManagerState.graph.getFunction(currentFunctionId);
         const newQueryBuilderState = new FunctionQueryBuilderState(
           applicationStore,
           graphManagerState,
@@ -146,7 +154,8 @@ export const FunctionQueryEditor: React.FC<{
       const V1_functionDefinition = guaranteeType(
         V1_deserializePackageableElement(
           guaranteeNonNullable(
-            entities.find((entity) => entity.path === currentFunctionId)?.content,
+            entities.find((entity) => entity.path === currentFunctionId)
+              ?.content,
             `Unable to find function entity with ID ${currentFunctionId}`,
           ),
           applicationStore.pluginManager.getPureProtocolProcessorPlugins(),
@@ -205,7 +214,9 @@ export const FunctionQueryEditor: React.FC<{
         if (e instanceof Error) {
           setError(e.message);
           if (queryBuilderState) {
-            queryBuilderState.applicationStore.notificationService.notifyError(e.message);
+            queryBuilderState.applicationStore.notificationService.notifyError(
+              e.message,
+            );
           }
         }
       } finally {
