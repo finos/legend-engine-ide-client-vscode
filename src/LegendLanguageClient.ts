@@ -193,8 +193,8 @@ export class LegendLanguageClient extends LanguageClient {
   ): Promise<string> {
     return commands.executeCommand(
       LEGEND_COMMAND,
-      ANALYZE_MAPPING_MODEL_COVERAGE_COMMAND_ID,
       mappingTextLocation,
+      ANALYZE_MAPPING_MODEL_COVERAGE_COMMAND_ID,
     );
   }
 
@@ -209,8 +209,8 @@ export class LegendLanguageClient extends LanguageClient {
   ): Promise<string> {
     return commands.executeCommand(
       LEGEND_COMMAND,
-      EXECUTE_QUERY_COMMAND_ID,
       entityTextLocation,
+      EXECUTE_QUERY_COMMAND_ID,
       {
         lambda: JSON.stringify(lambda),
         mapping,
@@ -234,8 +234,8 @@ export class LegendLanguageClient extends LanguageClient {
   ): Promise<LegendExecutionResult> {
     const response = (await commands.executeCommand(
       LEGEND_COMMAND,
-      EXECUTE_QUERY_COMMAND_ID,
       entityTextLocation,
+      EXECUTE_QUERY_COMMAND_ID,
       {
         lambda: JSON.stringify(lambda),
         mapping,
@@ -281,8 +281,8 @@ export class LegendLanguageClient extends LanguageClient {
   ): Promise<string> {
     return commands.executeCommand(
       LEGEND_COMMAND,
-      GENERATE_EXECUTION_PLAN_COMMAND_ID,
       entityTextLocation,
+      GENERATE_EXECUTION_PLAN_COMMAND_ID,
       {
         lambda: JSON.stringify(lambda),
         mapping,
@@ -303,8 +303,8 @@ export class LegendLanguageClient extends LanguageClient {
   ): Promise<string> {
     return commands.executeCommand(
       LEGEND_COMMAND,
-      GENERATE_EXECUTION_PLAN_COMMAND_ID,
       entityTextLocation,
+      GENERATE_EXECUTION_PLAN_COMMAND_ID,
       {
         lambda: JSON.stringify(lambda),
         mapping,
@@ -326,8 +326,8 @@ export class LegendLanguageClient extends LanguageClient {
   ): Promise<string> {
     return commands.executeCommand(
       LEGEND_COMMAND,
-      GRAMMAR_TO_JSON_LAMBDA_COMMAND_ID,
       entityTextLocation,
+      GRAMMAR_TO_JSON_LAMBDA_COMMAND_ID,
       {
         code,
         sourceId,
@@ -345,8 +345,8 @@ export class LegendLanguageClient extends LanguageClient {
   ): Promise<string> {
     return commands.executeCommand(
       LEGEND_COMMAND,
-      JSON_TO_GRAMMAR_LAMBDA_BATCH_COMMAND_ID,
       entityTextLocation,
+      JSON_TO_GRAMMAR_LAMBDA_BATCH_COMMAND_ID,
       {
         lambdas: JSON.stringify(lambdas),
         renderStyle,
@@ -360,8 +360,8 @@ export class LegendLanguageClient extends LanguageClient {
   ): Promise<string> {
     return commands.executeCommand(
       LEGEND_COMMAND,
-      GET_LAMBDA_RETURN_TYPE_COMMAND_ID,
       entityTextLocation,
+      GET_LAMBDA_RETURN_TYPE_COMMAND_ID,
       {
         lambda: JSON.stringify(lambda),
       },
@@ -376,8 +376,8 @@ export class LegendLanguageClient extends LanguageClient {
   ): Promise<string> {
     return commands.executeCommand(
       LEGEND_COMMAND,
-      SURVEY_DATASETS_COMMAND_ID,
       entityTextLocation,
+      SURVEY_DATASETS_COMMAND_ID,
       {
         mapping,
         runtime,
@@ -395,8 +395,8 @@ export class LegendLanguageClient extends LanguageClient {
   ): Promise<string> {
     return commands.executeCommand(
       LEGEND_COMMAND,
-      CHECK_DATASET_ENTITLEMENTS_COMMAND_ID,
       entityTextLocation,
+      CHECK_DATASET_ENTITLEMENTS_COMMAND_ID,
       {
         mapping,
         runtime,
