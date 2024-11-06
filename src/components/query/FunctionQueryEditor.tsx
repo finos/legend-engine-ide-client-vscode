@@ -17,11 +17,11 @@
 import { useEffect, useState } from 'react';
 import { flowResult } from 'mobx';
 import {
+  type Entity,
   type QueryBuilderState,
   assertTrue,
   CubesLoadingIndicator,
   CubesLoadingIndicatorIcon,
-  Entity,
   FunctionQueryBuilderState,
   guaranteeNonNullable,
   guaranteeType,
@@ -53,6 +53,7 @@ export const FunctionQueryEditor: React.FC<{
     LegendVSCodeApplicationConfig,
     LegendVSCodePluginManager
   >();
+  const [currentFunctionId, setCurrentFunctionId] = useState(functionId);
   const [queryBuilderState, setQueryBuilderState] =
     useState<QueryBuilderState | null>(null);
   const [entities, setEntities] = useState<Entity[]>([]);
@@ -64,7 +65,7 @@ export const FunctionQueryEditor: React.FC<{
     postMessage({
       command: GET_PROJECT_ENTITIES,
     });
-  }, [functionId]);
+  }, [currentFunctionId]);
 
   useEffect(() => {
     const handleMessage = (
@@ -101,7 +102,7 @@ export const FunctionQueryEditor: React.FC<{
           entities,
           applicationStore,
         );
-        const functionElement = graphManagerState.graph.getFunction(functionId);
+        const functionElement = graphManagerState.graph.getFunction(currentFunctionId);
         const newQueryBuilderState = new FunctionQueryBuilderState(
           applicationStore,
           graphManagerState,
@@ -145,7 +146,8 @@ export const FunctionQueryEditor: React.FC<{
       const V1_functionDefinition = guaranteeType(
         V1_deserializePackageableElement(
           guaranteeNonNullable(
-            entities.find((entity) => entity.path === functionId)?.content,
+            entities.find((entity) => entity.path === currentFunctionId)?.content,
+            `Unable to find function entity with ID ${currentFunctionId}`,
           ),
           applicationStore.pluginManager.getPureProtocolProcessorPlugins(),
         ),
@@ -155,7 +157,7 @@ export const FunctionQueryEditor: React.FC<{
       // Get existing function element
       const existingFunctionElement =
         nonNullQueryBuilderState.graphManagerState.graph.getFunction(
-          functionId,
+          currentFunctionId,
         );
 
       // Update existing function element
@@ -192,7 +194,7 @@ export const FunctionQueryEditor: React.FC<{
         ),
       );
     };
-    if (entities.length && functionId && applicationStore) {
+    if (entities.length && currentFunctionId && applicationStore) {
       try {
         if (queryBuilderState === null) {
           buildGraphManagerStateAndInitializeQuery();
@@ -202,6 +204,9 @@ export const FunctionQueryEditor: React.FC<{
       } catch (e) {
         if (e instanceof Error) {
           setError(e.message);
+          if (queryBuilderState) {
+            queryBuilderState.applicationStore.notificationService.notifyError(e.message);
+          }
         }
       } finally {
         setIsLoading(false);
@@ -209,7 +214,7 @@ export const FunctionQueryEditor: React.FC<{
     } else {
       setIsLoading(false);
     }
-  }, [functionId, applicationStore, entities, queryBuilderState]);
+  }, [currentFunctionId, applicationStore, entities, queryBuilderState]);
 
   return (
     <>

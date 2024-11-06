@@ -42,6 +42,7 @@ import {
   type Executable,
   type ServerOptions,
 } from 'vscode-languageclient/node';
+import { type V1_ConcreteFunctionDefinition } from '@finos/legend-vscode-extension-dependencies';
 import { LegendTreeDataProvider } from './utils/LegendTreeProvider';
 import { LanguageClientProgressResult } from './results/LanguageClientProgressResult';
 import type { PlainObject } from './utils/SerializationUtils';
@@ -72,7 +73,7 @@ import {
   resetExecutionTab,
 } from './results/ExecutionResultHelper';
 import { error } from 'console';
-import { isPlainObject } from './utils/AssertionUtils';
+import { guaranteeNonNullable, isPlainObject } from './utils/AssertionUtils';
 import { renderFunctionResultsWebView } from './webviews/FunctionResultsWebView';
 import type { FunctionTDSRequest } from './model/FunctionTDSRequest';
 import { LegendExecutionResult } from './results/LegendExecutionResult';
@@ -91,10 +92,25 @@ import { renderDiagramRendererWebView } from './webviews/DiagramWebView';
 import { renderServiceQueryEditorWebView } from './webviews/ServiceQueryEditorWebView';
 import { enableLegendBook } from './purebook/purebook';
 import { renderFunctionQueryEditorWebView } from './webviews/FunctionQueryEditorWebView';
+import { V1_getFunctionNameWithoutSignature } from './utils/V1_ProtocolUtils';
 
 let client: LegendLanguageClient;
 const openedWebViews: Record<string, WebviewPanel> = {};
 let legendConceptTreeProvider: LegendConceptTreeProvider;
+
+export const normalizeFunctionEntityId = async (
+  functionUri: string,
+): Promise<string | undefined> => {
+  const functionEntity = await client.entities(
+    new LegendEntitiesRequest([{ uri: functionUri }]),
+  );
+  return V1_getFunctionNameWithoutSignature(
+    guaranteeNonNullable(
+      functionEntity[0]?.content,
+      `Unable to find entity with URI ${functionUri}`,
+    ) as unknown as V1_ConcreteFunctionDefinition,
+  );
+};
 
 export function createClient(context: ExtensionContext): LanguageClient {
   languages.setLanguageConfiguration(LEGEND_LANGUAGE_ID, {
@@ -162,21 +178,34 @@ export function createClient(context: ExtensionContext): LanguageClient {
 
   // if pom changes, ask user if we should reload extension.
   // if query changes, we should reload any query builders that are open.
-  workspace.onDidSaveTextDocument((e) => {
-    const legendItem = legendConceptTreeProvider.getConceptsFrom(
-      e.uri.toString(),
-    )?.[0];
+  workspace.onDidSaveTextDocument(async (e) => {
+    const legendItem = guaranteeNonNullable(
+      legendConceptTreeProvider.getConceptsFrom(e.uri.toString())?.[0],
+      `Unable to find item in legend concept tree with URI ${e.uri.toString()}`,
+    );
+    const normalizedEntityId = legendItem.id
+      ? legendItem?.contextValue ===
+        'meta::pure::metamodel::function::ConcreteFunctionDefinition'
+        ? ((await normalizeFunctionEntityId(
+            guaranteeNonNullable(
+              legendItem.location?.uri.toString(),
+              `Legend tree item with ID ${legendItem.id} does not have a location URI`,
+            ),
+          )) ?? legendItem.id)
+        : legendItem.id
+      : '';
     const queryBuilderWebviewTypes = [
       SERVICE_QUERY_EDITOR,
       FUNCTION_QUERY_EDITOR,
     ];
     if (
       legendItem &&
-      legendItem.id &&
-      openedWebViews[legendItem.id] &&
-      queryBuilderWebviewTypes.includes(openedWebViews[legendItem.id]?.viewType ?? '')
+      openedWebViews[normalizedEntityId] &&
+      queryBuilderWebviewTypes.includes(
+        openedWebViews[normalizedEntityId]?.viewType ?? '',
+      )
     ) {
-      openedWebViews[legendItem.id]?.webview.postMessage({
+      openedWebViews[normalizedEntityId]?.webview.postMessage({
         command: LEGEND_REFRESH_QUERY_BUILDER,
       });
     }
@@ -388,11 +417,17 @@ export function registerCommands(context: ExtensionContext): void {
     LEGEND_EDIT_FUNCTION_QUERY,
     async (...args: unknown[]) => {
       const functionId = (args[0] as LegendConceptTreeItem).id as string;
+      const functionUri = guaranteeNonNullable(
+        (args[0] as LegendConceptTreeItem).location?.uri.toString(),
+        `Legend tree item with ID ${(args[0] as LegendConceptTreeItem).id} does not have a location URI`,
+      );
+      const normalizedFunctionId =
+        (await normalizeFunctionEntityId(functionUri)) ?? functionId;
       const columnToShowIn = window.activeTextEditor
         ? window.activeTextEditor.viewColumn
         : undefined;
-      if (openedWebViews[functionId]) {
-        openedWebViews[functionId]?.reveal(columnToShowIn);
+      if (openedWebViews[normalizedFunctionId]) {
+        openedWebViews[normalizedFunctionId]?.reveal(columnToShowIn);
       } else {
         const functionQueryEditorWebView = window.createWebviewPanel(
           FUNCTION_QUERY_EDITOR,
@@ -403,10 +438,10 @@ export function registerCommands(context: ExtensionContext): void {
             retainContextWhenHidden: true,
           },
         );
-        openedWebViews[functionId] = functionQueryEditorWebView;
+        openedWebViews[normalizedFunctionId] = functionQueryEditorWebView;
         functionQueryEditorWebView.onDidDispose(
           () => {
-            delete openedWebViews[functionId];
+            delete openedWebViews[normalizedFunctionId];
           },
           null,
           context.subscriptions,
