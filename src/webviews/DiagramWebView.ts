@@ -14,7 +14,12 @@
  * limitations under the License.
  */
 
-import { type ExtensionContext, type WebviewPanel, window } from 'vscode';
+import {
+  type ExtensionContext,
+  type Location,
+  type WebviewPanel,
+  window,
+} from 'vscode';
 import type { LegendEntity } from '../model/LegendEntity';
 import {
   DIAGRAM_DROP_CLASS_ERROR,
@@ -23,8 +28,11 @@ import {
   WRITE_ENTITY,
 } from '../utils/Const';
 import type { LegendLanguageClient } from '../LegendLanguageClient';
-import { getWebviewHtml } from './utils';
+import { getWebviewHtml, handleV1LSPEngineMessage } from './utils';
 import { type PlainObject } from '@finos/legend-vscode-extension-dependencies';
+import { guaranteeNonNullable } from '../utils/AssertionUtils';
+import { type LegendConceptTreeProvider } from '../conceptTree';
+import { TextLocation } from '../model/TextLocation';
 
 export const renderDiagramRendererWebView = (
   diagramRendererWebViewPanel: WebviewPanel,
@@ -33,8 +41,27 @@ export const renderDiagramRendererWebView = (
   entities: LegendEntity[],
   renderFilePath: string,
   client: LegendLanguageClient,
+  legendConceptTree: LegendConceptTreeProvider,
 ): void => {
   const { webview } = diagramRendererWebViewPanel;
+
+  const diagramLocation: Location = guaranteeNonNullable(
+    legendConceptTree.getTreeItemById(diagramId)?.location,
+    `Can't find diagram file with ID '${diagramId}'`,
+  );
+  const diagramTextLocation = TextLocation.serialization.fromJson({
+    documentId: diagramLocation.uri.toString(),
+    textInterval: {
+      start: {
+        line: diagramLocation.range.start.line,
+        column: diagramLocation.range.start.character,
+      },
+      end: {
+        line: diagramLocation.range.end.line,
+        column: diagramLocation.range.end.character,
+      },
+    },
+  });
 
   // Construct data input parameters
   const dataInputParams: PlainObject = {
@@ -50,6 +77,18 @@ export const renderDiagramRendererWebView = (
   );
 
   webview.onDidReceiveMessage(async (message) => {
+    if (
+      await handleV1LSPEngineMessage(
+        webview,
+        diagramTextLocation,
+        client,
+        context,
+        legendConceptTree,
+        message,
+      )
+    ) {
+      return;
+    }
     switch (message.command) {
       case GET_PROJECT_ENTITIES: {
         webview.postMessage({
@@ -70,7 +109,7 @@ export const renderDiagramRendererWebView = (
         break;
       }
       default:
-        throw new Error(`Unsupported request ${message.command}`);
+        break;
     }
   }, undefined);
 };

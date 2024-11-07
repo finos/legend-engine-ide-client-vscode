@@ -15,6 +15,7 @@
  */
 
 import {
+  type LegendApplicationConfigurationData,
   type LegendApplicationConfigurationInput,
   ApplicationFrameworkProvider,
   ApplicationStore,
@@ -23,14 +24,12 @@ import {
   BrowserEnvironmentProvider,
   Core_GraphManagerPreset,
   Core_LegendApplicationPlugin,
+  DSL_Diagram_GraphManagerPreset,
   QueryBuilder_GraphManagerPreset,
   QueryBuilder_LegendApplicationPlugin,
 } from '@finos/legend-vscode-extension-dependencies';
 import { useMemo } from 'react';
-import {
-  LegendVSCodeApplicationConfig,
-  type LegendVSCodeApplicationConfigurationData,
-} from './LegendVSCodeApplicationConfig';
+import { LegendVSCodeApplicationConfig } from './LegendVSCodeApplicationConfig';
 import { LegendVSCodePluginManager } from './LegendVSCodePluginManager';
 import { Core_LegendVSCodeApplicationPlugin } from './Core_LegendVSCodeApplicationPlugin';
 import { postMessage } from '../utils/VsCodeUtils';
@@ -38,13 +37,13 @@ import { QUERY_BUILDER_CONFIG_ERROR } from '../utils/Const';
 import packageJson from '../../package.json';
 
 export const LegendVSCodeApplication = (props: {
-  configData: LegendVSCodeApplicationConfigurationData;
+  configData: LegendApplicationConfigurationData;
   children: React.ReactNode;
 }): React.ReactNode => {
   const { configData, children } = props;
 
   const applicationStore = useMemo(() => {
-    const input: LegendApplicationConfigurationInput<LegendVSCodeApplicationConfigurationData> =
+    const input: LegendApplicationConfigurationInput<LegendApplicationConfigurationData> =
       {
         configData,
         versionData: {
@@ -60,6 +59,7 @@ export const LegendVSCodeApplication = (props: {
         .usePresets([
           new Core_GraphManagerPreset(),
           new QueryBuilder_GraphManagerPreset(),
+          new DSL_Diagram_GraphManagerPreset(),
         ])
         .usePlugins([
           new Core_LegendApplicationPlugin(),
@@ -79,7 +79,7 @@ export const LegendVSCodeApplication = (props: {
     applicationStore && (
       <ApplicationStoreProvider store={applicationStore}>
         <BrowserEnvironmentProvider baseUrl="/">
-          <ApplicationFrameworkProvider simple={true}>
+          <ApplicationFrameworkProvider>
             {children}
           </ApplicationFrameworkProvider>
         </BrowserEnvironmentProvider>

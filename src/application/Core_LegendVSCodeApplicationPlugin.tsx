@@ -23,6 +23,7 @@ import {
   Button,
   guaranteeType,
   pureExecution_setFunction,
+  PureExecution,
   SaveCurrIcon,
   ServiceQueryBuilderState,
   V1_PureGraphManager,
@@ -49,19 +50,23 @@ export class Core_LegendVSCodeApplicationPlugin extends LegendVSCodeApplicationP
             queryBuilderState.applicationStore.guardUnhandledError(async () => {
               try {
                 if (queryBuilderState instanceof ServiceQueryBuilderState) {
-                  guaranteeType(
+                  const graphManager = guaranteeType(
                     queryBuilderState.graphManagerState.graphManager,
                     V1_PureGraphManager,
                     'Graph manager must be a V1_PureGraphManager',
                   );
                   const rawLambda = queryBuilderState.buildQuery();
                   const service =
-                    queryBuilderState.graphManagerState.graph.getElement(
+                    queryBuilderState.graphManagerState.graph.getService(
                       queryBuilderState.service.path,
                     );
-                  pureExecution_setFunction(service.execution, rawLambda);
+                  const serviceExecution = guaranteeType(
+                    service.execution,
+                    PureExecution,
+                  );
+                  pureExecution_setFunction(serviceExecution, rawLambda);
                   const serviceProtocol =
-                    queryBuilderState.graphManagerState.graphManager.elementToProtocol<V1_Service>(
+                    graphManager.elementToProtocol<V1_Service>(
                       queryBuilderState.graphManagerState.graph.getElement(
                         queryBuilderState.service.path,
                       ),
@@ -69,6 +74,7 @@ export class Core_LegendVSCodeApplicationPlugin extends LegendVSCodeApplicationP
                     );
                   postMessage({
                     command: WRITE_ENTITY,
+                    entityPath: service.path,
                     msg: V1_serializePackageableElement(
                       serviceProtocol,
                       queryBuilderState.graphManagerState.pluginManager.getPureProtocolProcessorPlugins(),

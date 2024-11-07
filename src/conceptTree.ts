@@ -262,6 +262,24 @@ export class LegendConceptTreeProvider
     }
   }
 
+  getTreeItemById(id: string): LegendConceptTreeItem | undefined {
+    return this.getTreeItemById_recursive(this.root, id);
+  }
+
+  getTreeItemById_recursive(
+    treeItem: LegendConceptTreeItem,
+    id: string,
+  ): LegendConceptTreeItem | undefined {
+    if (treeItem.id === id) {
+      return treeItem;
+    } else {
+      return treeItem
+        .children()
+        .flatMap((v) => this.getTreeItemById_recursive(v, id))
+        .find((v) => v !== undefined);
+    }
+  }
+
   addEntity(entity: LegendEntity): void {
     const parts = entity.path.split('::');
     const name = parts.pop()!;

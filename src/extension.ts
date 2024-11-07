@@ -197,7 +197,8 @@ export function createClient(context: ExtensionContext): LanguageClient {
       e.affectsConfiguration('legend.sdlc.server.url') ||
       e.affectsConfiguration('legend.extensions.other.dependencies') ||
       e.affectsConfiguration('legend.extensions.dependencies.pom') ||
-      e.affectsConfiguration('legend.language.server.vmargs')
+      e.affectsConfiguration('legend.language.server.vmargs') ||
+      e.affectsConfiguration('legend.engine.server.remoteExecution')
     ) {
       window
         .showInformationMessage(
@@ -252,6 +253,7 @@ const showDiagramWebView = async (
       entities,
       workspace.getConfiguration('legend').get('studio.forms.file', ''),
       client,
+      legendConceptTreeProvider,
     );
   }
 };
@@ -368,6 +370,7 @@ export function registerCommands(context: ExtensionContext): void {
           workspace.getConfiguration('legend').get('engine.server.url', ''),
           workspace.getConfiguration('legend').get('studio.forms.file', ''),
           client,
+          legendConceptTreeProvider,
         );
       }
     },
@@ -512,6 +515,11 @@ export function activate(context: ExtensionContext): void {
   context.subscriptions.push(...disposables);
   legendConceptTreeProvider = treeDataProvider;
   enableLegendBook(context);
+  context.globalState.update(
+    'currentUserId',
+    // eslint-disable-next-line no-process-env
+    process.env.CODER_USERNAME || process.env.USER,
+  );
 }
 
 export function createStatusBarItem(context: ExtensionContext): void {

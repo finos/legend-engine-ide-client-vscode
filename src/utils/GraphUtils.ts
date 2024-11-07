@@ -16,31 +16,61 @@
 
 import {
   type ApplicationStore,
+  type Entity,
+  type ExecutionOptions,
+  type PlainObject,
+  type PureProtocolProcessorPlugin,
+  type V1_EntitlementReportAnalyticsInput,
+  type V1_ExecuteInput,
+  type V1_StoreEntitlementAnalysisInput,
+  buildPureGraphManager,
   GraphManagerState,
+  guaranteeType,
+  V1_PureGraphManager,
 } from '@finos/legend-vscode-extension-dependencies';
-import { type LegendEntity } from '../model/LegendEntity';
 import { type LegendVSCodeApplicationConfig } from '../application/LegendVSCodeApplicationConfig';
 import { type LegendVSCodePluginManager } from '../application/LegendVSCodePluginManager';
+import { type V1_LSPEngine } from '../graph/V1_LSPEngine';
+import { V1_LSPExecuteInput } from '../model/engine/ExecuteQueryInput';
+import {
+  type V1_LSPEntitlementReportAnallyticsInput,
+  V1_LSPEntitlementReportAnallyticsInputModelSchema,
+} from '../model/engine/EntitlementReportAnalyticsInput';
+import { serialize } from 'serializr';
+import { V1_LSPStoreEntitlementAnalysisInput } from '../model/engine/StoreEntitlementAnalysisInput';
 
 export const buildGraphManagerStateFromEntities = async (
-  entities: LegendEntity[],
+  entities: Entity[],
   applicationStore: ApplicationStore<
     LegendVSCodeApplicationConfig,
     LegendVSCodePluginManager
   >,
-): GraphManagerState => {
+  engine: V1_LSPEngine,
+): Promise<GraphManagerState> => {
+  const newGraphManager = buildPureGraphManager(
+    applicationStore.pluginManager,
+    applicationStore.logService,
+    engine,
+  );
   const graphManagerState = new GraphManagerState(
     applicationStore.pluginManager,
     applicationStore.logService,
+    newGraphManager,
   );
-  await graphManagerState.graphManager.initialize({
-    env: 'dev',
-    tabSize: 2,
-    clientConfig: {
-      baseUrl: applicationStore.config.engineServerUrl,
-      enableCompression: true,
+  const graphManager = guaranteeType<V1_PureGraphManager>(
+    graphManagerState.graphManager,
+    V1_PureGraphManager,
+  );
+  await graphManager.initialize(
+    {
+      env: 'dev',
+      tabSize: 2,
+      clientConfig: {},
     },
-  });
+    {
+      engine,
+    },
+  );
   await graphManagerState.initializeSystem();
   await graphManagerState.graphManager.buildGraph(
     graphManagerState.graph,
@@ -50,3 +80,42 @@ export const buildGraphManagerStateFromEntities = async (
   );
   return graphManagerState;
 };
+
+export const executeInputToLSPInput = (
+  input: V1_ExecuteInput,
+  options?: ExecutionOptions,
+): PlainObject<V1_LSPExecuteInput> =>
+  V1_LSPExecuteInput.serialization.toJson({
+    lambda: input.function,
+    mapping: input.mapping,
+    runtime: input.runtime,
+    context: input.context,
+    parameterValues: input.parameterValues.reduce(
+      (acc, val) => ({
+        ...acc,
+        [val.name]: (val.value as { _type: string; value: unknown }).value,
+      }),
+      {},
+    ),
+    serializationFormat: options?.serializationFormat,
+  });
+
+export const surveyDatasetsInputToLSPInput = (
+  input: V1_StoreEntitlementAnalysisInput,
+): PlainObject<V1_LSPStoreEntitlementAnalysisInput> =>
+  V1_LSPStoreEntitlementAnalysisInput.serialization.toJson({
+    lambda: input.query,
+    runtime: input.runtime,
+    mapping: input.mapping,
+  });
+
+export const entitlementReportAnalyticsInputToLSPInput = (
+  input: V1_EntitlementReportAnalyticsInput,
+  plugins: PureProtocolProcessorPlugin[],
+): PlainObject<V1_LSPEntitlementReportAnallyticsInput> =>
+  serialize(V1_LSPEntitlementReportAnallyticsInputModelSchema(plugins), {
+    lambda: input.storeEntitlementAnalyticsInput.query,
+    runtime: input.storeEntitlementAnalyticsInput.runtime,
+    mapping: input.storeEntitlementAnalyticsInput.mapping,
+    reports: input.reports,
+  });
