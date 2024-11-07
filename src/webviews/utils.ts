@@ -14,7 +14,12 @@
  * limitations under the License.
  */
 
-import { type ExtensionContext, type Webview, Location, Uri } from 'vscode';
+import {
+  type ExtensionContext,
+  type Location,
+  type Webview,
+  Uri,
+} from 'vscode';
 import * as path from 'path';
 import { type PlainObject } from '@finos/legend-vscode-extension-dependencies';
 import {
