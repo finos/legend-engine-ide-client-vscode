@@ -23,6 +23,7 @@ import {
   CubesLoadingIndicator,
   CubesLoadingIndicatorIcon,
   FunctionQueryBuilderState,
+  graph_renameElement,
   guaranteeNonNullable,
   guaranteeType,
   PackageableElementExplicitReference,
@@ -103,7 +104,7 @@ export const FunctionQueryEditor: React.FC<{
     return () => {
       window.removeEventListener('message', handleMessage);
     };
-  }, []);
+  }, [currentFunctionId]);
 
   useEffect(() => {
     const buildGraphManagerStateAndInitializeQuery =
@@ -173,7 +174,14 @@ export const FunctionQueryEditor: React.FC<{
         );
 
       // Update existing function element
-      existingFunctionElement.name = V1_functionDefinition.name;
+      if (existingFunctionElement.path !== V1_functionDefinition.path) {
+        graph_renameElement(
+          nonNullQueryBuilderState.graphManagerState.graph,
+          existingFunctionElement,
+          V1_functionDefinition.path,
+          nonNullQueryBuilderState.observerContext,
+        );
+      }
       existingFunctionElement.returnType =
         PackageableElementExplicitReference.create(
           nonNullQueryBuilderState.graphManagerState.graph.getType(
@@ -228,7 +236,13 @@ export const FunctionQueryEditor: React.FC<{
     } else {
       setIsLoading(false);
     }
-  }, [currentFunctionId, applicationStore, entities, queryBuilderState]);
+  }, [
+    currentFunctionId,
+    previousFunctionId,
+    applicationStore,
+    entities,
+    queryBuilderState,
+  ]);
 
   return (
     <>

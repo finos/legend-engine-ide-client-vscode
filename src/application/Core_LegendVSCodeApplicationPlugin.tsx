@@ -33,6 +33,9 @@ import {
   V1_PureGraphManager,
   V1_serializePackageableElement,
   RawVariableExpression,
+  getFunctionNameWithPath,
+  getFunctionSignature,
+  graph_renameElement,
 } from '@finos/legend-vscode-extension-dependencies';
 import { LegendVSCodeApplicationPlugin } from './LegendVSCodeApplicationPlugin';
 import { postMessage } from '../utils/VsCodeUtils';
@@ -121,16 +124,28 @@ export class Core_LegendVSCodeApplicationPlugin extends LegendVSCodeApplicationP
                   functionElement.expressionSequence =
                     rawLambda.body as object[];
                   functionElement.parameters = parameters;
-                  const functionProtocol = graphManager.elementToProtocol<V1_ConcreteFunctionDefinition>(
-                    functionElement,
-                    { keepSourceInformation: false },
-                  );
+                  // Rename the function element since query builder doesn't update function name when
+                  // parameters change
+                  const newFunctionPath = `${getFunctionNameWithPath(functionElement)}${getFunctionSignature(functionElement)}`;
+                  if (functionElement.path !== newFunctionPath) {
+                    graph_renameElement(
+                      queryBuilderState.graphManagerState.graph,
+                      functionElement,
+                      newFunctionPath,
+                      queryBuilderState.observerContext,
+                    );
+                  }
+                  const functionProtocol =
+                    graphManager.elementToProtocol<V1_ConcreteFunctionDefinition>(
+                      functionElement,
+                      { keepSourceInformation: false },
+                    );
                   postMessage({
                     command: WRITE_ENTITY,
                     msg: V1_serializePackageableElement(
                       functionProtocol,
                       queryBuilderState.graphManagerState.pluginManager.getPureProtocolProcessorPlugins(),
-                    )
+                    ),
                   });
                   queryBuilderState.applicationStore.notificationService.notifySuccess(
                     `Function query is updated`,
