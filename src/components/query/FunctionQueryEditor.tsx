@@ -171,10 +171,22 @@ export const FunctionQueryEditor: React.FC<{
       );
 
       // Get existing function element
-      const existingFunctionElement =
-        nonNullQueryBuilderState.graphManagerState.graph.getFunction(
-          previousFunctionId,
-        );
+      let existingFunctionElement;
+      try {
+        // If the function was changed from the text document, then we need to get
+        // the function using its previous ID, as we haven't updated the graph yet.
+        existingFunctionElement =
+          nonNullQueryBuilderState.graphManagerState.graph.getFunction(
+            previousFunctionId,
+          );
+      } catch {
+        // If the function was updated in the query builder and then saved, the graph
+        // has been updated, so we can get the function using its current ID.
+        existingFunctionElement =
+          nonNullQueryBuilderState.graphManagerState.graph.getFunction(
+            currentFunctionId,
+          );
+      }
 
       // Update existing function element
       existingFunctionElement.returnType =

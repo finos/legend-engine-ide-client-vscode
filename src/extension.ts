@@ -20,6 +20,7 @@ import {
   type ExtensionContext,
   type ProviderResult,
   type TerminalProfile,
+  type TextDocument,
   type TextDocumentContentProvider,
   type WebviewPanel,
   commands,
@@ -178,7 +179,9 @@ export function createClient(context: ExtensionContext): LanguageClient {
 
   // if pom changes, ask user if we should reload extension.
   // if query changes, we should reload any query builders that are open.
-  workspace.onDidSaveTextDocument(async (e) => {
+  workspace.onDidSaveTextDocument(async (e: TextDocument) => {
+    // refresh the tree provider in case the entity name has changed
+    await legendConceptTreeProvider.refresh(e);
     const legendItem = guaranteeNonNullable(
       legendConceptTreeProvider.getConceptsFrom(e.uri.toString())?.[0],
       `Unable to find item in legend concept tree with URI ${e.uri.toString()}`,

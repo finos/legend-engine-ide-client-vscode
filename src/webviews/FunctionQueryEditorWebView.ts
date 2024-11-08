@@ -19,6 +19,7 @@ import {
   type Location,
   type WebviewPanel,
   window,
+  workspace,
 } from 'vscode';
 import {
   GET_PROJECT_ENTITIES,
@@ -102,10 +103,19 @@ export const renderFunctionQueryEditorWebView = (
         break;
       }
       case WRITE_ENTITY: {
-        client.writeEntity({
+        await client.writeEntity({
           entityPath: message.entityPath,
           content: message.msg,
         });
+        await workspace.textDocuments
+          .filter(
+            (doc) =>
+              doc.uri.toString() ===
+              legendConceptTree
+                .getTreeItemById(message.entityPath)
+                ?.location?.uri?.toString(),
+          )?.[0]
+          ?.save();
         break;
       }
       case QUERY_BUILDER_CONFIG_ERROR: {
