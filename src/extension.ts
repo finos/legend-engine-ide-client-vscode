@@ -101,6 +101,7 @@ let legendConceptTreeProvider: LegendConceptTreeProvider;
 
 export const normalizeFunctionEntityId = async (
   functionUri: string,
+  includePackage: boolean = true,
 ): Promise<string | undefined> => {
   const functionEntity = await client.entities(
     new LegendEntitiesRequest([{ uri: functionUri }]),
@@ -110,6 +111,7 @@ export const normalizeFunctionEntityId = async (
       functionEntity[0]?.content,
       `Unable to find entity with URI ${functionUri}`,
     ) as unknown as V1_ConcreteFunctionDefinition,
+    includePackage,
   );
 };
 
@@ -426,6 +428,9 @@ export function registerCommands(context: ExtensionContext): void {
       );
       const normalizedFunctionId =
         (await normalizeFunctionEntityId(functionUri)) ?? functionId;
+      const normalizedFunctionName =
+        (await normalizeFunctionEntityId(functionUri, false)) ??
+        (args[0] as LegendConceptTreeItem).label;
       const columnToShowIn = window.activeTextEditor
         ? window.activeTextEditor.viewColumn
         : undefined;
@@ -434,7 +439,7 @@ export function registerCommands(context: ExtensionContext): void {
       } else {
         const functionQueryEditorWebView = window.createWebviewPanel(
           FUNCTION_QUERY_EDITOR,
-          `Function Query Editor: ${(args[0] as LegendConceptTreeItem).label}`,
+          `Function Query Editor: ${normalizedFunctionName}`,
           ViewColumn.One,
           {
             enableScripts: true,

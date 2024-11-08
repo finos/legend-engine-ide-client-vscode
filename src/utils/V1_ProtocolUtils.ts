@@ -37,9 +37,13 @@ const V1_buildFunctionSignatureSuffix = (
 
 export const V1_getFunctionNameWithoutSignature = (
   func: V1_ConcreteFunctionDefinition,
+  includePackage: boolean = true,
 ): string => {
   const signatureSuffix = V1_buildFunctionSignatureSuffix(func);
-  return func.name.endsWith(signatureSuffix)
+  const nameWithoutSignature = func.name.endsWith(signatureSuffix)
     ? func.name.substring(0, func.name.length - signatureSuffix.length)
     : func.name;
+  return includePackage
+    ? `${func.package}${ELEMENT_PATH_DELIMITER}${nameWithoutSignature}`
+    : nameWithoutSignature;
 };
