@@ -86,6 +86,12 @@
         "category": "Legend"
       },
       {
+        "command": "legend.edit.function.query",
+        "title": "Edit Query",
+        "icon": "$(search)",
+        "category": "Legend"
+      },
+      {
         "command": "legend.refresh.query.builder",
         "title": "Refresh Query Builder",
         "category": "Legend"
@@ -269,6 +275,11 @@
         {
           "command": "legend.edit.service.query",
           "when": "viewItem == meta::legend::service::metamodel::Service",
+          "group": "inline"
+        },
+        {
+          "command": "legend.edit.function.query",
+          "when": "viewItem == meta::pure::metamodel::function::ConcreteFunctionDefinition",
           "group": "inline"
         }
       ],
