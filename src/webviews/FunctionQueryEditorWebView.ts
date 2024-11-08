@@ -14,7 +14,12 @@
  * limitations under the License.
  */
 
-import { type ExtensionContext, type WebviewPanel, window } from 'vscode';
+import {
+  type ExtensionContext,
+  type Location,
+  type WebviewPanel,
+  window,
+} from 'vscode';
 import {
   GET_PROJECT_ENTITIES,
   GET_PROJECT_ENTITIES_RESPONSE,
@@ -25,8 +30,11 @@ import {
   type LegendLanguageClient,
   LegendEntitiesRequest,
 } from '../LegendLanguageClient';
-import { getWebviewHtml } from './utils';
+import { getWebviewHtml, handleV1LSPEngineMessage } from './utils';
 import { type PlainObject } from '@finos/legend-vscode-extension-dependencies';
+import { guaranteeNonNullable } from '../utils/AssertionUtils';
+import { type LegendConceptTreeProvider } from '../conceptTree';
+import { TextLocation } from '../model/TextLocation';
 
 export const renderFunctionQueryEditorWebView = (
   functionQueryEditorWebViewPanel: WebviewPanel,
@@ -35,13 +43,31 @@ export const renderFunctionQueryEditorWebView = (
   engineUrl: string,
   renderFilePath: string,
   client: LegendLanguageClient,
+  legendConceptTree: LegendConceptTreeProvider,
 ): void => {
   const { webview } = functionQueryEditorWebViewPanel;
+
+  const functionLocation: Location = guaranteeNonNullable(
+    legendConceptTree.getTreeItemById(functionId)?.location,
+    `Can't find service file with ID '${functionId}'`,
+  );
+  const serviceTextLocation = TextLocation.serialization.fromJson({
+    documentId: functionLocation.uri.toString(),
+    textInterval: {
+      start: {
+        line: functionLocation.range.start.line,
+        column: functionLocation.range.start.character,
+      },
+      end: {
+        line: functionLocation.range.end.line,
+        column: functionLocation.range.end.character,
+      },
+    },
+  });
 
   // Construct data input parameters
   const dataInputParams: PlainObject = {
     functionId,
-    engineUrl,
   };
 
   webview.html = getWebviewHtml(
@@ -53,6 +79,18 @@ export const renderFunctionQueryEditorWebView = (
   );
 
   webview.onDidReceiveMessage(async (message) => {
+    if (
+      await handleV1LSPEngineMessage(
+        webview,
+        serviceTextLocation,
+        client,
+        context,
+        legendConceptTree,
+        message,
+      )
+    ) {
+      return;
+    }
     switch (message.command) {
       case GET_PROJECT_ENTITIES: {
         const entities = await client.entities(new LegendEntitiesRequest([]));
@@ -64,7 +102,10 @@ export const renderFunctionQueryEditorWebView = (
         break;
       }
       case WRITE_ENTITY: {
-        client.writeEntity({ content: message.msg });
+        client.writeEntity({
+          entityPath: message.entityPath,
+          content: message.msg,
+        });
         break;
       }
       case QUERY_BUILDER_CONFIG_ERROR: {
@@ -75,7 +116,7 @@ export const renderFunctionQueryEditorWebView = (
         break;
       }
       default:
-        throw new Error(`Unsupported request ${message.command}`);
+        break;
     }
   }, undefined);
 };

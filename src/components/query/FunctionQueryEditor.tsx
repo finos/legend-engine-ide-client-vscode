@@ -46,6 +46,7 @@ import { QueryBuilderVSCodeWorkflowState } from './QueryBuilderWorkflowState';
 import { type LegendVSCodeApplicationConfig } from '../../application/LegendVSCodeApplicationConfig';
 import { type LegendVSCodePluginManager } from '../../application/LegendVSCodePluginManager';
 import { buildGraphManagerStateFromEntities } from '../../utils/GraphUtils';
+import { V1_LSPEngine } from '../../graph/V1_LSPEngine';
 
 export const FunctionQueryEditor: React.FC<{
   functionId: string;
@@ -109,9 +110,11 @@ export const FunctionQueryEditor: React.FC<{
   useEffect(() => {
     const buildGraphManagerStateAndInitializeQuery =
       async (): Promise<void> => {
+        const engine = new V1_LSPEngine();
         const graphManagerState = await buildGraphManagerStateFromEntities(
           entities,
           applicationStore,
+          engine,
         );
         const functionElement =
           graphManagerState.graph.getFunction(currentFunctionId);
@@ -174,14 +177,6 @@ export const FunctionQueryEditor: React.FC<{
         );
 
       // Update existing function element
-      if (existingFunctionElement.path !== V1_functionDefinition.path) {
-        graph_renameElement(
-          nonNullQueryBuilderState.graphManagerState.graph,
-          existingFunctionElement,
-          V1_functionDefinition.path,
-          nonNullQueryBuilderState.observerContext,
-        );
-      }
       existingFunctionElement.returnType =
         PackageableElementExplicitReference.create(
           nonNullQueryBuilderState.graphManagerState.graph.getType(
@@ -201,6 +196,18 @@ export const FunctionQueryEditor: React.FC<{
       existingFunctionElement.parameters = V1_functionDefinition.parameters.map(
         (e) => V1_buildVariable(e, context),
       );
+
+      // We need to update the function name if the signature has changed, and we
+      // need to do it after we update the parameters so that we can set the new
+      // functionName property
+      if (existingFunctionElement.path !== V1_functionDefinition.path) {
+        graph_renameElement(
+          nonNullQueryBuilderState.graphManagerState.graph,
+          existingFunctionElement,
+          V1_functionDefinition.path,
+          nonNullQueryBuilderState.observerContext,
+        );
+      }
 
       // Re-initialize query builder
       nonNullQueryBuilderState.initializeWithQuery(

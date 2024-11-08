@@ -18,24 +18,23 @@ import packageJson from '../../package.json';
 import {
   type QueryBuilderHeaderActionConfiguration,
   type QueryBuilderState,
+  type V1_ConcreteFunctionDefinition,
   type V1_Service,
   assertErrorThrown,
   assertTrue,
   Button,
   FunctionQueryBuilderState,
-  guaranteeType,
-  PureExecution,
-  pureExecution_setFunction,
-  PureExecution,
-  SaveCurrIcon,
-  ServiceQueryBuilderState,
-  V1_ConcreteFunctionDefinition,
-  V1_PureGraphManager,
-  V1_serializePackageableElement,
-  RawVariableExpression,
   getFunctionNameWithPath,
   getFunctionSignature,
   graph_renameElement,
+  guaranteeType,
+  pureExecution_setFunction,
+  PureExecution,
+  RawVariableExpression,
+  SaveCurrIcon,
+  ServiceQueryBuilderState,
+  V1_PureGraphManager,
+  V1_serializePackageableElement,
 } from '@finos/legend-vscode-extension-dependencies';
 import { LegendVSCodeApplicationPlugin } from './LegendVSCodeApplicationPlugin';
 import { postMessage } from '../utils/VsCodeUtils';
@@ -94,16 +93,20 @@ export class Core_LegendVSCodeApplicationPlugin extends LegendVSCodeApplicationP
                 } else if (
                   queryBuilderState instanceof FunctionQueryBuilderState
                 ) {
+                  // Get the existing function element
                   const graphManager = guaranteeType(
                     queryBuilderState.graphManagerState.graphManager,
                     V1_PureGraphManager,
                     'Graph manager must be a V1_PureGraphManager',
                   );
-                  const rawLambda = queryBuilderState.buildQuery();
                   const functionElement =
                     queryBuilderState.graphManagerState.graph.getFunction(
                       queryBuilderState.functionElement.path,
                     );
+                  const oldFunctionPath = functionElement.path;
+
+                  // Update the function element with the new query
+                  const rawLambda = queryBuilderState.buildQuery();
                   const lambdaParam = rawLambda.parameters
                     ? (rawLambda.parameters as object[])
                     : [];
@@ -124,6 +127,7 @@ export class Core_LegendVSCodeApplicationPlugin extends LegendVSCodeApplicationP
                   functionElement.expressionSequence =
                     rawLambda.body as object[];
                   functionElement.parameters = parameters;
+
                   // Rename the function element since query builder doesn't update function name when
                   // parameters change
                   const newFunctionPath = `${getFunctionNameWithPath(functionElement)}${getFunctionSignature(functionElement)}`;
@@ -135,6 +139,8 @@ export class Core_LegendVSCodeApplicationPlugin extends LegendVSCodeApplicationP
                       queryBuilderState.observerContext,
                     );
                   }
+
+                  // Write the updated function element to the server
                   const functionProtocol =
                     graphManager.elementToProtocol<V1_ConcreteFunctionDefinition>(
                       functionElement,
@@ -142,6 +148,7 @@ export class Core_LegendVSCodeApplicationPlugin extends LegendVSCodeApplicationP
                     );
                   postMessage({
                     command: WRITE_ENTITY,
+                    entityPath: oldFunctionPath,
                     msg: V1_serializePackageableElement(
                       functionProtocol,
                       queryBuilderState.graphManagerState.pluginManager.getPureProtocolProcessorPlugins(),
