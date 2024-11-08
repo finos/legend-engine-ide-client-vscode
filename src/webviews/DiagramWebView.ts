@@ -105,7 +105,10 @@ export const renderDiagramRendererWebView = (
         break;
       }
       case WRITE_ENTITY: {
-        client.writeEntity({ content: message.msg });
+        client.writeEntity({
+          entityPath: message.entityPath,
+          content: message.msg,
+        });
         break;
       }
       default:

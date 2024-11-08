@@ -125,6 +125,7 @@ export const DiagramEditorCanvas = observer(
 
         postMessage({
           command: WRITE_ENTITY,
+          entityPath: diagramEditorState.diagramId,
           msg: serialize(
             V1_diagramModelSchema,
             V1_transformDiagram(
