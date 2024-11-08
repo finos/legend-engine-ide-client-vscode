@@ -69,7 +69,6 @@ export const renderServiceQueryEditorWebView = (
   // Construct data input parameters
   const dataInputParams: PlainObject = {
     serviceId,
-    engineUrl,
   };
 
   webview.html = getWebviewHtml(
@@ -103,7 +102,10 @@ export const renderServiceQueryEditorWebView = (
         break;
       }
       case WRITE_ENTITY: {
-        await client.writeEntity({ content: message.msg });
+        await client.writeEntity({
+          entityPath: message.entityPath,
+          content: message.msg,
+        });
         await workspace.textDocuments
           .filter(
             (doc) =>
