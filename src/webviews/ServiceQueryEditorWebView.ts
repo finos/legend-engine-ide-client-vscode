@@ -41,7 +41,6 @@ export const renderServiceQueryEditorWebView = (
   serviceQueryEditorWebViewPanel: WebviewPanel,
   context: ExtensionContext,
   serviceId: string,
-  engineUrl: string,
   renderFilePath: string,
   client: LegendLanguageClient,
   legendConceptTree: LegendConceptTreeProvider,
