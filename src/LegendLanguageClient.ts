@@ -196,6 +196,9 @@ export class LegendLanguageClient extends LanguageClient {
       LEGEND_COMMAND,
       mappingTextLocation,
       ANALYZE_MAPPING_MODEL_COVERAGE_COMMAND_ID,
+      {
+        returnLightGraph: true,
+      },
     );
   }
 
