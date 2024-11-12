@@ -51,7 +51,7 @@ export const renderFunctionQueryEditorWebView = (
     legendConceptTree.getTreeItemById(functionId)?.location,
     `Can't find service file with ID '${functionId}'`,
   );
-  const serviceTextLocation = TextLocation.serialization.fromJson({
+  const functionTextLocation = TextLocation.serialization.fromJson({
     documentId: functionLocation.uri.toString(),
     textInterval: {
       start: {
@@ -82,7 +82,7 @@ export const renderFunctionQueryEditorWebView = (
     if (
       await handleV1LSPEngineMessage(
         webview,
-        serviceTextLocation,
+        functionTextLocation,
         client,
         context,
         legendConceptTree,
