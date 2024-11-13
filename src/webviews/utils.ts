@@ -19,6 +19,8 @@ import {
   type Location,
   type Webview,
   Uri,
+  window,
+  workspace,
 } from 'vscode';
 import * as path from 'path';
 import { type PlainObject } from '@finos/legend-vscode-extension-dependencies';
@@ -41,16 +43,23 @@ import {
   GET_CURRENT_USER_ID_RESPONSE,
   GET_LAMBDA_RETURN_TYPE_COMMAND_ID,
   GET_LAMBDA_RETURN_TYPE_RESPONSE,
+  GET_PROJECT_ENTITIES,
+  GET_PROJECT_ENTITIES_RESPONSE,
   GET_SUBTYPE_INFO_REQUEST_ID,
   GET_SUBTYPE_INFO_RESPONSE,
   GRAMMAR_TO_JSON_LAMBDA_COMMAND_ID,
   GRAMMAR_TO_JSON_LAMBDA_RESPONSE,
   JSON_TO_GRAMMAR_LAMBDA_BATCH_COMMAND_ID,
   JSON_TO_GRAMMAR_LAMBDA_BATCH_RESPONSE,
+  QUERY_BUILDER_CONFIG_ERROR,
   SURVEY_DATASETS_COMMAND_ID,
   SURVEY_DATASETS_RESPONSE,
+  WRITE_ENTITY,
 } from '../utils/Const';
-import { type LegendLanguageClient } from '../LegendLanguageClient';
+import {
+  LegendEntitiesRequest,
+  type LegendLanguageClient,
+} from '../LegendLanguageClient';
 import { type LegendConceptTreeProvider } from '../conceptTree';
 import { guaranteeNonNullable } from '../utils/AssertionUtils';
 import { TextLocation } from '../model/TextLocation';
@@ -343,4 +352,66 @@ export const handleV1LSPEngineMessage = async (
       return false;
   }
   return false;
+};
+
+/**
+ * This function handles shared QueryBuilder related messages that
+ * are common across webviews that render QueryBuilder. It returns
+ * true if the message is handled and false otherwise (so that the
+ * calling webview can handle it instead, if needed).
+ *
+ * @param webview the webview handling the message
+ * @param client LegendLanguageClient instance
+ * @param legendConceptTree concept tree provider
+ * @param message the message being handled
+ * @returns true if the message is handled, false otherwise
+ */
+export const handleQueryBuilderWebviewMessage = async (
+  webview: Webview,
+  client: LegendLanguageClient,
+  legendConceptTree: LegendConceptTreeProvider,
+  message: {
+    command: string;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    msg: any;
+    entityPath: string;
+    updatedEntityId?: string;
+  },
+): Promise<boolean> => {
+  switch (message.command) {
+    case GET_PROJECT_ENTITIES: {
+      const entities = await client.entities(new LegendEntitiesRequest([]));
+      webview.postMessage({
+        command: GET_PROJECT_ENTITIES_RESPONSE,
+        result: entities,
+        updatedEntityId: message.updatedEntityId,
+      });
+      return true;
+    }
+    case WRITE_ENTITY: {
+      await client.writeEntity({
+        entityPath: message.entityPath,
+        content: message.msg,
+      });
+      await workspace.textDocuments
+        .filter(
+          (doc) =>
+            doc.uri.toString() ===
+            legendConceptTree
+              .getTreeItemById(message.entityPath)
+              ?.location?.uri?.toString(),
+        )?.[0]
+        ?.save();
+      return true;
+    }
+    case QUERY_BUILDER_CONFIG_ERROR: {
+      window.showErrorMessage('Error setting up Query Builder', {
+        modal: true,
+        detail: message.msg,
+      });
+      return true;
+    }
+    default:
+      return false;
+  }
 };

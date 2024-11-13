@@ -18,20 +18,13 @@ import {
   type ExtensionContext,
   type Location,
   type WebviewPanel,
-  window,
-  workspace,
 } from 'vscode';
+import { type LegendLanguageClient } from '../LegendLanguageClient';
 import {
-  GET_PROJECT_ENTITIES,
-  GET_PROJECT_ENTITIES_RESPONSE,
-  QUERY_BUILDER_CONFIG_ERROR,
-  WRITE_ENTITY,
-} from '../utils/Const';
-import {
-  type LegendLanguageClient,
-  LegendEntitiesRequest,
-} from '../LegendLanguageClient';
-import { getWebviewHtml, handleV1LSPEngineMessage } from './utils';
+  getWebviewHtml,
+  handleQueryBuilderWebviewMessage,
+  handleV1LSPEngineMessage,
+} from './utils';
 import { type LegendConceptTreeProvider } from '../conceptTree';
 import { type PlainObject } from '../utils/SerializationUtils';
 import { guaranteeNonNullable } from '../utils/AssertionUtils';
@@ -90,41 +83,13 @@ export const renderServiceQueryEditorWebView = (
       )
     ) {
       return;
-    }
-    switch (message.command) {
-      case GET_PROJECT_ENTITIES: {
-        const entities = await client.entities(new LegendEntitiesRequest([]));
-        webview.postMessage({
-          command: GET_PROJECT_ENTITIES_RESPONSE,
-          result: entities,
-        });
-        break;
-      }
-      case WRITE_ENTITY: {
-        await client.writeEntity({
-          entityPath: message.entityPath,
-          content: message.msg,
-        });
-        await workspace.textDocuments
-          .filter(
-            (doc) =>
-              doc.uri.toString() ===
-              legendConceptTree
-                .getTreeItemById(message.entityPath)
-                ?.location?.uri?.toString(),
-          )?.[0]
-          ?.save();
-        break;
-      }
-      case QUERY_BUILDER_CONFIG_ERROR: {
-        window.showErrorMessage('Error setting up Query Builder', {
-          modal: true,
-          detail: message.msg,
-        });
-        break;
-      }
-      default:
-        break;
+    } else {
+      await handleQueryBuilderWebviewMessage(
+        webview,
+        client,
+        legendConceptTree,
+        message,
+      );
     }
   }, undefined);
 };
