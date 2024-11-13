@@ -48,7 +48,10 @@ import { postMessage } from '../../utils/VsCodeUtils';
 import { QueryBuilderVSCodeWorkflowState } from './QueryBuilderWorkflowState';
 import { type LegendVSCodeApplicationConfig } from '../../application/LegendVSCodeApplicationConfig';
 import { type LegendVSCodePluginManager } from '../../application/LegendVSCodePluginManager';
-import { buildGraphManagerStateFromEntities } from '../../utils/GraphUtils';
+import {
+  buildGraphManagerStateFromEntities,
+  buildRawLambdaFromFunction,
+} from '../../utils/GraphUtils';
 import { V1_LSPEngine } from '../../graph/V1_LSPEngine';
 import { deserialize } from 'serializr';
 
@@ -156,8 +159,7 @@ export const useQueryBuilderState = (
           ).catch(applicationStore.alertUnhandledError);
           setQueryBuilderState(newQueryBuilderState);
         } else if (type === 'function') {
-          const functionEntity =
-            graphManagerState.graph.getFunction(currentId);
+          const functionEntity = graphManagerState.graph.getFunction(currentId);
           const newQueryBuilderState = new FunctionQueryBuilderState(
             applicationStore,
             graphManagerState,
@@ -166,14 +168,7 @@ export const useQueryBuilderState = (
             undefined,
           );
           newQueryBuilderState.initializeWithQuery(
-            new RawLambda(
-              functionEntity.parameters.map((_param) =>
-                graphManagerState.graphManager.serializeRawValueSpecification(
-                  _param,
-                ),
-              ),
-              functionEntity.expressionSequence,
-            ),
+            buildRawLambdaFromFunction(functionEntity, graphManagerState),
           );
           assertTrue(
             Boolean(
@@ -300,13 +295,9 @@ export const useQueryBuilderState = (
 
         // Re-initialize query builder
         nonNullQueryBuilderState.initializeWithQuery(
-          new RawLambda(
-            existingFunctionEntity.parameters.map((_param) =>
-              nonNullQueryBuilderState.graphManagerState.graphManager.serializeRawValueSpecification(
-                _param,
-              ),
-            ),
-            existingFunctionEntity.expressionSequence,
+          buildRawLambdaFromFunction(
+            existingFunctionEntity,
+            nonNullQueryBuilderState.graphManagerState,
           ),
         );
       }

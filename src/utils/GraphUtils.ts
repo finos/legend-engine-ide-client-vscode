@@ -16,6 +16,7 @@
 
 import {
   type ApplicationStore,
+  type ConcreteFunctionDefinition,
   type Entity,
   type ExecutionOptions,
   type PlainObject,
@@ -26,6 +27,7 @@ import {
   buildPureGraphManager,
   GraphManagerState,
   guaranteeType,
+  RawLambda,
   V1_PureGraphManager,
 } from '@finos/legend-vscode-extension-dependencies';
 import { type LegendVSCodeApplicationConfig } from '../application/LegendVSCodeApplicationConfig';
@@ -80,6 +82,17 @@ export const buildGraphManagerStateFromEntities = async (
   );
   return graphManagerState;
 };
+
+export const buildRawLambdaFromFunction = (
+  functionEntity: ConcreteFunctionDefinition,
+  graphManagerState: GraphManagerState,
+): RawLambda =>
+  new RawLambda(
+    functionEntity.parameters.map((_param) =>
+      graphManagerState.graphManager.serializeRawValueSpecification(_param),
+    ),
+    functionEntity.expressionSequence,
+  );
 
 export const executeInputToLSPInput = (
   input: V1_ExecuteInput,
