@@ -42,6 +42,7 @@ import {
   type LanguageClientOptions,
   type Executable,
   type ServerOptions,
+  TextDocumentIdentifier,
 } from 'vscode-languageclient/node';
 import { type V1_ConcreteFunctionDefinition } from '@finos/legend-vscode-extension-dependencies';
 import { LegendTreeDataProvider } from './utils/LegendTreeProvider';
@@ -94,26 +95,20 @@ import { renderServiceQueryEditorWebView } from './webviews/ServiceQueryEditorWe
 import { enableLegendBook } from './purebook/purebook';
 import { renderFunctionQueryEditorWebView } from './webviews/FunctionQueryEditorWebView';
 import { V1_getFunctionNameWithoutSignature } from './utils/V1_ProtocolUtils';
+import { type LegendEntity } from './model/LegendEntity';
 
 let client: LegendLanguageClient;
 const openedWebViews: Record<string, WebviewPanel> = {};
 let legendConceptTreeProvider: LegendConceptTreeProvider;
 
-export const normalizeFunctionEntityId = async (
-  functionUri: string,
+export const normalizeFunctionEntityId = (
+  functionEntity: LegendEntity,
   includePackage: boolean = true,
-): Promise<string | undefined> => {
-  const functionEntity = await client.entities(
-    new LegendEntitiesRequest([{ uri: functionUri }]),
-  );
-  return V1_getFunctionNameWithoutSignature(
-    guaranteeNonNullable(
-      functionEntity[0]?.content,
-      `Unable to find entity with URI ${functionUri}`,
-    ) as unknown as V1_ConcreteFunctionDefinition,
+): string =>
+  V1_getFunctionNameWithoutSignature(
+    functionEntity.content as unknown as V1_ConcreteFunctionDefinition,
     includePackage,
   );
-};
 
 export function createClient(context: ExtensionContext): LanguageClient {
   languages.setLanguageConfiguration(LEGEND_LANGUAGE_ID, {
@@ -182,39 +177,34 @@ export function createClient(context: ExtensionContext): LanguageClient {
   // if pom changes, ask user if we should reload extension.
   // if query changes, we should reload any query builders that are open.
   workspace.onDidSaveTextDocument(async (e: TextDocument) => {
-    // refresh the tree provider in case the entity name has changed
-    await legendConceptTreeProvider.refresh(e);
-    const legendItem = guaranteeNonNullable(
-      legendConceptTreeProvider.getConceptsFrom(e.uri.toString())?.[0],
-      `Unable to find item in legend concept tree with URI ${e.uri.toString()}`,
+    const updatedEntities = await client.entities(
+      new LegendEntitiesRequest([
+        TextDocumentIdentifier.create(e.uri.toString()),
+      ]),
     );
-    const normalizedEntityId = legendItem.id
-      ? legendItem?.contextValue ===
+    updatedEntities.forEach((updatedEntity) => {
+      const normalizedEntityId =
+        updatedEntity.classifierPath ===
         'meta::pure::metamodel::function::ConcreteFunctionDefinition'
-        ? ((await normalizeFunctionEntityId(
-            guaranteeNonNullable(
-              legendItem.location?.uri.toString(),
-              `Legend tree item with ID ${legendItem.id} does not have a location URI`,
-            ),
-          )) ?? legendItem.id)
-        : legendItem.id
-      : '';
-    const queryBuilderWebviewTypes = [
-      SERVICE_QUERY_EDITOR,
-      FUNCTION_QUERY_EDITOR,
-    ];
-    if (
-      legendItem &&
-      openedWebViews[normalizedEntityId] &&
-      queryBuilderWebviewTypes.includes(
-        openedWebViews[normalizedEntityId]?.viewType ?? '',
-      )
-    ) {
-      openedWebViews[normalizedEntityId]?.webview.postMessage({
-        command: LEGEND_REFRESH_QUERY_BUILDER,
-        updatedEntityId: legendItem.id,
-      });
-    }
+          ? normalizeFunctionEntityId(updatedEntity)
+          : updatedEntity.path;
+      const queryBuilderWebviewTypes = [
+        SERVICE_QUERY_EDITOR,
+        FUNCTION_QUERY_EDITOR,
+      ];
+      if (
+        openedWebViews[normalizedEntityId] &&
+        queryBuilderWebviewTypes.includes(
+          openedWebViews[normalizedEntityId]?.viewType ?? '',
+        )
+      ) {
+        openedWebViews[normalizedEntityId]?.webview.postMessage({
+          command: LEGEND_REFRESH_QUERY_BUILDER,
+          updatedEntityId: updatedEntity.path,
+        });
+      }
+    });
+
     if (e.fileName.endsWith('pom.xml')) {
       window
         .showInformationMessage(
@@ -426,11 +416,20 @@ export function registerCommands(context: ExtensionContext): void {
         (args[0] as LegendConceptTreeItem).location?.uri.toString(),
         `Legend tree item with ID ${(args[0] as LegendConceptTreeItem).id} does not have a location URI`,
       );
-      const normalizedFunctionId =
-        (await normalizeFunctionEntityId(functionUri)) ?? functionId;
-      const normalizedFunctionName =
-        (await normalizeFunctionEntityId(functionUri, false)) ??
-        (args[0] as LegendConceptTreeItem).label;
+      const functionEntity = guaranteeNonNullable(
+        (
+          await client.entities(
+            new LegendEntitiesRequest([
+              TextDocumentIdentifier.create(functionUri),
+            ]),
+          )
+        ).filter((entity) => entity.path === functionId)[0],
+      );
+      const normalizedFunctionId = normalizeFunctionEntityId(functionEntity);
+      const normalizedFunctionName = normalizeFunctionEntityId(
+        functionEntity,
+        false,
+      );
       const columnToShowIn = window.activeTextEditor
         ? window.activeTextEditor.viewColumn
         : undefined;
