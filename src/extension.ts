@@ -91,11 +91,10 @@ import {
   createLegendConceptTreeProvider,
 } from './conceptTree';
 import { renderDiagramRendererWebView } from './webviews/DiagramWebView';
-import { renderServiceQueryEditorWebView } from './webviews/ServiceQueryEditorWebView';
 import { enableLegendBook } from './purebook/purebook';
-import { renderFunctionQueryEditorWebView } from './webviews/FunctionQueryEditorWebView';
 import { V1_getFunctionNameWithoutSignature } from './utils/V1_ProtocolUtils';
 import { type LegendEntity } from './model/LegendEntity';
+import { renderQueryBuilderWebView } from './webviews/QueryBuilderWebView';
 
 let client: LegendLanguageClient;
 const openedWebViews: Record<string, WebviewPanel> = {};
@@ -395,7 +394,7 @@ export function registerCommands(context: ExtensionContext): void {
           null,
           context.subscriptions,
         );
-        renderServiceQueryEditorWebView(
+        renderQueryBuilderWebView(
           serviceQueryEditorWebView,
           context,
           serviceId,
@@ -453,7 +452,7 @@ export function registerCommands(context: ExtensionContext): void {
           null,
           context.subscriptions,
         );
-        renderFunctionQueryEditorWebView(
+        renderQueryBuilderWebView(
           functionQueryEditorWebView,
           context,
           functionId,

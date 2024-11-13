@@ -30,42 +30,42 @@ import { type PlainObject } from '../utils/SerializationUtils';
 import { guaranteeNonNullable } from '../utils/AssertionUtils';
 import { TextLocation } from '../model/TextLocation';
 
-export const renderServiceQueryEditorWebView = (
-  serviceQueryEditorWebViewPanel: WebviewPanel,
+export const renderQueryBuilderWebView = (
+  webViewPanel: WebviewPanel,
   context: ExtensionContext,
-  serviceId: string,
+  entityId: string,
   renderFilePath: string,
   client: LegendLanguageClient,
   legendConceptTree: LegendConceptTreeProvider,
 ): void => {
-  const { webview } = serviceQueryEditorWebViewPanel;
+  const { webview } = webViewPanel;
 
-  const serviceLocation: Location = guaranteeNonNullable(
-    legendConceptTree.getTreeItemById(serviceId)?.location,
-    `Can't find service file with ID '${serviceId}'`,
+  const entityLocation: Location = guaranteeNonNullable(
+    legendConceptTree.getTreeItemById(entityId)?.location,
+    `Can't find entity with ID '${entityId}'`,
   );
-  const serviceTextLocation = TextLocation.serialization.fromJson({
-    documentId: serviceLocation.uri.toString(),
+  const entityTextLocation = TextLocation.serialization.fromJson({
+    documentId: entityLocation.uri.toString(),
     textInterval: {
       start: {
-        line: serviceLocation.range.start.line,
-        column: serviceLocation.range.start.character,
+        line: entityLocation.range.start.line,
+        column: entityLocation.range.start.character,
       },
       end: {
-        line: serviceLocation.range.end.line,
-        column: serviceLocation.range.end.character,
+        line: entityLocation.range.end.line,
+        column: entityLocation.range.end.character,
       },
     },
   });
 
   // Construct data input parameters
   const dataInputParams: PlainObject = {
-    serviceId,
+    entityId,
   };
 
   webview.html = getWebviewHtml(
     webview,
-    serviceQueryEditorWebViewPanel.viewType,
+    webViewPanel.viewType,
     context,
     renderFilePath,
     dataInputParams,
@@ -75,7 +75,7 @@ export const renderServiceQueryEditorWebView = (
     if (
       await handleV1LSPEngineMessage(
         webview,
-        serviceTextLocation,
+        entityTextLocation,
         client,
         context,
         legendConceptTree,

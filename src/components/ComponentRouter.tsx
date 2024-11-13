@@ -47,7 +47,7 @@ export const ComponentRouter = (props: PlainObject): React.ReactNode => {
 
   switch (webviewType) {
     case SERVICE_QUERY_EDITOR: {
-      const serviceId = guaranteeNonNullable(props.serviceId as string);
+      const serviceId = guaranteeNonNullable(props.entityId as string);
       component = (
         <LegendVSCodeApplication configData={configData}>
           <ServiceQueryEditor serviceId={serviceId} />
@@ -57,7 +57,7 @@ export const ComponentRouter = (props: PlainObject): React.ReactNode => {
       break;
     }
     case FUNCTION_QUERY_EDITOR: {
-      const functionId = guaranteeNonNullable(props.functionId as string);
+      const functionId = guaranteeNonNullable(props.entityId as string);
       component = (
         <LegendVSCodeApplication configData={configData}>
           <FunctionQueryEditor functionId={functionId} />
