@@ -130,9 +130,9 @@ export const useQueryBuilderState = (
         );
 
         if (type === 'service') {
-          const service = graphManagerState.graph.getService(currentId);
+          const serviceEntity = graphManagerState.graph.getService(currentId);
           const serviceExecution = guaranteeType(
-            service.execution,
+            serviceEntity.execution,
             PureExecution,
           );
           const newQueryBuilderState = new ServiceQueryBuilderState(
@@ -140,14 +140,14 @@ export const useQueryBuilderState = (
             graphManagerState,
             QueryBuilderVSCodeWorkflowState.INSTANCE,
             QueryBuilderActionConfig.INSTANCE,
-            service,
+            serviceEntity,
             undefined,
             undefined,
             undefined,
             undefined,
             undefined,
             {
-              service: service.path,
+              service: serviceEntity.path,
             },
           );
           newQueryBuilderState.initializeWithQuery(serviceExecution.func);
@@ -156,23 +156,23 @@ export const useQueryBuilderState = (
           ).catch(applicationStore.alertUnhandledError);
           setQueryBuilderState(newQueryBuilderState);
         } else if (type === 'function') {
-          const functionElement =
+          const functionEntity =
             graphManagerState.graph.getFunction(currentId);
           const newQueryBuilderState = new FunctionQueryBuilderState(
             applicationStore,
             graphManagerState,
             QueryBuilderVSCodeWorkflowState.INSTANCE,
-            functionElement,
+            functionEntity,
             undefined,
           );
           newQueryBuilderState.initializeWithQuery(
             new RawLambda(
-              functionElement.parameters.map((_param) =>
+              functionEntity.parameters.map((_param) =>
                 graphManagerState.graphManager.serializeRawValueSpecification(
                   _param,
                 ),
               ),
-              functionElement.expressionSequence,
+              functionEntity.expressionSequence,
             ),
           );
           assertTrue(
