@@ -14,19 +14,19 @@
  * limitations under the License.
  */
 
+import { useQueryBuilderState } from './useQueryBuilderState';
 import {
   CubesLoadingIndicator,
   CubesLoadingIndicatorIcon,
   QueryBuilder,
 } from '@finos/legend-vscode-extension-dependencies';
-import { useQueryBuilderState } from './useQueryBuilderState';
 
-export const ServiceQueryEditor: React.FC<{
-  serviceId: string;
-}> = ({ serviceId }) => {
+export const FunctionQueryEditor: React.FC<{
+  functionId: string;
+}> = ({ functionId }) => {
   const { queryBuilderState, isLoading, error } = useQueryBuilderState(
-    serviceId,
-    'service',
+    functionId,
+    'function',
   );
 
   return (

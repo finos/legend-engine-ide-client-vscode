@@ -86,6 +86,12 @@
         "category": "Legend"
       },
       {
+        "command": "legend.edit.function.query",
+        "title": "Edit Query",
+        "icon": "$(search)",
+        "category": "Legend"
+      },
+      {
         "command": "legend.refresh.query.builder",
         "title": "Refresh Query Builder",
         "category": "Legend"
@@ -270,6 +276,11 @@
           "command": "legend.edit.service.query",
           "when": "viewItem == meta::legend::service::metamodel::Service",
           "group": "inline"
+        },
+        {
+          "command": "legend.edit.function.query",
+          "when": "viewItem == meta::pure::metamodel::function::ConcreteFunctionDefinition",
+          "group": "inline"
         }
       ],
       "view/title": [
@@ -359,7 +370,7 @@
     "@ag-grid-enterprise/menu": "30.2.0",
     "@ag-grid-enterprise/row-grouping": "30.2.0",
     "@ag-grid-enterprise/server-side-row-model": "30.2.0",
-    "@finos/legend-vscode-extension-dependencies": "4.0.24",
+    "@finos/legend-vscode-extension-dependencies": "4.0.25",
     "@types/vscode": "1.83.0",
     "glob": "11.0.0",
     "path": "0.12.7",
