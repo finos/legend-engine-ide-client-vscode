@@ -22,6 +22,7 @@ import {
   type TerminalProfile,
   type TextDocument,
   type TextDocumentContentProvider,
+  type TreeItemLabel,
   type WebviewPanel,
   commands,
   EndOfLine,
@@ -289,8 +290,64 @@ const showDiagramWebView = async (
   }
 };
 
+const showQueryBuilderWebView = async (
+  entityId: string,
+  entityLabel: string | TreeItemLabel,
+  entityUri: string,
+  type: 'service' | 'function',
+  context: ExtensionContext,
+): Promise<void> => {
+  const entity = guaranteeNonNullable(
+    (
+      await client.entities(
+        new LegendEntitiesRequest([TextDocumentIdentifier.create(entityUri)]),
+      )
+    ).filter((_entity) => _entity.path === entityId)[0],
+  );
+  const normalizedEntityId =
+    type === 'function' ? normalizeFunctionEntityId(entity) : entityId;
+  const normalizedEntityName =
+    type === 'function'
+      ? normalizeFunctionEntityId(entity, false)
+      : entityLabel;
+  const columnToShowIn = window.activeTextEditor
+    ? window.activeTextEditor.viewColumn
+    : undefined;
+  if (openedWebViews[normalizedEntityId]) {
+    openedWebViews[normalizedEntityId]?.reveal(columnToShowIn);
+  } else {
+    const queryBuilderWebView = window.createWebviewPanel(
+      type === 'service' ? SERVICE_QUERY_EDITOR : FUNCTION_QUERY_EDITOR,
+      `Service Query Editor: ${normalizedEntityName}`,
+      ViewColumn.One,
+      {
+        enableScripts: true,
+        retainContextWhenHidden: true,
+      },
+    );
+    openedWebViews[normalizedEntityId] = queryBuilderWebView;
+    queryBuilderWebView.onDidDispose(
+      () => {
+        delete openedWebViews[normalizedEntityId];
+      },
+      null,
+      context.subscriptions,
+    );
+    renderQueryBuilderWebView(
+      queryBuilderWebView,
+      context,
+      entityId,
+      workspace.getConfiguration('legend').get('studio.forms.file', ''),
+      client,
+      legendConceptTreeProvider,
+    );
+  }
+};
+
 export function registerCommands(context: ExtensionContext): void {
-  const functionCommand = commands.registerCommand(
+  // Register CodeLens commands (commands sent from the LSP server
+  // to the client)
+  const clientCommand = commands.registerCommand(
     LEGEND_CLIENT_COMMAND_ID,
     async (...args: unknown[]) => {
       const commandId = args[3] as string;
@@ -299,24 +356,34 @@ export function registerCommands(context: ExtensionContext): void {
           handleExecuteFunctionCommand(context, args);
           break;
         }
-
         case ACTIVATE_FUNCTION_ID: {
           handleActivateFunctionCommand(args);
           break;
         }
-
         case LEGEND_SHOW_DIAGRAM: {
           showDiagramWebView(args[2] as string, context);
           break;
         }
-
+        case LEGEND_EDIT_SERVICE_QUERY: {
+          const entityId = args[2] as string;
+          const entityLabel = entityId.split('::')?.pop() ?? entityId;
+          const entityUri = args[0] as string;
+          showQueryBuilderWebView(
+            entityId,
+            entityLabel,
+            entityUri,
+            'service',
+            context,
+          );
+          break;
+        }
         default: {
           window.showWarningMessage(`${commandId} command is not supported`);
         }
       }
     },
   );
-  context.subscriptions.push(functionCommand);
+  context.subscriptions.push(clientCommand);
 
   const openLog = commands.registerCommand('legend.log', () => {
     const openPath = Uri.joinPath(context.storageUri!, 'engine-lsp', 'log.txt');
@@ -370,39 +437,21 @@ export function registerCommands(context: ExtensionContext): void {
   const editServiceQuery = commands.registerCommand(
     LEGEND_EDIT_SERVICE_QUERY,
     async (...args: unknown[]) => {
-      const serviceId = (args[0] as LegendConceptTreeItem).id as string;
-      const columnToShowIn = window.activeTextEditor
-        ? window.activeTextEditor.viewColumn
-        : undefined;
-      if (openedWebViews[serviceId]) {
-        openedWebViews[serviceId]?.reveal(columnToShowIn);
-      } else {
-        const serviceQueryEditorWebView = window.createWebviewPanel(
-          SERVICE_QUERY_EDITOR,
-          `Service Query Editor: ${(args[0] as LegendConceptTreeItem).label}`,
-          ViewColumn.One,
-          {
-            enableScripts: true,
-            retainContextWhenHidden: true,
-          },
-        );
-        openedWebViews[serviceId] = serviceQueryEditorWebView;
-        serviceQueryEditorWebView.onDidDispose(
-          () => {
-            delete openedWebViews[serviceId];
-          },
-          null,
-          context.subscriptions,
-        );
-        renderQueryBuilderWebView(
-          serviceQueryEditorWebView,
-          context,
-          serviceId,
-          workspace.getConfiguration('legend').get('studio.forms.file', ''),
-          client,
-          legendConceptTreeProvider,
-        );
-      }
+      const legendConceptTreeItem = args[0] as LegendConceptTreeItem;
+      const id = guaranteeNonNullable(
+        legendConceptTreeItem.id,
+        'Legend tree item does not have an ID',
+      );
+      showQueryBuilderWebView(
+        id,
+        legendConceptTreeItem.label ?? id,
+        guaranteeNonNullable(
+          legendConceptTreeItem.location?.uri.toString(),
+          'Legend tree item does not have a location URI',
+        ),
+        'service',
+        context,
+      );
     },
   );
   context.subscriptions.push(editServiceQuery);
@@ -410,57 +459,21 @@ export function registerCommands(context: ExtensionContext): void {
   const editFunctionQuery = commands.registerCommand(
     LEGEND_EDIT_FUNCTION_QUERY,
     async (...args: unknown[]) => {
-      const functionId = (args[0] as LegendConceptTreeItem).id as string;
-      const functionUri = guaranteeNonNullable(
-        (args[0] as LegendConceptTreeItem).location?.uri.toString(),
-        `Legend tree item with ID ${(args[0] as LegendConceptTreeItem).id} does not have a location URI`,
+      const legendConceptTreeItem = args[0] as LegendConceptTreeItem;
+      const id = guaranteeNonNullable(
+        legendConceptTreeItem.id,
+        'Legend tree item does not have an ID',
       );
-      const functionEntity = guaranteeNonNullable(
-        (
-          await client.entities(
-            new LegendEntitiesRequest([
-              TextDocumentIdentifier.create(functionUri),
-            ]),
-          )
-        ).filter((entity) => entity.path === functionId)[0],
+      showQueryBuilderWebView(
+        id,
+        legendConceptTreeItem.label ?? id,
+        guaranteeNonNullable(
+          legendConceptTreeItem.location?.uri.toString(),
+          'Legend tree item does not have a location URI',
+        ),
+        'function',
+        context,
       );
-      const normalizedFunctionId = normalizeFunctionEntityId(functionEntity);
-      const normalizedFunctionName = normalizeFunctionEntityId(
-        functionEntity,
-        false,
-      );
-      const columnToShowIn = window.activeTextEditor
-        ? window.activeTextEditor.viewColumn
-        : undefined;
-      if (openedWebViews[normalizedFunctionId]) {
-        openedWebViews[normalizedFunctionId]?.reveal(columnToShowIn);
-      } else {
-        const functionQueryEditorWebView = window.createWebviewPanel(
-          FUNCTION_QUERY_EDITOR,
-          `Function Query Editor: ${normalizedFunctionName}`,
-          ViewColumn.One,
-          {
-            enableScripts: true,
-            retainContextWhenHidden: true,
-          },
-        );
-        openedWebViews[normalizedFunctionId] = functionQueryEditorWebView;
-        functionQueryEditorWebView.onDidDispose(
-          () => {
-            delete openedWebViews[normalizedFunctionId];
-          },
-          null,
-          context.subscriptions,
-        );
-        renderQueryBuilderWebView(
-          functionQueryEditorWebView,
-          context,
-          functionId,
-          workspace.getConfiguration('legend').get('studio.forms.file', ''),
-          client,
-          legendConceptTreeProvider,
-        );
-      }
     },
   );
   context.subscriptions.push(editFunctionQuery);
