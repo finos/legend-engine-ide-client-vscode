@@ -44,8 +44,7 @@ export const ACTIVATE_FUNCTION_ID = 'legend.pure.activateFunction';
 export const SEND_TDS_REQUEST_ID = 'sendTDSRequest';
 export const GET_TDS_REQUEST_RESULTS_ID = 'getTDSRequestResultsId';
 export const LEGEND_SHOW_DIAGRAM = 'legend.show.diagram';
-export const LEGEND_EDIT_SERVICE_QUERY = 'legend.edit.service.query';
-export const LEGEND_EDIT_FUNCTION_QUERY = 'legend.edit.function.query';
+export const LEGEND_EDIT_IN_QUERYBUILDER = 'legend.editInQueryBuilder';
 export const LEGEND_REFRESH_QUERY_BUILDER = 'legend.refresh.query.builder';
 export const ONE_ENTITY_PER_FILE_REQUEST_ID =
   'legend/oneEntityPerFileRefactoring';

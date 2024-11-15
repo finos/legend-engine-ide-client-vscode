@@ -50,25 +50,24 @@ import { LegendTreeDataProvider } from './utils/LegendTreeProvider';
 import { LanguageClientProgressResult } from './results/LanguageClientProgressResult';
 import type { PlainObject } from './utils/SerializationUtils';
 import {
+  ACTIVATE_FUNCTION_ID,
+  DIAGRAM_RENDERER,
+  EXEC_FUNCTION_ID,
+  EXECUTION_TREE_VIEW,
+  FUNCTION_PARAMTER_VALUES_ID,
+  FUNCTION_QUERY_EDITOR,
+  LEGEND_CLIENT_COMMAND_ID,
+  LEGEND_EDIT_IN_QUERYBUILDER,
+  LEGEND_LANGUAGE_ID,
+  LEGEND_REFRESH_QUERY_BUILDER,
+  LEGEND_SHOW_DIAGRAM,
+  LEGEND_VIRTUAL_FS_SCHEME,
+  ONE_ENTITY_PER_FILE_COMMAND_ID,
   PROGRESS_NOTIFICATION_ID,
   RESULTS_WEB_VIEW,
-  SHOW_RESULTS_COMMAND_ID,
-  EXECUTION_TREE_VIEW,
-  LEGEND_CLIENT_COMMAND_ID,
-  FUNCTION_PARAMTER_VALUES_ID,
   SEND_TDS_REQUEST_ID,
-  EXEC_FUNCTION_ID,
-  LEGEND_VIRTUAL_FS_SCHEME,
-  ACTIVATE_FUNCTION_ID,
-  LEGEND_LANGUAGE_ID,
-  LEGEND_SHOW_DIAGRAM,
-  DIAGRAM_RENDERER,
-  ONE_ENTITY_PER_FILE_COMMAND_ID,
-  LEGEND_EDIT_SERVICE_QUERY,
   SERVICE_QUERY_EDITOR,
-  LEGEND_REFRESH_QUERY_BUILDER,
-  LEGEND_EDIT_FUNCTION_QUERY,
-  FUNCTION_QUERY_EDITOR,
+  SHOW_RESULTS_COMMAND_ID,
 } from './utils/Const';
 import { LegendWebViewProvider } from './utils/LegendWebViewProvider';
 import {
@@ -100,6 +99,11 @@ import { renderQueryBuilderWebView } from './webviews/QueryBuilderWebView';
 let client: LegendLanguageClient;
 const openedWebViews: Record<string, WebviewPanel> = {};
 let legendConceptTreeProvider: LegendConceptTreeProvider;
+
+const classifierPathMapToType: Record<string, 'service' | 'function'> = {
+  'meta::legend::service::metamodel::Service': 'service',
+  'meta::pure::metamodel::function::ConcreteFunctionDefinition': 'function',
+};
 
 export const normalizeFunctionEntityId = (
   functionEntity: LegendEntity,
@@ -294,7 +298,6 @@ const showQueryBuilderWebView = async (
   entityId: string,
   entityLabel: string | TreeItemLabel,
   entityUri: string,
-  type: 'service' | 'function',
   context: ExtensionContext,
 ): Promise<void> => {
   const entity = guaranteeNonNullable(
@@ -303,6 +306,11 @@ const showQueryBuilderWebView = async (
         new LegendEntitiesRequest([TextDocumentIdentifier.create(entityUri)]),
       )
     ).filter((_entity) => _entity.path === entityId)[0],
+    `No entity found with ID ${entityId} at ${entityUri}`,
+  );
+  const type = guaranteeNonNullable(
+    classifierPathMapToType[entity.classifierPath],
+    `QueryBuilder does not support entity type: ${entity.classifierPath}`,
   );
   const normalizedEntityId =
     type === 'function' ? normalizeFunctionEntityId(entity) : entityId;
@@ -318,7 +326,7 @@ const showQueryBuilderWebView = async (
   } else {
     const queryBuilderWebView = window.createWebviewPanel(
       type === 'service' ? SERVICE_QUERY_EDITOR : FUNCTION_QUERY_EDITOR,
-      `Service Query Editor: ${normalizedEntityName}`,
+      `${type === 'service' ? 'Service' : 'Function'} Query Editor: ${normalizedEntityName}`,
       ViewColumn.One,
       {
         enableScripts: true,
@@ -364,17 +372,11 @@ export function registerCommands(context: ExtensionContext): void {
           showDiagramWebView(args[2] as string, context);
           break;
         }
-        case LEGEND_EDIT_SERVICE_QUERY: {
+        case LEGEND_EDIT_IN_QUERYBUILDER: {
           const entityId = args[2] as string;
           const entityLabel = entityId.split('::')?.pop() ?? entityId;
           const entityUri = args[0] as string;
-          showQueryBuilderWebView(
-            entityId,
-            entityLabel,
-            entityUri,
-            'service',
-            context,
-          );
+          showQueryBuilderWebView(entityId, entityLabel, entityUri, context);
           break;
         }
         default: {
@@ -434,8 +436,8 @@ export function registerCommands(context: ExtensionContext): void {
   );
   context.subscriptions.push(showDiagram);
 
-  const editServiceQuery = commands.registerCommand(
-    LEGEND_EDIT_SERVICE_QUERY,
+  const editInQueryBuilder = commands.registerCommand(
+    LEGEND_EDIT_IN_QUERYBUILDER,
     async (...args: unknown[]) => {
       const legendConceptTreeItem = args[0] as LegendConceptTreeItem;
       const id = guaranteeNonNullable(
@@ -449,34 +451,11 @@ export function registerCommands(context: ExtensionContext): void {
           legendConceptTreeItem.location?.uri.toString(),
           'Legend tree item does not have a location URI',
         ),
-        'service',
         context,
       );
     },
   );
-  context.subscriptions.push(editServiceQuery);
-
-  const editFunctionQuery = commands.registerCommand(
-    LEGEND_EDIT_FUNCTION_QUERY,
-    async (...args: unknown[]) => {
-      const legendConceptTreeItem = args[0] as LegendConceptTreeItem;
-      const id = guaranteeNonNullable(
-        legendConceptTreeItem.id,
-        'Legend tree item does not have an ID',
-      );
-      showQueryBuilderWebView(
-        id,
-        legendConceptTreeItem.label ?? id,
-        guaranteeNonNullable(
-          legendConceptTreeItem.location?.uri.toString(),
-          'Legend tree item does not have a location URI',
-        ),
-        'function',
-        context,
-      );
-    },
-  );
-  context.subscriptions.push(editFunctionQuery);
+  context.subscriptions.push(editInQueryBuilder);
 
   const oneEntityPerFileRefactor = commands.registerCommand(
     ONE_ENTITY_PER_FILE_COMMAND_ID,
