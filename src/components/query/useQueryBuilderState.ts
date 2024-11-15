@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { flowResult } from 'mobx';
 import {
   type Entity,
@@ -38,14 +38,21 @@ import {
   PackageableElementExplicitReference,
   V1_buildVariable,
   assertTrue,
+  V1_Service,
+  V1_PureSingleExecution,
+  V1_MappingModelCoverageAnalysisResult,
 } from '@finos/legend-vscode-extension-dependencies';
 import {
+  ANALYZE_MAPPING_MODEL_COVERAGE_COMMAND_ID,
+  ANALYZE_MAPPING_MODEL_COVERAGE_RESPONSE,
   CLASSIFIER_PATH,
-  GET_PROJECT_ENTITIES,
+  GET_ENTITY_TEXT_LOCATIONS_RESPONSE,
+  GET_ENTITY_TEXT_LOCATIONS,
   GET_PROJECT_ENTITIES_RESPONSE,
+  GET_PROJECT_ENTITIES,
   LEGEND_REFRESH_QUERY_BUILDER,
 } from '../../utils/Const';
-import { postMessage } from '../../utils/VsCodeUtils';
+import { postAndWaitForMessage } from '../../utils/VsCodeUtils';
 import { QueryBuilderVSCodeWorkflowState } from './QueryBuilderWorkflowState';
 import { type LegendVSCodeApplicationConfig } from '../../application/LegendVSCodeApplicationConfig';
 import { type LegendVSCodePluginManager } from '../../application/LegendVSCodePluginManager';
@@ -55,6 +62,8 @@ import {
 } from '../../utils/GraphUtils';
 import { V1_LSPEngine } from '../../graph/V1_LSPEngine';
 import { deserialize } from 'serializr';
+import { type TextLocation } from '../../model/TextLocation';
+import { type LegendExecutionResult } from '../../results/LegendExecutionResult';
 
 export const useQueryBuilderState = (
   initialId: string,
@@ -79,38 +88,116 @@ export const useQueryBuilderState = (
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
-  useEffect(() => {
-    setIsLoading(true);
-    postMessage({
-      command: GET_PROJECT_ENTITIES,
-    });
-  }, [initialId]);
+  const getMinimalEntities = useMemo(
+    () => async (updatedEntityId?: string): Promise<Entity[]> => {
+      const allEntities = await postAndWaitForMessage<Entity[]>(
+        {
+          command: GET_PROJECT_ENTITIES,
+        },
+        GET_PROJECT_ENTITIES_RESPONSE,
+      );
+      if (updatedEntityId) {
+        setPreviousId(currentId);
+        setCurrentId(updatedEntityId);
+      }
+      const serviceTextLocation = guaranteeNonNullable(
+        (
+          await postAndWaitForMessage<TextLocation[]>(
+            {
+              command: GET_ENTITY_TEXT_LOCATIONS,
+              msg: { entityIds: [currentId] },
+            },
+            GET_ENTITY_TEXT_LOCATIONS_RESPONSE,
+          )
+        )[0],
+      );
+      const serviceEntity = guaranteeType(
+        V1_deserializePackageableElement(
+          guaranteeNonNullable(
+            (
+              await postAndWaitForMessage<Entity[]>(
+                {
+                  command: GET_PROJECT_ENTITIES,
+                  msg: { entityTextLocations: [serviceTextLocation] },
+                },
+                GET_PROJECT_ENTITIES_RESPONSE,
+              )
+            )[0]?.content,
+          ),
+          applicationStore.pluginManager.getPureProtocolProcessorPlugins(),
+        ),
+        V1_Service,
+      );
+      const mappingPath = guaranteeNonNullable(
+        guaranteeType(serviceEntity.execution, V1_PureSingleExecution).mapping,
+      );
+      const mappingAnalysisResponse = await postAndWaitForMessage<
+        LegendExecutionResult[]
+      >(
+        {
+          command: ANALYZE_MAPPING_MODEL_COVERAGE_COMMAND_ID,
+          msg: { mapping: mappingPath },
+        },
+        ANALYZE_MAPPING_MODEL_COVERAGE_RESPONSE,
+      );
+      const mappingAnalysisResult = deserialize(
+        V1_MappingModelCoverageAnalysisResult,
+        JSON.parse(guaranteeNonNullable(mappingAnalysisResponse?.[0]?.message)),
+      );
+      const mappedEntityPaths = mappingAnalysisResult.mappedEntities.map(
+        (entity) => entity.path,
+      );
+      return allEntities.filter((entity) =>
+        mappedEntityPaths.includes(entity.path),
+      );
+      // const mappedEntityTextLocations = await postAndWaitForMessage<
+      //   TextLocation[]
+      // >(
+      //   {
+      //     command: GET_ENTITY_TEXT_LOCATIONS,
+      //     msg: {
+      //       entityIds: mappingAnalysisResult.mappedEntities.map(
+      //         (entity) => entity.path,
+      //       ),
+      //     },
+      //   },
+      //   GET_ENTITY_TEXT_LOCATIONS_RESPONSE,
+      // );
+      // console.log('mappedEntityTextLocations', mappedEntityTextLocations);
+      // return postAndWaitForMessage<Entity[]>(
+      //   {
+      //     command: GET_PROJECT_ENTITIES,
+      //     msg: { entityTextLocations: mappedEntityTextLocations },
+      //   },
+      //   GET_PROJECT_ENTITIES_RESPONSE,
+      // );
+    },
+    [currentId, applicationStore.pluginManager],
+  );
 
   useEffect(() => {
-    const handleMessage = (
+    setIsLoading(true);
+    const fetchAndSetMinimalEntities = async (): Promise<void> => {
+      setEntities(await getMinimalEntities());
+      setIsLoading(false);
+    };
+    fetchAndSetMinimalEntities();
+  }, [getMinimalEntities]);
+
+  useEffect(() => {
+    const handleMessage = async (
       event: MessageEvent<{
         command: string;
         result: Entity[];
         updatedEntityId?: string;
       }>,
-    ): void => {
+    ): Promise<void> => {
       const message = event.data;
       switch (message.command) {
-        case GET_PROJECT_ENTITIES_RESPONSE: {
-          const es: Entity[] = message.result;
-          setEntities(es);
-          if (message.updatedEntityId) {
-            setPreviousId(currentId);
-            setCurrentId(message.updatedEntityId);
-          }
-          break;
-        }
         case LEGEND_REFRESH_QUERY_BUILDER: {
           setIsLoading(true);
-          postMessage({
-            command: GET_PROJECT_ENTITIES,
-            updatedEntityId: message.updatedEntityId,
-          });
+          setEntities(await getMinimalEntities(message.updatedEntityId));
+          setIsLoading(false);
           break;
         }
         default:
@@ -121,7 +208,7 @@ export const useQueryBuilderState = (
     return () => {
       window.removeEventListener('message', handleMessage);
     };
-  }, [currentId]);
+  }, [getMinimalEntities, currentId]);
 
   useEffect(() => {
     const buildGraphManagerStateAndInitializeQuery =
