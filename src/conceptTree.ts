@@ -203,9 +203,11 @@ export class LegendConceptTreeProvider
 
   async refresh(doc?: TextDocument): Promise<void> {
     if (!doc || this.root.childrenMap.size === 0) {
-      const x = await this.client.entities(new LegendEntitiesRequest([]));
+      const entities = await this.client.entities(
+        new LegendEntitiesRequest([]),
+      );
       this.root.childrenMap.clear();
-      x
+      entities
         ?.sort((l, r) => l.path.localeCompare(r.path))
         .forEach((s) => {
           this.addEntity(s);
@@ -213,13 +215,14 @@ export class LegendConceptTreeProvider
       this._onDidChangeTreeData.fire();
     } else {
       const docUri = doc.uri.toString();
-      const x_1 = await this.client
-        .entities(
-          new LegendEntitiesRequest([TextDocumentIdentifier.create(docUri)]));
+      const entities = await this.client.entities(
+        new LegendEntitiesRequest([TextDocumentIdentifier.create(docUri)]),
+      );
       this.removeEntitiesFrom(new Map(), this.root, docUri);
-      x_1?.sort((l_1, r_1) => l_1.path.localeCompare(r_1.path))
-        .forEach((s_1) => {
-          this.addEntity(s_1);
+      entities
+        ?.sort((l, r) => l.path.localeCompare(r.path))
+        .forEach((s) => {
+          this.addEntity(s);
         });
       this._onDidChangeTreeData.fire();
     }
