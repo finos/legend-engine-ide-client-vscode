@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+import { type PlainObject } from './SerializationUtils';
+
 interface Vscode {
   postMessage(message: unknown): void;
 }
@@ -22,4 +24,25 @@ declare const vscode: Vscode;
 
 export const postMessage = (message: unknown): void => {
   vscode.postMessage(message);
+};
+
+export const postAndWaitForMessage = <T>(
+  requestMessage: { command: string; msg?: PlainObject },
+  responseCommandId: string,
+): Promise<T> => {
+  postMessage({
+    command: requestMessage.command,
+    msg: requestMessage.msg,
+  });
+  return new Promise((resolve) => {
+    const handleMessage = (
+      event: MessageEvent<{ result: T; command: string }>,
+    ): void => {
+      if (event.data.command === responseCommandId) {
+        window.removeEventListener('message', handleMessage);
+        resolve(event.data.result);
+      }
+    };
+    window.addEventListener('message', handleMessage);
+  });
 };
