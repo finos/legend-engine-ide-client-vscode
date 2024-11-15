@@ -74,7 +74,6 @@ import {
   renderTestResults,
   resetExecutionTab,
 } from './results/ExecutionResultHelper';
-import { error } from 'console';
 import { guaranteeNonNullable, isPlainObject } from './utils/AssertionUtils';
 import { renderFunctionResultsWebView } from './webviews/FunctionResultsWebView';
 import type { FunctionTDSRequest } from './model/FunctionTDSRequest';
@@ -300,55 +299,61 @@ const showQueryBuilderWebView = async (
   entityUri: string,
   context: ExtensionContext,
 ): Promise<void> => {
-  const entity = guaranteeNonNullable(
-    (
-      await client.entities(
-        new LegendEntitiesRequest([TextDocumentIdentifier.create(entityUri)]),
-      )
-    ).filter((_entity) => _entity.path === entityId)[0],
-    `No entity found with ID ${entityId} at ${entityUri}`,
-  );
-  const type = guaranteeNonNullable(
-    classifierPathMapToType[entity.classifierPath],
-    `QueryBuilder does not support entity type: ${entity.classifierPath}`,
-  );
-  const normalizedEntityId =
-    type === 'function' ? normalizeFunctionEntityId(entity) : entityId;
-  const normalizedEntityName =
-    type === 'function'
-      ? normalizeFunctionEntityId(entity, false)
-      : entityLabel;
-  const columnToShowIn = window.activeTextEditor
-    ? window.activeTextEditor.viewColumn
-    : undefined;
-  if (openedWebViews[normalizedEntityId]) {
-    openedWebViews[normalizedEntityId]?.reveal(columnToShowIn);
-  } else {
-    const queryBuilderWebView = window.createWebviewPanel(
-      type === 'service' ? SERVICE_QUERY_EDITOR : FUNCTION_QUERY_EDITOR,
-      `${type === 'service' ? 'Service' : 'Function'} Query Editor: ${normalizedEntityName}`,
-      ViewColumn.One,
-      {
-        enableScripts: true,
-        retainContextWhenHidden: true,
-      },
+  try {
+    const entity = guaranteeNonNullable(
+      (
+        await client.entities(
+          new LegendEntitiesRequest([TextDocumentIdentifier.create(entityUri)]),
+        )
+      ).filter((_entity) => _entity.path === entityId)[0],
+      `No entity found with ID ${entityId} at ${entityUri}`,
     );
-    openedWebViews[normalizedEntityId] = queryBuilderWebView;
-    queryBuilderWebView.onDidDispose(
-      () => {
-        delete openedWebViews[normalizedEntityId];
-      },
-      null,
-      context.subscriptions,
+    const type = guaranteeNonNullable(
+      classifierPathMapToType[entity.classifierPath],
+      `QueryBuilder does not support entity type: ${entity.classifierPath}`,
     );
-    renderQueryBuilderWebView(
-      queryBuilderWebView,
-      context,
-      entityId,
-      workspace.getConfiguration('legend').get('studio.forms.file', ''),
-      client,
-      legendConceptTreeProvider,
-    );
+    const normalizedEntityId =
+      type === 'function' ? normalizeFunctionEntityId(entity) : entityId;
+    const normalizedEntityName =
+      type === 'function'
+        ? normalizeFunctionEntityId(entity, false)
+        : entityLabel;
+    const columnToShowIn = window.activeTextEditor
+      ? window.activeTextEditor.viewColumn
+      : undefined;
+    if (openedWebViews[normalizedEntityId]) {
+      openedWebViews[normalizedEntityId]?.reveal(columnToShowIn);
+    } else {
+      const queryBuilderWebView = window.createWebviewPanel(
+        type === 'service' ? SERVICE_QUERY_EDITOR : FUNCTION_QUERY_EDITOR,
+        `${type === 'service' ? 'Service' : 'Function'} Query Editor: ${normalizedEntityName}`,
+        ViewColumn.One,
+        {
+          enableScripts: true,
+          retainContextWhenHidden: true,
+        },
+      );
+      openedWebViews[normalizedEntityId] = queryBuilderWebView;
+      queryBuilderWebView.onDidDispose(
+        () => {
+          delete openedWebViews[normalizedEntityId];
+        },
+        null,
+        context.subscriptions,
+      );
+      renderQueryBuilderWebView(
+        queryBuilderWebView,
+        context,
+        entityId,
+        workspace.getConfiguration('legend').get('studio.forms.file', ''),
+        client,
+        legendConceptTreeProvider,
+      );
+    }
+  } catch (error) {
+    if (error instanceof Error) {
+      window.showErrorMessage(error.message);
+    }
   }
 };
 
@@ -557,23 +562,25 @@ export function registerClientViews(context: ExtensionContext): void {
     PROGRESS_NOTIFICATION_ID,
     (objectResult: PlainObject<LanguageClientProgressResult>) => {
       try {
-        if (
-          isPlainObject(objectResult.value) &&
-          objectResult.value.kind !== 'end'
-        ) {
-          resetExecutionTab(resultsTreeDataProvider, resultsViewprovider);
+        if (resultsViewprovider.getView() && resultsViewprovider.getWebView()) {
+          if (
+            isPlainObject(objectResult.value) &&
+            objectResult.value.kind !== 'end'
+          ) {
+            resetExecutionTab(resultsTreeDataProvider, resultsViewprovider);
+          }
+          resultsViewprovider.focus();
+          const result =
+            LanguageClientProgressResult.serialization.fromJson(objectResult);
+          renderTestResults(
+            result,
+            resultsTreeDataProvider,
+            context.extensionUri,
+            context.extensionPath,
+            resultsViewprovider.getWebView(),
+          );
         }
-        resultsViewprovider.focus();
-        const result =
-          LanguageClientProgressResult.serialization.fromJson(objectResult);
-        renderTestResults(
-          result,
-          resultsTreeDataProvider,
-          context.extensionUri,
-          context.extensionPath,
-          resultsViewprovider.getWebView(),
-        );
-      } catch {
+      } catch (error) {
         if (error instanceof Error) {
           window.showErrorMessage(error.message);
         }

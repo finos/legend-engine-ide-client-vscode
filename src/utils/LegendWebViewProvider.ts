@@ -46,6 +46,10 @@ export class LegendWebViewProvider implements WebviewViewProvider {
     this.view.show();
   }
 
+  getView(): WebviewView {
+    return this.view;
+  }
+
   getWebView(): Webview {
     return this.view.webview;
   }
