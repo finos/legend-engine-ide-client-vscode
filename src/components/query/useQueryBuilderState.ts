@@ -89,89 +89,113 @@ export const useQueryBuilderState = (
   const [error, setError] = useState('');
 
   const getMinimalEntities = useMemo(
-    () => async (updatedEntityId?: string): Promise<Entity[]> => {
-      const allEntities = await postAndWaitForMessage<Entity[]>(
-        {
-          command: GET_PROJECT_ENTITIES,
-        },
-        GET_PROJECT_ENTITIES_RESPONSE,
-      );
-      if (updatedEntityId) {
-        setPreviousId(currentId);
-        setCurrentId(updatedEntityId);
-      }
-      const serviceTextLocation = guaranteeNonNullable(
-        (
-          await postAndWaitForMessage<TextLocation[]>(
-            {
-              command: GET_ENTITY_TEXT_LOCATIONS,
-              msg: { entityIds: [currentId] },
-            },
-            GET_ENTITY_TEXT_LOCATIONS_RESPONSE,
-          )
-        )[0],
-      );
-      const serviceEntity = guaranteeType(
-        V1_deserializePackageableElement(
-          guaranteeNonNullable(
-            (
-              await postAndWaitForMessage<Entity[]>(
-                {
-                  command: GET_PROJECT_ENTITIES,
-                  msg: { entityTextLocations: [serviceTextLocation] },
-                },
-                GET_PROJECT_ENTITIES_RESPONSE,
-              )
-            )[0]?.content,
+    () =>
+      async (updatedEntityId?: string): Promise<Entity[]> => {
+        console.log('getMinimalEntities called');
+        const allEntities = await postAndWaitForMessage<Entity[]>(
+          {
+            command: GET_PROJECT_ENTITIES,
+          },
+          GET_PROJECT_ENTITIES_RESPONSE,
+        );
+        console.log('allEntities', allEntities);
+        // if (updatedEntityId) {
+        //   console.log('updatedEntityId', updatedEntityId);
+        //   setPreviousId(currentId);
+        //   setCurrentId(updatedEntityId);
+        // }
+        const serviceTextLocation = guaranteeNonNullable(
+          (
+            await postAndWaitForMessage<TextLocation[]>(
+              {
+                command: GET_ENTITY_TEXT_LOCATIONS,
+                msg: { entityIds: [currentId] },
+              },
+              GET_ENTITY_TEXT_LOCATIONS_RESPONSE,
+            )
+          )[0],
+        );
+        console.log('serviceTextLocation', serviceTextLocation);
+        const serviceEntity = guaranteeType(
+          V1_deserializePackageableElement(
+            guaranteeNonNullable(
+              (
+                await postAndWaitForMessage<Entity[]>(
+                  {
+                    command: GET_PROJECT_ENTITIES,
+                    msg: { entityTextLocations: [serviceTextLocation] },
+                  },
+                  GET_PROJECT_ENTITIES_RESPONSE,
+                )
+              )[0]?.content,
+            ),
+            applicationStore.pluginManager.getPureProtocolProcessorPlugins(),
           ),
-          applicationStore.pluginManager.getPureProtocolProcessorPlugins(),
-        ),
-        V1_Service,
-      );
-      const mappingPath = guaranteeNonNullable(
-        guaranteeType(serviceEntity.execution, V1_PureSingleExecution).mapping,
-      );
-      const mappingAnalysisResponse = await postAndWaitForMessage<
-        LegendExecutionResult[]
-      >(
-        {
-          command: ANALYZE_MAPPING_MODEL_COVERAGE_COMMAND_ID,
-          msg: { mapping: mappingPath },
-        },
-        ANALYZE_MAPPING_MODEL_COVERAGE_RESPONSE,
-      );
-      const mappingAnalysisResult = deserialize(
-        V1_MappingModelCoverageAnalysisResult,
-        JSON.parse(guaranteeNonNullable(mappingAnalysisResponse?.[0]?.message)),
-      );
-      const mappedEntityPaths = mappingAnalysisResult.mappedEntities.map(
-        (entity) => entity.path,
-      );
-      return allEntities.filter((entity) =>
-        mappedEntityPaths.includes(entity.path),
-      );
-      // const mappedEntityTextLocations = await postAndWaitForMessage<
-      //   TextLocation[]
-      // >(
-      //   {
-      //     command: GET_ENTITY_TEXT_LOCATIONS,
-      //     msg: {
-      //       entityIds: mappingAnalysisResult.mappedEntities.map(
-      //         (entity) => entity.path,
-      //       ),
-      //     },
-      //   },
-      //   GET_ENTITY_TEXT_LOCATIONS_RESPONSE,
-      // );
-      // console.log('mappedEntityTextLocations', mappedEntityTextLocations);
-      // return postAndWaitForMessage<Entity[]>(
-      //   {
-      //     command: GET_PROJECT_ENTITIES,
-      //     msg: { entityTextLocations: mappedEntityTextLocations },
-      //   },
-      //   GET_PROJECT_ENTITIES_RESPONSE,
-      // );
-    },
+          V1_Service,
+        );
+        console.log('serviceEntity', serviceEntity);
+        const mappingPath = guaranteeNonNullable(
+          guaranteeType(serviceEntity.execution, V1_PureSingleExecution)
+            .mapping,
+        );
+        console.log('mappingPath', mappingPath);
+        const mappingAnalysisResponse = await postAndWaitForMessage<
+          LegendExecutionResult[]
+        >(
+          {
+            command: ANALYZE_MAPPING_MODEL_COVERAGE_COMMAND_ID,
+            msg: { mapping: mappingPath },
+          },
+          ANALYZE_MAPPING_MODEL_COVERAGE_RESPONSE,
+        );
+        console.log('mappingAnalysisResponse', mappingAnalysisResponse);
+        // const mappingAnalysisResult = deserialize(
+        //   V1_MappingModelCoverageAnalysisResult,
+        //   JSON.parse(guaranteeNonNullable(mappingAnalysisResponse?.[0]?.message)),
+        // );
+        const mappingAnalysisResult = JSON.parse(
+          guaranteeNonNullable(mappingAnalysisResponse?.[0]?.message),
+        );
+        console.log('mappingAnalysisResult', mappingAnalysisResult);
+        const mappedEntityPaths = uniq(
+          mappingAnalysisResult.mappedEntities.map(
+            (entity: {
+              info: {
+                classPath: string;
+                isRootEntity: boolean;
+                subClasses: string[];
+              };
+              path: string;
+              properties: object[];
+            }) => entity.info.classPath,
+          ),
+        );
+        console.log('mappedEntityPaths', mappedEntityPaths);
+        return allEntities.filter((entity) =>
+          mappedEntityPaths.includes(entity.path),
+        );
+        // const mappedEntityTextLocations = await postAndWaitForMessage<
+        //   TextLocation[]
+        // >(
+        //   {
+        //     command: GET_ENTITY_TEXT_LOCATIONS,
+        //     msg: {
+        //       entityIds: mappingAnalysisResult.mappedEntities.map(
+        //         (entity) => entity.path,
+        //       ),
+        //     },
+        //   },
+        //   GET_ENTITY_TEXT_LOCATIONS_RESPONSE,
+        // );
+        // console.log('mappedEntityTextLocations', mappedEntityTextLocations);
+        // return postAndWaitForMessage<Entity[]>(
+        //   {
+        //     command: GET_PROJECT_ENTITIES,
+        //     msg: { entityTextLocations: mappedEntityTextLocations },
+        //   },
+        //   GET_PROJECT_ENTITIES_RESPONSE,
+        // );
+      },
     [currentId, applicationStore.pluginManager],
   );
 
