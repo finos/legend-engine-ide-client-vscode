@@ -191,7 +191,7 @@ export class LegendLanguageClient extends LanguageClient {
 
   async analyzeMappingModelCoverage(
     mappingTextLocation: TextLocation,
-  ): Promise<string> {
+  ): Promise<LegendExecutionResult[]> {
     return commands.executeCommand(
       LEGEND_COMMAND,
       mappingTextLocation,
@@ -210,7 +210,7 @@ export class LegendLanguageClient extends LanguageClient {
     context: V1_RawExecutionContext,
     parameterValues: { [key: string]: unknown },
     serializationFormat?: EXECUTION_SERIALIZATION_FORMAT | undefined,
-  ): Promise<string> {
+  ): Promise<LegendExecutionResult[]> {
     return commands.executeCommand(
       LEGEND_COMMAND,
       entityTextLocation,
@@ -282,7 +282,7 @@ export class LegendLanguageClient extends LanguageClient {
     runtime: V1_Runtime | undefined,
     context: V1_RawExecutionContext,
     parameterValues: V1_ParameterValue[],
-  ): Promise<string> {
+  ): Promise<LegendExecutionResult[]> {
     return commands.executeCommand(
       LEGEND_COMMAND,
       entityTextLocation,
@@ -304,7 +304,7 @@ export class LegendLanguageClient extends LanguageClient {
     runtime: V1_Runtime | undefined,
     context: V1_RawExecutionContext,
     parameterValues: V1_ParameterValue[],
-  ): Promise<string> {
+  ): Promise<LegendExecutionResult[]> {
     return commands.executeCommand(
       LEGEND_COMMAND,
       entityTextLocation,
@@ -327,7 +327,7 @@ export class LegendLanguageClient extends LanguageClient {
     lineOffset?: number | undefined,
     columnOffset?: number | undefined,
     returnSourceInformation?: boolean | undefined,
-  ): Promise<string> {
+  ): Promise<LegendExecutionResult[]> {
     return commands.executeCommand(
       LEGEND_COMMAND,
       entityTextLocation,
@@ -346,7 +346,7 @@ export class LegendLanguageClient extends LanguageClient {
     entityTextLocation: TextLocation,
     lambdas: Record<string, PlainObject<V1_RawLambda>>,
     renderStyle?: V1_RenderStyle | undefined,
-  ): Promise<string> {
+  ): Promise<LegendExecutionResult[]> {
     return commands.executeCommand(
       LEGEND_COMMAND,
       entityTextLocation,
@@ -361,7 +361,7 @@ export class LegendLanguageClient extends LanguageClient {
   async getLambdaReturnType(
     entityTextLocation: TextLocation,
     lambda: V1_RawLambda,
-  ): Promise<string> {
+  ): Promise<LegendExecutionResult[]> {
     return commands.executeCommand(
       LEGEND_COMMAND,
       entityTextLocation,
@@ -377,7 +377,7 @@ export class LegendLanguageClient extends LanguageClient {
     mapping: string,
     runtime: string,
     lambda: V1_RawLambda,
-  ): Promise<string> {
+  ): Promise<LegendExecutionResult[]> {
     return commands.executeCommand(
       LEGEND_COMMAND,
       entityTextLocation,
@@ -396,7 +396,7 @@ export class LegendLanguageClient extends LanguageClient {
     runtime: string,
     lambda: V1_RawLambda,
     reports: { name: string; type: string }[],
-  ): Promise<string> {
+  ): Promise<LegendExecutionResult[]> {
     return commands.executeCommand(
       LEGEND_COMMAND,
       entityTextLocation,
