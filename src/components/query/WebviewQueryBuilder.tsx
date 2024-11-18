@@ -24,7 +24,7 @@ import { type CLASSIFIER_PATH } from '../../utils/Const';
 
 export const WebviewQueryBuilder: React.FC<{
   entityId: string;
-  classifierPath: CLASSIFIER_PATH,
+  classifierPath: CLASSIFIER_PATH;
 }> = ({ entityId, classifierPath }) => {
   const { queryBuilderState, isLoading, error } = useQueryBuilderState(
     entityId,

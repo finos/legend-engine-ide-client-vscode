@@ -50,7 +50,10 @@ export const ComponentRouter = (props: PlainObject): React.ReactNode => {
       const entityId = guaranteeNonNullable(props.entityId as string);
       component = (
         <LegendVSCodeApplication configData={configData}>
-          <WebviewQueryBuilder entityId={entityId} classifierPath={CLASSIFIER_PATH.SERVICE} />
+          <WebviewQueryBuilder
+            entityId={entityId}
+            classifierPath={CLASSIFIER_PATH.SERVICE}
+          />
         </LegendVSCodeApplication>
       );
       break;
@@ -59,7 +62,10 @@ export const ComponentRouter = (props: PlainObject): React.ReactNode => {
       const entityId = guaranteeNonNullable(props.entityId as string);
       component = (
         <LegendVSCodeApplication configData={configData}>
-          <WebviewQueryBuilder entityId={entityId} classifierPath={CLASSIFIER_PATH.FUNCTION} />
+          <WebviewQueryBuilder
+            entityId={entityId}
+            classifierPath={CLASSIFIER_PATH.FUNCTION}
+          />
         </LegendVSCodeApplication>
       );
       break;
