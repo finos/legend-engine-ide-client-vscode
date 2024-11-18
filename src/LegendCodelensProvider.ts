@@ -20,7 +20,7 @@ export class LegendCodelensProvider implements CodeLensProvider {
     this.client = client;
   }
 
-  private addServiceCodeLens(entity: LegendEntity): void {
+  private addQueryBuilderCodeLens(entity: LegendEntity): void {
     this.codeLenses.push(
       new CodeLens(
         new Range(
@@ -51,9 +51,11 @@ export class LegendCodelensProvider implements CodeLensProvider {
     );
     entities.forEach((entity) => {
       if (
-        entity.classifierPath === 'meta::legend::service::metamodel::Service'
+        entity.classifierPath === 'meta::legend::service::metamodel::Service' ||
+        entity.classifierPath ===
+          'meta::pure::metamodel::function::ConcreteFunctionDefinition'
       ) {
-        this.addServiceCodeLens(entity);
+        this.addQueryBuilderCodeLens(entity);
       }
     });
     return this.codeLenses;
