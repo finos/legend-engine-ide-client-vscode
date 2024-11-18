@@ -51,6 +51,7 @@ import { LanguageClientProgressResult } from './results/LanguageClientProgressRe
 import type { PlainObject } from './utils/SerializationUtils';
 import {
   ACTIVATE_FUNCTION_ID,
+  CLASSIFIER_PATH,
   DIAGRAM_RENDERER,
   EXEC_FUNCTION_ID,
   EXECUTION_TREE_VIEW,
@@ -101,8 +102,8 @@ const openedWebViews: Record<string, WebviewPanel> = {};
 let legendConceptTreeProvider: LegendConceptTreeProvider;
 
 const classifierPathMapToType: Record<string, 'service' | 'function'> = {
-  'meta::legend::service::metamodel::Service': 'service',
-  'meta::pure::metamodel::function::ConcreteFunctionDefinition': 'function',
+  [CLASSIFIER_PATH.SERVICE]: 'service',
+  [CLASSIFIER_PATH.FUNCTION]: 'function',
 };
 
 export const normalizeFunctionEntityId = (

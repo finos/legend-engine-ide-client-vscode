@@ -27,6 +27,7 @@ import {
 } from './LegendLanguageClient';
 import { TextDocumentIdentifier } from 'vscode-languageclient';
 import { type LegendEntity } from './model/LegendEntity';
+import { CLASSIFIER_PATH } from './utils/Const';
 
 export class LegendCodelensProvider implements CodeLensProvider {
   private client: LegendLanguageClient;
@@ -67,9 +68,8 @@ export class LegendCodelensProvider implements CodeLensProvider {
     );
     entities.forEach((entity) => {
       if (
-        entity.classifierPath === 'meta::legend::service::metamodel::Service' ||
-        entity.classifierPath ===
-          'meta::pure::metamodel::function::ConcreteFunctionDefinition'
+        entity.classifierPath === CLASSIFIER_PATH.SERVICE ||
+        entity.classifierPath === CLASSIFIER_PATH.FUNCTION
       ) {
         this.addQueryBuilderCodeLens(entity);
       }

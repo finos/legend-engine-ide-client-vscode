@@ -123,6 +123,12 @@ export const DIAGRAM_RENDERER = 'diagramRenderer';
 export const SERVICE_QUERY_EDITOR = 'serviceQueryEditor';
 export const FUNCTION_QUERY_EDITOR = 'functionQueryEditor';
 
+// Classifier paths
+export enum CLASSIFIER_PATH {
+  SERVICE = 'meta::legend::service::metamodel::Service',
+  FUNCTION = 'meta::pure::metamodel::function::ConcreteFunctionDefinition',
+}
+
 // Primitive types
 export enum PRIMITIVE_TYPE {
   STRING = 'String',
