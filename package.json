@@ -80,14 +80,8 @@
         "category": "Legend"
       },
       {
-        "command": "legend.edit.service.query",
-        "title": "Edit Query",
-        "icon": "$(search)",
-        "category": "Legend"
-      },
-      {
-        "command": "legend.edit.function.query",
-        "title": "Edit Query",
+        "command": "legend.editInQueryBuilder",
+        "title": "Edit/Execute in QueryBuilder",
         "icon": "$(search)",
         "category": "Legend"
       },
