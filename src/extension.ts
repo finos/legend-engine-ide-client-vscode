@@ -388,13 +388,6 @@ export function registerCommands(context: ExtensionContext): void {
           showDiagramWebView(args[2] as string, context);
           break;
         }
-        case LEGEND_EDIT_IN_QUERYBUILDER: {
-          const entityId = args[2] as string;
-          const entityLabel = entityId.split('::')?.pop() ?? entityId;
-          const entityUri = args[0] as string;
-          showQueryBuilderWebView(entityId, entityLabel, entityUri, context);
-          break;
-        }
         default: {
           window.showWarningMessage(`${commandId} command is not supported`);
         }
