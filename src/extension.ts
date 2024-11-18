@@ -94,6 +94,7 @@ import { enableLegendBook } from './purebook/purebook';
 import { V1_getFunctionNameWithoutSignature } from './utils/V1_ProtocolUtils';
 import { type LegendEntity } from './model/LegendEntity';
 import { renderQueryBuilderWebView } from './webviews/QueryBuilderWebView';
+import { LegendCodelensProvider } from './LegendCodelensProvider';
 
 let client: LegendLanguageClient;
 const openedWebViews: Record<string, WebviewPanel> = {};
@@ -444,20 +445,37 @@ export function registerCommands(context: ExtensionContext): void {
   const editInQueryBuilder = commands.registerCommand(
     LEGEND_EDIT_IN_QUERYBUILDER,
     async (...args: unknown[]) => {
-      const legendConceptTreeItem = args[0] as LegendConceptTreeItem;
-      const id = guaranteeNonNullable(
-        legendConceptTreeItem.id,
-        'Legend tree item does not have an ID',
-      );
-      showQueryBuilderWebView(
-        id,
-        legendConceptTreeItem.label ?? id,
-        guaranteeNonNullable(
-          legendConceptTreeItem.location?.uri.toString(),
-          'Legend tree item does not have a location URI',
-        ),
-        context,
-      );
+      if (args.length > 1 && (args[1] as string) === 'codelens') {
+        const legendEntity = args[0] as LegendEntity;
+        const id = guaranteeNonNullable(
+          legendEntity.path,
+          'Legend entity does not have an ID',
+        );
+        showQueryBuilderWebView(
+          id,
+          legendEntity.content.name as string ?? id,
+          guaranteeNonNullable(
+            legendEntity.location?.documentId,
+            'Legend entity does not have a document ID',
+          ),
+          context,
+        );
+      } else {
+        const legendConceptTreeItem = args[0] as LegendConceptTreeItem;
+        const id = guaranteeNonNullable(
+          legendConceptTreeItem.id,
+          'Legend tree item does not have an ID',
+        );
+        showQueryBuilderWebView(
+          id,
+          legendConceptTreeItem.label ?? id,
+          guaranteeNonNullable(
+            legendConceptTreeItem.location?.uri.toString(),
+            'Legend tree item does not have a location URI',
+          ),
+          context,
+        );
+      }
     },
   );
   context.subscriptions.push(editInQueryBuilder);
@@ -602,6 +620,11 @@ export function activate(context: ExtensionContext): void {
   context.subscriptions.push(...disposables);
   legendConceptTreeProvider = treeDataProvider;
   enableLegendBook(context);
+  const legendCodelensProvider = new LegendCodelensProvider(client);
+  languages.registerCodeLensProvider(
+    LEGEND_LANGUAGE_ID,
+    legendCodelensProvider,
+  );
   context.globalState.update(
     'currentUserId',
     // eslint-disable-next-line no-process-env
