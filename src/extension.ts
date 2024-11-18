@@ -453,7 +453,7 @@ export function registerCommands(context: ExtensionContext): void {
         );
         showQueryBuilderWebView(
           id,
-          legendEntity.content.name as string ?? id,
+          (legendEntity.content.name as string) ?? id,
           guaranteeNonNullable(
             legendEntity.location?.documentId,
             'Legend entity does not have a document ID',
