@@ -101,10 +101,10 @@ let client: LegendLanguageClient;
 const openedWebViews: Record<string, WebviewPanel> = {};
 let legendConceptTreeProvider: LegendConceptTreeProvider;
 
-const classifierPathMapToType: Record<string, 'service' | 'function'> = {
-  [CLASSIFIER_PATH.SERVICE]: 'service',
-  [CLASSIFIER_PATH.FUNCTION]: 'function',
-};
+const queryBuilderSupportedTypes = [
+  CLASSIFIER_PATH.SERVICE,
+  CLASSIFIER_PATH.FUNCTION,
+];
 
 export const normalizeFunctionEntityId = (
   functionEntity: LegendEntity,
@@ -310,14 +310,21 @@ const showQueryBuilderWebView = async (
       ).filter((_entity) => _entity.path === entityId)[0],
       `No entity found with ID ${entityId} at ${entityUri}`,
     );
-    const type = guaranteeNonNullable(
-      classifierPathMapToType[entity.classifierPath],
-      `QueryBuilder does not support entity type: ${entity.classifierPath}`,
-    );
+    if (
+      !queryBuilderSupportedTypes.includes(
+        entity.classifierPath as CLASSIFIER_PATH,
+      )
+    ) {
+      throw new Error(
+        `QueryBuilder does not support entity type: ${entity.classifierPath}`,
+      );
+    }
     const normalizedEntityId =
-      type === 'function' ? normalizeFunctionEntityId(entity) : entityId;
+      entity.classifierPath === CLASSIFIER_PATH.FUNCTION
+        ? normalizeFunctionEntityId(entity)
+        : entityId;
     const normalizedEntityName =
-      type === 'function'
+      entity.classifierPath === CLASSIFIER_PATH.FUNCTION
         ? normalizeFunctionEntityId(entity, false)
         : entityLabel;
     const columnToShowIn = window.activeTextEditor
@@ -327,8 +334,10 @@ const showQueryBuilderWebView = async (
       openedWebViews[normalizedEntityId]?.reveal(columnToShowIn);
     } else {
       const queryBuilderWebView = window.createWebviewPanel(
-        type === 'service' ? SERVICE_QUERY_EDITOR : FUNCTION_QUERY_EDITOR,
-        `${type === 'service' ? 'Service' : 'Function'} Query Editor: ${normalizedEntityName}`,
+        entity.classifierPath === CLASSIFIER_PATH.SERVICE
+          ? SERVICE_QUERY_EDITOR
+          : FUNCTION_QUERY_EDITOR,
+        `${entity.classifierPath === CLASSIFIER_PATH.SERVICE ? 'Service' : 'Function'} Query Editor: ${normalizedEntityName}`,
         ViewColumn.One,
         {
           enableScripts: true,

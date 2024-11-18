@@ -16,6 +16,7 @@
 
 import React from 'react';
 import {
+  CLASSIFIER_PATH,
   DIAGRAM_RENDERER,
   FUNCTION_QUERY_EDITOR,
   SERVICE_QUERY_EDITOR,
@@ -27,10 +28,9 @@ import {
   guaranteeNonNullable,
 } from '@finos/legend-vscode-extension-dependencies';
 import { LegendVSCodeApplication } from '../application/LegendVSCodeApplication';
-import { ServiceQueryEditor } from './query/ServiceQueryEditor';
+import { WebviewQueryBuilder } from './query/WebviewQueryBuilder';
 import { DiagramEditor } from './diagram/DiagramEditor';
 import { DiagramEditorState } from '../stores/DiagramEditorState';
-import { FunctionQueryEditor } from './query/FunctionQueryEditor';
 
 export const ComponentRouter = (props: PlainObject): React.ReactNode => {
   const webviewType = guaranteeNonEmptyString(
@@ -47,23 +47,21 @@ export const ComponentRouter = (props: PlainObject): React.ReactNode => {
 
   switch (webviewType) {
     case SERVICE_QUERY_EDITOR: {
-      const serviceId = guaranteeNonNullable(props.entityId as string);
+      const entityId = guaranteeNonNullable(props.entityId as string);
       component = (
         <LegendVSCodeApplication configData={configData}>
-          <ServiceQueryEditor serviceId={serviceId} />
+          <WebviewQueryBuilder entityId={entityId} classifierPath={CLASSIFIER_PATH.SERVICE} />
         </LegendVSCodeApplication>
       );
-
       break;
     }
     case FUNCTION_QUERY_EDITOR: {
-      const functionId = guaranteeNonNullable(props.entityId as string);
+      const entityId = guaranteeNonNullable(props.entityId as string);
       component = (
         <LegendVSCodeApplication configData={configData}>
-          <FunctionQueryEditor functionId={functionId} />
+          <WebviewQueryBuilder entityId={entityId} classifierPath={CLASSIFIER_PATH.FUNCTION} />
         </LegendVSCodeApplication>
       );
-
       break;
     }
     case DIAGRAM_RENDERER: {
