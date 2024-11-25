@@ -40,6 +40,7 @@ import {
   assertTrue,
 } from '@finos/legend-vscode-extension-dependencies';
 import {
+  CLASSIFIER_PATH,
   GET_PROJECT_ENTITIES,
   GET_PROJECT_ENTITIES_RESPONSE,
   LEGEND_REFRESH_QUERY_BUILDER,
@@ -57,7 +58,7 @@ import { deserialize } from 'serializr';
 
 export const useQueryBuilderState = (
   initialId: string,
-  type: 'service' | 'function',
+  classifierPath: CLASSIFIER_PATH,
 ): {
   queryBuilderState: QueryBuilderState | null;
   isLoading: boolean;
@@ -132,7 +133,7 @@ export const useQueryBuilderState = (
           engine,
         );
 
-        if (type === 'service') {
+        if (classifierPath === CLASSIFIER_PATH.SERVICE) {
           const serviceEntity = graphManagerState.graph.getService(currentId);
           const serviceExecution = guaranteeType(
             serviceEntity.execution,
@@ -158,7 +159,7 @@ export const useQueryBuilderState = (
             newQueryBuilderState.explorerState.analyzeMappingModelCoverage(),
           ).catch(applicationStore.alertUnhandledError);
           setQueryBuilderState(newQueryBuilderState);
-        } else if (type === 'function') {
+        } else if (classifierPath === CLASSIFIER_PATH.FUNCTION) {
           const functionEntity = graphManagerState.graph.getFunction(currentId);
           const newQueryBuilderState = new FunctionQueryBuilderState(
             applicationStore,
@@ -188,7 +189,7 @@ export const useQueryBuilderState = (
     const updateExistingQuery = (): void => {
       const nonNullQueryBuilderState = guaranteeNonNullable(queryBuilderState);
 
-      if (type === 'service') {
+      if (classifierPath === CLASSIFIER_PATH.SERVICE) {
         // Get updated service execution
         const V1_newExecution = guaranteeType(
           deserialize(
@@ -222,7 +223,7 @@ export const useQueryBuilderState = (
         // Update the existing execution with the new lambda
         pureExecution_setFunction(existingExecution, newFunc);
         nonNullQueryBuilderState.initializeWithQuery(newFunc);
-      } else if (type === 'function') {
+      } else if (classifierPath === CLASSIFIER_PATH.FUNCTION) {
         const graphManager = guaranteeType(
           nonNullQueryBuilderState.graphManagerState.graphManager,
           V1_PureGraphManager,
@@ -331,7 +332,7 @@ export const useQueryBuilderState = (
     applicationStore,
     entities,
     queryBuilderState,
-    type,
+    classifierPath,
   ]);
 
   return { queryBuilderState, isLoading, error };

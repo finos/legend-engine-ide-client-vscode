@@ -44,8 +44,7 @@ export const ACTIVATE_FUNCTION_ID = 'legend.pure.activateFunction';
 export const SEND_TDS_REQUEST_ID = 'sendTDSRequest';
 export const GET_TDS_REQUEST_RESULTS_ID = 'getTDSRequestResultsId';
 export const LEGEND_SHOW_DIAGRAM = 'legend.show.diagram';
-export const LEGEND_EDIT_SERVICE_QUERY = 'legend.edit.service.query';
-export const LEGEND_EDIT_FUNCTION_QUERY = 'legend.edit.function.query';
+export const LEGEND_EDIT_IN_QUERYBUILDER = 'legend.editInQueryBuilder';
 export const LEGEND_REFRESH_QUERY_BUILDER = 'legend.refresh.query.builder';
 export const ONE_ENTITY_PER_FILE_REQUEST_ID =
   'legend/oneEntityPerFileRefactoring';
@@ -123,6 +122,12 @@ export const FUNCTION_PARAMTER_VALUES_ID = 'functionParameterValues';
 export const DIAGRAM_RENDERER = 'diagramRenderer';
 export const SERVICE_QUERY_EDITOR = 'serviceQueryEditor';
 export const FUNCTION_QUERY_EDITOR = 'functionQueryEditor';
+
+// Classifier paths
+export enum CLASSIFIER_PATH {
+  SERVICE = 'meta::legend::service::metamodel::Service',
+  FUNCTION = 'meta::pure::metamodel::function::ConcreteFunctionDefinition',
+}
 
 // Primitive types
 export enum PRIMITIVE_TYPE {

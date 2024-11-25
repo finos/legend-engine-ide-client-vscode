@@ -30,15 +30,18 @@ import { type PlainObject } from '../utils/SerializationUtils';
 import { guaranteeNonNullable } from '../utils/AssertionUtils';
 import { TextLocation } from '../model/TextLocation';
 
-export const renderQueryBuilderWebView = (
+export const renderQueryBuilderWebView = async (
   webViewPanel: WebviewPanel,
   context: ExtensionContext,
   entityId: string,
   renderFilePath: string,
   client: LegendLanguageClient,
   legendConceptTree: LegendConceptTreeProvider,
-): void => {
+): Promise<void> => {
   const { webview } = webViewPanel;
+
+  // Refresh legend concept tree in case it hasn't been built yet
+  await legendConceptTree.refresh();
 
   const entityLocation: Location = guaranteeNonNullable(
     legendConceptTree.getTreeItemById(entityId)?.location,

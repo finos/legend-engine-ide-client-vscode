@@ -22,6 +22,7 @@ import {
   type TerminalProfile,
   type TextDocument,
   type TextDocumentContentProvider,
+  type TreeItemLabel,
   type WebviewPanel,
   commands,
   EndOfLine,
@@ -49,32 +50,31 @@ import { LegendTreeDataProvider } from './utils/LegendTreeProvider';
 import { LanguageClientProgressResult } from './results/LanguageClientProgressResult';
 import type { PlainObject } from './utils/SerializationUtils';
 import {
+  ACTIVATE_FUNCTION_ID,
+  CLASSIFIER_PATH,
+  DIAGRAM_RENDERER,
+  EXEC_FUNCTION_ID,
+  EXECUTION_TREE_VIEW,
+  FUNCTION_PARAMTER_VALUES_ID,
+  FUNCTION_QUERY_EDITOR,
+  LEGEND_CLIENT_COMMAND_ID,
+  LEGEND_EDIT_IN_QUERYBUILDER,
+  LEGEND_LANGUAGE_ID,
+  LEGEND_REFRESH_QUERY_BUILDER,
+  LEGEND_SHOW_DIAGRAM,
+  LEGEND_VIRTUAL_FS_SCHEME,
+  ONE_ENTITY_PER_FILE_COMMAND_ID,
   PROGRESS_NOTIFICATION_ID,
   RESULTS_WEB_VIEW,
-  SHOW_RESULTS_COMMAND_ID,
-  EXECUTION_TREE_VIEW,
-  LEGEND_CLIENT_COMMAND_ID,
-  FUNCTION_PARAMTER_VALUES_ID,
   SEND_TDS_REQUEST_ID,
-  EXEC_FUNCTION_ID,
-  LEGEND_VIRTUAL_FS_SCHEME,
-  ACTIVATE_FUNCTION_ID,
-  LEGEND_LANGUAGE_ID,
-  LEGEND_SHOW_DIAGRAM,
-  DIAGRAM_RENDERER,
-  ONE_ENTITY_PER_FILE_COMMAND_ID,
-  LEGEND_EDIT_SERVICE_QUERY,
   SERVICE_QUERY_EDITOR,
-  LEGEND_REFRESH_QUERY_BUILDER,
-  LEGEND_EDIT_FUNCTION_QUERY,
-  FUNCTION_QUERY_EDITOR,
+  SHOW_RESULTS_COMMAND_ID,
 } from './utils/Const';
 import { LegendWebViewProvider } from './utils/LegendWebViewProvider';
 import {
   renderTestResults,
   resetExecutionTab,
 } from './results/ExecutionResultHelper';
-import { error } from 'console';
 import { guaranteeNonNullable, isPlainObject } from './utils/AssertionUtils';
 import { renderFunctionResultsWebView } from './webviews/FunctionResultsWebView';
 import type { FunctionTDSRequest } from './model/FunctionTDSRequest';
@@ -95,10 +95,16 @@ import { enableLegendBook } from './purebook/purebook';
 import { V1_getFunctionNameWithoutSignature } from './utils/V1_ProtocolUtils';
 import { type LegendEntity } from './model/LegendEntity';
 import { renderQueryBuilderWebView } from './webviews/QueryBuilderWebView';
+import { LegendCodelensProvider } from './LegendCodelensProvider';
 
 let client: LegendLanguageClient;
 const openedWebViews: Record<string, WebviewPanel> = {};
 let legendConceptTreeProvider: LegendConceptTreeProvider;
+
+const queryBuilderSupportedTypes = [
+  CLASSIFIER_PATH.SERVICE,
+  CLASSIFIER_PATH.FUNCTION,
+];
 
 export const normalizeFunctionEntityId = (
   functionEntity: LegendEntity,
@@ -289,8 +295,83 @@ const showDiagramWebView = async (
   }
 };
 
+const showQueryBuilderWebView = async (
+  entityId: string,
+  entityLabel: string | TreeItemLabel,
+  entityUri: string,
+  context: ExtensionContext,
+): Promise<void> => {
+  try {
+    const entity = guaranteeNonNullable(
+      (
+        await client.entities(
+          new LegendEntitiesRequest([TextDocumentIdentifier.create(entityUri)]),
+        )
+      ).filter((_entity) => _entity.path === entityId)[0],
+      `No entity found with ID ${entityId} at ${entityUri}`,
+    );
+    if (
+      !queryBuilderSupportedTypes.includes(
+        entity.classifierPath as CLASSIFIER_PATH,
+      )
+    ) {
+      throw new Error(
+        `QueryBuilder does not support entity type: ${entity.classifierPath}`,
+      );
+    }
+    const normalizedEntityId =
+      entity.classifierPath === CLASSIFIER_PATH.FUNCTION
+        ? normalizeFunctionEntityId(entity)
+        : entityId;
+    const normalizedEntityName =
+      entity.classifierPath === CLASSIFIER_PATH.FUNCTION
+        ? normalizeFunctionEntityId(entity, false)
+        : entityLabel;
+    const columnToShowIn = window.activeTextEditor
+      ? window.activeTextEditor.viewColumn
+      : undefined;
+    if (openedWebViews[normalizedEntityId]) {
+      openedWebViews[normalizedEntityId]?.reveal(columnToShowIn);
+    } else {
+      const queryBuilderWebView = window.createWebviewPanel(
+        entity.classifierPath === CLASSIFIER_PATH.SERVICE
+          ? SERVICE_QUERY_EDITOR
+          : FUNCTION_QUERY_EDITOR,
+        `${entity.classifierPath === CLASSIFIER_PATH.SERVICE ? 'Service' : 'Function'} Query Editor: ${normalizedEntityName}`,
+        ViewColumn.One,
+        {
+          enableScripts: true,
+          retainContextWhenHidden: true,
+        },
+      );
+      openedWebViews[normalizedEntityId] = queryBuilderWebView;
+      queryBuilderWebView.onDidDispose(
+        () => {
+          delete openedWebViews[normalizedEntityId];
+        },
+        null,
+        context.subscriptions,
+      );
+      renderQueryBuilderWebView(
+        queryBuilderWebView,
+        context,
+        entityId,
+        workspace.getConfiguration('legend').get('studio.forms.file', ''),
+        client,
+        legendConceptTreeProvider,
+      );
+    }
+  } catch (error) {
+    if (error instanceof Error) {
+      window.showErrorMessage(error.message);
+    }
+  }
+};
+
 export function registerCommands(context: ExtensionContext): void {
-  const functionCommand = commands.registerCommand(
+  // Register CodeLens commands (commands sent from the LSP server
+  // to the client)
+  const clientCommand = commands.registerCommand(
     LEGEND_CLIENT_COMMAND_ID,
     async (...args: unknown[]) => {
       const commandId = args[3] as string;
@@ -299,24 +380,21 @@ export function registerCommands(context: ExtensionContext): void {
           handleExecuteFunctionCommand(context, args);
           break;
         }
-
         case ACTIVATE_FUNCTION_ID: {
           handleActivateFunctionCommand(args);
           break;
         }
-
         case LEGEND_SHOW_DIAGRAM: {
           showDiagramWebView(args[2] as string, context);
           break;
         }
-
         default: {
           window.showWarningMessage(`${commandId} command is not supported`);
         }
       }
     },
   );
-  context.subscriptions.push(functionCommand);
+  context.subscriptions.push(clientCommand);
 
   const openLog = commands.registerCommand('legend.log', () => {
     const openPath = Uri.joinPath(context.storageUri!, 'engine-lsp', 'log.txt');
@@ -367,103 +445,43 @@ export function registerCommands(context: ExtensionContext): void {
   );
   context.subscriptions.push(showDiagram);
 
-  const editServiceQuery = commands.registerCommand(
-    LEGEND_EDIT_SERVICE_QUERY,
+  const editInQueryBuilder = commands.registerCommand(
+    LEGEND_EDIT_IN_QUERYBUILDER,
     async (...args: unknown[]) => {
-      const serviceId = (args[0] as LegendConceptTreeItem).id as string;
-      const columnToShowIn = window.activeTextEditor
-        ? window.activeTextEditor.viewColumn
-        : undefined;
-      if (openedWebViews[serviceId]) {
-        openedWebViews[serviceId]?.reveal(columnToShowIn);
-      } else {
-        const serviceQueryEditorWebView = window.createWebviewPanel(
-          SERVICE_QUERY_EDITOR,
-          `Service Query Editor: ${(args[0] as LegendConceptTreeItem).label}`,
-          ViewColumn.One,
-          {
-            enableScripts: true,
-            retainContextWhenHidden: true,
-          },
+      if (args.length > 1 && (args[1] as string) === 'codelens') {
+        const legendEntity = args[0] as LegendEntity;
+        const id = guaranteeNonNullable(
+          legendEntity.path,
+          'Legend entity does not have an ID',
         );
-        openedWebViews[serviceId] = serviceQueryEditorWebView;
-        serviceQueryEditorWebView.onDidDispose(
-          () => {
-            delete openedWebViews[serviceId];
-          },
-          null,
-          context.subscriptions,
-        );
-        renderQueryBuilderWebView(
-          serviceQueryEditorWebView,
+        showQueryBuilderWebView(
+          id,
+          (legendEntity.content.name as string) ?? id,
+          guaranteeNonNullable(
+            legendEntity.location?.documentId,
+            'Legend entity does not have a document ID',
+          ),
           context,
-          serviceId,
-          workspace.getConfiguration('legend').get('studio.forms.file', ''),
-          client,
-          legendConceptTreeProvider,
+        );
+      } else {
+        const legendConceptTreeItem = args[0] as LegendConceptTreeItem;
+        const id = guaranteeNonNullable(
+          legendConceptTreeItem.id,
+          'Legend tree item does not have an ID',
+        );
+        showQueryBuilderWebView(
+          id,
+          legendConceptTreeItem.label ?? id,
+          guaranteeNonNullable(
+            legendConceptTreeItem.location?.uri.toString(),
+            'Legend tree item does not have a location URI',
+          ),
+          context,
         );
       }
     },
   );
-  context.subscriptions.push(editServiceQuery);
-
-  const editFunctionQuery = commands.registerCommand(
-    LEGEND_EDIT_FUNCTION_QUERY,
-    async (...args: unknown[]) => {
-      const functionId = (args[0] as LegendConceptTreeItem).id as string;
-      const functionUri = guaranteeNonNullable(
-        (args[0] as LegendConceptTreeItem).location?.uri.toString(),
-        `Legend tree item with ID ${(args[0] as LegendConceptTreeItem).id} does not have a location URI`,
-      );
-      const functionEntity = guaranteeNonNullable(
-        (
-          await client.entities(
-            new LegendEntitiesRequest([
-              TextDocumentIdentifier.create(functionUri),
-            ]),
-          )
-        ).filter((entity) => entity.path === functionId)[0],
-      );
-      const normalizedFunctionId = normalizeFunctionEntityId(functionEntity);
-      const normalizedFunctionName = normalizeFunctionEntityId(
-        functionEntity,
-        false,
-      );
-      const columnToShowIn = window.activeTextEditor
-        ? window.activeTextEditor.viewColumn
-        : undefined;
-      if (openedWebViews[normalizedFunctionId]) {
-        openedWebViews[normalizedFunctionId]?.reveal(columnToShowIn);
-      } else {
-        const functionQueryEditorWebView = window.createWebviewPanel(
-          FUNCTION_QUERY_EDITOR,
-          `Function Query Editor: ${normalizedFunctionName}`,
-          ViewColumn.One,
-          {
-            enableScripts: true,
-            retainContextWhenHidden: true,
-          },
-        );
-        openedWebViews[normalizedFunctionId] = functionQueryEditorWebView;
-        functionQueryEditorWebView.onDidDispose(
-          () => {
-            delete openedWebViews[normalizedFunctionId];
-          },
-          null,
-          context.subscriptions,
-        );
-        renderQueryBuilderWebView(
-          functionQueryEditorWebView,
-          context,
-          functionId,
-          workspace.getConfiguration('legend').get('studio.forms.file', ''),
-          client,
-          legendConceptTreeProvider,
-        );
-      }
-    },
-  );
-  context.subscriptions.push(editFunctionQuery);
+  context.subscriptions.push(editInQueryBuilder);
 
   const oneEntityPerFileRefactor = commands.registerCommand(
     ONE_ENTITY_PER_FILE_COMMAND_ID,
@@ -565,23 +583,25 @@ export function registerClientViews(context: ExtensionContext): void {
     PROGRESS_NOTIFICATION_ID,
     (objectResult: PlainObject<LanguageClientProgressResult>) => {
       try {
-        if (
-          isPlainObject(objectResult.value) &&
-          objectResult.value.kind !== 'end'
-        ) {
-          resetExecutionTab(resultsTreeDataProvider, resultsViewprovider);
+        if (resultsViewprovider.getView() && resultsViewprovider.getWebView()) {
+          if (
+            isPlainObject(objectResult.value) &&
+            objectResult.value.kind !== 'end'
+          ) {
+            resetExecutionTab(resultsTreeDataProvider, resultsViewprovider);
+          }
+          resultsViewprovider.focus();
+          const result =
+            LanguageClientProgressResult.serialization.fromJson(objectResult);
+          renderTestResults(
+            result,
+            resultsTreeDataProvider,
+            context.extensionUri,
+            context.extensionPath,
+            resultsViewprovider.getWebView(),
+          );
         }
-        resultsViewprovider.focus();
-        const result =
-          LanguageClientProgressResult.serialization.fromJson(objectResult);
-        renderTestResults(
-          result,
-          resultsTreeDataProvider,
-          context.extensionUri,
-          context.extensionPath,
-          resultsViewprovider.getWebView(),
-        );
-      } catch {
+      } catch (error) {
         if (error instanceof Error) {
           window.showErrorMessage(error.message);
         }
@@ -603,6 +623,11 @@ export function activate(context: ExtensionContext): void {
   context.subscriptions.push(...disposables);
   legendConceptTreeProvider = treeDataProvider;
   enableLegendBook(context);
+  const legendCodelensProvider = new LegendCodelensProvider(client);
+  languages.registerCodeLensProvider(
+    LEGEND_LANGUAGE_ID,
+    legendCodelensProvider,
+  );
   context.globalState.update(
     'currentUserId',
     // eslint-disable-next-line no-process-env

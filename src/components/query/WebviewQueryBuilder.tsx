@@ -14,19 +14,21 @@
  * limitations under the License.
  */
 
-import { useQueryBuilderState } from './useQueryBuilderState';
 import {
   CubesLoadingIndicator,
   CubesLoadingIndicatorIcon,
   QueryBuilder,
 } from '@finos/legend-vscode-extension-dependencies';
+import { useQueryBuilderState } from './useQueryBuilderState';
+import { type CLASSIFIER_PATH } from '../../utils/Const';
 
-export const FunctionQueryEditor: React.FC<{
-  functionId: string;
-}> = ({ functionId }) => {
+export const WebviewQueryBuilder: React.FC<{
+  entityId: string;
+  classifierPath: CLASSIFIER_PATH;
+}> = ({ entityId, classifierPath }) => {
   const { queryBuilderState, isLoading, error } = useQueryBuilderState(
-    functionId,
-    'function',
+    entityId,
+    classifierPath,
   );
 
   return (

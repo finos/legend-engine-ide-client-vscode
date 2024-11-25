@@ -201,32 +201,30 @@ export class LegendConceptTreeProvider
     return element.parent;
   }
 
-  refresh(doc?: TextDocument): Promise<void> {
+  async refresh(doc?: TextDocument): Promise<void> {
     if (!doc || this.root.childrenMap.size === 0) {
-      return this.client.entities(new LegendEntitiesRequest([])).then((x) => {
-        this.root.childrenMap.clear();
-        x
-          ?.sort((l, r) => l.path.localeCompare(r.path))
-          .forEach((s) => {
-            this.addEntity(s);
-          });
-        this._onDidChangeTreeData.fire();
-      });
+      const entities = await this.client.entities(
+        new LegendEntitiesRequest([]),
+      );
+      this.root.childrenMap.clear();
+      entities
+        ?.sort((l, r) => l.path.localeCompare(r.path))
+        .forEach((s) => {
+          this.addEntity(s);
+        });
+      this._onDidChangeTreeData.fire();
     } else {
       const docUri = doc.uri.toString();
-      return this.client
-        .entities(
-          new LegendEntitiesRequest([TextDocumentIdentifier.create(docUri)]),
-        )
-        .then((x) => {
-          this.removeEntitiesFrom(new Map(), this.root, docUri);
-          x
-            ?.sort((l, r) => l.path.localeCompare(r.path))
-            .forEach((s) => {
-              this.addEntity(s);
-            });
-          this._onDidChangeTreeData.fire();
+      const entities = await this.client.entities(
+        new LegendEntitiesRequest([TextDocumentIdentifier.create(docUri)]),
+      );
+      this.removeEntitiesFrom(new Map(), this.root, docUri);
+      entities
+        ?.sort((l, r) => l.path.localeCompare(r.path))
+        .forEach((s) => {
+          this.addEntity(s);
         });
+      this._onDidChangeTreeData.fire();
     }
   }
 
