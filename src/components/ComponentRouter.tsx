@@ -22,7 +22,6 @@ import {
   SERVICE_QUERY_EDITOR,
 } from '../utils/Const';
 import {
-  type LegendApplicationConfigurationData,
   type PlainObject,
   guaranteeNonEmptyString,
   guaranteeNonNullable,
@@ -31,6 +30,7 @@ import { LegendVSCodeApplication } from '../application/LegendVSCodeApplication'
 import { WebviewQueryBuilder } from './query/WebviewQueryBuilder';
 import { DiagramEditor } from './diagram/DiagramEditor';
 import { DiagramEditorState } from '../stores/DiagramEditorState';
+import { type LegendVSCodeApplicationConfigurationData } from '../application/LegendVSCodeApplicationConfig';
 
 export const ComponentRouter = (props: PlainObject): React.ReactNode => {
   const webviewType = guaranteeNonEmptyString(
@@ -40,9 +40,16 @@ export const ComponentRouter = (props: PlainObject): React.ReactNode => {
 
   let component: React.ReactNode = null;
 
-  const configData: LegendApplicationConfigurationData = {
+  const configData: LegendVSCodeApplicationConfigurationData = {
     appName: 'legend-vs-code',
     env: 'dev',
+    extensions: {
+      core: {
+        queryBuilderConfig: {
+          TEMPORARY__enableExportToCube: true,
+        },
+      },
+    },
   };
 
   switch (webviewType) {

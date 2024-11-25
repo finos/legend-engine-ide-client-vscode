@@ -66,6 +66,7 @@ export const GRAMMAR_TO_JSON_LAMBDA_BATCH_COMMAND_ID =
 export const JSON_TO_GRAMMAR_LAMBDA_BATCH_COMMAND_ID =
   'legend.jsonToGrammar.lambda.batch';
 export const GET_LAMBDA_RETURN_TYPE_COMMAND_ID = 'legend.lambda.returnType';
+export const GET_LAMBDA_RELATION_TYPE_COMMAND_ID = 'legend.lambda.relationType';
 export const SURVEY_DATASETS_COMMAND_ID = 'legend.entitlements.surveyDatasets';
 export const CHECK_DATASET_ENTITLEMENTS_COMMAND_ID =
   'legend.entitlements.checkDatasetEntitlements';
@@ -103,6 +104,7 @@ export const DEBUG_GENERATE_EXECUTION_PLAN_RESPONSE = `${DEBUG_GENERATE_EXECUTIO
 export const GRAMMAR_TO_JSON_LAMBDA_BATCH_RESPONSE = `${GRAMMAR_TO_JSON_LAMBDA_BATCH_COMMAND_ID}/response`;
 export const JSON_TO_GRAMMAR_LAMBDA_BATCH_RESPONSE = `${JSON_TO_GRAMMAR_LAMBDA_BATCH_COMMAND_ID}/response`;
 export const GET_LAMBDA_RETURN_TYPE_RESPONSE = `${GET_LAMBDA_RETURN_TYPE_COMMAND_ID}/response`;
+export const GET_LAMBDA_RELATION_TYPE_RESPONSE = `${GET_LAMBDA_RELATION_TYPE_COMMAND_ID}/response`;
 export const EXPORT_DATA_RESPONSE = `${EXPORT_DATA_COMMAND_ID}/response`;
 export const SURVEY_DATASETS_RESPONSE = `${SURVEY_DATASETS_COMMAND_ID}/response`;
 export const CHECK_DATASET_ENTITLEMENTS_RESPONSE = `${CHECK_DATASET_ENTITLEMENTS_COMMAND_ID}/response`;
