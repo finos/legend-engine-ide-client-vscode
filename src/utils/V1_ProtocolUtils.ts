@@ -16,9 +16,9 @@
 
 import {
   type V1_ConcreteFunctionDefinition,
-  type V1_GenericType,
   type V1_Multiplicity,
   type V1_RawVariable,
+  type V1_GenericType,
 } from '@finos/legend-vscode-extension-dependencies';
 
 const ELEMENT_PATH_DELIMITER = '::';
