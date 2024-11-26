@@ -132,6 +132,8 @@ import {
   GET_SUBTYPE_INFO_RESPONSE,
   GRAMMAR_TO_JSON_LAMBDA_COMMAND_ID,
   GRAMMAR_TO_JSON_LAMBDA_RESPONSE,
+  GRAMMAR_TO_JSON_VALUE_SPECIFICATION_BATCH_ID,
+  GRAMMAR_TO_JSON_VALUE_SPECIFICATION_BATCH_RESPONSE,
   JSON_TO_GRAMMAR_LAMBDA_BATCH_COMMAND_ID,
   JSON_TO_GRAMMAR_LAMBDA_BATCH_RESPONSE,
   SURVEY_DATASETS_COMMAND_ID,
@@ -250,14 +252,38 @@ export class V1_LSPEngine implements V1_GraphManagerEngine {
 
   async transformCodeToValueSpeces(
     input: Record<string, V1_GrammarParserBatchInputEntry>,
-  ): Promise<Map<string, PlainObject>> {
-    throw new Error('transformCodeToValueSpeces not implemented');
+  ): Promise<Map<string, PlainObject<V1_ValueSpecification>>> {
+    const response = await this.postAndWaitForMessage<LegendExecutionResult[]>(
+      {
+        command: GRAMMAR_TO_JSON_VALUE_SPECIFICATION_BATCH_ID,
+        msg: {
+          input,
+        },
+      },
+      GRAMMAR_TO_JSON_VALUE_SPECIFICATION_BATCH_RESPONSE,
+    );
+    const result = deserializeMap(
+      JSON.parse(guaranteeNonNullable(response?.[0]?.message)) as Record<
+        string,
+        PlainObject<V1_ValueSpecification>
+      >,
+      (v) => v,
+    );
+    return result;
   }
 
   async transformCodeToValueSpec(
     input: string,
+    returnSourceInformation?: boolean,
   ): Promise<PlainObject<V1_ValueSpecification>> {
-    throw new Error('transformCodeToValueSpec not implemented');
+    const batchInput: Record<string, V1_GrammarParserBatchInputEntry> = {
+      valueSpec: {
+        value: input,
+        returnSourceInformation,
+      },
+    };
+    const result = await this.transformCodeToValueSpeces(batchInput);
+    return guaranteeNonNullable(result.get('valueSpec'));
   }
 
   async transformLambdaToCode(

@@ -44,6 +44,7 @@ import {
   CHECK_DATASET_ENTITLEMENTS_COMMAND_ID,
   SURVEY_DATASETS_COMMAND_ID,
   GET_LAMBDA_RELATION_TYPE_COMMAND_ID,
+  GRAMMAR_TO_JSON_VALUE_SPECIFICATION_BATCH_ID,
 } from './utils/Const';
 import type { PlainObject } from './utils/SerializationUtils';
 import {
@@ -55,6 +56,7 @@ import type { ExecuteTestRequest } from './model/ExecuteTestRequest';
 import type { LegendTestExecutionResult } from './model/LegendTestExecutionResult';
 import { LegendEntity } from './model/LegendEntity';
 import {
+  V1_GrammarParserBatchInputEntry,
   type EXECUTION_SERIALIZATION_FORMAT,
   type V1_ParameterValue,
   type V1_RawExecutionContext,
@@ -339,6 +341,20 @@ export class LegendLanguageClient extends LanguageClient {
         lineOffset,
         columnOffset,
         returnSourceInformation,
+      },
+    );
+  }
+
+  async grammarToJson_valueSpecification_batch(
+    entityTextLocation: TextLocation,
+    input: Record<string, V1_GrammarParserBatchInputEntry>,
+  ): Promise<string> {
+    return commands.executeCommand(
+      LEGEND_COMMAND,
+      entityTextLocation,
+      GRAMMAR_TO_JSON_VALUE_SPECIFICATION_BATCH_ID,
+      {
+        input: JSON.stringify(input),
       },
     );
   }
