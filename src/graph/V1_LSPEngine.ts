@@ -401,7 +401,7 @@ export class V1_LSPEngine implements V1_GraphManagerEngine {
       );
     }
     const v1_relationType = V1_RelationType.serialization.fromJson(
-      response?.[0]?.message,
+      JSON.parse(guaranteeNonNullable(response?.[0]?.message)),
     );
     const result = new RelationTypeMetadata();
     result.columns = v1_relationType.columns.map(

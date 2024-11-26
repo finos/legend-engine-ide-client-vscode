@@ -43,6 +43,7 @@ import {
   JSON_TO_GRAMMAR_LAMBDA_BATCH_COMMAND_ID,
   CHECK_DATASET_ENTITLEMENTS_COMMAND_ID,
   SURVEY_DATASETS_COMMAND_ID,
+  GET_LAMBDA_RELATION_TYPE_COMMAND_ID,
 } from './utils/Const';
 import type { PlainObject } from './utils/SerializationUtils';
 import {
@@ -366,6 +367,20 @@ export class LegendLanguageClient extends LanguageClient {
       LEGEND_COMMAND,
       entityTextLocation,
       GET_LAMBDA_RETURN_TYPE_COMMAND_ID,
+      {
+        lambda: JSON.stringify(lambda),
+      },
+    );
+  }
+
+  async getLambdaRelationType(
+    entityTextLocation: TextLocation,
+    lambda: V1_RawLambda,
+  ): Promise<string> {
+    return commands.executeCommand(
+      LEGEND_COMMAND,
+      entityTextLocation,
+      GET_LAMBDA_RELATION_TYPE_COMMAND_ID,
       {
         lambda: JSON.stringify(lambda),
       },
