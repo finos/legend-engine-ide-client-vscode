@@ -55,6 +55,7 @@ import type { ExecuteTestRequest } from './model/ExecuteTestRequest';
 import type { LegendTestExecutionResult } from './model/LegendTestExecutionResult';
 import { LegendEntity } from './model/LegendEntity';
 import {
+  V1_GrammarParserBatchInputEntry,
   type EXECUTION_SERIALIZATION_FORMAT,
   type V1_GrammarParserBatchInputEntry,
   type V1_Lambda,
@@ -403,6 +404,20 @@ export class LegendLanguageClient extends LanguageClient {
           GRAMMAR_TO_JSON_LAMBDA_BATCH_COMMAND_ID,
           executableArgs,
         );
+  }
+
+  async grammarToJson_valueSpecification_batch(
+    entityTextLocation: TextLocation,
+    input: Record<string, V1_GrammarParserBatchInputEntry>,
+  ): Promise<string> {
+    return commands.executeCommand(
+      LEGEND_COMMAND,
+      entityTextLocation,
+      GRAMMAR_TO_JSON_VALUE_SPECIFICATION_BATCH_ID,
+      {
+        input: JSON.stringify(input),
+      },
+    );
   }
 
   async jsonToGrammar_lambda_batch(
