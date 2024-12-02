@@ -19,35 +19,39 @@ import { flowResult } from 'mobx';
 import {
   type Entity,
   type QueryBuilderState,
+  assertTrue,
+  FunctionQueryBuilderState,
+  graph_renameElement,
   guaranteeNonNullable,
   guaranteeType,
+  PackageableElementExplicitReference,
   pureExecution_setFunction,
   PureExecution,
   QueryBuilderActionConfig,
   RawLambda,
+  resolvePackagePathAndElementName,
   ServiceQueryBuilderState,
   useApplicationStore,
-  V1_PureExecution,
-  V1_serviceModelSchema,
-  FunctionQueryBuilderState,
-  V1_deserializePackageableElement,
-  V1_ConcreteFunctionDefinition,
-  V1_GraphBuilderContextBuilder,
-  V1_PureGraphManager,
-  graph_renameElement,
-  PackageableElementExplicitReference,
   V1_buildVariable,
-  assertTrue,
-  V1_Service,
+  V1_ConcreteFunctionDefinition,
+  V1_deserializePackageableElement,
+  V1_EngineRuntime,
+  V1_getFullReturnTypePath,
+  V1_GraphBuilderContextBuilder,
+  V1_Mapping,
+  V1_PackageableElement,
+  V1_PackageableRuntime,
+  V1_PureExecution,
+  V1_PureGraphManager,
   V1_PureSingleExecution,
-  V1_MappingModelCoverageAnalysisResult,
+  V1_RuntimePointer,
+  V1_Service,
+  V1_serviceModelSchema,
 } from '@finos/legend-vscode-extension-dependencies';
 import {
   ANALYZE_MAPPING_MODEL_COVERAGE_COMMAND_ID,
   ANALYZE_MAPPING_MODEL_COVERAGE_RESPONSE,
   CLASSIFIER_PATH,
-  GET_ENTITY_TEXT_LOCATIONS_RESPONSE,
-  GET_ENTITY_TEXT_LOCATIONS,
   GET_PROJECT_ENTITIES_RESPONSE,
   GET_PROJECT_ENTITIES,
   LEGEND_REFRESH_QUERY_BUILDER,
@@ -62,8 +66,8 @@ import {
 } from '../../utils/GraphUtils';
 import { V1_LSPEngine } from '../../graph/V1_LSPEngine';
 import { deserialize } from 'serializr';
-import { type TextLocation } from '../../model/TextLocation';
 import { type LegendExecutionResult } from '../../results/LegendExecutionResult';
+import { V1_LSPMappingModelCoverageAnalysisResult } from '../../model/engine/MappingModelCoverageAnalysisResult';
 
 export const useQueryBuilderState = (
   initialId: string,
@@ -85,60 +89,51 @@ export const useQueryBuilderState = (
   const [queryBuilderState, setQueryBuilderState] =
     useState<QueryBuilderState | null>(null);
   const [entities, setEntities] = useState<Entity[]>([]);
+  const [dummyElements, setDummyElements] = useState<V1_PackageableElement[]>(
+    [],
+  );
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
   const getMinimalEntities = useMemo(
     () =>
-      async (updatedEntityId?: string): Promise<Entity[]> => {
-        console.log('getMinimalEntities called');
+      async (
+        updatedEntityId?: string,
+      ): Promise<{
+        entities: Entity[];
+        dummyElements: V1_PackageableElement[];
+      }> => {
+        if (updatedEntityId) {
+          setPreviousId(currentId);
+          setCurrentId(updatedEntityId);
+        }
         const allEntities = await postAndWaitForMessage<Entity[]>(
           {
             command: GET_PROJECT_ENTITIES,
           },
           GET_PROJECT_ENTITIES_RESPONSE,
         );
-        console.log('allEntities', allEntities);
-        // if (updatedEntityId) {
-        //   console.log('updatedEntityId', updatedEntityId);
-        //   setPreviousId(currentId);
-        //   setCurrentId(updatedEntityId);
-        // }
-        const serviceTextLocation = guaranteeNonNullable(
-          (
-            await postAndWaitForMessage<TextLocation[]>(
-              {
-                command: GET_ENTITY_TEXT_LOCATIONS,
-                msg: { entityIds: [currentId] },
-              },
-              GET_ENTITY_TEXT_LOCATIONS_RESPONSE,
-            )
-          )[0],
+        const serviceEntity = guaranteeNonNullable(
+          allEntities.find((entity) => entity.path === currentId),
+          `Can't find entity with ID ${currentId}`,
         );
-        console.log('serviceTextLocation', serviceTextLocation);
-        const serviceEntity = guaranteeType(
+        const serviceElement = guaranteeType(
           V1_deserializePackageableElement(
-            guaranteeNonNullable(
-              (
-                await postAndWaitForMessage<Entity[]>(
-                  {
-                    command: GET_PROJECT_ENTITIES,
-                    msg: { entityTextLocations: [serviceTextLocation] },
-                  },
-                  GET_PROJECT_ENTITIES_RESPONSE,
-                )
-              )[0]?.content,
-            ),
+            guaranteeNonNullable(serviceEntity.content),
             applicationStore.pluginManager.getPureProtocolProcessorPlugins(),
           ),
           V1_Service,
         );
-        console.log('serviceEntity', serviceEntity);
-        const mappingPath = guaranteeNonNullable(
-          guaranteeType(serviceEntity.execution, V1_PureSingleExecution)
-            .mapping,
+        const serviceExection = guaranteeType(
+          serviceElement.execution,
+          V1_PureSingleExecution,
         );
-        console.log('mappingPath', mappingPath);
+        const mappingPath = guaranteeNonNullable(serviceExection.mapping);
+        const runtimePath = guaranteeType(
+          serviceExection.runtime,
+          V1_RuntimePointer,
+        ).runtime;
+
         const mappingAnalysisResponse = await postAndWaitForMessage<
           LegendExecutionResult[]
         >(
@@ -148,53 +143,34 @@ export const useQueryBuilderState = (
           },
           ANALYZE_MAPPING_MODEL_COVERAGE_RESPONSE,
         );
-        console.log('mappingAnalysisResponse', mappingAnalysisResponse);
-        // const mappingAnalysisResult = deserialize(
-        //   V1_MappingModelCoverageAnalysisResult,
-        //   JSON.parse(guaranteeNonNullable(mappingAnalysisResponse?.[0]?.message)),
-        // );
-        const mappingAnalysisResult = JSON.parse(
-          guaranteeNonNullable(mappingAnalysisResponse?.[0]?.message),
+        const mappingAnalysisResult =
+          V1_LSPMappingModelCoverageAnalysisResult.serialization.fromJson(
+            JSON.parse(
+              guaranteeNonNullable(mappingAnalysisResponse?.[0]?.message),
+            ),
+          );
+        const modelEntities = guaranteeNonNullable(
+          mappingAnalysisResult.modelEntities,
+          'Mapping analysis request returned empty model entities',
         );
-        console.log('mappingAnalysisResult', mappingAnalysisResult);
-        const mappedEntityPaths = uniq(
-          mappingAnalysisResult.mappedEntities.map(
-            (entity: {
-              info: {
-                classPath: string;
-                isRootEntity: boolean;
-                subClasses: string[];
-              };
-              path: string;
-              properties: object[];
-            }) => entity.info.classPath,
-          ),
-        );
-        console.log('mappedEntityPaths', mappedEntityPaths);
-        return allEntities.filter((entity) =>
-          mappedEntityPaths.includes(entity.path),
-        );
-        // const mappedEntityTextLocations = await postAndWaitForMessage<
-        //   TextLocation[]
-        // >(
-        //   {
-        //     command: GET_ENTITY_TEXT_LOCATIONS,
-        //     msg: {
-        //       entityIds: mappingAnalysisResult.mappedEntities.map(
-        //         (entity) => entity.path,
-        //       ),
-        //     },
-        //   },
-        //   GET_ENTITY_TEXT_LOCATIONS_RESPONSE,
-        // );
-        // console.log('mappedEntityTextLocations', mappedEntityTextLocations);
-        // return postAndWaitForMessage<Entity[]>(
-        //   {
-        //     command: GET_PROJECT_ENTITIES,
-        //     msg: { entityTextLocations: mappedEntityTextLocations },
-        //   },
-        //   GET_PROJECT_ENTITIES_RESPONSE,
-        // );
+        const finalEntities = modelEntities.concat(serviceEntity);
+
+        // Create dummy mapping
+        const _mapping = new V1_Mapping();
+        const [mappingPackagePath, mappingName] =
+          resolvePackagePathAndElementName(mappingPath);
+        _mapping.package = mappingPackagePath;
+        _mapping.name = mappingName;
+
+        // Create dummy runtime
+        const _runtime = new V1_PackageableRuntime();
+        const [runtimePackagePath, runtimeName] =
+          resolvePackagePathAndElementName(runtimePath);
+        _runtime.package = runtimePackagePath;
+        _runtime.name = runtimeName;
+        _runtime.runtimeValue = new V1_EngineRuntime();
+
+        return { entities: finalEntities, dummyElements: [_mapping, _runtime] };
       },
     [currentId, applicationStore.pluginManager],
   );
@@ -202,7 +178,9 @@ export const useQueryBuilderState = (
   useEffect(() => {
     setIsLoading(true);
     const fetchAndSetMinimalEntities = async (): Promise<void> => {
-      setEntities(await getMinimalEntities());
+      const { entities, dummyElements } = await getMinimalEntities();
+      setEntities(entities);
+      setDummyElements(dummyElements);
       setIsLoading(false);
     };
     fetchAndSetMinimalEntities();
@@ -220,7 +198,11 @@ export const useQueryBuilderState = (
       switch (message.command) {
         case LEGEND_REFRESH_QUERY_BUILDER: {
           setIsLoading(true);
-          setEntities(await getMinimalEntities(message.updatedEntityId));
+          const { entities, dummyElements } = await getMinimalEntities(
+            message.updatedEntityId,
+          );
+          setEntities(entities);
+          setDummyElements(dummyElements);
           setIsLoading(false);
           break;
         }
@@ -238,10 +220,12 @@ export const useQueryBuilderState = (
     const buildGraphManagerStateAndInitializeQuery =
       async (): Promise<void> => {
         const engine = new V1_LSPEngine();
+
         const graphManagerState = await buildGraphManagerStateFromEntities(
           entities,
           applicationStore,
           engine,
+          dummyElements,
         );
 
         if (classifierPath === CLASSIFIER_PATH.SERVICE) {
@@ -375,7 +359,7 @@ export const useQueryBuilderState = (
         existingFunctionEntity.returnType =
           PackageableElementExplicitReference.create(
             nonNullQueryBuilderState.graphManagerState.graph.getType(
-              V1_functionDefinition.returnType,
+              V1_getFullReturnTypePath(V1_functionDefinition.returnGenericType),
             ),
           );
         existingFunctionEntity.returnMultiplicity =

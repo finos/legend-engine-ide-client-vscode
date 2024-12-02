@@ -28,6 +28,7 @@ import {
   GraphManagerState,
   guaranteeType,
   RawLambda,
+  V1_PackageableElement,
   V1_PureGraphManager,
 } from '@finos/legend-vscode-extension-dependencies';
 import { type LegendVSCodeApplicationConfig } from '../application/LegendVSCodeApplicationConfig';
@@ -48,6 +49,7 @@ export const buildGraphManagerStateFromEntities = async (
     LegendVSCodePluginManager
   >,
   engine: V1_LSPEngine,
+  dummyElements?: V1_PackageableElement[],
 ): Promise<GraphManagerState> => {
   const newGraphManager = buildPureGraphManager(
     applicationStore.pluginManager,
@@ -74,9 +76,20 @@ export const buildGraphManagerStateFromEntities = async (
     },
   );
   await graphManagerState.initializeSystem();
+  const finalEntities = entities
+    .filter(
+      (el) =>
+        !graphManagerState.graph.getNullableElement(el.path, false) &&
+        !el.path.startsWith('meta::'),
+    )
+    .concat(
+      dummyElements?.map((element) =>
+        graphManager.elementProtocolToEntity(element),
+      ) ?? [],
+    );
   await graphManagerState.graphManager.buildGraph(
     graphManagerState.graph,
-    entities,
+    finalEntities,
     graphManagerState.graphBuildState,
     {},
   );
