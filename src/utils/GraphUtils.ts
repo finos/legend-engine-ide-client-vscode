@@ -23,12 +23,12 @@ import {
   type PureProtocolProcessorPlugin,
   type V1_EntitlementReportAnalyticsInput,
   type V1_ExecuteInput,
+  type V1_PackageableElement,
   type V1_StoreEntitlementAnalysisInput,
   buildPureGraphManager,
   GraphManagerState,
   guaranteeType,
   RawLambda,
-  V1_PackageableElement,
   V1_PureGraphManager,
 } from '@finos/legend-vscode-extension-dependencies';
 import { type LegendVSCodeApplicationConfig } from '../application/LegendVSCodeApplicationConfig';
