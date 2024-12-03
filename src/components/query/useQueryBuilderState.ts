@@ -36,7 +36,7 @@ import {
   V1_ConcreteFunctionDefinition,
   V1_deserializePackageableElement,
   V1_EngineRuntime,
-  V1_getFullReturnTypePath,
+  V1_getGenericTypeFullPath,
   V1_GraphBuilderContextBuilder,
   V1_Mapping,
   V1_PackageableElement,
@@ -359,7 +359,7 @@ export const useQueryBuilderState = (
         existingFunctionEntity.returnType =
           PackageableElementExplicitReference.create(
             nonNullQueryBuilderState.graphManagerState.graph.getType(
-              V1_getFullReturnTypePath(V1_functionDefinition.returnGenericType),
+              V1_getGenericTypeFullPath(V1_functionDefinition.returnGenericType),
             ),
           );
         existingFunctionEntity.returnMultiplicity =

@@ -29,7 +29,7 @@ const V1_getGenericTypeFullPath = (val: V1_GenericType): string => {
     Object.prototype.hasOwnProperty.call(val, 'rawType') &&
     Object.prototype.hasOwnProperty.call(val.rawType, 'fullPath')
   ) {
-    return val.rawType.fullPath;
+    return (val.rawType as unknown as { fullPath: string }).fullPath;
   }
   throw new Error('Failed to get full path from generic type');
 };
