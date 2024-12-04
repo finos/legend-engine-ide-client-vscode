@@ -49,6 +49,7 @@ import {
   V1_PureGraphManager,
   V1_PureSingleExecution,
   V1_RuntimePointer,
+  V1_serializePackageableElement,
   V1_Service,
   V1_serviceModelSchema,
   V1_setupDatabaseSerialization,
@@ -76,32 +77,62 @@ import { deserialize } from 'serializr';
 import { type LegendExecutionResult } from '../../results/LegendExecutionResult';
 import { V1_LSPMappingModelCoverageAnalysisResult } from '../../model/engine/MappingModelCoverageAnalysisResult';
 
+const replaceCustomRuntimeWithDummy = (
+  entity: Entity,
+  pluginManager: LegendVSCodePluginManager,
+): Entity => {
+  if (entity.classifierPath === CLASSIFIER_PATH.SERVICE) {
+    // setup serialization plugins
+    V1_setupDatabaseSerialization(
+      pluginManager.getPureProtocolProcessorPlugins(),
+    );
+    V1_setupEngineRuntimeSerialization(
+      pluginManager.getPureProtocolProcessorPlugins(),
+    );
+    V1_setupLegacyRuntimeSerialization(
+      pluginManager.getPureProtocolProcessorPlugins(),
+    );
+    const serviceElement = guaranteeType(
+      V1_deserializePackageableElement(
+        guaranteeNonNullable(entity.content),
+        pluginManager.getPureProtocolProcessorPlugins(),
+      ),
+      V1_Service,
+    );
+    const serviceExection = guaranteeType(
+      serviceElement.execution,
+      V1_PureSingleExecution,
+    );
+    if (serviceExection.runtime instanceof V1_EngineRuntime) {
+      // If runtime is custom (defined in the service rather than a pointer),
+      // replace it with a dummy runtime.
+      serviceExection.runtime = new V1_EngineRuntime();
+      return {
+        path: entity.path,
+        classifierPath: entity.classifierPath,
+        content: V1_serializePackageableElement(
+          serviceElement,
+          pluginManager.getPureProtocolProcessorPlugins(),
+        ),
+      };
+    }
+  }
+  return entity;
+};
+
 const getMappingAndRuntimePathsForEntity = (
   entity: Entity,
-  allEntities: Entity[],
   classifierPath: string,
   pluginManager: LegendVSCodePluginManager,
 ): {
   mappingPath: string;
   runtimePath: string | undefined;
-  storeEntities: Entity[];
 } => {
   let mappingPath: string;
   let runtimePath: string | undefined = undefined;
-  const storeEntities: Entity[] = [];
 
   switch (classifierPath) {
     case CLASSIFIER_PATH.SERVICE: {
-      // setup serialization plugins
-      V1_setupDatabaseSerialization(
-        pluginManager.getPureProtocolProcessorPlugins(),
-      );
-      V1_setupEngineRuntimeSerialization(
-        pluginManager.getPureProtocolProcessorPlugins(),
-      );
-      V1_setupLegacyRuntimeSerialization(
-        pluginManager.getPureProtocolProcessorPlugins(),
-      );
       const serviceElement = guaranteeType(
         V1_deserializePackageableElement(
           guaranteeNonNullable(entity.content),
@@ -116,16 +147,6 @@ const getMappingAndRuntimePathsForEntity = (
       mappingPath = guaranteeNonNullable(serviceExection.mapping);
       if (serviceExection.runtime instanceof V1_RuntimePointer) {
         runtimePath = serviceExection.runtime.runtime;
-      } else if (serviceExection.runtime instanceof V1_EngineRuntime) {
-        // If runtime is custom (defined in the service rather than a pointer), add the
-        // custom runtime's stores to additionalEntities.
-        storeEntities.push(
-          ...allEntities.filter((entity) =>
-            (serviceExection.runtime as V1_EngineRuntime).connections
-              .map((connection) => connection.store.path)
-              .includes(entity.path),
-          ),
-        );
       }
       break;
     }
@@ -165,7 +186,7 @@ const getMappingAndRuntimePathsForEntity = (
     }
   }
 
-  return { mappingPath, runtimePath, storeEntities };
+  return { mappingPath, runtimePath };
 };
 
 const getMinimalEntities = async (
@@ -182,9 +203,12 @@ const getMinimalEntities = async (
     },
     GET_PROJECT_ENTITIES_RESPONSE,
   );
-  const currentEntity = guaranteeNonNullable(
-    allEntities.find((entity) => entity.path === currentId),
-    `Can't find entity with ID ${currentId}`,
+  const currentEntity = replaceCustomRuntimeWithDummy(
+    guaranteeNonNullable(
+      allEntities.find((entity) => entity.path === currentId),
+      `Can't find entity with ID ${currentId}`,
+    ),
+    pluginManager,
   );
 
   // Store additional entities that are needed for graph building
@@ -192,16 +216,11 @@ const getMinimalEntities = async (
   const additionalEntities = [currentEntity];
 
   // Get the mapping and runtime paths for the current entity
-  // Additionally, if the runtime is custom, get the stores used
-  // by the custom runtime.
-  const { mappingPath, runtimePath, storeEntities } =
-    getMappingAndRuntimePathsForEntity(
-      currentEntity,
-      allEntities,
-      classifierPath,
-      pluginManager,
-    );
-  additionalEntities.push(...storeEntities);
+  const { mappingPath, runtimePath } = getMappingAndRuntimePathsForEntity(
+    currentEntity,
+    classifierPath,
+    pluginManager,
+  );
 
   // Perform mapping model coverage analysis
   const mappingAnalysisResponse = await postAndWaitForMessage<
@@ -223,11 +242,13 @@ const getMinimalEntities = async (
     mappingAnalysisResult.modelEntities,
     'Mapping analysis request returned empty model entities',
   );
-  const finalEntities = modelEntities.find(
-    (entity) => entity.path === currentEntity.path,
-  )
-    ? modelEntities
-    : modelEntities.concat(additionalEntities);
+  const finalEntities = modelEntities.concat(
+    additionalEntities.filter((additionalEntity) =>
+      !modelEntities
+        .map((modelEntity) => modelEntity.path)
+        .includes(additionalEntity.path),
+    ),
+  );
 
   // Create dummy mapping and runtime needed to build the graph
   const dummyElements: V1_PackageableElement[] = [];
