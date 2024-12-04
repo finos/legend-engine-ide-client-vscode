@@ -34,13 +34,16 @@ import {
   resolvePackagePathAndElementName,
   ServiceQueryBuilderState,
   useApplicationStore,
+  V1_AppliedFunction,
   V1_buildVariable,
   V1_ConcreteFunctionDefinition,
   V1_deserializePackageableElement,
+  V1_deserializeValueSpecification,
   V1_EngineRuntime,
   V1_getGenericTypeFullPath,
   V1_GraphBuilderContextBuilder,
   V1_Mapping,
+  V1_PackageableElementPtr,
   V1_PackageableRuntime,
   V1_PureExecution,
   V1_PureGraphManager,
@@ -48,9 +51,9 @@ import {
   V1_RuntimePointer,
   V1_Service,
   V1_serviceModelSchema,
-  V1_AppliedFunction,
-  V1_PackageableElementPtr,
-  V1_deserializeValueSpecification,
+  V1_setupDatabaseSerialization,
+  V1_setupEngineRuntimeSerialization,
+  V1_setupLegacyRuntimeSerialization,
 } from '@finos/legend-vscode-extension-dependencies';
 import {
   ANALYZE_MAPPING_MODEL_COVERAGE_COMMAND_ID,
@@ -73,31 +76,35 @@ import { deserialize } from 'serializr';
 import { type LegendExecutionResult } from '../../results/LegendExecutionResult';
 import { V1_LSPMappingModelCoverageAnalysisResult } from '../../model/engine/MappingModelCoverageAnalysisResult';
 
-const getMinimalEntities = async (
-  currentId: string,
+const getMappingAndRuntimePathsForEntity = (
+  entity: Entity,
+  allEntities: Entity[],
   classifierPath: string,
   pluginManager: LegendVSCodePluginManager,
-): Promise<{
-  entities: Entity[];
-  dummyElements: V1_PackageableElement[];
-}> => {
-  const allEntities = await postAndWaitForMessage<Entity[]>(
-    {
-      command: GET_PROJECT_ENTITIES,
-    },
-    GET_PROJECT_ENTITIES_RESPONSE,
-  );
-  const currentEntity = guaranteeNonNullable(
-    allEntities.find((entity) => entity.path === currentId),
-    `Can't find entity with ID ${currentId}`,
-  );
+): {
+  mappingPath: string;
+  runtimePath: string | undefined;
+  storeEntities: Entity[];
+} => {
   let mappingPath: string;
-  let runtimePath: string;
+  let runtimePath: string | undefined = undefined;
+  const storeEntities: Entity[] = [];
+
   switch (classifierPath) {
     case CLASSIFIER_PATH.SERVICE: {
+      // setup serialization plugins
+      V1_setupDatabaseSerialization(
+        pluginManager.getPureProtocolProcessorPlugins(),
+      );
+      V1_setupEngineRuntimeSerialization(
+        pluginManager.getPureProtocolProcessorPlugins(),
+      );
+      V1_setupLegacyRuntimeSerialization(
+        pluginManager.getPureProtocolProcessorPlugins(),
+      );
       const serviceElement = guaranteeType(
         V1_deserializePackageableElement(
-          guaranteeNonNullable(currentEntity.content),
+          guaranteeNonNullable(entity.content),
           pluginManager.getPureProtocolProcessorPlugins(),
         ),
         V1_Service,
@@ -107,16 +114,25 @@ const getMinimalEntities = async (
         V1_PureSingleExecution,
       );
       mappingPath = guaranteeNonNullable(serviceExection.mapping);
-      runtimePath = guaranteeType(
-        serviceExection.runtime,
-        V1_RuntimePointer,
-      ).runtime;
+      if (serviceExection.runtime instanceof V1_RuntimePointer) {
+        runtimePath = serviceExection.runtime.runtime;
+      } else if (serviceExection.runtime instanceof V1_EngineRuntime) {
+        // If runtime is custom (defined in the service rather than a pointer), add the
+        // custom runtime's stores to additionalEntities.
+        storeEntities.push(
+          ...allEntities.filter((entity) =>
+            (serviceExection.runtime as V1_EngineRuntime).connections
+              .map((connection) => connection.store.path)
+              .includes(entity.path),
+          ),
+        );
+      }
       break;
     }
     case CLASSIFIER_PATH.FUNCTION: {
       const functionElement = guaranteeType(
         V1_deserializePackageableElement(
-          guaranteeNonNullable(currentEntity.content),
+          guaranteeNonNullable(entity.content),
           pluginManager.getPureProtocolProcessorPlugins(),
         ),
         V1_ConcreteFunctionDefinition,
@@ -149,6 +165,45 @@ const getMinimalEntities = async (
     }
   }
 
+  return { mappingPath, runtimePath, storeEntities };
+};
+
+const getMinimalEntities = async (
+  currentId: string,
+  classifierPath: string,
+  pluginManager: LegendVSCodePluginManager,
+): Promise<{
+  entities: Entity[];
+  dummyElements: V1_PackageableElement[];
+}> => {
+  const allEntities = await postAndWaitForMessage<Entity[]>(
+    {
+      command: GET_PROJECT_ENTITIES,
+    },
+    GET_PROJECT_ENTITIES_RESPONSE,
+  );
+  const currentEntity = guaranteeNonNullable(
+    allEntities.find((entity) => entity.path === currentId),
+    `Can't find entity with ID ${currentId}`,
+  );
+
+  // Store additional entities that are needed for graph building
+  // but don't get returned by the mapping model analysis
+  const additionalEntities = [currentEntity];
+
+  // Get the mapping and runtime paths for the current entity
+  // Additionally, if the runtime is custom, get the stores used
+  // by the custom runtime.
+  const { mappingPath, runtimePath, storeEntities } =
+    getMappingAndRuntimePathsForEntity(
+      currentEntity,
+      allEntities,
+      classifierPath,
+      pluginManager,
+    );
+  additionalEntities.push(...storeEntities);
+
+  // Perform mapping model coverage analysis
   const mappingAnalysisResponse = await postAndWaitForMessage<
     LegendExecutionResult[]
   >(
@@ -162,6 +217,8 @@ const getMinimalEntities = async (
     V1_LSPMappingModelCoverageAnalysisResult.serialization.fromJson(
       JSON.parse(guaranteeNonNullable(mappingAnalysisResponse?.[0]?.message)),
     );
+
+  // Construct final list of minimal entities using model entities and additional entities
   const modelEntities = guaranteeNonNullable(
     mappingAnalysisResult.modelEntities,
     'Mapping analysis request returned empty model entities',
@@ -170,24 +227,29 @@ const getMinimalEntities = async (
     (entity) => entity.path === currentEntity.path,
   )
     ? modelEntities
-    : modelEntities.concat(currentEntity);
+    : modelEntities.concat(additionalEntities);
 
-  // Create dummy mapping
+  // Create dummy mapping and runtime needed to build the graph
+  const dummyElements: V1_PackageableElement[] = [];
+
   const _mapping = new V1_Mapping();
   const [mappingPackagePath, mappingName] =
     resolvePackagePathAndElementName(mappingPath);
   _mapping.package = mappingPackagePath;
   _mapping.name = mappingName;
+  dummyElements.push(_mapping);
 
-  // Create dummy runtime
-  const _runtime = new V1_PackageableRuntime();
-  const [runtimePackagePath, runtimeName] =
-    resolvePackagePathAndElementName(runtimePath);
-  _runtime.package = runtimePackagePath;
-  _runtime.name = runtimeName;
-  _runtime.runtimeValue = new V1_EngineRuntime();
+  if (runtimePath !== undefined) {
+    const _runtime = new V1_PackageableRuntime();
+    const [runtimePackagePath, runtimeName] =
+      resolvePackagePathAndElementName(runtimePath);
+    _runtime.package = runtimePackagePath;
+    _runtime.name = runtimeName;
+    _runtime.runtimeValue = new V1_EngineRuntime();
+    dummyElements.push(_runtime);
+  }
 
-  return { entities: finalEntities, dummyElements: [_mapping, _runtime] };
+  return { entities: finalEntities, dummyElements };
 };
 
 export const useQueryBuilderState = (
