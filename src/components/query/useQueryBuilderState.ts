@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { flowResult } from 'mobx';
 import {
   type Entity,
@@ -73,6 +73,123 @@ import { deserialize } from 'serializr';
 import { type LegendExecutionResult } from '../../results/LegendExecutionResult';
 import { V1_LSPMappingModelCoverageAnalysisResult } from '../../model/engine/MappingModelCoverageAnalysisResult';
 
+const getMinimalEntities = async (
+  currentId: string,
+  classifierPath: string,
+  pluginManager: LegendVSCodePluginManager,
+): Promise<{
+  entities: Entity[];
+  dummyElements: V1_PackageableElement[];
+}> => {
+  const allEntities = await postAndWaitForMessage<Entity[]>(
+    {
+      command: GET_PROJECT_ENTITIES,
+    },
+    GET_PROJECT_ENTITIES_RESPONSE,
+  );
+  const currentEntity = guaranteeNonNullable(
+    allEntities.find((entity) => entity.path === currentId),
+    `Can't find entity with ID ${currentId}`,
+  );
+  let mappingPath: string;
+  let runtimePath: string;
+  switch (classifierPath) {
+    case CLASSIFIER_PATH.SERVICE: {
+      const serviceElement = guaranteeType(
+        V1_deserializePackageableElement(
+          guaranteeNonNullable(currentEntity.content),
+          pluginManager.getPureProtocolProcessorPlugins(),
+        ),
+        V1_Service,
+      );
+      const serviceExection = guaranteeType(
+        serviceElement.execution,
+        V1_PureSingleExecution,
+      );
+      mappingPath = guaranteeNonNullable(serviceExection.mapping);
+      runtimePath = guaranteeType(
+        serviceExection.runtime,
+        V1_RuntimePointer,
+      ).runtime;
+      break;
+    }
+    case CLASSIFIER_PATH.FUNCTION: {
+      const functionElement = guaranteeType(
+        V1_deserializePackageableElement(
+          guaranteeNonNullable(currentEntity.content),
+          pluginManager.getPureProtocolProcessorPlugins(),
+        ),
+        V1_ConcreteFunctionDefinition,
+      );
+      const appliedFunction = guaranteeType(
+        V1_deserializeValueSpecification(
+          guaranteeNonNullable(
+            functionElement.body[0],
+          ) as PlainObject<V1_AppliedFunction>,
+          pluginManager.getPureProtocolProcessorPlugins(),
+        ),
+        V1_AppliedFunction,
+      );
+      assertTrue(
+        appliedFunction.function === 'from',
+        `Only functions returning TDS/graph fetch using the from() function can be edited via query builder`,
+      );
+      mappingPath = guaranteeType(
+        appliedFunction.parameters[1],
+        V1_PackageableElementPtr,
+      ).fullPath;
+      runtimePath = guaranteeType(
+        appliedFunction.parameters[2],
+        V1_PackageableElementPtr,
+      ).fullPath;
+      break;
+    }
+    default: {
+      throw new Error(`Unsupported classifier path: ${classifierPath}`);
+    }
+  }
+
+  const mappingAnalysisResponse = await postAndWaitForMessage<
+    LegendExecutionResult[]
+  >(
+    {
+      command: ANALYZE_MAPPING_MODEL_COVERAGE_COMMAND_ID,
+      msg: { mapping: mappingPath },
+    },
+    ANALYZE_MAPPING_MODEL_COVERAGE_RESPONSE,
+  );
+  const mappingAnalysisResult =
+    V1_LSPMappingModelCoverageAnalysisResult.serialization.fromJson(
+      JSON.parse(guaranteeNonNullable(mappingAnalysisResponse?.[0]?.message)),
+    );
+  const modelEntities = guaranteeNonNullable(
+    mappingAnalysisResult.modelEntities,
+    'Mapping analysis request returned empty model entities',
+  );
+  const finalEntities = modelEntities.find(
+    (entity) => entity.path === currentEntity.path,
+  )
+    ? modelEntities
+    : modelEntities.concat(currentEntity);
+
+  // Create dummy mapping
+  const _mapping = new V1_Mapping();
+  const [mappingPackagePath, mappingName] =
+    resolvePackagePathAndElementName(mappingPath);
+  _mapping.package = mappingPackagePath;
+  _mapping.name = mappingName;
+
+  // Create dummy runtime
+  const _runtime = new V1_PackageableRuntime();
+  const [runtimePackagePath, runtimeName] =
+    resolvePackagePathAndElementName(runtimePath);
+  _runtime.package = runtimePackagePath;
+  _runtime.name = runtimeName;
+  _runtime.runtimeValue = new V1_EngineRuntime();
+
+  return { entities: finalEntities, dummyElements: [_mapping, _runtime] };
+};
+
 export const useQueryBuilderState = (
   initialId: string,
   classifierPath: CLASSIFIER_PATH,
@@ -99,144 +216,21 @@ export const useQueryBuilderState = (
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const getMinimalEntities = useMemo(
-    () =>
-      async (
-        updatedEntityId?: string,
-      ): Promise<{
-        entities: Entity[];
-        dummyElements: V1_PackageableElement[];
-      }> => {
-        if (updatedEntityId) {
-          setPreviousId(currentId);
-          setCurrentId(updatedEntityId);
-        }
-        const allEntities = await postAndWaitForMessage<Entity[]>(
-          {
-            command: GET_PROJECT_ENTITIES,
-          },
-          GET_PROJECT_ENTITIES_RESPONSE,
-        );
-        const currentEntity = guaranteeNonNullable(
-          allEntities.find(
-            (entity) => entity.path === (updatedEntityId ?? currentId),
-          ),
-          `Can't find entity with ID ${updatedEntityId ?? currentId}`,
-        );
-        let mappingPath: string;
-        let runtimePath: string;
-        switch (classifierPath) {
-          case CLASSIFIER_PATH.SERVICE: {
-            const serviceElement = guaranteeType(
-              V1_deserializePackageableElement(
-                guaranteeNonNullable(currentEntity.content),
-                applicationStore.pluginManager.getPureProtocolProcessorPlugins(),
-              ),
-              V1_Service,
-            );
-            const serviceExection = guaranteeType(
-              serviceElement.execution,
-              V1_PureSingleExecution,
-            );
-            mappingPath = guaranteeNonNullable(serviceExection.mapping);
-            runtimePath = guaranteeType(
-              serviceExection.runtime,
-              V1_RuntimePointer,
-            ).runtime;
-            break;
-          }
-          case CLASSIFIER_PATH.FUNCTION: {
-            const functionElement = guaranteeType(
-              V1_deserializePackageableElement(
-                guaranteeNonNullable(currentEntity.content),
-                applicationStore.pluginManager.getPureProtocolProcessorPlugins(),
-              ),
-              V1_ConcreteFunctionDefinition,
-            );
-            const appliedFunction = guaranteeType(
-              V1_deserializeValueSpecification(
-                guaranteeNonNullable(
-                  functionElement.body[0],
-                ) as PlainObject<V1_AppliedFunction>,
-                applicationStore.pluginManager.getPureProtocolProcessorPlugins(),
-              ),
-              V1_AppliedFunction,
-            );
-            assertTrue(
-              appliedFunction.function === 'from',
-              `Only functions returning TDS/graph fetch using the from() function can be edited via query builder`,
-            );
-            mappingPath = guaranteeType(
-              appliedFunction.parameters[1],
-              V1_PackageableElementPtr,
-            ).fullPath;
-            runtimePath = guaranteeType(
-              appliedFunction.parameters[2],
-              V1_PackageableElementPtr,
-            ).fullPath;
-            break;
-          }
-          default: {
-            throw new Error(`Unsupported classifier path: ${classifierPath}`);
-          }
-        }
-
-        const mappingAnalysisResponse = await postAndWaitForMessage<
-          LegendExecutionResult[]
-        >(
-          {
-            command: ANALYZE_MAPPING_MODEL_COVERAGE_COMMAND_ID,
-            msg: { mapping: mappingPath },
-          },
-          ANALYZE_MAPPING_MODEL_COVERAGE_RESPONSE,
-        );
-        const mappingAnalysisResult =
-          V1_LSPMappingModelCoverageAnalysisResult.serialization.fromJson(
-            JSON.parse(
-              guaranteeNonNullable(mappingAnalysisResponse?.[0]?.message),
-            ),
-          );
-        const modelEntities = guaranteeNonNullable(
-          mappingAnalysisResult.modelEntities,
-          'Mapping analysis request returned empty model entities',
-        );
-        const finalEntities = modelEntities.find(
-          (entity) => entity.path === currentEntity.path,
-        )
-          ? modelEntities
-          : modelEntities.concat(currentEntity);
-
-        // Create dummy mapping
-        const _mapping = new V1_Mapping();
-        const [mappingPackagePath, mappingName] =
-          resolvePackagePathAndElementName(mappingPath);
-        _mapping.package = mappingPackagePath;
-        _mapping.name = mappingName;
-
-        // Create dummy runtime
-        const _runtime = new V1_PackageableRuntime();
-        const [runtimePackagePath, runtimeName] =
-          resolvePackagePathAndElementName(runtimePath);
-        _runtime.package = runtimePackagePath;
-        _runtime.name = runtimeName;
-        _runtime.runtimeValue = new V1_EngineRuntime();
-
-        return { entities: finalEntities, dummyElements: [_mapping, _runtime] };
-      },
-    [currentId, classifierPath, applicationStore.pluginManager],
-  );
-
   useEffect(() => {
     setIsLoading(true);
     const fetchAndSetMinimalEntities = async (): Promise<void> => {
       const { entities: newEntities, dummyElements: newDummyElements } =
-        await getMinimalEntities();
+        await getMinimalEntities(
+          initialId,
+          classifierPath,
+          applicationStore.pluginManager,
+        );
       setEntities(newEntities);
       setDummyElements(newDummyElements);
       setIsLoading(false);
     };
     fetchAndSetMinimalEntities();
-  }, [getMinimalEntities]);
+  }, [initialId, classifierPath, applicationStore.pluginManager]);
 
   useEffect(() => {
     const handleMessage = async (
@@ -251,7 +245,15 @@ export const useQueryBuilderState = (
         case LEGEND_REFRESH_QUERY_BUILDER: {
           setIsLoading(true);
           const { entities: newEntities, dummyElements: newDummyElements } =
-            await getMinimalEntities(message.updatedEntityId);
+            await getMinimalEntities(
+              message.updatedEntityId ?? currentId,
+              classifierPath,
+              applicationStore.pluginManager,
+            );
+          if (message.updatedEntityId) {
+            setPreviousId(currentId);
+            setCurrentId(message.updatedEntityId);
+          }
           setEntities(newEntities);
           setDummyElements(newDummyElements);
           setIsLoading(false);
@@ -265,7 +267,7 @@ export const useQueryBuilderState = (
     return () => {
       window.removeEventListener('message', handleMessage);
     };
-  }, [getMinimalEntities, currentId]);
+  }, [currentId, classifierPath, applicationStore.pluginManager]);
 
   useEffect(() => {
     const buildGraphManagerStateAndInitializeQuery =
