@@ -40,7 +40,10 @@ export const WebviewQueryBuilder: React.FC<{
         <QueryBuilder queryBuilderState={queryBuilderState} />
       )}
       {!queryBuilderState && !isLoading && error && (
-        <>Failed setting up QueryBuilderState&nbsp;{error}</>
+        <>
+          <div>Failed setting up QueryBuilder state</div>
+          <div>{error}</div>
+        </>
       )}
     </>
   );

@@ -83,18 +83,26 @@ export const useQueryBuilderState = (
   const [error, setError] = useState('');
 
   useEffect(() => {
-    setIsLoading(true);
     const fetchAndSetMinimalEntities = async (): Promise<void> => {
-      const { entities: newEntities, dummyElements: newDummyElements } =
-        await getMinimalEntities(
-          initialId,
-          classifierPath,
-          applicationStore.pluginManager,
-        );
-      setEntities(newEntities);
-      setDummyElements(newDummyElements);
-      setIsLoading(false);
+      try {
+        const { entities: newEntities, dummyElements: newDummyElements } =
+          await getMinimalEntities(
+            initialId,
+            classifierPath,
+            applicationStore.pluginManager,
+          );
+        setEntities(newEntities);
+        setDummyElements(newDummyElements);
+        setError('');
+      } catch (e) {
+        if (e instanceof Error) {
+          setError(e.message);
+        }
+      } finally {
+        setIsLoading(false);
+      }
     };
+    setIsLoading(true);
     fetchAndSetMinimalEntities();
   }, [initialId, classifierPath, applicationStore.pluginManager]);
 
@@ -109,20 +117,29 @@ export const useQueryBuilderState = (
       const message = event.data;
       switch (message.command) {
         case LEGEND_REFRESH_QUERY_BUILDER: {
-          setIsLoading(true);
-          const { entities: newEntities, dummyElements: newDummyElements } =
-            await getMinimalEntities(
-              message.updatedEntityId ?? currentId,
-              classifierPath,
-              applicationStore.pluginManager,
-            );
-          if (message.updatedEntityId) {
-            setPreviousId(currentId);
-            setCurrentId(message.updatedEntityId);
+          try {
+            setIsLoading(true);
+            const { entities: newEntities, dummyElements: newDummyElements } =
+              await getMinimalEntities(
+                message.updatedEntityId ?? currentId,
+                classifierPath,
+                applicationStore.pluginManager,
+              );
+            if (message.updatedEntityId) {
+              setPreviousId(currentId);
+              setCurrentId(message.updatedEntityId);
+            }
+            setEntities(newEntities);
+            setDummyElements(newDummyElements);
+            setError('');
+          } catch (e) {
+            if (e instanceof Error) {
+              setError(e.message);
+            }
+            setQueryBuilderState(null);
+          } finally {
+            setIsLoading(false);
           }
-          setEntities(newEntities);
-          setDummyElements(newDummyElements);
-          setIsLoading(false);
           break;
         }
         default:
@@ -320,7 +337,7 @@ export const useQueryBuilderState = (
       }
     };
 
-    if (entities.length && currentId && applicationStore) {
+    if (entities.length && currentId && applicationStore && !error) {
       try {
         if (queryBuilderState === null) {
           buildGraphManagerStateAndInitializeQuery();
