@@ -42,7 +42,6 @@ export class V1_LSPExecuteInput {
   context!: V1_RawExecutionContext;
   parameterValues: { [key: string]: unknown } = {};
   serializationFormat: EXECUTION_SERIALIZATION_FORMAT | undefined;
-  multiExecutionParameterKey: string | undefined;
 
   static readonly serialization = new SerializationFactory(
     createModelSchema(V1_LSPExecuteInput, {
@@ -55,10 +54,6 @@ export class V1_LSPExecuteInput {
       context: usingModelSchema(V1_rawBaseExecutionContextModelSchema),
       parameterValues: map(raw()),
       serializationFormat: custom(
-        (val) => (val ? val : undefined),
-        () => SKIP,
-      ),
-      multiExecutionParameterKey: custom(
         (val) => (val ? val : undefined),
         () => SKIP,
       ),

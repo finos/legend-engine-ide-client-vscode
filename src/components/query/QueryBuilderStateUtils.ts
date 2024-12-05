@@ -32,7 +32,6 @@ import {
   V1_PackageableRuntime,
   V1_PureSingleExecution,
   V1_RuntimePointer,
-  V1_serializePackageableElement,
   V1_Service,
   V1_setupDatabaseSerialization,
   V1_setupEngineRuntimeSerialization,
@@ -52,10 +51,10 @@ import { type LegendVSCodePluginManager } from '../../application/LegendVSCodePl
 import { type LegendExecutionResult } from '../../results/LegendExecutionResult';
 import { V1_LSPMappingModelCoverageAnalysisResult } from '../../model/engine/MappingModelCoverageAnalysisResult';
 
-export const replaceCustomRuntimeWithDummy = (
+const isServiceWithNonPointerRuntime = (
   entity: Entity,
   pluginManager: LegendVSCodePluginManager,
-): Entity => {
+): boolean => {
   if (entity.classifierPath === CLASSIFIER_PATH.SERVICE) {
     // setup serialization plugins
     V1_setupDatabaseSerialization(
@@ -74,39 +73,24 @@ export const replaceCustomRuntimeWithDummy = (
       ),
       V1_Service,
     );
-    if (serviceElement.execution instanceof V1_PureSingleExecution) {
-      if (serviceElement.execution.runtime instanceof V1_EngineRuntime) {
-        // If runtime is custom (defined in the service rather than a pointer),
-        // replace it with a dummy runtime.
-        serviceElement.execution.runtime = new V1_EngineRuntime();
-        return {
-          path: entity.path,
-          classifierPath: entity.classifierPath,
-          content: V1_serializePackageableElement(
-            serviceElement,
-            pluginManager.getPureProtocolProcessorPlugins(),
-          ),
-        };
-      }
-    } else if (serviceElement.execution instanceof V1_PureMultiExecution) {
-      serviceElement.execution.executionParameters?.forEach((parameter) => {
-        if (parameter.runtime instanceof V1_EngineRuntime) {
-          // If runtime is custom (defined in the service rather than a pointer),
-          // replace it with a dummy runtime.
-          parameter.runtime = new V1_EngineRuntime();
+    if (
+      serviceElement.execution instanceof V1_PureSingleExecution &&
+      !(serviceElement.execution.runtime instanceof V1_RuntimePointer)
+    ) {
+      return true;
+    } else if (
+      serviceElement.execution instanceof V1_PureMultiExecution &&
+      serviceElement.execution.executionParameters
+    ) {
+      for (const executionParameter of serviceElement.execution
+        .executionParameters) {
+        if (!(executionParameter.runtime instanceof V1_RuntimePointer)) {
+          return true;
         }
-      });
-      return {
-        path: entity.path,
-        classifierPath: entity.classifierPath,
-        content: V1_serializePackageableElement(
-          serviceElement,
-          pluginManager.getPureProtocolProcessorPlugins(),
-        ),
-      };
+      }
     }
   }
-  return entity;
+  return false;
 };
 
 export const getMappingAndRuntimePathsForEntity = (
@@ -205,13 +189,14 @@ export const getMinimalEntities = async (
     },
     GET_PROJECT_ENTITIES_RESPONSE,
   );
-  const currentEntity = replaceCustomRuntimeWithDummy(
-    guaranteeNonNullable(
-      allEntities.find((entity) => entity.path === currentId),
-      `Can't find entity with ID ${currentId}`,
-    ),
-    pluginManager,
+  const currentEntity = guaranteeNonNullable(
+    allEntities.find((entity) => entity.path === currentId),
+    `Can't find entity with ID ${currentId}`,
   );
+
+  if (isServiceWithNonPointerRuntime(currentEntity, pluginManager)) {
+    throw new Error('Only runtime pointers are supported in services');
+  }
 
   // Store additional entities that are needed for graph building
   // but don't get returned by the mapping model analysis
