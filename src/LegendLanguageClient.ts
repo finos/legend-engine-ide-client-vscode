@@ -210,6 +210,7 @@ export class LegendLanguageClient extends LanguageClient {
     context: V1_RawExecutionContext,
     parameterValues: { [key: string]: unknown },
     serializationFormat?: EXECUTION_SERIALIZATION_FORMAT | undefined,
+    multiExecutionParameterKey?: string | undefined,
   ): Promise<LegendExecutionResult[]> {
     return commands.executeCommand(
       LEGEND_COMMAND,
@@ -221,6 +222,7 @@ export class LegendLanguageClient extends LanguageClient {
         runtime: JSON.stringify(runtime),
         context: JSON.stringify(context),
         serializationFormat,
+        multiExecutionParameterKey,
       },
       parameterValues,
     );

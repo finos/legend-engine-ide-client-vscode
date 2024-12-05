@@ -124,6 +124,7 @@ export const executeInputToLSPInput = (
       {},
     ),
     serializationFormat: options?.serializationFormat,
+    multiExecutionParameterKey: options?.multiExecutionParameterKey,
   });
 
 export const surveyDatasetsInputToLSPInput = (

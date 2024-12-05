@@ -194,6 +194,7 @@ export const handleV1LSPEngineMessage = async (
         context: executionContext,
         parameterValues,
         serializationFormat,
+        multiExecutionParameterKey,
       } = message.msg;
       const result = await client.executeQuery(
         entityTextLocation,
@@ -203,6 +204,7 @@ export const handleV1LSPEngineMessage = async (
         executionContext,
         parameterValues ?? {},
         serializationFormat,
+        multiExecutionParameterKey,
       );
       webview.postMessage({
         command: EXECUTE_QUERY_RESPONSE,

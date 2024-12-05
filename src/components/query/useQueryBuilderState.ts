@@ -55,6 +55,8 @@ import {
   V1_setupDatabaseSerialization,
   V1_setupEngineRuntimeSerialization,
   V1_setupLegacyRuntimeSerialization,
+  V1_PureMultiExecution,
+  uniq,
 } from '@finos/legend-vscode-extension-dependencies';
 import {
   ANALYZE_MAPPING_MODEL_COVERAGE_COMMAND_ID,
@@ -99,14 +101,28 @@ const replaceCustomRuntimeWithDummy = (
       ),
       V1_Service,
     );
-    const serviceExection = guaranteeType(
-      serviceElement.execution,
-      V1_PureSingleExecution,
-    );
-    if (serviceExection.runtime instanceof V1_EngineRuntime) {
-      // If runtime is custom (defined in the service rather than a pointer),
-      // replace it with a dummy runtime.
-      serviceExection.runtime = new V1_EngineRuntime();
+    if (serviceElement.execution instanceof V1_PureSingleExecution) {
+      if (serviceElement.execution.runtime instanceof V1_EngineRuntime) {
+        // If runtime is custom (defined in the service rather than a pointer),
+        // replace it with a dummy runtime.
+        serviceElement.execution.runtime = new V1_EngineRuntime();
+        return {
+          path: entity.path,
+          classifierPath: entity.classifierPath,
+          content: V1_serializePackageableElement(
+            serviceElement,
+            pluginManager.getPureProtocolProcessorPlugins(),
+          ),
+        };
+      }
+    } else if (serviceElement.execution instanceof V1_PureMultiExecution) {
+      serviceElement.execution.executionParameters?.forEach((parameter) => {
+        if (parameter.runtime instanceof V1_EngineRuntime) {
+          // If runtime is custom (defined in the service rather than a pointer),
+          // replace it with a dummy runtime.
+          parameter.runtime = new V1_EngineRuntime();
+        }
+      });
       return {
         path: entity.path,
         classifierPath: entity.classifierPath,
@@ -125,11 +141,11 @@ const getMappingAndRuntimePathsForEntity = (
   classifierPath: string,
   pluginManager: LegendVSCodePluginManager,
 ): {
-  mappingPath: string;
-  runtimePath: string | undefined;
+  mappingPaths: string[];
+  runtimePaths: string[];
 } => {
-  let mappingPath: string;
-  let runtimePath: string | undefined = undefined;
+  const mappingPaths: string[] = [];
+  const runtimePaths: string[] = [];
 
   switch (classifierPath) {
     case CLASSIFIER_PATH.SERVICE: {
@@ -140,13 +156,26 @@ const getMappingAndRuntimePathsForEntity = (
         ),
         V1_Service,
       );
-      const serviceExection = guaranteeType(
-        serviceElement.execution,
-        V1_PureSingleExecution,
-      );
-      mappingPath = guaranteeNonNullable(serviceExection.mapping);
-      if (serviceExection.runtime instanceof V1_RuntimePointer) {
-        runtimePath = serviceExection.runtime.runtime;
+      if (serviceElement.execution instanceof V1_PureSingleExecution) {
+        mappingPaths.push(
+          guaranteeNonNullable(serviceElement.execution.mapping),
+        );
+        if (serviceElement.execution.runtime instanceof V1_RuntimePointer) {
+          runtimePaths.push(serviceElement.execution.runtime.runtime);
+        }
+      } else if (serviceElement.execution instanceof V1_PureMultiExecution) {
+        serviceElement.execution.executionParameters?.forEach((parameter) => {
+          if (parameter.mapping) {
+            mappingPaths.push(parameter.mapping);
+          }
+          if (parameter.runtime instanceof V1_RuntimePointer) {
+            runtimePaths.push(parameter.runtime.runtime);
+          }
+        });
+      } else {
+        throw new Error(
+          `Unsupported service execution type: ${serviceElement.execution}`,
+        );
       }
       break;
     }
@@ -171,14 +200,14 @@ const getMappingAndRuntimePathsForEntity = (
         appliedFunction.function === 'from',
         `Only functions returning TDS/graph fetch using the from() function can be edited via query builder`,
       );
-      mappingPath = guaranteeType(
-        appliedFunction.parameters[1],
-        V1_PackageableElementPtr,
-      ).fullPath;
-      runtimePath = guaranteeType(
-        appliedFunction.parameters[2],
-        V1_PackageableElementPtr,
-      ).fullPath;
+      mappingPaths.push(
+        guaranteeType(appliedFunction.parameters[1], V1_PackageableElementPtr)
+          .fullPath,
+      );
+      runtimePaths.push(
+        guaranteeType(appliedFunction.parameters[2], V1_PackageableElementPtr)
+          .fullPath,
+      );
       break;
     }
     default: {
@@ -186,7 +215,7 @@ const getMappingAndRuntimePathsForEntity = (
     }
   }
 
-  return { mappingPath, runtimePath };
+  return { mappingPaths: uniq(mappingPaths), runtimePaths: uniq(runtimePaths) };
 };
 
 const getMinimalEntities = async (
@@ -216,11 +245,15 @@ const getMinimalEntities = async (
   const additionalEntities = [currentEntity];
 
   // Get the mapping and runtime paths for the current entity
-  const { mappingPath, runtimePath } = getMappingAndRuntimePathsForEntity(
+  const { mappingPaths, runtimePaths } = getMappingAndRuntimePathsForEntity(
     currentEntity,
     classifierPath,
     pluginManager,
   );
+
+  if (mappingPaths.length === 0) {
+    throw new Error(`No mappings found for entity ${currentId}`);
+  }
 
   // Perform mapping model coverage analysis
   const mappingAnalysisResponse = await postAndWaitForMessage<
@@ -228,7 +261,7 @@ const getMinimalEntities = async (
   >(
     {
       command: ANALYZE_MAPPING_MODEL_COVERAGE_COMMAND_ID,
-      msg: { mapping: mappingPath },
+      msg: { mapping: mappingPaths[0] },
     },
     ANALYZE_MAPPING_MODEL_COVERAGE_RESPONSE,
   );
@@ -243,24 +276,27 @@ const getMinimalEntities = async (
     'Mapping analysis request returned empty model entities',
   );
   const finalEntities = modelEntities.concat(
-    additionalEntities.filter((additionalEntity) =>
-      !modelEntities
-        .map((modelEntity) => modelEntity.path)
-        .includes(additionalEntity.path),
+    additionalEntities.filter(
+      (additionalEntity) =>
+        !modelEntities
+          .map((modelEntity) => modelEntity.path)
+          .includes(additionalEntity.path),
     ),
   );
 
-  // Create dummy mapping and runtime needed to build the graph
+  // Create dummy mappings and runtimes needed to build the graph
   const dummyElements: V1_PackageableElement[] = [];
 
-  const _mapping = new V1_Mapping();
-  const [mappingPackagePath, mappingName] =
-    resolvePackagePathAndElementName(mappingPath);
-  _mapping.package = mappingPackagePath;
-  _mapping.name = mappingName;
-  dummyElements.push(_mapping);
+  mappingPaths.forEach((mappingPath) => {
+    const _mapping = new V1_Mapping();
+    const [mappingPackagePath, mappingName] =
+      resolvePackagePathAndElementName(mappingPath);
+    _mapping.package = mappingPackagePath;
+    _mapping.name = mappingName;
+    dummyElements.push(_mapping);
+  });
 
-  if (runtimePath !== undefined) {
+  runtimePaths.forEach((runtimePath) => {
     const _runtime = new V1_PackageableRuntime();
     const [runtimePackagePath, runtimeName] =
       resolvePackagePathAndElementName(runtimePath);
@@ -268,7 +304,7 @@ const getMinimalEntities = async (
     _runtime.name = runtimeName;
     _runtime.runtimeValue = new V1_EngineRuntime();
     dummyElements.push(_runtime);
-  }
+  });
 
   return { entities: finalEntities, dummyElements };
 };
