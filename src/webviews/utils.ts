@@ -41,8 +41,6 @@ import {
   GET_CLASSIFIER_PATH_MAP_RESPONSE,
   GET_CURRENT_USER_ID_REQUEST_ID,
   GET_CURRENT_USER_ID_RESPONSE,
-  GET_ENTITY_TEXT_LOCATIONS,
-  GET_ENTITY_TEXT_LOCATIONS_RESPONSE,
   GET_LAMBDA_RETURN_TYPE_COMMAND_ID,
   GET_LAMBDA_RETURN_TYPE_RESPONSE,
   GET_PROJECT_ENTITIES,
@@ -65,7 +63,6 @@ import {
 import { type LegendConceptTreeProvider } from '../conceptTree';
 import { guaranteeNonNullable } from '../utils/AssertionUtils';
 import { TextLocation } from '../model/TextLocation';
-import { locationToTextLocation } from '../utils/TextLocationUtils';
 import { TextDocumentIdentifier } from 'vscode-languageclient';
 
 export const getWebviewHtml = (
@@ -414,23 +411,6 @@ export const handleQueryBuilderWebviewMessage = async (
               ?.location?.uri?.toString(),
         )?.[0]
         ?.save();
-      return true;
-    }
-    case GET_ENTITY_TEXT_LOCATIONS: {
-      const result = message.msg.entityIds
-        .map(
-          (entityId: string) =>
-            legendConceptTree.getTreeItemById(entityId)?.location,
-        )
-        .filter(
-          (location: Location | undefined) =>
-            location !== null && location !== undefined,
-        )
-        .map((location: Location) => locationToTextLocation(location));
-      webview.postMessage({
-        command: GET_ENTITY_TEXT_LOCATIONS_RESPONSE,
-        result,
-      });
       return true;
     }
     case QUERY_BUILDER_CONFIG_ERROR: {
