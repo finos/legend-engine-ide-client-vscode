@@ -95,7 +95,6 @@ const isServiceWithNonPointerRuntime = (
 
 export const getMappingAndRuntimePathsForEntity = (
   entity: Entity,
-  classifierPath: string,
   pluginManager: LegendVSCodePluginManager,
 ): {
   mappingPaths: string[];
@@ -104,7 +103,7 @@ export const getMappingAndRuntimePathsForEntity = (
   const mappingPaths: string[] = [];
   const runtimePaths: string[] = [];
 
-  switch (classifierPath) {
+  switch (entity.classifierPath) {
     case CLASSIFIER_PATH.SERVICE: {
       const serviceElement = guaranteeType(
         V1_deserializePackageableElement(
@@ -168,7 +167,7 @@ export const getMappingAndRuntimePathsForEntity = (
       break;
     }
     default: {
-      throw new Error(`Unsupported classifier path: ${classifierPath}`);
+      throw new Error(`Unsupported classifier path: ${entity.classifierPath}`);
     }
   }
 
@@ -177,7 +176,6 @@ export const getMappingAndRuntimePathsForEntity = (
 
 export const getMinimalEntities = async (
   currentId: string,
-  classifierPath: string,
   pluginManager: LegendVSCodePluginManager,
 ): Promise<{
   entities: Entity[];
@@ -205,7 +203,6 @@ export const getMinimalEntities = async (
   // Get the mapping and runtime paths for the current entity
   const { mappingPaths, runtimePaths } = getMappingAndRuntimePathsForEntity(
     currentEntity,
-    classifierPath,
     pluginManager,
   );
 

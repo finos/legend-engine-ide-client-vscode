@@ -88,7 +88,6 @@ export const useQueryBuilderState = (
         const { entities: newEntities, dummyElements: newDummyElements } =
           await getMinimalEntities(
             initialId,
-            classifierPath,
             applicationStore.pluginManager,
           );
         setEntities(newEntities);
@@ -122,7 +121,6 @@ export const useQueryBuilderState = (
             const { entities: newEntities, dummyElements: newDummyElements } =
               await getMinimalEntities(
                 message.updatedEntityId ?? currentId,
-                classifierPath,
                 applicationStore.pluginManager,
               );
             if (message.updatedEntityId) {
@@ -360,13 +358,14 @@ export const useQueryBuilderState = (
       setIsLoading(false);
     }
   }, [
-    currentId,
-    previousId,
     applicationStore,
-    entities,
-    dummyElements,
-    queryBuilderState,
     classifierPath,
+    currentId,
+    dummyElements,
+    entities,
+    error,
+    previousId,
+    queryBuilderState,
   ]);
 
   return { queryBuilderState, isLoading, error };
