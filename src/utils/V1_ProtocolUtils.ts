@@ -16,12 +16,23 @@
 
 import {
   type V1_ConcreteFunctionDefinition,
+  type V1_GenericType,
   type V1_Multiplicity,
   type V1_RawVariable,
 } from '@finos/legend-vscode-extension-dependencies';
 
 const ELEMENT_PATH_DELIMITER = '::';
 const FUNCTION_SIGNATURE_MULTIPLICITY_INFINITE_TOKEN = 'MANY';
+
+const V1_getGenericTypeFullPath = (val: V1_GenericType): string => {
+  if (
+    Object.prototype.hasOwnProperty.call(val, 'rawType') &&
+    Object.prototype.hasOwnProperty.call(val.rawType, 'fullPath')
+  ) {
+    return (val.rawType as unknown as { fullPath: string }).fullPath;
+  }
+  throw new Error('Failed to get full path from generic type');
+};
 
 const V1_buildFunctionMultiplicitySignature = (
   multiplicity: V1_Multiplicity,
@@ -38,7 +49,7 @@ const V1_buildFunctionMultiplicitySignature = (
 };
 
 const V1_buildFunctionParameterSignature = (variable: V1_RawVariable): string =>
-  `${variable.class
+  `${variable.genericType.rawType.fullPath
     .split(ELEMENT_PATH_DELIMITER)
     .pop()}_${V1_buildFunctionMultiplicitySignature(variable.multiplicity)}_`;
 
@@ -47,7 +58,7 @@ const V1_buildFunctionSignatureSuffix = (
 ): string =>
   `_${func.parameters
     .map((p) => V1_buildFunctionParameterSignature(p))
-    .join('_')}_${func.returnType
+    .join('_')}_${V1_getGenericTypeFullPath(func.returnGenericType)
     .split(ELEMENT_PATH_DELIMITER)
     .pop()}_${V1_buildFunctionMultiplicitySignature(func.returnMultiplicity)}_`;
 

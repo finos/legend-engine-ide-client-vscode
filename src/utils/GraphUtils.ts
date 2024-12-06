@@ -23,6 +23,7 @@ import {
   type PureProtocolProcessorPlugin,
   type V1_EntitlementReportAnalyticsInput,
   type V1_ExecuteInput,
+  type V1_PackageableElement,
   type V1_StoreEntitlementAnalysisInput,
   buildPureGraphManager,
   GraphManagerState,
@@ -48,6 +49,7 @@ export const buildGraphManagerStateFromEntities = async (
     LegendVSCodePluginManager
   >,
   engine: V1_LSPEngine,
+  dummyElements?: V1_PackageableElement[],
 ): Promise<GraphManagerState> => {
   const newGraphManager = buildPureGraphManager(
     applicationStore.pluginManager,
@@ -74,9 +76,20 @@ export const buildGraphManagerStateFromEntities = async (
     },
   );
   await graphManagerState.initializeSystem();
+  const finalEntities = entities
+    .concat(
+      dummyElements?.map((element) =>
+        graphManager.elementProtocolToEntity(element),
+      ) ?? [],
+    )
+    .filter(
+      (el) =>
+        !graphManagerState.graph.getNullableElement(el.path, false) &&
+        !el.path.startsWith('meta::'),
+    );
   await graphManagerState.graphManager.buildGraph(
     graphManagerState.graph,
-    entities,
+    finalEntities,
     graphManagerState.graphBuildState,
     {},
   );

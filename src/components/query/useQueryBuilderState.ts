@@ -19,33 +19,32 @@ import { flowResult } from 'mobx';
 import {
   type Entity,
   type QueryBuilderState,
+  type V1_PackageableElement,
+  assertTrue,
+  FunctionQueryBuilderState,
+  graph_renameElement,
   guaranteeNonNullable,
   guaranteeType,
+  PackageableElementExplicitReference,
   pureExecution_setFunction,
   PureExecution,
   QueryBuilderActionConfig,
   RawLambda,
   ServiceQueryBuilderState,
   useApplicationStore,
-  V1_PureExecution,
-  V1_serviceModelSchema,
-  FunctionQueryBuilderState,
-  V1_deserializePackageableElement,
-  V1_ConcreteFunctionDefinition,
-  V1_GraphBuilderContextBuilder,
-  V1_PureGraphManager,
-  graph_renameElement,
-  PackageableElementExplicitReference,
   V1_buildVariable,
-  assertTrue,
+  V1_ConcreteFunctionDefinition,
+  V1_deserializePackageableElement,
+  V1_getGenericTypeFullPath,
+  V1_GraphBuilderContextBuilder,
+  V1_PureExecution,
+  V1_PureGraphManager,
+  V1_serviceModelSchema,
 } from '@finos/legend-vscode-extension-dependencies';
 import {
   CLASSIFIER_PATH,
-  GET_PROJECT_ENTITIES,
-  GET_PROJECT_ENTITIES_RESPONSE,
   LEGEND_REFRESH_QUERY_BUILDER,
 } from '../../utils/Const';
-import { postMessage } from '../../utils/VsCodeUtils';
 import { QueryBuilderVSCodeWorkflowState } from './QueryBuilderWorkflowState';
 import { type LegendVSCodeApplicationConfig } from '../../application/LegendVSCodeApplicationConfig';
 import { type LegendVSCodePluginManager } from '../../application/LegendVSCodePluginManager';
@@ -55,6 +54,7 @@ import {
 } from '../../utils/GraphUtils';
 import { V1_LSPEngine } from '../../graph/V1_LSPEngine';
 import { deserialize } from 'serializr';
+import { getMinimalEntities } from './QueryBuilderStateUtils';
 
 export const useQueryBuilderState = (
   initialId: string,
@@ -76,41 +76,65 @@ export const useQueryBuilderState = (
   const [queryBuilderState, setQueryBuilderState] =
     useState<QueryBuilderState | null>(null);
   const [entities, setEntities] = useState<Entity[]>([]);
+  const [dummyElements, setDummyElements] = useState<V1_PackageableElement[]>(
+    [],
+  );
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
   useEffect(() => {
+    const fetchAndSetMinimalEntities = async (): Promise<void> => {
+      try {
+        const { entities: newEntities, dummyElements: newDummyElements } =
+          await getMinimalEntities(initialId, applicationStore.pluginManager);
+        setEntities(newEntities);
+        setDummyElements(newDummyElements);
+        setError('');
+      } catch (e) {
+        if (e instanceof Error) {
+          setError(e.message);
+        }
+      } finally {
+        setIsLoading(false);
+      }
+    };
     setIsLoading(true);
-    postMessage({
-      command: GET_PROJECT_ENTITIES,
-    });
-  }, [initialId]);
+    fetchAndSetMinimalEntities();
+  }, [initialId, applicationStore.pluginManager]);
 
   useEffect(() => {
-    const handleMessage = (
+    const handleMessage = async (
       event: MessageEvent<{
         command: string;
         result: Entity[];
         updatedEntityId?: string;
       }>,
-    ): void => {
+    ): Promise<void> => {
       const message = event.data;
       switch (message.command) {
-        case GET_PROJECT_ENTITIES_RESPONSE: {
-          const es: Entity[] = message.result;
-          setEntities(es);
-          if (message.updatedEntityId) {
-            setPreviousId(currentId);
-            setCurrentId(message.updatedEntityId);
-          }
-          break;
-        }
         case LEGEND_REFRESH_QUERY_BUILDER: {
-          setIsLoading(true);
-          postMessage({
-            command: GET_PROJECT_ENTITIES,
-            updatedEntityId: message.updatedEntityId,
-          });
+          try {
+            setIsLoading(true);
+            const { entities: newEntities, dummyElements: newDummyElements } =
+              await getMinimalEntities(
+                message.updatedEntityId ?? currentId,
+                applicationStore.pluginManager,
+              );
+            if (message.updatedEntityId) {
+              setPreviousId(currentId);
+              setCurrentId(message.updatedEntityId);
+            }
+            setEntities(newEntities);
+            setDummyElements(newDummyElements);
+            setError('');
+          } catch (e) {
+            if (e instanceof Error) {
+              setError(e.message);
+            }
+            setQueryBuilderState(null);
+          } finally {
+            setIsLoading(false);
+          }
           break;
         }
         default:
@@ -121,16 +145,18 @@ export const useQueryBuilderState = (
     return () => {
       window.removeEventListener('message', handleMessage);
     };
-  }, [currentId]);
+  }, [currentId, applicationStore.pluginManager]);
 
   useEffect(() => {
     const buildGraphManagerStateAndInitializeQuery =
       async (): Promise<void> => {
         const engine = new V1_LSPEngine();
+
         const graphManagerState = await buildGraphManagerStateFromEntities(
           entities,
           applicationStore,
           engine,
+          dummyElements,
         );
 
         if (classifierPath === CLASSIFIER_PATH.SERVICE) {
@@ -264,7 +290,9 @@ export const useQueryBuilderState = (
         existingFunctionEntity.returnType =
           PackageableElementExplicitReference.create(
             nonNullQueryBuilderState.graphManagerState.graph.getType(
-              V1_functionDefinition.returnType,
+              V1_getGenericTypeFullPath(
+                V1_functionDefinition.returnGenericType,
+              ),
             ),
           );
         existingFunctionEntity.returnMultiplicity =
@@ -304,7 +332,7 @@ export const useQueryBuilderState = (
       }
     };
 
-    if (entities.length && currentId && applicationStore) {
+    if (entities.length && currentId && applicationStore && !error) {
       try {
         if (queryBuilderState === null) {
           buildGraphManagerStateAndInitializeQuery();
@@ -327,12 +355,14 @@ export const useQueryBuilderState = (
       setIsLoading(false);
     }
   }, [
-    currentId,
-    previousId,
     applicationStore,
-    entities,
-    queryBuilderState,
     classifierPath,
+    currentId,
+    dummyElements,
+    entities,
+    error,
+    previousId,
+    queryBuilderState,
   ]);
 
   return { queryBuilderState, isLoading, error };

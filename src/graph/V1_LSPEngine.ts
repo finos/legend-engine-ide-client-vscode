@@ -103,7 +103,7 @@ import {
   V1_transformRawLambda,
 } from '@finos/legend-vscode-extension-dependencies';
 import { deserialize } from 'serializr';
-import { postMessage } from '../utils/VsCodeUtils';
+import { postAndWaitForMessage } from '../utils/VsCodeUtils';
 import {
   ANALYZE_MAPPING_MODEL_COVERAGE_COMMAND_ID,
   ANALYZE_MAPPING_MODEL_COVERAGE_RESPONSE,
@@ -151,7 +151,7 @@ export class V1_LSPEngine implements V1_GraphManagerEngine {
   currentUserId: string | undefined;
 
   setup = async (_: TEMPORARY__EngineSetupConfig): Promise<void> => {
-    this.currentUserId = await this.postAndWaitForMessage<string>(
+    this.currentUserId = await postAndWaitForMessage<string>(
       {
         command: GET_CURRENT_USER_ID_REQUEST_ID,
       },
@@ -159,31 +159,10 @@ export class V1_LSPEngine implements V1_GraphManagerEngine {
     );
   };
 
-  private postAndWaitForMessage = <T>(
-    requestMessage: { command: string; msg?: PlainObject },
-    responseCommandId: string,
-  ): Promise<T> => {
-    postMessage({
-      command: requestMessage.command,
-      msg: requestMessage.msg,
-    });
-    return new Promise((resolve) => {
-      const handleMessage = (
-        event: MessageEvent<{ result: T; command: string }>,
-      ): void => {
-        if (event.data.command === responseCommandId) {
-          window.removeEventListener('message', handleMessage);
-          resolve(event.data.result);
-        }
-      };
-      window.addEventListener('message', handleMessage);
-    });
-  };
-
   // ------------------------------------------- Protocol -------------------------------------------
 
   async getClassifierPathMapping(): Promise<ClassifierPathMapping[]> {
-    const response = await this.postAndWaitForMessage<string>(
+    const response = await postAndWaitForMessage<string>(
       { command: GET_CLASSIFIER_PATH_MAP_REQUEST_ID },
       GET_CLASSIFIER_PATH_MAP_RESPONSE,
     );
@@ -191,7 +170,7 @@ export class V1_LSPEngine implements V1_GraphManagerEngine {
   }
 
   async getSubtypeInfo(): Promise<SubtypeInfo> {
-    return this.postAndWaitForMessage<SubtypeInfo>(
+    return postAndWaitForMessage<SubtypeInfo>(
       { command: GET_SUBTYPE_INFO_REQUEST_ID },
       GET_SUBTYPE_INFO_RESPONSE,
     );
@@ -230,7 +209,7 @@ export class V1_LSPEngine implements V1_GraphManagerEngine {
         ),
       );
     });
-    const response = await this.postAndWaitForMessage<LegendExecutionResult[]>(
+    const response = await postAndWaitForMessage<LegendExecutionResult[]>(
       {
         command: JSON_TO_GRAMMAR_LAMBDA_BATCH_COMMAND_ID,
         msg: {
@@ -298,7 +277,7 @@ export class V1_LSPEngine implements V1_GraphManagerEngine {
       pruneSourceInformation?: boolean;
     },
   ): Promise<V1_RawLambda> {
-    const response = await this.postAndWaitForMessage<LegendExecutionResult[]>(
+    const response = await postAndWaitForMessage<LegendExecutionResult[]>(
       {
         command: GRAMMAR_TO_JSON_LAMBDA_COMMAND_ID,
         msg: {
@@ -370,7 +349,7 @@ export class V1_LSPEngine implements V1_GraphManagerEngine {
   async getLambdaReturnTypeFromRawInput(
     rawInput: PlainObject<V1_LambdaReturnTypeInput>,
   ): Promise<string> {
-    const response = await this.postAndWaitForMessage<LegendExecutionResult[]>(
+    const response = await postAndWaitForMessage<LegendExecutionResult[]>(
       {
         command: GET_LAMBDA_RETURN_TYPE_COMMAND_ID,
         msg: rawInput,
@@ -434,7 +413,7 @@ export class V1_LSPEngine implements V1_GraphManagerEngine {
   ): Promise<Response> {
     const downloadFileName = `result.${getContentTypeFileExtension(contentType ?? ContentType.TEXT_CSV)}`;
     const response = guaranteeNonNullable(
-      await this.postAndWaitForMessage<LegendExecutionResult>(
+      await postAndWaitForMessage<LegendExecutionResult>(
         {
           command: EXPORT_DATA_COMMAND_ID,
           msg: {
@@ -463,7 +442,7 @@ export class V1_LSPEngine implements V1_GraphManagerEngine {
     options?: ExecutionOptions,
   ): Promise<Map<string, string>> {
     const result = new Map<string, string>();
-    const response = await this.postAndWaitForMessage<LegendExecutionResult[]>(
+    const response = await postAndWaitForMessage<LegendExecutionResult[]>(
       {
         command: EXECUTE_QUERY_COMMAND_ID,
         msg: executeInputToLSPInput(input, options),
@@ -523,7 +502,7 @@ export class V1_LSPEngine implements V1_GraphManagerEngine {
   async generateExecutionPlan(
     input: V1_ExecuteInput,
   ): Promise<PlainObject<V1_ExecutionPlan>> {
-    const response = await this.postAndWaitForMessage<LegendExecutionResult[]>(
+    const response = await postAndWaitForMessage<LegendExecutionResult[]>(
       {
         command: GENERATE_EXECUTION_PLAN_COMMAND_ID,
         msg: executeInputToLSPInput(input),
@@ -536,7 +515,7 @@ export class V1_LSPEngine implements V1_GraphManagerEngine {
   async debugExecutionPlanGeneration(
     input: V1_ExecuteInput,
   ): Promise<{ plan: PlainObject<V1_ExecutionPlan>; debug: string[] }> {
-    const response = await this.postAndWaitForMessage<LegendExecutionResult[]>(
+    const response = await postAndWaitForMessage<LegendExecutionResult[]>(
       {
         command: DEBUG_GENERATE_EXECUTION_PLAN_COMMAND_ID,
         msg: executeInputToLSPInput(input),
@@ -708,7 +687,7 @@ export class V1_LSPEngine implements V1_GraphManagerEngine {
   async analyzeMappingModelCoverage(
     input: V1_MappingModelCoverageAnalysisInput,
   ): Promise<V1_MappingModelCoverageAnalysisResult> {
-    const response = await this.postAndWaitForMessage<LegendExecutionResult[]>(
+    const response = await postAndWaitForMessage<LegendExecutionResult[]>(
       {
         command: ANALYZE_MAPPING_MODEL_COVERAGE_COMMAND_ID,
         msg: V1_MappingModelCoverageAnalysisInput.serialization.toJson(input),
@@ -725,7 +704,7 @@ export class V1_LSPEngine implements V1_GraphManagerEngine {
     input: V1_StoreEntitlementAnalysisInput,
     plugins: PureProtocolProcessorPlugin[],
   ): Promise<V1_DatasetSpecification[]> {
-    const response = await this.postAndWaitForMessage<LegendExecutionResult[]>(
+    const response = await postAndWaitForMessage<LegendExecutionResult[]>(
       {
         command: SURVEY_DATASETS_COMMAND_ID,
         msg: surveyDatasetsInputToLSPInput(input),
@@ -749,7 +728,7 @@ export class V1_LSPEngine implements V1_GraphManagerEngine {
     input: V1_EntitlementReportAnalyticsInput,
     plugins: PureProtocolProcessorPlugin[],
   ): Promise<V1_DatasetEntitlementReport[]> {
-    const response = await this.postAndWaitForMessage<LegendExecutionResult[]>(
+    const response = await postAndWaitForMessage<LegendExecutionResult[]>(
       {
         command: CHECK_DATASET_ENTITLEMENTS_COMMAND_ID,
         msg: entitlementReportAnalyticsInputToLSPInput(input, plugins),

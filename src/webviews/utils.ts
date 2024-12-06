@@ -63,6 +63,7 @@ import {
 import { type LegendConceptTreeProvider } from '../conceptTree';
 import { guaranteeNonNullable } from '../utils/AssertionUtils';
 import { TextLocation } from '../model/TextLocation';
+import { TextDocumentIdentifier } from 'vscode-languageclient';
 
 export const getWebviewHtml = (
   webview: Webview,
@@ -380,7 +381,13 @@ export const handleQueryBuilderWebviewMessage = async (
 ): Promise<boolean> => {
   switch (message.command) {
     case GET_PROJECT_ENTITIES: {
-      const entities = await client.entities(new LegendEntitiesRequest([]));
+      const entities = await client.entities(
+        new LegendEntitiesRequest(
+          message.msg?.entityTextLocations.map((textLocation: TextLocation) =>
+            TextDocumentIdentifier.create(textLocation.documentId),
+          ) ?? [],
+        ),
+      );
       webview.postMessage({
         command: GET_PROJECT_ENTITIES_RESPONSE,
         result: entities,
