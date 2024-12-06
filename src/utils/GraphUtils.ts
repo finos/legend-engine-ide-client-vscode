@@ -77,15 +77,15 @@ export const buildGraphManagerStateFromEntities = async (
   );
   await graphManagerState.initializeSystem();
   const finalEntities = entities
-    .filter(
-      (el) =>
-        !graphManagerState.graph.getNullableElement(el.path, false) &&
-        !el.path.startsWith('meta::'),
-    )
     .concat(
       dummyElements?.map((element) =>
         graphManager.elementProtocolToEntity(element),
       ) ?? [],
+    )
+    .filter(
+      (el) =>
+        !graphManagerState.graph.getNullableElement(el.path, false) &&
+        !el.path.startsWith('meta::'),
     );
   await graphManagerState.graphManager.buildGraph(
     graphManagerState.graph,
