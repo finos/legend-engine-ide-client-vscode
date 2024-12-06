@@ -100,7 +100,7 @@ export const useQueryBuilderState = (
     };
     setIsLoading(true);
     fetchAndSetMinimalEntities();
-  }, [initialId, classifierPath, applicationStore.pluginManager]);
+  }, [initialId, applicationStore.pluginManager]);
 
   useEffect(() => {
     const handleMessage = async (
@@ -145,7 +145,7 @@ export const useQueryBuilderState = (
     return () => {
       window.removeEventListener('message', handleMessage);
     };
-  }, [currentId, classifierPath, applicationStore.pluginManager]);
+  }, [currentId, applicationStore.pluginManager]);
 
   useEffect(() => {
     const buildGraphManagerStateAndInitializeQuery =
