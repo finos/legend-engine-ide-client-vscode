@@ -93,7 +93,7 @@ const isServiceWithNonPointerRuntime = (
   return false;
 };
 
-export const getMappingAndRuntimePathsForEntity = (
+const getMappingAndRuntimePathsForEntity = (
   entity: Entity,
   pluginManager: LegendVSCodePluginManager,
 ): {
