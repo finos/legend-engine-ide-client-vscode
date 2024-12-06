@@ -174,8 +174,16 @@ const getMappingAndRuntimePathsForEntity = (
   return { mappingPaths: uniq(mappingPaths), runtimePaths: uniq(runtimePaths) };
 };
 
+/**
+ * Given an entity ID, return the minimal list of entities and dummy elements needed
+ * to build a QueryBuilder graph for the entity.
+ *
+ * @param entityId the entity to analyze
+ * @param pluginManager legend plugin manager
+ * @returns list of minimal entities and dummy elements needed to build the graph
+ */
 export const getMinimalEntities = async (
-  currentId: string,
+  entityId: string,
   pluginManager: LegendVSCodePluginManager,
 ): Promise<{
   entities: Entity[];
@@ -188,8 +196,8 @@ export const getMinimalEntities = async (
     GET_PROJECT_ENTITIES_RESPONSE,
   );
   const currentEntity = guaranteeNonNullable(
-    allEntities.find((entity) => entity.path === currentId),
-    `Can't find entity with ID ${currentId}`,
+    allEntities.find((entity) => entity.path === entityId),
+    `Can't find entity with ID ${entityId}`,
   );
 
   if (isServiceWithNonPointerRuntime(currentEntity, pluginManager)) {
@@ -207,7 +215,7 @@ export const getMinimalEntities = async (
   );
 
   if (mappingPaths.length === 0) {
-    throw new Error(`No mappings found for entity ${currentId}`);
+    throw new Error(`No mappings found for entity ${entityId}`);
   }
 
   // Perform mapping model coverage analysis
