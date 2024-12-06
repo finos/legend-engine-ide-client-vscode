@@ -86,10 +86,7 @@ export const useQueryBuilderState = (
     const fetchAndSetMinimalEntities = async (): Promise<void> => {
       try {
         const { entities: newEntities, dummyElements: newDummyElements } =
-          await getMinimalEntities(
-            initialId,
-            applicationStore.pluginManager,
-          );
+          await getMinimalEntities(initialId, applicationStore.pluginManager);
         setEntities(newEntities);
         setDummyElements(newDummyElements);
         setError('');
