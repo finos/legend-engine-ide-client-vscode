@@ -41,6 +41,8 @@ import {
   GET_CLASSIFIER_PATH_MAP_RESPONSE,
   GET_CURRENT_USER_ID_REQUEST_ID,
   GET_CURRENT_USER_ID_RESPONSE,
+  GET_LAMBDA_RELATION_TYPE_COMMAND_ID,
+  GET_LAMBDA_RELATION_TYPE_RESPONSE,
   GET_LAMBDA_RETURN_TYPE_COMMAND_ID,
   GET_LAMBDA_RETURN_TYPE_RESPONSE,
   GET_PROJECT_ENTITIES,
@@ -49,6 +51,8 @@ import {
   GET_SUBTYPE_INFO_RESPONSE,
   GRAMMAR_TO_JSON_LAMBDA_COMMAND_ID,
   GRAMMAR_TO_JSON_LAMBDA_RESPONSE,
+  GRAMMAR_TO_JSON_VALUE_SPECIFICATION_BATCH_ID,
+  GRAMMAR_TO_JSON_VALUE_SPECIFICATION_BATCH_RESPONSE,
   JSON_TO_GRAMMAR_LAMBDA_BATCH_COMMAND_ID,
   JSON_TO_GRAMMAR_LAMBDA_BATCH_RESPONSE,
   QUERY_BUILDER_CONFIG_ERROR,
@@ -295,6 +299,18 @@ export const handleV1LSPEngineMessage = async (
       });
       return true;
     }
+    case GRAMMAR_TO_JSON_VALUE_SPECIFICATION_BATCH_ID: {
+      const { input } = message.msg;
+      const result = await client.grammarToJson_valueSpecification_batch(
+        entityTextLocation,
+        input,
+      );
+      webview.postMessage({
+        command: GRAMMAR_TO_JSON_VALUE_SPECIFICATION_BATCH_RESPONSE,
+        result,
+      });
+      return true;
+    }
     case JSON_TO_GRAMMAR_LAMBDA_BATCH_COMMAND_ID: {
       const { lambdas, renderStyle } = message.msg;
       const result = await client.jsonToGrammar_lambda_batch(
@@ -316,6 +332,18 @@ export const handleV1LSPEngineMessage = async (
       );
       webview.postMessage({
         command: GET_LAMBDA_RETURN_TYPE_RESPONSE,
+        result,
+      });
+      return true;
+    }
+    case GET_LAMBDA_RELATION_TYPE_COMMAND_ID: {
+      const { lambda } = message.msg;
+      const result = await client.getLambdaRelationType(
+        entityTextLocation,
+        lambda,
+      );
+      webview.postMessage({
+        command: GET_LAMBDA_RELATION_TYPE_RESPONSE,
         result,
       });
       return true;
