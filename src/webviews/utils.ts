@@ -398,6 +398,7 @@ export const handleQueryBuilderWebviewMessage = async (
       return true;
     }
     case GET_ENTITY_TEXT_LOCATION: {
+      await legendConceptTree.refresh();
       const entityLocation = guaranteeNonNullable(
         legendConceptTree.getTreeItemById(message.msg.entityId)?.location,
         `Can't find entity with ID '${message.msg.entityId}'`,
