@@ -16,7 +16,7 @@
 
 import { v4 as uuidv4 } from 'uuid';
 import { commands } from 'vscode';
-import { CancellationToken } from 'vscode-languageclient';
+import { type CancellationToken } from 'vscode-languageclient';
 import { LEGEND_CANCEL_COMMAND } from './Const';
 
 export function withCancellationSupport(
