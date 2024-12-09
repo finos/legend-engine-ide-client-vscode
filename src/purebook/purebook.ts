@@ -33,10 +33,11 @@ import {
   WorkspaceEdit,
   Uri,
 } from 'vscode';
-import { LEGEND_COMMAND, LEGEND_LANGUAGE_ID } from '../utils/Const';
+import { LEGEND_COMMAND_V2, LEGEND_LANGUAGE_ID } from '../utils/Const';
 import type { PlainObject } from '@finos/legend-vscode-extension-dependencies';
 import { LegendExecutionResult } from '../results/LegendExecutionResult';
 import { LegendExecutionResultType } from '../results/LegendExecutionResultType';
+import { withCancellationSupport } from '../utils/cancellationSupport';
 
 interface RawNotebookCell {
   source: string[];
@@ -122,7 +123,10 @@ async function executeCells(
   _document: NotebookDocument,
   controller: NotebookController,
 ): Promise<void> {
-  await Promise.all(cells.map((cell) => executeCell(cell, controller)));
+  return cells.reduce(
+    (prev, cell) => prev.then(() => executeCell(cell, controller)),
+    Promise.resolve(),
+  );
 }
 
 let executionOrder = 0;
@@ -135,9 +139,19 @@ async function executeCell(
   execution.executionOrder = ++executionOrder;
   execution.start(Date.now());
 
+  const requestId = withCancellationSupport(execution.token, () => {
+    execution.replaceOutput(
+      new NotebookCellOutput([
+        NotebookCellOutputItem.stdout('Execution canceled!'),
+      ]),
+    );
+    execution.end(undefined, Date.now());
+  });
+
   return commands
     .executeCommand(
-      LEGEND_COMMAND,
+      LEGEND_COMMAND_V2,
+      requestId,
       cell.document.uri.toString(),
       0,
       'notebook_cell',
@@ -189,11 +203,20 @@ async function executeCell(
         }
       },
       (error) => {
-        execution.replaceOutput([
-          new NotebookCellOutput([NotebookCellOutputItem.error(error)]),
-        ]);
+        if (!execution.token.isCancellationRequested) {
+          execution.replaceOutput([
+            new NotebookCellOutput([NotebookCellOutputItem.error(error)]),
+          ]);
 
-        execution.end(false, Date.now());
+          execution.end(false, Date.now());
+        } else {
+          execution.replaceOutput(
+            new NotebookCellOutput([
+              NotebookCellOutputItem.stdout('Execution canceled!'),
+            ]),
+          );
+          execution.end(undefined, Date.now());
+        }
       },
     );
 }
