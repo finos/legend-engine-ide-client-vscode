@@ -199,18 +199,17 @@ export const getMinimalEntities = async (
     },
     GET_ENTITY_TEXT_LOCATION_RESPONSE,
   );
+  const entitiesInTextLocation = await postAndWaitForMessage<Entity[]>(
+    {
+      command: GET_PROJECT_ENTITIES,
+      msg: {
+        entityTextLocations: [currentEntityTextLocation],
+      },
+    },
+    GET_PROJECT_ENTITIES_RESPONSE,
+  );
   const currentEntity = guaranteeNonNullable(
-    (
-      await postAndWaitForMessage<Entity[]>(
-        {
-          command: GET_PROJECT_ENTITIES,
-          msg: {
-            entityTextLocations: [currentEntityTextLocation],
-          },
-        },
-        GET_PROJECT_ENTITIES_RESPONSE,
-      )
-    )[0],
+    entitiesInTextLocation.find((entity) => entity.path === entityId),
     `Can't find entity with ID ${entityId}`,
   );
 
