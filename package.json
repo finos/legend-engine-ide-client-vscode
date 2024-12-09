@@ -321,6 +321,16 @@
           }
         ]
       }
+    ],
+    "notebookRenderer": [
+      {
+        "id": "legend-cube-renderer",
+        "displayName": "Legend Cube Renderer",
+        "mimeTypes": [
+          "application/legend-relational-result"
+        ],
+        "entrypoint": "dist/PureBookRendererRoot.js"
+      }
     ]
   },
   "capabilities": {
@@ -366,13 +376,14 @@
     "@ag-grid-enterprise/server-side-row-model": "30.2.0",
     "@finos/legend-vscode-extension-dependencies": "4.0.38",
     "@types/vscode": "1.83.0",
+    "@types/vscode-notebook-renderer": "^1.72.3",
     "glob": "11.0.0",
-    "mobx-react-lite": "4.0.7",
     "mobx": "6.13.1",
+    "mobx-react-lite": "4.0.7",
     "path": "0.12.7",
+    "react": "18.3.1",
     "react-dom": "18.3.1",
     "react-select": "5.8.0",
-    "react": "18.3.1",
     "serializr": "3.0.3",
     "vscode-languageclient": "9.0.1"
   },

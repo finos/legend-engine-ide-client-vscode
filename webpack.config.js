@@ -78,6 +78,64 @@ const webviewConfig = {
   },
 };
 
+const purebookRendererConfig = {
+  entry: {
+    PureBookRendererRoot: './src/purebook/PurebookCubeRenderer.tsx',
+  },
+  externals: {
+    vscode: 'commonjs vscode',
+  },
+  output: {
+    filename: '[name].js',
+    path: path.resolve(__dirname, 'dist'),
+    assetModuleFilename: 'assets/[hash][ext][query]'
+  },
+  devtool: 'nosources-source-map',
+  module: {
+    rules: [
+      {
+        test: /\.tsx?$/,
+        use: 'ts-loader',
+        exclude: /node_modules/,
+      },
+      {
+        test: /\.s?(a|c)ss$/,
+        use: [
+          'style-loader',
+          'css-loader',
+          {
+            loader: 'sass-loader',
+          },
+        ],
+      },
+      {
+        test: /\.(woff|woff2|eot|ttf|otf)$/i,
+        type: 'asset',
+      }
+    ],
+  },
+  plugins: [
+    new webpack.ProvidePlugin({
+           process: 'process/browser',
+    }),
+    new webpack.DefinePlugin({
+      AG_GRID_LICENSE: null,
+    }),
+  ],
+  resolve: {
+    extensions: ['.tsx', '.ts', '.js', '.css', '.scss'],
+    fallback: {
+      stream: require.resolve("stream-browserify"),
+      crypto: require.resolve("crypto-browserify"),
+      vm: require.resolve("vm-browserify")
+    },
+    alias: {
+      react: path.resolve('./node_modules/react'),
+      process: "process/browser"
+    }
+  },
+};
+
 const extensionConfig = {
   target: 'webworker',
   entry: './src/extension.ts',
@@ -130,4 +188,4 @@ const extensionConfig = {
 };
 
 
-module.exports = [webviewConfig, extensionConfig]
+module.exports = [webviewConfig, purebookRendererConfig, extensionConfig]

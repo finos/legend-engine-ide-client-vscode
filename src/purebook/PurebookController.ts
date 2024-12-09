@@ -111,7 +111,10 @@ export class PurebookController {
               let output: NotebookCellOutputItem;
               switch (funcResult.messageType) {
                 case 'text':
-                  output = NotebookCellOutputItem.text(funcResult.message);
+                  output = NotebookCellOutputItem.text(
+                    funcResult.message,
+                    'application/legend-relational-result',
+                  );
                   break;
                 case 'json':
                   output = NotebookCellOutputItem.json(

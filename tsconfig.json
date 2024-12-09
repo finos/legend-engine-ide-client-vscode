@@ -14,6 +14,7 @@
     "declarationMap": true,
     "resolveJsonModule": true,
     "esModuleInterop": true,
+    "types": ["vscode-notebook-renderer"],
     // ---exactOptionalPropertyTypes specifies that optional property types should be interpreted exactly as
     // written, meaning that `| undefined` is not added to the type.
     // This makes it possible to ensure that optional properties are never `undefined` when they're present
