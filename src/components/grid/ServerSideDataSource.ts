@@ -15,7 +15,6 @@
  */
 
 import type {
-  FilterModel,
   IServerSideDatasource,
   IServerSideGetRowsParams,
 } from 'ag-grid-community';
@@ -94,7 +93,7 @@ export class ServerSideDataSource implements IServerSideDatasource {
     const request = params.request;
     const startRow = request.startRow;
     const endRow = request.endRow;
-    const columns = params.api.getColumns()?.map((c) => c.getColId());
+    const columns = params.columnApi.getColumns()?.map((c) => c.getColId());
     const sort = request.sortModel.map(
       (i) => new TDSSort(i.colId, getTDSSortOrder(i.sort)),
     );
@@ -112,7 +111,7 @@ export class ServerSideDataSource implements IServerSideDatasource {
       aggregations,
     );
     const filter: TDSFilter[] = [];
-    const filterModel = request.filterModel as FilterModel;
+    const filterModel = request.filterModel;
     if (filterModel) {
       Object.keys(filterModel).forEach((key) => {
         const item = filterModel[key];
