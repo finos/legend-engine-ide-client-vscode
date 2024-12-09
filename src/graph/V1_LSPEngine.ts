@@ -253,7 +253,7 @@ export class V1_LSPEngine implements V1_GraphManagerEngine {
   async transformCodeToValueSpeces(
     input: Record<string, V1_GrammarParserBatchInputEntry>,
   ): Promise<Map<string, PlainObject<V1_ValueSpecification>>> {
-    const response = await this.postAndWaitForMessage<LegendExecutionResult[]>(
+    const response = await postAndWaitForMessage<LegendExecutionResult[]>(
       {
         command: GRAMMAR_TO_JSON_VALUE_SPECIFICATION_BATCH_ID,
         msg: {
@@ -408,7 +408,7 @@ export class V1_LSPEngine implements V1_GraphManagerEngine {
   async getLambdaRelationTypeFromRawInput(
     rawInput: V1_LambdaReturnTypeInput,
   ): Promise<RelationTypeMetadata> {
-    const response = await this.postAndWaitForMessage<LegendExecutionResult[]>(
+    const response = await postAndWaitForMessage<LegendExecutionResult[]>(
       {
         command: GET_LAMBDA_RELATION_TYPE_COMMAND_ID,
         msg: V1_LambdaReturnTypeInput.serialization.toJson(rawInput),
