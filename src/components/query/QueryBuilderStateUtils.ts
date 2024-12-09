@@ -52,7 +52,7 @@ import { postAndWaitForMessage } from '../../utils/VsCodeUtils';
 import { type LegendVSCodePluginManager } from '../../application/LegendVSCodePluginManager';
 import { type LegendExecutionResult } from '../../results/LegendExecutionResult';
 import { V1_LSPMappingModelCoverageAnalysisResult } from '../../model/engine/MappingModelCoverageAnalysisResult';
-import { TextLocation } from '../../model/TextLocation';
+import { type TextLocation } from '../../model/TextLocation';
 
 const isServiceWithNonPointerRuntime = (
   entity: Entity,
