@@ -66,9 +66,11 @@ import { type TextLocation } from './model/TextLocation';
 
 export class LegendEntitiesRequest {
   private textDocuments!: TextDocumentIdentifier[];
+  private entityPaths!: string[];
 
-  constructor(textDocuments: TextDocumentIdentifier[]) {
+  constructor(textDocuments: TextDocumentIdentifier[], entityPaths: string[]) {
     this.textDocuments = textDocuments;
+    this.entityPaths = entityPaths;
   }
 }
 

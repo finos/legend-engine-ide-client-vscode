@@ -41,8 +41,6 @@ import {
   GET_CLASSIFIER_PATH_MAP_RESPONSE,
   GET_CURRENT_USER_ID_REQUEST_ID,
   GET_CURRENT_USER_ID_RESPONSE,
-  GET_ENTITY_TEXT_LOCATION,
-  GET_ENTITY_TEXT_LOCATION_RESPONSE,
   GET_LAMBDA_RETURN_TYPE_COMMAND_ID,
   GET_LAMBDA_RETURN_TYPE_RESPONSE,
   GET_PROJECT_ENTITIES,
@@ -385,40 +383,16 @@ export const handleQueryBuilderWebviewMessage = async (
     case GET_PROJECT_ENTITIES: {
       const entities = await client.entities(
         new LegendEntitiesRequest(
-          message.msg?.entityTextLocations.map((textLocation: TextLocation) =>
+          message.msg?.entityTextLocations?.map((textLocation: TextLocation) =>
             TextDocumentIdentifier.create(textLocation.documentId),
           ) ?? [],
+          message.msg?.entityPaths ?? [],
         ),
       );
       webview.postMessage({
         command: GET_PROJECT_ENTITIES_RESPONSE,
         result: entities,
         updatedEntityId: message.updatedEntityId,
-      });
-      return true;
-    }
-    case GET_ENTITY_TEXT_LOCATION: {
-      await legendConceptTree.refresh();
-      const entityLocation = guaranteeNonNullable(
-        legendConceptTree.getTreeItemById(message.msg.entityId)?.location,
-        `Can't find entity with ID '${message.msg.entityId}'`,
-      );
-      const entityTextLocation = TextLocation.serialization.fromJson({
-        documentId: entityLocation.uri.toString(),
-        textInterval: {
-          start: {
-            line: entityLocation.range.start.line,
-            column: entityLocation.range.start.character,
-          },
-          end: {
-            line: entityLocation.range.end.line,
-            column: entityLocation.range.end.character,
-          },
-        },
-      });
-      webview.postMessage({
-        command: GET_ENTITY_TEXT_LOCATION_RESPONSE,
-        result: entityTextLocation,
       });
       return true;
     }

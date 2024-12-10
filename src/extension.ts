@@ -183,9 +183,10 @@ export function createClient(context: ExtensionContext): LanguageClient {
   // if query changes, we should reload any query builders that are open.
   workspace.onDidSaveTextDocument(async (e: TextDocument) => {
     const updatedEntities = await client.entities(
-      new LegendEntitiesRequest([
-        TextDocumentIdentifier.create(e.uri.toString()),
-      ]),
+      new LegendEntitiesRequest(
+        [TextDocumentIdentifier.create(e.uri.toString())],
+        [],
+      ),
     );
     updatedEntities.forEach((updatedEntity) => {
       const normalizedEntityId =
@@ -282,7 +283,7 @@ const showDiagramWebView = async (
     });
     openedWebViews[diagramId] = diagramRendererWebView;
 
-    const entities = await client.entities(new LegendEntitiesRequest([]));
+    const entities = await client.entities(new LegendEntitiesRequest([], []));
     renderDiagramRendererWebView(
       diagramRendererWebView,
       context,
@@ -305,9 +306,12 @@ const showQueryBuilderWebView = async (
     const entity = guaranteeNonNullable(
       (
         await client.entities(
-          new LegendEntitiesRequest([TextDocumentIdentifier.create(entityUri)]),
+          new LegendEntitiesRequest(
+            [TextDocumentIdentifier.create(entityUri)],
+            [entityId],
+          ),
         )
-      ).filter((_entity) => _entity.path === entityId)[0],
+      )[0],
       `No entity found with ID ${entityId} at ${entityUri}`,
     );
     if (

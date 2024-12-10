@@ -82,7 +82,6 @@ export const GET_SUBTYPE_INFO_REQUEST_ID = 'legend/getSubtypeInfo';
 
 // Event Types
 export const GET_PROJECT_ENTITIES = 'getProjectEntities';
-export const GET_ENTITY_TEXT_LOCATION = 'getEntityTextLocation';
 export const DIAGRAM_DROP_CLASS_ERROR = 'diagramDropClassError';
 export const WRITE_ENTITY = 'writeEntity';
 export const QUERY_BUILDER_CONFIG_ERROR = 'queryBuilderConfigError';
@@ -90,7 +89,6 @@ export const EXPORT_DATA_COMMAND_ID = 'legend.query.exportData';
 
 // Response events
 export const GET_PROJECT_ENTITIES_RESPONSE = `${GET_PROJECT_ENTITIES}/response`;
-export const GET_ENTITY_TEXT_LOCATION_RESPONSE = `${GET_ENTITY_TEXT_LOCATION}/response`;
 export const GET_CURRENT_USER_ID_RESPONSE = `${GET_CURRENT_USER_ID_REQUEST_ID}/response`;
 export const GET_CLASSIFIER_PATH_MAP_RESPONSE = `${GET_CLASSIFIER_PATH_MAP_REQUEST_ID}/response`;
 export const GET_SUBTYPE_INFO_RESPONSE = `${GET_SUBTYPE_INFO_REQUEST_ID}/response`;

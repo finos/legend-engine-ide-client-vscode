@@ -45,14 +45,11 @@ import {
   CLASSIFIER_PATH,
   GET_PROJECT_ENTITIES_RESPONSE,
   GET_PROJECT_ENTITIES,
-  GET_ENTITY_TEXT_LOCATION,
-  GET_ENTITY_TEXT_LOCATION_RESPONSE,
 } from '../../utils/Const';
 import { postAndWaitForMessage } from '../../utils/VsCodeUtils';
 import { type LegendVSCodePluginManager } from '../../application/LegendVSCodePluginManager';
 import { type LegendExecutionResult } from '../../results/LegendExecutionResult';
 import { V1_LSPMappingModelCoverageAnalysisResult } from '../../model/engine/MappingModelCoverageAnalysisResult';
-import { type TextLocation } from '../../model/TextLocation';
 
 const isServiceWithNonPointerRuntime = (
   entity: Entity,
@@ -192,24 +189,18 @@ export const getMinimalEntities = async (
   entities: Entity[];
   dummyElements: V1_PackageableElement[];
 }> => {
-  const currentEntityTextLocation = await postAndWaitForMessage<TextLocation>(
-    {
-      command: GET_ENTITY_TEXT_LOCATION,
-      msg: { entityId },
-    },
-    GET_ENTITY_TEXT_LOCATION_RESPONSE,
-  );
-  const entitiesInTextLocation = await postAndWaitForMessage<Entity[]>(
-    {
-      command: GET_PROJECT_ENTITIES,
-      msg: {
-        entityTextLocations: [currentEntityTextLocation],
-      },
-    },
-    GET_PROJECT_ENTITIES_RESPONSE,
-  );
   const currentEntity = guaranteeNonNullable(
-    entitiesInTextLocation.find((entity) => entity.path === entityId),
+    (
+      await postAndWaitForMessage<Entity[]>(
+        {
+          command: GET_PROJECT_ENTITIES,
+          msg: {
+            entityPaths: [entityId],
+          },
+        },
+        GET_PROJECT_ENTITIES_RESPONSE,
+      )
+    )[0],
     `Can't find entity with ID ${entityId}`,
   );
 

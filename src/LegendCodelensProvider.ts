@@ -61,9 +61,10 @@ export class LegendCodelensProvider implements CodeLensProvider {
   ): Promise<CodeLens[]> {
     this.codeLenses = [];
     const entities = await this.client.entities(
-      new LegendEntitiesRequest([
-        TextDocumentIdentifier.create(document.uri.toString()),
-      ]),
+      new LegendEntitiesRequest(
+        [TextDocumentIdentifier.create(document.uri.toString())],
+        [],
+      ),
       _token,
     );
     entities.forEach((entity) => {
