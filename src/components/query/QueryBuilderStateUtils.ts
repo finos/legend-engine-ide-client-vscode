@@ -189,14 +189,18 @@ export const getMinimalEntities = async (
   entities: Entity[];
   dummyElements: V1_PackageableElement[];
 }> => {
-  const allEntities = await postAndWaitForMessage<Entity[]>(
-    {
-      command: GET_PROJECT_ENTITIES,
-    },
-    GET_PROJECT_ENTITIES_RESPONSE,
-  );
   const currentEntity = guaranteeNonNullable(
-    allEntities.find((entity) => entity.path === entityId),
+    (
+      await postAndWaitForMessage<Entity[]>(
+        {
+          command: GET_PROJECT_ENTITIES,
+          msg: {
+            entityPaths: [entityId],
+          },
+        },
+        GET_PROJECT_ENTITIES_RESPONSE,
+      )
+    )[0],
     `Can't find entity with ID ${entityId}`,
   );
 

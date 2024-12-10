@@ -383,9 +383,10 @@ export const handleQueryBuilderWebviewMessage = async (
     case GET_PROJECT_ENTITIES: {
       const entities = await client.entities(
         new LegendEntitiesRequest(
-          message.msg?.entityTextLocations.map((textLocation: TextLocation) =>
+          message.msg?.entityTextLocations?.map((textLocation: TextLocation) =>
             TextDocumentIdentifier.create(textLocation.documentId),
           ) ?? [],
+          message.msg?.entityPaths ?? [],
         ),
       );
       webview.postMessage({

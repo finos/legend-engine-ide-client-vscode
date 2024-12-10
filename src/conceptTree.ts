@@ -204,7 +204,7 @@ export class LegendConceptTreeProvider
   async refresh(doc?: TextDocument): Promise<void> {
     if (!doc || this.root.childrenMap.size === 0) {
       const entities = await this.client.entities(
-        new LegendEntitiesRequest([]),
+        new LegendEntitiesRequest([], []),
       );
       this.root.childrenMap.clear();
       entities
@@ -216,7 +216,7 @@ export class LegendConceptTreeProvider
     } else {
       const docUri = doc.uri.toString();
       const entities = await this.client.entities(
-        new LegendEntitiesRequest([TextDocumentIdentifier.create(docUri)]),
+        new LegendEntitiesRequest([TextDocumentIdentifier.create(docUri)], []),
       );
       this.removeEntitiesFrom(new Map(), this.root, docUri);
       entities
