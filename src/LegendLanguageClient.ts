@@ -35,7 +35,6 @@ import {
   GET_QUERY_TYPEAHEAD_COMMAND_ID,
   GET_SUBTYPE_INFO_REQUEST_ID,
   GRAMMAR_TO_JSON_LAMBDA_BATCH_COMMAND_ID,
-  GRAMMAR_TO_JSON_VALUE_SPECIFICATION_BATCH_ID,
   JSON_TO_GRAMMAR_LAMBDA_BATCH_COMMAND_ID,
   LEGEND_COMMAND,
   LEGEND_WRITE_ENTITY_REQUEST_ID,
@@ -404,20 +403,6 @@ export class LegendLanguageClient extends LanguageClient {
           GRAMMAR_TO_JSON_LAMBDA_BATCH_COMMAND_ID,
           executableArgs,
         );
-  }
-
-  async grammarToJson_valueSpecification_batch(
-    entityTextLocation: TextLocation,
-    input: Record<string, V1_GrammarParserBatchInputEntry>,
-  ): Promise<string> {
-    return commands.executeCommand(
-      LEGEND_COMMAND,
-      entityTextLocation,
-      GRAMMAR_TO_JSON_VALUE_SPECIFICATION_BATCH_ID,
-      {
-        input: JSON.stringify(input),
-      },
-    );
   }
 
   async jsonToGrammar_lambda_batch(
