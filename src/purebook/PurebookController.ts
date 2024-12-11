@@ -109,26 +109,31 @@ export class PurebookController {
             execution.end(false, Date.now());
           } else {
             try {
-              let output: NotebookCellOutputItem;
+              let output: NotebookCellOutputItem[];
               switch (funcResult.messageType) {
                 case 'text':
-                  output = NotebookCellOutputItem.text(
-                    funcResult.message,
-                    'application/legend-relational-result',
-                  );
+                  output = [
+                    NotebookCellOutputItem.text(funcResult.message),
+                    NotebookCellOutputItem.text(
+                      funcResult.message,
+                      'application/legend-relational-result',
+                    ),
+                  ];
                   break;
                 case 'json':
-                  output = NotebookCellOutputItem.json(
-                    JSON.parse(funcResult.message),
-                  );
+                  output = [
+                    NotebookCellOutputItem.json(JSON.parse(funcResult.message)),
+                  ];
                   break;
                 default:
-                  output = NotebookCellOutputItem.stderr(
-                    `Not supported ${funcResult.messageType}`,
-                  );
+                  output = [
+                    NotebookCellOutputItem.stderr(
+                      `Not supported ${funcResult.messageType}`,
+                    ),
+                  ];
               }
 
-              execution.replaceOutput([new NotebookCellOutput([output])]);
+              execution.replaceOutput([new NotebookCellOutput(output)]);
               execution.end(true, Date.now());
             } catch (e) {
               execution.replaceOutput([
