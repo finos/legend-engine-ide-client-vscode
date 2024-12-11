@@ -14,9 +14,38 @@
  * limitations under the License.
  */
 
-import { LegendApplicationConfig } from '@finos/legend-vscode-extension-dependencies';
+import {
+  type ExtensionsConfigurationData,
+  type LegendApplicationConfigurationInput,
+  type PlainObject,
+  LegendApplicationConfig,
+  QueryBuilderConfig,
+} from '@finos/legend-vscode-extension-dependencies';
+
+export interface LegendVSCodeApplicationConfigurationData {
+  appName: string;
+  env: string;
+  extensions?: ExtensionsConfigurationData;
+}
 
 export class LegendVSCodeApplicationConfig extends LegendApplicationConfig {
+  /**
+   * Config specific to query builder
+   */
+  queryBuilderConfig: QueryBuilderConfig | undefined;
+
+  constructor(
+    input: LegendApplicationConfigurationInput<LegendVSCodeApplicationConfigurationData>,
+  ) {
+    super(input);
+
+    // options
+    this.queryBuilderConfig = QueryBuilderConfig.serialization.fromJson(
+      (input.configData.extensions?.core
+        ?.queryBuilderConfig as PlainObject<QueryBuilderConfig>) ?? {},
+    );
+  }
+
   override getDefaultApplicationStorageKey(): string {
     return 'legend-vs-code';
   }

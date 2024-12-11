@@ -39,7 +39,7 @@ import {
   EXECUTE_QUERY_COMMAND_ID,
   GENERATE_EXECUTION_PLAN_COMMAND_ID,
   GET_LAMBDA_RETURN_TYPE_COMMAND_ID,
-  GRAMMAR_TO_JSON_LAMBDA_COMMAND_ID,
+  GRAMMAR_TO_JSON_LAMBDA_BATCH_COMMAND_ID,
   JSON_TO_GRAMMAR_LAMBDA_BATCH_COMMAND_ID,
   CHECK_DATASET_ENTITLEMENTS_COMMAND_ID,
   SURVEY_DATASETS_COMMAND_ID,
@@ -55,6 +55,7 @@ import type { LegendTestExecutionResult } from './model/LegendTestExecutionResul
 import { LegendEntity } from './model/LegendEntity';
 import {
   type EXECUTION_SERIALIZATION_FORMAT,
+  type V1_GrammarParserBatchInputEntry,
   type V1_ParameterValue,
   type V1_RawExecutionContext,
   type V1_RawLambda,
@@ -322,24 +323,16 @@ export class LegendLanguageClient extends LanguageClient {
     );
   }
 
-  async grammarToJson_lambda(
+  async grammarToJson_lambda_batch(
     entityTextLocation: TextLocation,
-    code: string,
-    sourceId?: string | undefined,
-    lineOffset?: number | undefined,
-    columnOffset?: number | undefined,
-    returnSourceInformation?: boolean | undefined,
+    input: Record<string, V1_GrammarParserBatchInputEntry>,
   ): Promise<LegendExecutionResult[]> {
     return commands.executeCommand(
       LEGEND_COMMAND,
       entityTextLocation,
-      GRAMMAR_TO_JSON_LAMBDA_COMMAND_ID,
+      GRAMMAR_TO_JSON_LAMBDA_BATCH_COMMAND_ID,
       {
-        code,
-        sourceId,
-        lineOffset,
-        columnOffset,
-        returnSourceInformation,
+        input: JSON.stringify(input),
       },
     );
   }

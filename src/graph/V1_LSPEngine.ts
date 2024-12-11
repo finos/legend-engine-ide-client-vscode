@@ -28,7 +28,6 @@ import {
   type PureProtocolProcessorPlugin,
   type RawLambda,
   type RawRelationalOperationElement,
-  type RelationTypeMetadata,
   type ServiceExecutionMode,
   type SubtypeInfo,
   type TEMPORARY__EngineSetupConfig,
@@ -62,6 +61,7 @@ import {
   type V1_RawRelationalOperationElement,
   type V1_RawSQLExecuteInput,
   type V1_RelationalConnectionBuilder,
+  type V1_RelationTypeColumn,
   type V1_RunTestsInput,
   type V1_RunTestsResult,
   type V1_ServiceConfigurationInfo,
@@ -81,6 +81,8 @@ import {
   guaranteeNonNullable,
   isLossSafeNumber,
   parseLosslessJSON,
+  RelationTypeColumnMetadata,
+  RelationTypeMetadata,
   returnUndefOnError,
   TEMPORARY__AbstractEngineConfig,
   V1_buildCompilationError,
@@ -97,6 +99,7 @@ import {
   V1_MappingModelCoverageAnalysisInput,
   V1_MappingModelCoverageAnalysisResult,
   V1_ParserError,
+  V1_RelationType,
   V1_RenderStyle,
   V1_serializeExecutionResult,
   V1_serializeRawValueSpecification,
@@ -125,8 +128,8 @@ import {
   GET_LAMBDA_RETURN_TYPE_RESPONSE,
   GET_SUBTYPE_INFO_REQUEST_ID,
   GET_SUBTYPE_INFO_RESPONSE,
-  GRAMMAR_TO_JSON_LAMBDA_COMMAND_ID,
-  GRAMMAR_TO_JSON_LAMBDA_RESPONSE,
+  GRAMMAR_TO_JSON_LAMBDA_BATCH_COMMAND_ID,
+  GRAMMAR_TO_JSON_LAMBDA_BATCH_RESPONSE,
   JSON_TO_GRAMMAR_LAMBDA_BATCH_COMMAND_ID,
   JSON_TO_GRAMMAR_LAMBDA_BATCH_RESPONSE,
   SURVEY_DATASETS_COMMAND_ID,
@@ -140,6 +143,7 @@ import {
   executeInputToLSPInput,
   surveyDatasetsInputToLSPInput,
 } from '../utils/GraphUtils';
+import { type V1_LSPLambdaReturnTypeResult } from '../model/engine/LambdaReturnTypeResult';
 
 class V1_LSPEngine_Config extends TEMPORARY__AbstractEngineConfig {}
 
@@ -245,14 +249,50 @@ export class V1_LSPEngine implements V1_GraphManagerEngine {
 
   async transformCodeToValueSpeces(
     input: Record<string, V1_GrammarParserBatchInputEntry>,
-  ): Promise<Map<string, PlainObject>> {
-    throw new Error('transformCodeToValueSpeces not implemented');
+    throwOnFirstError?: boolean,
+  ): Promise<Map<string, PlainObject<V1_ValueSpecification>>> {
+    // Convert value spec strings to lambdas by prepending | since LSP only supports
+    // lambda conversion.
+    const mappedInput = Object.keys(input).reduce(
+      (acc, key) => {
+        acc[key] = {
+          ...input[key],
+          value: `|${input[key]?.value}`,
+        };
+        return acc;
+      },
+      {} as Record<string, V1_GrammarParserBatchInputEntry>,
+    );
+    const resultLambdas: Map<
+      string,
+      PlainObject<V1_RawLambda>
+    > = await this.transformCodeToLambdas(mappedInput, throwOnFirstError);
+    // Grab the first element of the returned lambdas' bodies, which represent
+    // the value specs.
+    const mappedResult = new Map<string, PlainObject<V1_ValueSpecification>>();
+    resultLambdas.forEach((value, key) => {
+      const lambdaValueSpec = (
+        value?.body as object[]
+      )?.[0] as PlainObject<V1_ValueSpecification>;
+      if (lambdaValueSpec) {
+        mappedResult.set(key, lambdaValueSpec);
+      }
+    });
+    return mappedResult;
   }
 
   async transformCodeToValueSpec(
     input: string,
+    returnSourceInformation?: boolean,
   ): Promise<PlainObject<V1_ValueSpecification>> {
-    throw new Error('transformCodeToValueSpec not implemented');
+    const batchInput: Record<string, V1_GrammarParserBatchInputEntry> = {
+      valueSpec: {
+        value: input,
+        returnSourceInformation,
+      },
+    };
+    const result = await this.transformCodeToValueSpeces(batchInput, true);
+    return guaranteeNonNullable(result.get('valueSpec'));
   }
 
   async transformLambdaToCode(
@@ -270,6 +310,44 @@ export class V1_LSPEngine implements V1_GraphManagerEngine {
     throw new Error('prettyLambdaContent not implemented');
   }
 
+  async transformCodeToLambdas(
+    input: Record<string, V1_GrammarParserBatchInputEntry>,
+    throwOnFirstError?: boolean,
+  ): Promise<Map<string, PlainObject<V1_RawLambda>>> {
+    const response = await postAndWaitForMessage<LegendExecutionResult[]>(
+      {
+        command: GRAMMAR_TO_JSON_LAMBDA_BATCH_COMMAND_ID,
+        msg: {
+          input,
+        },
+      },
+      GRAMMAR_TO_JSON_LAMBDA_BATCH_RESPONSE,
+    );
+    if (throwOnFirstError) {
+      const firstError = response?.find(
+        (r) => r.type === LegendExecutionResultType.ERROR,
+      );
+      if (firstError) {
+        const sourceInformation = firstError.location
+          ? textLocationToSourceInformation(firstError.location)
+          : undefined;
+        throw V1_buildParserError(
+          V1_ParserError.serialization.fromJson({
+            message: firstError.message,
+            sourceInformation,
+          }),
+        );
+      }
+    }
+    return deserializeMap(
+      JSON.parse(guaranteeNonNullable(response?.[0]?.message)) as Record<
+        string,
+        PlainObject<V1_RawLambda>
+      >,
+      (v) => v,
+    );
+  }
+
   async transformCodeToLambda(
     code: string,
     lambdaId?: string,
@@ -277,29 +355,19 @@ export class V1_LSPEngine implements V1_GraphManagerEngine {
       pruneSourceInformation?: boolean;
     },
   ): Promise<V1_RawLambda> {
-    const response = await postAndWaitForMessage<LegendExecutionResult[]>(
-      {
-        command: GRAMMAR_TO_JSON_LAMBDA_COMMAND_ID,
-        msg: {
-          code,
-          lambdaId: lambdaId ?? '',
-          options,
+    const batchInput: Record<string, V1_GrammarParserBatchInputEntry> = {
+      lambda: {
+        value: code,
+        sourceInformationOffset: {
+          sourceId: lambdaId,
         },
+        returnSourceInformation: !options?.pruneSourceInformation,
       },
-      GRAMMAR_TO_JSON_LAMBDA_RESPONSE,
-    );
-    if (response?.[0]?.type === LegendExecutionResultType.ERROR) {
-      const sourceInformation = response[0].location
-        ? textLocationToSourceInformation(response[0].location)
-        : undefined;
-      throw V1_buildParserError(
-        V1_ParserError.serialization.fromJson({
-          message: response[0].message,
-          sourceInformation,
-        }),
-      );
-    }
-    return JSON.parse(guaranteeNonNullable(response?.[0]?.message));
+    };
+    const result = await this.transformCodeToLambdas(batchInput, true);
+    return guaranteeNonNullable(
+      result.get('lambda'),
+    ) as unknown as V1_RawLambda;
   }
 
   async transformRelationalOperationElementsToPureCode(
@@ -377,7 +445,40 @@ export class V1_LSPEngine implements V1_GraphManagerEngine {
   async getLambdaRelationTypeFromRawInput(
     rawInput: V1_LambdaReturnTypeInput,
   ): Promise<RelationTypeMetadata> {
-    throw new Error('getLambdaRelationTypeFromRawInput not implemented');
+    const response = await postAndWaitForMessage<LegendExecutionResult[]>(
+      {
+        command: GET_LAMBDA_RETURN_TYPE_COMMAND_ID,
+        msg: V1_LambdaReturnTypeInput.serialization.toJson(rawInput),
+      },
+      GET_LAMBDA_RETURN_TYPE_RESPONSE,
+    );
+    if (response?.[0]?.type === LegendExecutionResultType.ERROR) {
+      const sourceInformation = response[0].location
+        ? textLocationToSourceInformation(response[0].location)
+        : undefined;
+      throw V1_buildCompilationError(
+        V1_CompilationError.serialization.fromJson({
+          message: response[0].message,
+          sourceInformation,
+        }),
+      );
+    }
+    const v1_relationType = V1_RelationType.serialization.fromJson(
+      guaranteeNonNullable(
+        (
+          JSON.parse(
+            guaranteeNonNullable(response?.[0]?.message),
+          ) as V1_LSPLambdaReturnTypeResult
+        ).relationType,
+        'Lambda return type response does not contain relationType',
+      ),
+    );
+    const result = new RelationTypeMetadata();
+    result.columns = v1_relationType.columns.map(
+      (e: V1_RelationTypeColumn) =>
+        new RelationTypeColumnMetadata(e.type, e.name),
+    );
+    return result;
   }
 
   async getCodeCompletion(
