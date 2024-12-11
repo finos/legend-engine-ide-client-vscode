@@ -14,17 +14,11 @@
  * limitations under the License.
  */
 
-import type { ActivationFunction } from 'vscode-notebook-renderer';
 import { createRoot } from 'react-dom/client';
-
-// const rootElement = document.getElementById('root');
-
-// createRoot(rootElement as HTMLElement).render(
-//   <p>Hello, World!</p>,
-// );
+import type { ActivationFunction } from 'vscode-notebook-renderer';
 
 export const activate: ActivationFunction = (context) => ({
   renderOutputItem(data, element) {
-    element.innerText = 'Hello, World!';
+    createRoot(element as HTMLElement).render(<h1>Hello, world!</h1>);
   },
 });
