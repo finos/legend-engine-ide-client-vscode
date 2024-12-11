@@ -21,7 +21,8 @@ const webpack = require('webpack');
 const webviewConfig = {
   entry: {
     AgGridRenderer: './src/components/grid/AgGridRenderer.tsx',
-    FunctionResultsEditorRenderer: './src/components/function/FunctionResultsEditorRenderer.tsx',
+    FunctionResultsEditorRenderer:
+      './src/components/function/FunctionResultsEditorRenderer.tsx',
     WebViewRoot: './src/components/WebViewRoot.tsx',
   },
   externals: {
@@ -30,7 +31,7 @@ const webviewConfig = {
   output: {
     filename: '[name].js',
     path: path.resolve(__dirname, 'dist'),
-    assetModuleFilename: 'assets/[hash][ext][query]'
+    assetModuleFilename: 'assets/[hash][ext][query]',
   },
   devtool: 'nosources-source-map',
   module: {
@@ -53,12 +54,12 @@ const webviewConfig = {
       {
         test: /\.(woff|woff2|eot|ttf|otf)$/i,
         type: 'asset',
-      }
+      },
     ],
   },
   plugins: [
     new webpack.ProvidePlugin({
-           process: 'process/browser',
+      process: 'process/browser',
     }),
     new webpack.DefinePlugin({
       AG_GRID_LICENSE: null,
@@ -67,14 +68,14 @@ const webviewConfig = {
   resolve: {
     extensions: ['.tsx', '.ts', '.js', '.css', '.scss'],
     fallback: {
-      stream: require.resolve("stream-browserify"),
-      crypto: require.resolve("crypto-browserify"),
-      vm: require.resolve("vm-browserify")
+      stream: require.resolve('stream-browserify'),
+      crypto: require.resolve('crypto-browserify'),
+      vm: require.resolve('vm-browserify'),
     },
     alias: {
       react: path.resolve('./node_modules/react'),
-      process: "process/browser"
-    }
+      process: 'process/browser',
+    },
   },
 };
 
@@ -85,10 +86,15 @@ const purebookRendererConfig = {
   externals: {
     vscode: 'commonjs vscode',
   },
+  target: 'web',
   output: {
     filename: '[name].js',
     path: path.resolve(__dirname, 'dist'),
-    assetModuleFilename: 'assets/[hash][ext][query]'
+    libraryTarget: 'module',
+    assetModuleFilename: 'assets/[hash][ext][query]',
+  },
+  experiments: {
+    outputModule: true,
   },
   devtool: 'nosources-source-map',
   module: {
@@ -111,12 +117,12 @@ const purebookRendererConfig = {
       {
         test: /\.(woff|woff2|eot|ttf|otf)$/i,
         type: 'asset',
-      }
+      },
     ],
   },
   plugins: [
     new webpack.ProvidePlugin({
-           process: 'process/browser',
+      process: 'process/browser',
     }),
     new webpack.DefinePlugin({
       AG_GRID_LICENSE: null,
@@ -125,14 +131,14 @@ const purebookRendererConfig = {
   resolve: {
     extensions: ['.tsx', '.ts', '.js', '.css', '.scss'],
     fallback: {
-      stream: require.resolve("stream-browserify"),
-      crypto: require.resolve("crypto-browserify"),
-      vm: require.resolve("vm-browserify")
+      stream: require.resolve('stream-browserify'),
+      crypto: require.resolve('crypto-browserify'),
+      vm: require.resolve('vm-browserify'),
     },
     alias: {
       react: path.resolve('./node_modules/react'),
-      process: "process/browser"
-    }
+      process: 'process/browser',
+    },
   },
 };
 
@@ -143,12 +149,12 @@ const extensionConfig = {
     path: path.resolve(__dirname, 'dist'),
     filename: 'extension.js',
     libraryTarget: 'commonjs2',
-    devtoolModuleFilenameTemplate: '../[resource-path]'
+    devtoolModuleFilenameTemplate: '../[resource-path]',
   },
   devtool: 'nosources-source-map',
   externals: {
     vscode: 'commonjs vscode',
-    'vscode-languageclient/node': 'vscode-languageclient/node'
+    'vscode-languageclient/node': 'vscode-languageclient/node',
   },
   resolve: {
     mainFields: ['browser', 'module', 'main'],
@@ -159,8 +165,8 @@ const extensionConfig = {
       assert: require.resolve('assert'),
     },
     alias: {
-      react: path.resolve('./node_modules/react')
-    }
+      react: path.resolve('./node_modules/react'),
+    },
   },
   module: {
     rules: [
@@ -169,9 +175,9 @@ const extensionConfig = {
         exclude: /node_modules/,
         use: [
           {
-            loader: 'ts-loader'
-          }
-        ]
+            loader: 'ts-loader',
+          },
+        ],
       },
       {
         test: /\.s?(a|c)ss$/,
@@ -183,9 +189,8 @@ const extensionConfig = {
           },
         ],
       },
-    ]
-  }
+    ],
+  },
 };
 
-
-module.exports = [webviewConfig, purebookRendererConfig, extensionConfig]
+module.exports = [webviewConfig, purebookRendererConfig, extensionConfig];
