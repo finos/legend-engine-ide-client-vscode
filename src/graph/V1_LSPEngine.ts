@@ -269,8 +269,13 @@ export class V1_LSPEngine implements V1_GraphManagerEngine {
     // Grab the first element of the returned lambdas' bodies, which represent
     // the value specs.
     const mappedResult = new Map<string, PlainObject<V1_ValueSpecification>>();
-    Object.entries(resultLambdas).forEach(([key, value]) => {
-      mappedResult.set(key, value?.body?.[0]);
+    resultLambdas.forEach((value, key) => {
+      const lambdaValueSpec = (
+        value?.body as object[]
+      )?.[0] as PlainObject<V1_ValueSpecification>;
+      if (lambdaValueSpec) {
+        mappedResult.set(key, lambdaValueSpec);
+      }
     });
     return mappedResult;
   }
