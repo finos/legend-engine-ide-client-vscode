@@ -35,6 +35,7 @@ import {
   GET_QUERY_TYPEAHEAD_COMMAND_ID,
   GET_SUBTYPE_INFO_REQUEST_ID,
   GRAMMAR_TO_JSON_LAMBDA_BATCH_COMMAND_ID,
+  GRAMMAR_TO_JSON_VALUE_SPECIFICATION_BATCH_ID,
   JSON_TO_GRAMMAR_LAMBDA_BATCH_COMMAND_ID,
   LEGEND_COMMAND,
   LEGEND_WRITE_ENTITY_REQUEST_ID,
@@ -55,7 +56,6 @@ import type { ExecuteTestRequest } from './model/ExecuteTestRequest';
 import type { LegendTestExecutionResult } from './model/LegendTestExecutionResult';
 import { LegendEntity } from './model/LegendEntity';
 import {
-  V1_GrammarParserBatchInputEntry,
   type EXECUTION_SERIALIZATION_FORMAT,
   type V1_GrammarParserBatchInputEntry,
   type V1_Lambda,
