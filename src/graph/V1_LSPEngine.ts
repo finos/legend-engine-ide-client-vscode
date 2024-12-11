@@ -124,8 +124,6 @@ import {
   GET_CLASSIFIER_PATH_MAP_RESPONSE,
   GET_CURRENT_USER_ID_REQUEST_ID,
   GET_CURRENT_USER_ID_RESPONSE,
-  GET_LAMBDA_RELATION_TYPE_COMMAND_ID,
-  GET_LAMBDA_RELATION_TYPE_RESPONSE,
   GET_LAMBDA_RETURN_TYPE_COMMAND_ID,
   GET_LAMBDA_RETURN_TYPE_RESPONSE,
   GET_SUBTYPE_INFO_REQUEST_ID,
@@ -147,6 +145,7 @@ import {
   executeInputToLSPInput,
   surveyDatasetsInputToLSPInput,
 } from '../utils/GraphUtils';
+import { type V1_LSPLambdaReturnTypeResult } from '../model/engine/LambdaReturnTypeResult';
 
 class V1_LSPEngine_Config extends TEMPORARY__AbstractEngineConfig {}
 
@@ -410,10 +409,10 @@ export class V1_LSPEngine implements V1_GraphManagerEngine {
   ): Promise<RelationTypeMetadata> {
     const response = await postAndWaitForMessage<LegendExecutionResult[]>(
       {
-        command: GET_LAMBDA_RELATION_TYPE_COMMAND_ID,
+        command: GET_LAMBDA_RETURN_TYPE_COMMAND_ID,
         msg: V1_LambdaReturnTypeInput.serialization.toJson(rawInput),
       },
-      GET_LAMBDA_RELATION_TYPE_RESPONSE,
+      GET_LAMBDA_RETURN_TYPE_RESPONSE,
     );
     if (response?.[0]?.type === LegendExecutionResultType.ERROR) {
       const sourceInformation = response[0].location
@@ -427,7 +426,14 @@ export class V1_LSPEngine implements V1_GraphManagerEngine {
       );
     }
     const v1_relationType = V1_RelationType.serialization.fromJson(
-      JSON.parse(guaranteeNonNullable(response?.[0]?.message)),
+      guaranteeNonNullable(
+        (
+          JSON.parse(
+            guaranteeNonNullable(response?.[0]?.message),
+          ) as V1_LSPLambdaReturnTypeResult
+        ).relationType,
+        'Lambda return type response does not contain relationType',
+      ),
     );
     const result = new RelationTypeMetadata();
     result.columns = v1_relationType.columns.map(

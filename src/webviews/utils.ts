@@ -41,8 +41,6 @@ import {
   GET_CLASSIFIER_PATH_MAP_RESPONSE,
   GET_CURRENT_USER_ID_REQUEST_ID,
   GET_CURRENT_USER_ID_RESPONSE,
-  GET_LAMBDA_RELATION_TYPE_COMMAND_ID,
-  GET_LAMBDA_RELATION_TYPE_RESPONSE,
   GET_LAMBDA_RETURN_TYPE_COMMAND_ID,
   GET_LAMBDA_RETURN_TYPE_RESPONSE,
   GET_PROJECT_ENTITIES,
@@ -332,18 +330,6 @@ export const handleV1LSPEngineMessage = async (
       );
       webview.postMessage({
         command: GET_LAMBDA_RETURN_TYPE_RESPONSE,
-        result,
-      });
-      return true;
-    }
-    case GET_LAMBDA_RELATION_TYPE_COMMAND_ID: {
-      const { lambda } = message.msg;
-      const result = await client.getLambdaRelationType(
-        entityTextLocation,
-        lambda,
-      );
-      webview.postMessage({
-        command: GET_LAMBDA_RELATION_TYPE_RESPONSE,
         result,
       });
       return true;
