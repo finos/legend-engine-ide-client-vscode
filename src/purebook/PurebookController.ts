@@ -23,10 +23,11 @@ import {
   type NotebookController,
   notebooks,
 } from 'vscode';
-import { LEGEND_COMMAND, LEGEND_LANGUAGE_ID } from '../utils/Const';
+import { LEGEND_COMMAND_V2, LEGEND_LANGUAGE_ID } from '../utils/Const';
 import { LegendExecutionResult } from '../results/LegendExecutionResult';
 import { type PlainObject } from '../utils/SerializationUtils';
 import { LegendExecutionResultType } from '../results/LegendExecutionResultType';
+import { withCancellationSupport } from '../utils/cancellationSupport';
 
 export class PurebookController {
   readonly controllerId = 'legend-book-controller-id';
@@ -63,7 +64,7 @@ export class PurebookController {
       Promise.resolve(),
     );
 
-  executeCell = (
+  executeCell = async (
     cell: NotebookCell,
     controller: NotebookController,
   ): Promise<void> => {
