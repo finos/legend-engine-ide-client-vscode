@@ -43,7 +43,6 @@ import {
   JSON_TO_GRAMMAR_LAMBDA_BATCH_COMMAND_ID,
   CHECK_DATASET_ENTITLEMENTS_COMMAND_ID,
   SURVEY_DATASETS_COMMAND_ID,
-  GRAMMAR_TO_JSON_VALUE_SPECIFICATION_BATCH_ID,
 } from './utils/Const';
 import type { PlainObject } from './utils/SerializationUtils';
 import {
@@ -330,20 +329,6 @@ export class LegendLanguageClient extends LanguageClient {
       LEGEND_COMMAND,
       entityTextLocation,
       GRAMMAR_TO_JSON_LAMBDA_BATCH_COMMAND_ID,
-      {
-        input: JSON.stringify(input),
-      },
-    );
-  }
-
-  async grammarToJson_valueSpecification_batch(
-    entityTextLocation: TextLocation,
-    input: Record<string, V1_GrammarParserBatchInputEntry>,
-  ): Promise<string> {
-    return commands.executeCommand(
-      LEGEND_COMMAND,
-      entityTextLocation,
-      GRAMMAR_TO_JSON_VALUE_SPECIFICATION_BATCH_ID,
       {
         input: JSON.stringify(input),
       },

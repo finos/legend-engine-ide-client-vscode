@@ -49,8 +49,6 @@ import {
   GET_SUBTYPE_INFO_RESPONSE,
   GRAMMAR_TO_JSON_LAMBDA_BATCH_COMMAND_ID,
   GRAMMAR_TO_JSON_LAMBDA_BATCH_RESPONSE,
-  GRAMMAR_TO_JSON_VALUE_SPECIFICATION_BATCH_ID,
-  GRAMMAR_TO_JSON_VALUE_SPECIFICATION_BATCH_RESPONSE,
   JSON_TO_GRAMMAR_LAMBDA_BATCH_COMMAND_ID,
   JSON_TO_GRAMMAR_LAMBDA_BATCH_RESPONSE,
   QUERY_BUILDER_CONFIG_ERROR,
@@ -287,18 +285,6 @@ export const handleV1LSPEngineMessage = async (
       );
       webview.postMessage({
         command: GRAMMAR_TO_JSON_LAMBDA_BATCH_RESPONSE,
-        result,
-      });
-      return true;
-    }
-    case GRAMMAR_TO_JSON_VALUE_SPECIFICATION_BATCH_ID: {
-      const { input } = message.msg;
-      const result = await client.grammarToJson_valueSpecification_batch(
-        entityTextLocation,
-        input,
-      );
-      webview.postMessage({
-        command: GRAMMAR_TO_JSON_VALUE_SPECIFICATION_BATCH_RESPONSE,
         result,
       });
       return true;
