@@ -249,6 +249,7 @@ export class V1_LSPEngine implements V1_GraphManagerEngine {
 
   async transformCodeToValueSpeces(
     input: Record<string, V1_GrammarParserBatchInputEntry>,
+    throwOnFirstError?: boolean,
   ): Promise<Map<string, PlainObject<V1_ValueSpecification>>> {
     // Convert value spec strings to lambdas by prepending | since LSP only supports
     // lambda conversion.
@@ -265,7 +266,7 @@ export class V1_LSPEngine implements V1_GraphManagerEngine {
     const resultLambdas: Map<
       string,
       PlainObject<V1_RawLambda>
-    > = await this.transformCodeToLambdas(mappedInput);
+    > = await this.transformCodeToLambdas(mappedInput, throwOnFirstError);
     // Grab the first element of the returned lambdas' bodies, which represent
     // the value specs.
     const mappedResult = new Map<string, PlainObject<V1_ValueSpecification>>();
@@ -290,7 +291,7 @@ export class V1_LSPEngine implements V1_GraphManagerEngine {
         returnSourceInformation,
       },
     };
-    const result = await this.transformCodeToValueSpeces(batchInput);
+    const result = await this.transformCodeToValueSpeces(batchInput, true);
     return guaranteeNonNullable(result.get('valueSpec'));
   }
 
