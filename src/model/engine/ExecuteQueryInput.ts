@@ -29,8 +29,6 @@ import {
   createModelSchema,
   custom,
   map,
-  optional,
-  primitive,
   raw,
   SKIP,
 } from 'serializr';
@@ -46,9 +44,12 @@ export class V1_LSPExecuteInput {
   static readonly serialization = new SerializationFactory(
     createModelSchema(V1_LSPExecuteInput, {
       lambda: usingModelSchema(V1_rawLambdaModelSchema),
-      mapping: optional(primitive()),
+      mapping: custom(
+        (val) => (val ? val : undefined),
+        () => SKIP,
+      ),
       runtime: custom(
-        (val) => (val ? V1_serializeRuntime(val) : SKIP),
+        (val) => (val ? V1_serializeRuntime(val) : undefined),
         () => SKIP,
       ),
       context: usingModelSchema(V1_rawBaseExecutionContextModelSchema),
