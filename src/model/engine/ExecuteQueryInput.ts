@@ -25,13 +25,7 @@ import {
   V1_rawBaseExecutionContextModelSchema,
   type EXECUTION_SERIALIZATION_FORMAT,
 } from '@finos/legend-vscode-extension-dependencies';
-import {
-  createModelSchema,
-  custom,
-  map,
-  raw,
-  SKIP,
-} from 'serializr';
+import { createModelSchema, custom, map, raw, SKIP } from 'serializr';
 
 export class V1_LSPExecuteInput {
   lambda!: V1_RawLambda;
