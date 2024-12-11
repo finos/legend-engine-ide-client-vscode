@@ -47,8 +47,8 @@ import {
   GET_PROJECT_ENTITIES_RESPONSE,
   GET_SUBTYPE_INFO_REQUEST_ID,
   GET_SUBTYPE_INFO_RESPONSE,
-  GRAMMAR_TO_JSON_LAMBDA_COMMAND_ID,
-  GRAMMAR_TO_JSON_LAMBDA_RESPONSE,
+  GRAMMAR_TO_JSON_LAMBDA_BATCH_COMMAND_ID,
+  GRAMMAR_TO_JSON_LAMBDA_BATCH_RESPONSE,
   GRAMMAR_TO_JSON_VALUE_SPECIFICATION_BATCH_ID,
   GRAMMAR_TO_JSON_VALUE_SPECIFICATION_BATCH_RESPONSE,
   JSON_TO_GRAMMAR_LAMBDA_BATCH_COMMAND_ID,
@@ -279,20 +279,14 @@ export const handleV1LSPEngineMessage = async (
       });
       return true;
     }
-    case GRAMMAR_TO_JSON_LAMBDA_COMMAND_ID: {
-      const { code, lambdaId, options } = message.msg;
-      const result = await client.grammarToJson_lambda(
+    case GRAMMAR_TO_JSON_LAMBDA_BATCH_COMMAND_ID: {
+      const { input } = message.msg;
+      const result = await client.grammarToJson_lambda_batch(
         entityTextLocation,
-        code,
-        lambdaId,
-        undefined,
-        undefined,
-        options?.pruneSourceInformation !== undefined
-          ? !options.pruneSourceInformation
-          : true,
+        input,
       );
       webview.postMessage({
-        command: GRAMMAR_TO_JSON_LAMBDA_RESPONSE,
+        command: GRAMMAR_TO_JSON_LAMBDA_BATCH_RESPONSE,
         result,
       });
       return true;

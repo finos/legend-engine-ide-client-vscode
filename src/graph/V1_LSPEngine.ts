@@ -128,10 +128,8 @@ import {
   GET_LAMBDA_RETURN_TYPE_RESPONSE,
   GET_SUBTYPE_INFO_REQUEST_ID,
   GET_SUBTYPE_INFO_RESPONSE,
-  GRAMMAR_TO_JSON_LAMBDA_COMMAND_ID,
-  GRAMMAR_TO_JSON_LAMBDA_RESPONSE,
-  GRAMMAR_TO_JSON_VALUE_SPECIFICATION_BATCH_ID,
-  GRAMMAR_TO_JSON_VALUE_SPECIFICATION_BATCH_RESPONSE,
+  GRAMMAR_TO_JSON_LAMBDA_BATCH_COMMAND_ID,
+  GRAMMAR_TO_JSON_LAMBDA_BATCH_RESPONSE,
   JSON_TO_GRAMMAR_LAMBDA_BATCH_COMMAND_ID,
   JSON_TO_GRAMMAR_LAMBDA_BATCH_RESPONSE,
   SURVEY_DATASETS_COMMAND_ID,
@@ -252,23 +250,29 @@ export class V1_LSPEngine implements V1_GraphManagerEngine {
   async transformCodeToValueSpeces(
     input: Record<string, V1_GrammarParserBatchInputEntry>,
   ): Promise<Map<string, PlainObject<V1_ValueSpecification>>> {
-    const response = await postAndWaitForMessage<LegendExecutionResult[]>(
-      {
-        command: GRAMMAR_TO_JSON_VALUE_SPECIFICATION_BATCH_ID,
-        msg: {
-          input,
-        },
+    // Convert value spec strings to lambdas by prepending | since LSP only supports
+    // lambda conversion.
+    const mappedInput = Object.keys(input).reduce(
+      (acc, key) => {
+        acc[key] = {
+          ...input[key],
+          value: `|${input[key]?.value}`,
+        };
+        return acc;
       },
-      GRAMMAR_TO_JSON_VALUE_SPECIFICATION_BATCH_RESPONSE,
+      {} as Record<string, V1_GrammarParserBatchInputEntry>,
     );
-    const result = deserializeMap(
-      JSON.parse(guaranteeNonNullable(response?.[0]?.message)) as Record<
-        string,
-        PlainObject<V1_ValueSpecification>
-      >,
-      (v) => v,
-    );
-    return result;
+    const resultLambdas: Map<
+      string,
+      PlainObject<V1_RawLambda>
+    > = await this.transformCodeToLambdas(mappedInput);
+    // Grab the first element of the returned lambdas' bodies, which represent
+    // the value specs.
+    const mappedResult = new Map<string, PlainObject<V1_ValueSpecification>>();
+    Object.entries(resultLambdas).forEach(([key, value]) => {
+      mappedResult.set(key, value?.body?.[0]);
+    });
+    return mappedResult;
   }
 
   async transformCodeToValueSpec(
@@ -300,6 +304,44 @@ export class V1_LSPEngine implements V1_GraphManagerEngine {
     throw new Error('prettyLambdaContent not implemented');
   }
 
+  async transformCodeToLambdas(
+    input: Record<string, V1_GrammarParserBatchInputEntry>,
+    throwOnFirstError?: boolean,
+  ): Promise<Map<string, PlainObject<V1_RawLambda>>> {
+    const response = await postAndWaitForMessage<LegendExecutionResult[]>(
+      {
+        command: GRAMMAR_TO_JSON_LAMBDA_BATCH_COMMAND_ID,
+        msg: {
+          input,
+        },
+      },
+      GRAMMAR_TO_JSON_LAMBDA_BATCH_RESPONSE,
+    );
+    if (throwOnFirstError) {
+      const firstError = response?.find(
+        (r) => r.type === LegendExecutionResultType.ERROR,
+      );
+      if (firstError) {
+        const sourceInformation = firstError.location
+          ? textLocationToSourceInformation(firstError.location)
+          : undefined;
+        throw V1_buildParserError(
+          V1_ParserError.serialization.fromJson({
+            message: firstError.message,
+            sourceInformation,
+          }),
+        );
+      }
+    }
+    return deserializeMap(
+      JSON.parse(guaranteeNonNullable(response?.[0]?.message)) as Record<
+        string,
+        PlainObject<V1_RawLambda>
+      >,
+      (v) => v,
+    );
+  }
+
   async transformCodeToLambda(
     code: string,
     lambdaId?: string,
@@ -307,29 +349,19 @@ export class V1_LSPEngine implements V1_GraphManagerEngine {
       pruneSourceInformation?: boolean;
     },
   ): Promise<V1_RawLambda> {
-    const response = await postAndWaitForMessage<LegendExecutionResult[]>(
-      {
-        command: GRAMMAR_TO_JSON_LAMBDA_COMMAND_ID,
-        msg: {
-          code,
-          lambdaId: lambdaId ?? '',
-          options,
+    const batchInput: Record<string, V1_GrammarParserBatchInputEntry> = {
+      lambda: {
+        value: code,
+        sourceInformationOffset: {
+          sourceId: lambdaId,
         },
+        returnSourceInformation: !options?.pruneSourceInformation,
       },
-      GRAMMAR_TO_JSON_LAMBDA_RESPONSE,
-    );
-    if (response?.[0]?.type === LegendExecutionResultType.ERROR) {
-      const sourceInformation = response[0].location
-        ? textLocationToSourceInformation(response[0].location)
-        : undefined;
-      throw V1_buildParserError(
-        V1_ParserError.serialization.fromJson({
-          message: response[0].message,
-          sourceInformation,
-        }),
-      );
-    }
-    return JSON.parse(guaranteeNonNullable(response?.[0]?.message));
+    };
+    const result = await this.transformCodeToLambdas(batchInput, true);
+    return guaranteeNonNullable(
+      result.get('lambda'),
+    ) as unknown as V1_RawLambda;
   }
 
   async transformRelationalOperationElementsToPureCode(
