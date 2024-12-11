@@ -7,7 +7,9 @@
     "Linters",
     "Other"
   ],
-  "keywords": [],
+  "keywords": [
+    "notebookRenderer"
+  ],
   "icon": "icons/legend_full.png",
   "homepage": "https://legend.finos.org/",
   "publisher": "FINOS",
@@ -326,10 +328,10 @@
       {
         "id": "legend-cube-renderer",
         "displayName": "Legend Cube Renderer",
+        "entrypoint": "./dist/PureBookRendererRoot.js",
         "mimeTypes": [
           "application/legend-relational-result"
-        ],
-        "entrypoint": "dist/PureBookRendererRoot.js"
+        ]
       }
     ]
   },
