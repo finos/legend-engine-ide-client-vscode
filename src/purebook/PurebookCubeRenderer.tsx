@@ -14,11 +14,20 @@
  * limitations under the License.
  */
 
-import { createRoot } from 'react-dom/client';
-import type { ActivationFunction } from 'vscode-notebook-renderer';
+import {
+  DataCube,
+  PlainObject,
+  V1_RawLambda,
+} from '@finos/legend-vscode-extension-dependencies';
+import { LSPDataCubeEngine } from './LSPDataCubeEngine';
+import { VSCodeEvent } from 'vscode-notebook-renderer/events';
 
-export const activate: ActivationFunction = (context) => ({
-  renderOutputItem(data, element) {
-    createRoot(element as HTMLElement).render(<h1>Hello, world!</h1>);
-  },
-});
+export const PurebookCubeRenderer = (props: {
+  lambda: PlainObject<V1_RawLambda>;
+  postMessage: (message: unknown) => void;
+  onDidReceiveMessage: VSCodeEvent<any>;
+}): React.ReactNode => {
+  const { lambda, postMessage, onDidReceiveMessage } = props;
+  const engine = new LSPDataCubeEngine(lambda, postMessage, onDidReceiveMessage);
+  return <DataCube engine={engine} />;
+};

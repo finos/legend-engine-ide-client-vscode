@@ -328,10 +328,11 @@
       {
         "id": "legend-cube-renderer",
         "displayName": "Legend Cube Renderer",
-        "entrypoint": "./dist/PureBookRendererRoot.js",
+        "entrypoint": "./dist/PurebookRendererRoot.js",
         "mimeTypes": [
           "application/legend-relational-result"
-        ]
+        ],
+        "requiresMessaging": "always"
       }
     ]
   },

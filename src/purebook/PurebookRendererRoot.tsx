@@ -16,7 +16,7 @@
 
 import { createRoot } from 'react-dom/client';
 import type { ActivationFunction, OutputItem } from 'vscode-notebook-renderer';
-// import { PurebookCubeRenderer } from './PurebookCubeRenderer';
+import { PurebookCubeRenderer } from './PurebookCubeRenderer';
 
 export const activate: ActivationFunction = (context) => ({
   renderOutputItem(data, element) {
@@ -30,15 +30,12 @@ export const activate: ActivationFunction = (context) => ({
         'vscode extension context onDidReceiveMessage is required to render Purebook cube',
       );
     }
-    console.log('context:', context);
-    console.log('data:', data);
-    console.log('element:', element);
-    // createRoot(element).render(
-    //   <PurebookCubeRenderer
-    //     lambda={data.json()}
-    //     postMessage={context.postMessage}
-    //     onDidReceiveMessage={context.onDidReceiveMessage}
-    //   />,
-    // );
+    createRoot(element).render(
+      <PurebookCubeRenderer
+        lambda={data.json()}
+        postMessage={context.postMessage}
+        onDidReceiveMessage={context.onDidReceiveMessage}
+      />,
+    );
   },
 });

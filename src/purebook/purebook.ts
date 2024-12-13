@@ -26,6 +26,7 @@ import {
   window,
   WorkspaceEdit,
   Uri,
+  notebooks,
 } from 'vscode';
 import { LEGEND_LANGUAGE_ID } from '../utils/Const';
 import { PurebookController } from './PurebookController';
@@ -96,6 +97,16 @@ export function enableLegendBook(context: ExtensionContext): void {
   context.subscriptions.push(
     commands.registerCommand('legend.createNotebook', createNotebook),
   );
+
+  const messageChannel = notebooks.createRendererMessaging(
+    'legend-cube-renderer'
+  );
+  messageChannel.onDidReceiveMessage((e) => {
+    messageChannel.postMessage({
+      command: 'testCommandResponse',
+      data: 'test data response',
+    });
+  });
 }
 
 async function createNotebook(): Promise<void> {
