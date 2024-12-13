@@ -81,7 +81,7 @@ const webviewConfig = {
 
 const purebookRendererConfig = {
   entry: {
-    PureBookRendererRoot: './src/purebook/PurebookCubeRenderer.tsx',
+    PureBookRendererRoot: './src/purebook/PurebookRendererRoot.tsx',
   },
   externals: {
     vscode: 'commonjs vscode',
