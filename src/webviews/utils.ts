@@ -47,8 +47,8 @@ import {
   GET_PROJECT_ENTITIES_RESPONSE,
   GET_SUBTYPE_INFO_REQUEST_ID,
   GET_SUBTYPE_INFO_RESPONSE,
-  GRAMMAR_TO_JSON_LAMBDA_COMMAND_ID,
-  GRAMMAR_TO_JSON_LAMBDA_RESPONSE,
+  GRAMMAR_TO_JSON_LAMBDA_BATCH_COMMAND_ID,
+  GRAMMAR_TO_JSON_LAMBDA_BATCH_RESPONSE,
   JSON_TO_GRAMMAR_LAMBDA_BATCH_COMMAND_ID,
   JSON_TO_GRAMMAR_LAMBDA_BATCH_RESPONSE,
   QUERY_BUILDER_CONFIG_ERROR,
@@ -277,7 +277,7 @@ export const handleV1LSPEngineMessage = async (
       });
       return true;
     }
-    case GRAMMAR_TO_JSON_LAMBDA_COMMAND_ID: {
+    case GRAMMAR_TO_JSON_LAMBDA_BATCH_COMMAND_ID: {
       const { code, lambdaId, options } = message.msg;
       const result = await client.grammarToJson_lambda(
         entityTextLocation,
@@ -290,7 +290,7 @@ export const handleV1LSPEngineMessage = async (
           : true,
       );
       webview.postMessage({
-        command: GRAMMAR_TO_JSON_LAMBDA_RESPONSE,
+        command: GRAMMAR_TO_JSON_LAMBDA_BATCH_RESPONSE,
         result,
       });
       return true;
