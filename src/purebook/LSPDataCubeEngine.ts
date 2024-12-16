@@ -15,31 +15,31 @@
  */
 
 import {
-  CompletionItem,
-  DataCubeAPI,
+  type CompletionItem,
+  type DataCubeAPI,
+  type DataCubeExecutionResult,
+  type DataCubeInitialInput,
+  type PlainObject,
+  type RelationType,
+  type V1_ValueSpecification,
+  assertTrue,
   DataCubeEngine,
-  DataCubeExecutionResult,
-  DataCubeInitialInput,
   DataCubeQuery,
   DataCubeSource,
   guaranteeType,
-  LogEvent,
-  PlainObject,
-  RawLambda,
-  RelationalExecutionActivities,
-  RelationType,
-  TDSExecutionResult,
   V1_AppliedFunction,
   V1_deserializeRawValueSpecification,
   V1_deserializeValueSpecification,
   V1_Lambda,
+  V1_PackageableElementPtr,
   V1_RawLambda,
+  V1_RelationalExecutionActivities,
   V1_serializeRawValueSpecification,
   V1_serializeValueSpecification,
-  V1_ValueSpecification,
+  V1_TDSExecutionResult,
 } from '@finos/legend-vscode-extension-dependencies';
 import { V1_LSPEngine } from '../graph/V1_LSPEngine';
-import { VSCodeEvent } from 'vscode-notebook-renderer/events';
+import { type VSCodeEvent } from 'vscode-notebook-renderer/events';
 
 class LSPDataCubeSource extends DataCubeSource {
   mapping?: string | undefined;
@@ -50,37 +50,41 @@ export class LSPDataCubeEngine extends DataCubeEngine {
   lspEngine: V1_LSPEngine;
   rawLambda: V1_RawLambda;
   postMessage: (message: unknown) => void;
-  // lambda: V1_Lambda;
-  // srcFuncExp: V1_ValueSpecification;
-  // _parameters: object | undefined;
+  onDidReceiveMessage: VSCodeEvent<{ command: string; result: unknown }>;
+
+  postAndWaitForMessage =
+    (cellUri: string) =>
+    <T>(
+      requestMessage: { command: string; msg?: PlainObject },
+      responseCommandId: string,
+    ): Promise<T> => {
+      this.postMessage({
+        command: requestMessage.command,
+        msg: requestMessage.msg,
+        cellUri,
+      });
+      return new Promise((resolve) => {
+        this.onDidReceiveMessage((message) => {
+          if (message.command === responseCommandId) {
+            resolve(message.result as T);
+          }
+        });
+      });
+    };
 
   constructor(
+    cellUri: string,
     lambdaJson: PlainObject<V1_RawLambda>,
     postMessage: (message: unknown) => void,
-    onDidReceiveMessage: VSCodeEvent<any>,
+    onDidReceiveMessage: VSCodeEvent<{ command: string; result: unknown }>,
   ) {
     super();
-    this.lspEngine = new V1_LSPEngine();
+    this.lspEngine = new V1_LSPEngine(this.postAndWaitForMessage(cellUri));
     this.rawLambda = V1_deserializeRawValueSpecification(
       lambdaJson,
     ) as V1_RawLambda;
     this.postMessage = postMessage;
-    onDidReceiveMessage((message) => {
-      console.log('LSPDataCubeEngine received message:', message);
-    });
-    // const valueSpec = V1_deserializeValueSpecification(
-    //   lambdaJson,
-    //   [],
-    // );
-    // We could do a further check here to ensure the experssion is an applied funciton
-    // this is because data cube expects an expression to be able to built further upon the queery
-    // if (valueSpec instanceof V1_Lambda && valueSpec.body.length === 1 && valueSpec.body[0]) {
-    //   this.lambda = valueSpec;
-    //   this._parameters = valueSpec.parameters;
-    //   this.srcFuncExp = valueSpec.body[0];
-    // } else {
-    //   throw Error('DataCube engine expects a lambda with a single expression');
-    // }
+    this.onDidReceiveMessage = onDidReceiveMessage;
   }
 
   async getRelationalType(query: V1_RawLambda): Promise<RelationType> {
@@ -96,58 +100,70 @@ export class LSPDataCubeEngine extends DataCubeEngine {
   // ------------------------------- CORE OPERATIONS -------------------------------
 
   override async getInitialInput(): Promise<DataCubeInitialInput | undefined> {
-    this.postMessage({ command: 'testCommand', msg: 'data' });
-    return undefined;
-    // let srcFuncExp = this.rawLambda;
-    // // We could do a further check here to ensure the experssion is an applied funciton
-    // // this is because data cube expects an expression to be able to built further upon the queery
-    // // if (
-    // //   srcFuncExp instanceof V1_Lambda &&
-    // //   srcFuncExp.body.length === 1 &&
-    // //   srcFuncExp.body[0]
-    // // ) {
-    // //   srcFuncExp = srcFuncExp.body[0];
-    // // }
-    // // this._parameters = this.selectInitialQuery.parameters;
-    // // const fromFuncExp = new V1_AppliedFunction();
-    // // fromFuncExp.function = _functionName(SUPPORTED_FUNCTIONS.FROM);
-    // // fromFuncExp.parameters = [srcFuncExp];
-    // // if (this.mappingPath) {
-    // //   fromFuncExp.parameters.push(_elementPtr(this.mappingPath));
-    // // }
-    // // if (this.runtimePath) {
-    // //   fromFuncExp.parameters.push(_elementPtr(this.runtimePath));
-    // // }
-    // const columns = (await this.getRelationalType(this.rawLambda)).columns;
-    // const query = new DataCubeQuery();
-    // query.query = `~[${columns.map((e) => `'${e.name}'`)}]->select()`;
-    // const source = new LSPDataCubeSource();
-    // source.sourceColumns = columns;
-    // // source.mapping = this.mappingPath;
-    // // source.runtime = this.runtimePath;
-    // const v1lambda = new V1_Lambda();
-    // v1lambda.body = (this.rawLambda.body as any[]) ?? [];
-    // v1lambda.parameters = (this.rawLambda.parameters as any[]) ?? [];
-    // source.query = v1lambda;
-    // console.log('getInitialInput:', { query, source });
-    // return {
-    //   query,
-    //   source,
-    // };
+    const source = new LSPDataCubeSource();
+    source.query = V1_deserializeValueSpecification(
+      V1_serializeRawValueSpecification(this.rawLambda),
+      [],
+    );
+    // We could do a further check here to ensure the experssion is an applied funciton
+    // this is because data cube expects an expression to be able to built further upon the queery
+    if (
+      source.query instanceof V1_Lambda &&
+      source.query.body.length === 1 &&
+      source.query.body[0]
+    ) {
+      source.query = source.query.body[0];
+    }
+    const queryFunc = guaranteeType(source.query, V1_AppliedFunction);
+    assertTrue(
+      queryFunc.function === 'from',
+      `Only functions returning TDS/graph fetch using the from() function can be opened in Data Cube`,
+    );
+    if (queryFunc.parameters.length === 2) {
+      source.runtime = guaranteeType(
+        queryFunc.parameters[1],
+        V1_PackageableElementPtr,
+      ).fullPath;
+    } else if (queryFunc.parameters.length === 3) {
+      source.mapping = guaranteeType(
+        queryFunc.parameters[1],
+        V1_PackageableElementPtr,
+      ).fullPath;
+      source.runtime = guaranteeType(
+        queryFunc.parameters[2],
+        V1_PackageableElementPtr,
+      ).fullPath;
+    } else {
+      throw new Error(`Expected 'from' function to have 2 or 3 parameters`);
+    }
+
+    source.sourceColumns = (
+      await this.lspEngine.getLambdaRelationTypeFromRawInput({
+        lambda: this.rawLambda,
+        model: {},
+      })
+    ).columns;
+
+    const query = new DataCubeQuery();
+    query.query = `~[${source.sourceColumns.map((e) => `'${e.name}'`)}]->select()`;
+
+    return {
+      query,
+      source,
+    };
   }
 
   override async parseValueSpecification(
     code: string,
     returnSourceInformation?: boolean | undefined,
   ): Promise<V1_ValueSpecification> {
-    throw new Error('parseValueSpecification has not been implemented');
-    // return V1_deserializeValueSpecification(
-    //   await this.lspEngine.transformCodeToValueSpec(
-    //     code,
-    //     returnSourceInformation,
-    //   ),
-    //   [],
-    // );
+    return V1_deserializeValueSpecification(
+      await this.lspEngine.transformCodeToValueSpec(
+        code,
+        returnSourceInformation,
+      ),
+      [],
+    );
   }
 
   override getValueSpecificationCode(
@@ -184,14 +200,19 @@ export class LSPDataCubeEngine extends DataCubeEngine {
     source: DataCubeSource,
   ): Promise<RelationType> {
     throw new Error('getQueryCodeRelationReturnType has not been implemented');
-    // const queryString =
-    //   await this.graphState.graphManager.valueSpecificationToPureCode(
-    //     V1_serializeValueSpecification(baseQuery, []),
-    //   );
-    // const fullQuery = queryString + code;
-    // return this.getRelationalType(
-    //   await this.graphState.graphManager.pureCodeToLambda(fullQuery),
-    // );
+  }
+
+  private buildRawLambdaFromValueSpec(query: V1_Lambda): V1_RawLambda {
+    const json = guaranteeType(
+      V1_deserializeRawValueSpecification(
+        V1_serializeValueSpecification(query, []),
+      ),
+      V1_RawLambda,
+    );
+    const rawLambda = new V1_RawLambda();
+    rawLambda.parameters = json.parameters;
+    rawLambda.body = json.body;
+    return rawLambda;
   }
 
   override async executeQuery(
@@ -199,76 +220,46 @@ export class LSPDataCubeEngine extends DataCubeEngine {
     source: DataCubeSource,
     api: DataCubeAPI,
   ): Promise<DataCubeExecutionResult> {
-    throw new Error('runQuery has not been implemented');
-    // const rawLambda = new V1_RawLambda();
-    // rawLambda.body = query.body;
-    // rawLambda.parameters = query.parameters;
+    const rawLambda = this.buildRawLambdaFromValueSpec(query);
 
-    // const [executionWithMetadata, queryString] = await Promise.all([
-    //   this.lspEngine.runQuery({
-    //     clientVersion: undefined,
-    //     function: rawLambda,
-    //     mapping: undefined,
-    //     model: {},
-    //     runtime: undefined,
-    //     context: {
-    //       queryTimeOutInSeconds: 3000,
-    //       enableConstraints: true,
-    //     },
-    //     parameterValues: [],
-    //   }),
-    //   this.lspEngine.transformV1RawLambdaToCode(rawLambda, true),
-    // ]);
-    // const expectedTDS = guaranteeType(
-    //   executionWithMetadata.executionResult,
-    //   TDSExecutionResult,
-    //   'Query returned expected to be of tabular data set',
-    // );
-    // const sql = expectedTDS.activities?.[0];
-    // let sqlString = '### NO SQL FOUND';
-    // if (sql instanceof RelationalExecutionActivities) {
-    //   sqlString = sql.sql;
-    // }
-    // return {
-    //   result: expectedTDS,
-    //   executedQuery: queryString,
-    //   executedSQL: sqlString,
-    // };
+    const [executionWithMetadata, queryString] = await Promise.all([
+      this.lspEngine.runQuery({
+        clientVersion: undefined,
+        function: rawLambda,
+        mapping: undefined,
+        model: {},
+        runtime: undefined,
+        context: {
+          queryTimeOutInSeconds: 3000,
+          enableConstraints: true,
+        },
+        parameterValues: [],
+      }),
+      this.lspEngine.transformV1RawLambdaToCode(
+        V1_serializeRawValueSpecification(rawLambda),
+        true,
+      ),
+    ]);
+    const expectedTDS = guaranteeType(
+      executionWithMetadata.executionResult,
+      V1_TDSExecutionResult,
+      'Query returned expected to be of tabular data set',
+    );
+    const sql = expectedTDS.activities?.[0];
+    let sqlString = '### NO SQL FOUND';
+    if (sql instanceof V1_RelationalExecutionActivities) {
+      sqlString = sql.sql;
+    }
+    return {
+      result: expectedTDS,
+      executedQuery: queryString,
+      executedSQL: sqlString,
+    };
   }
 
   override buildExecutionContext(
     source: DataCubeSource,
   ): V1_AppliedFunction | undefined {
     return undefined;
-  }
-
-  // ---------------------------------- LOGGING ----------------------------------
-
-  override logDebug(message: string, ...data: unknown[]) {
-    console.debug(message, data);
-  }
-
-  override debugProcess(processName: string, ...data: [string, unknown][]) {
-    console.debug(processName, data);
-  }
-
-  override logInfo(event: LogEvent, ...data: unknown[]) {
-    console.log(event, data);
-  }
-
-  override logWarning(event: LogEvent, ...data: unknown[]) {
-    console.warn(event, data);
-  }
-
-  override logError(event: LogEvent, ...data: unknown[]) {
-    console.error(event, data);
-  }
-
-  override logUnhandledError(error: Error) {
-    console.error(error);
-  }
-
-  override logIllegalStateError(message: string, error?: Error) {
-    console.error(message, error);
   }
 }

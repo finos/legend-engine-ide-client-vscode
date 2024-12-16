@@ -15,19 +15,33 @@
  */
 
 import {
+  type PlainObject,
+  type V1_RawLambda,
   DataCube,
-  PlainObject,
-  V1_RawLambda,
 } from '@finos/legend-vscode-extension-dependencies';
 import { LSPDataCubeEngine } from './LSPDataCubeEngine';
-import { VSCodeEvent } from 'vscode-notebook-renderer/events';
+import { type VSCodeEvent } from 'vscode-notebook-renderer/events';
 
 export const PurebookCubeRenderer = (props: {
+  cellUri: string;
   lambda: PlainObject<V1_RawLambda>;
   postMessage: (message: unknown) => void;
-  onDidReceiveMessage: VSCodeEvent<any>;
+  onDidReceiveMessage: VSCodeEvent<{ command: string; result: unknown }>;
 }): React.ReactNode => {
-  const { lambda, postMessage, onDidReceiveMessage } = props;
-  const engine = new LSPDataCubeEngine(lambda, postMessage, onDidReceiveMessage);
-  return <DataCube engine={engine} />;
+  const { cellUri, lambda, postMessage, onDidReceiveMessage } = props;
+  const engine = new LSPDataCubeEngine(
+    cellUri,
+    lambda,
+    postMessage,
+    onDidReceiveMessage,
+  );
+  return (
+    <div
+      id={`purebook-cube-renderer-${cellUri}`}
+      className="purebook-cube-renderer-container"
+      style={{ height: '500px' }}
+    >
+      <DataCube engine={engine} />
+    </div>
+  );
 };

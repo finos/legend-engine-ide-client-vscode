@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 
+import '@finos/legend-vscode-extension-dependencies/style/index.css';
 import { createRoot } from 'react-dom/client';
-import type { ActivationFunction, OutputItem } from 'vscode-notebook-renderer';
+import type { ActivationFunction } from 'vscode-notebook-renderer';
 import { PurebookCubeRenderer } from './PurebookCubeRenderer';
 
 export const activate: ActivationFunction = (context) => ({
@@ -32,7 +33,8 @@ export const activate: ActivationFunction = (context) => ({
     }
     createRoot(element).render(
       <PurebookCubeRenderer
-        lambda={data.json()}
+        cellUri={data.json().cellUri}
+        lambda={data.json().lambda}
         postMessage={context.postMessage}
         onDidReceiveMessage={context.onDidReceiveMessage}
       />,

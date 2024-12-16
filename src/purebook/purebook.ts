@@ -30,6 +30,9 @@ import {
 } from 'vscode';
 import { LEGEND_LANGUAGE_ID } from '../utils/Const';
 import { PurebookController } from './PurebookController';
+import { handleV1LSPEngineMessage } from './utils';
+import { type LegendLanguageClient } from '../LegendLanguageClient';
+import { type LegendConceptTreeProvider } from '../conceptTree';
 
 interface RawNotebookCell {
   source: string[];
@@ -84,7 +87,11 @@ class LegendBookSerializer implements NotebookSerializer {
   }
 }
 
-export function enableLegendBook(context: ExtensionContext): void {
+export function enableLegendBook(
+  context: ExtensionContext,
+  client: LegendLanguageClient,
+  legendConceptTree: LegendConceptTreeProvider,
+): void {
   const controller = new PurebookController();
 
   context.subscriptions.push(
@@ -99,13 +106,19 @@ export function enableLegendBook(context: ExtensionContext): void {
   );
 
   const messageChannel = notebooks.createRendererMessaging(
-    'legend-cube-renderer'
+    'legend-cube-renderer',
   );
-  messageChannel.onDidReceiveMessage((e) => {
-    messageChannel.postMessage({
-      command: 'testCommandResponse',
-      data: 'test data response',
-    });
+  messageChannel.onDidReceiveMessage(async (e) => {
+    await handleV1LSPEngineMessage(
+      messageChannel.postMessage,
+      e.message.cellUri,
+      0,
+      'notebook_cell',
+      client,
+      context,
+      legendConceptTree,
+      e.message,
+    );
   });
 }
 

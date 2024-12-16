@@ -18,7 +18,6 @@ import {
   type ModelSchema,
   type PropSchema,
   custom,
-  SKIP,
   deserialize,
   serialize,
 } from 'serializr';
@@ -44,7 +43,7 @@ export class SerializationFactory<T> {
 
 export const usingModelSchema = <T>(schema: ModelSchema<T>): PropSchema =>
   custom(
-    (value) => (value === undefined ? SKIP : serialize(schema, value)),
+    (value) => (value === undefined ? undefined : serialize(schema, value)),
     (value) => deserialize(schema, value),
   );
 

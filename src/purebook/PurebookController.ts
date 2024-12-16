@@ -122,7 +122,10 @@ export class PurebookController {
                 case 'cube':
                   output = [
                     NotebookCellOutputItem.json(
-                      JSON.parse(funcResult.message),
+                      {
+                        cellUri: cell.document.uri.toString(),
+                        lambda: JSON.parse(funcResult.message),
+                      },
                       'application/legend-relational-result',
                     ),
                   ];

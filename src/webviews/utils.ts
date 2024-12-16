@@ -278,16 +278,10 @@ export const handleV1LSPEngineMessage = async (
       return true;
     }
     case GRAMMAR_TO_JSON_LAMBDA_BATCH_COMMAND_ID: {
-      const { code, lambdaId, options } = message.msg;
-      const result = await client.grammarToJson_lambda(
+      const { input } = message.msg;
+      const result = await client.grammarToJson_lambda_batch(
         entityTextLocation,
-        code,
-        lambdaId,
-        undefined,
-        undefined,
-        options?.pruneSourceInformation !== undefined
-          ? !options.pruneSourceInformation
-          : true,
+        input,
       );
       webview.postMessage({
         command: GRAMMAR_TO_JSON_LAMBDA_BATCH_RESPONSE,

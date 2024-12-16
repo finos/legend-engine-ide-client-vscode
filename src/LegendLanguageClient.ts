@@ -55,6 +55,7 @@ import type { LegendTestExecutionResult } from './model/LegendTestExecutionResul
 import { LegendEntity } from './model/LegendEntity';
 import {
   type EXECUTION_SERIALIZATION_FORMAT,
+  type V1_GrammarParserBatchInputEntry,
   type V1_ParameterValue,
   type V1_RawExecutionContext,
   type V1_RawLambda,
@@ -228,6 +229,34 @@ export class LegendLanguageClient extends LanguageClient {
     );
   }
 
+  async executeQueryByDocumentId(
+    documentUri: string,
+    sectionIndex: number,
+    entityId: string,
+    lambda: V1_RawLambda,
+    mapping: string | undefined,
+    runtime: V1_Runtime | undefined,
+    context: V1_RawExecutionContext,
+    parameterValues: { [key: string]: unknown },
+    serializationFormat?: EXECUTION_SERIALIZATION_FORMAT | undefined,
+  ): Promise<LegendExecutionResult[]> {
+    return commands.executeCommand(
+      LEGEND_COMMAND,
+      documentUri,
+      sectionIndex,
+      entityId,
+      EXECUTE_QUERY_COMMAND_ID,
+      {
+        lambda: JSON.stringify(lambda),
+        mapping,
+        runtime: JSON.stringify(runtime),
+        context: JSON.stringify(context),
+        serializationFormat,
+      },
+      parameterValues,
+    );
+  }
+
   async exportData(
     entityTextLocation: TextLocation,
     lambda: V1_RawLambda,
@@ -322,24 +351,34 @@ export class LegendLanguageClient extends LanguageClient {
     );
   }
 
-  async grammarToJson_lambda(
+  async grammarToJson_lambda_batch(
     entityTextLocation: TextLocation,
-    code: string,
-    sourceId?: string | undefined,
-    lineOffset?: number | undefined,
-    columnOffset?: number | undefined,
-    returnSourceInformation?: boolean | undefined,
+    input: Record<string, V1_GrammarParserBatchInputEntry>,
   ): Promise<LegendExecutionResult[]> {
     return commands.executeCommand(
       LEGEND_COMMAND,
       entityTextLocation,
       GRAMMAR_TO_JSON_LAMBDA_BATCH_COMMAND_ID,
       {
-        code,
-        sourceId,
-        lineOffset,
-        columnOffset,
-        returnSourceInformation,
+        input: JSON.stringify(input),
+      },
+    );
+  }
+
+  async grammarToJson_lambda_batchByDocumentId(
+    documentUri: string,
+    sectionIndex: number,
+    entityId: string,
+    input: Record<string, V1_GrammarParserBatchInputEntry>,
+  ): Promise<LegendExecutionResult[]> {
+    return commands.executeCommand(
+      LEGEND_COMMAND,
+      documentUri,
+      sectionIndex,
+      entityId,
+      GRAMMAR_TO_JSON_LAMBDA_BATCH_COMMAND_ID,
+      {
+        input: JSON.stringify(input),
       },
     );
   }
@@ -360,6 +399,26 @@ export class LegendLanguageClient extends LanguageClient {
     );
   }
 
+  async jsonToGrammar_lambda_batchByDocumentId(
+    documentUri: string,
+    sectionIndex: number,
+    entityId: string,
+    lambdas: Record<string, PlainObject<V1_RawLambda>>,
+    renderStyle?: V1_RenderStyle | undefined,
+  ): Promise<LegendExecutionResult[]> {
+    return commands.executeCommand(
+      LEGEND_COMMAND,
+      documentUri,
+      sectionIndex,
+      entityId,
+      JSON_TO_GRAMMAR_LAMBDA_BATCH_COMMAND_ID,
+      {
+        lambdas: JSON.stringify(lambdas),
+        renderStyle,
+      },
+    );
+  }
+
   async getLambdaReturnType(
     entityTextLocation: TextLocation,
     lambda: V1_RawLambda,
@@ -367,6 +426,24 @@ export class LegendLanguageClient extends LanguageClient {
     return commands.executeCommand(
       LEGEND_COMMAND,
       entityTextLocation,
+      GET_LAMBDA_RETURN_TYPE_COMMAND_ID,
+      {
+        lambda: JSON.stringify(lambda),
+      },
+    );
+  }
+
+  async getLambdaReturnTypeByDocumentId(
+    documentUri: string,
+    sectionIndex: number,
+    entityId: string,
+    lambda: V1_RawLambda,
+  ): Promise<LegendExecutionResult[]> {
+    return commands.executeCommand(
+      LEGEND_COMMAND,
+      documentUri,
+      sectionIndex,
+      entityId,
       GET_LAMBDA_RETURN_TYPE_COMMAND_ID,
       {
         lambda: JSON.stringify(lambda),
