@@ -15,29 +15,37 @@
  */
 
 import '@finos/legend-vscode-extension-dependencies/style/index.css';
-import { createRoot } from 'react-dom/client';
+import { type Root, createRoot } from 'react-dom/client';
 import type { ActivationFunction } from 'vscode-notebook-renderer';
 import { PurebookCubeRenderer } from './PurebookCubeRenderer';
 
-export const activate: ActivationFunction = (context) => ({
-  renderOutputItem(data, element) {
-    if (!context.postMessage) {
-      throw new Error(
-        'vscode extension context postMessage is required to render Purebook cube',
+export const activate: ActivationFunction = (context) => {
+  let root: Root | null = null;
+
+  return {
+    renderOutputItem(data, element) {
+      if (!context.postMessage) {
+        throw new Error(
+          'vscode extension context postMessage is required to render Purebook cube',
+        );
+      }
+      if (!context.onDidReceiveMessage) {
+        throw new Error(
+          'vscode extension context onDidReceiveMessage is required to render Purebook cube',
+        );
+      }
+      if (root) {
+        root.unmount();
+      }
+      root = createRoot(element);
+      root.render(
+        <PurebookCubeRenderer
+          cellUri={data.json().cellUri}
+          lambda={data.json().lambda}
+          postMessage={context.postMessage}
+          onDidReceiveMessage={context.onDidReceiveMessage}
+        />,
       );
-    }
-    if (!context.onDidReceiveMessage) {
-      throw new Error(
-        'vscode extension context onDidReceiveMessage is required to render Purebook cube',
-      );
-    }
-    createRoot(element).render(
-      <PurebookCubeRenderer
-        cellUri={data.json().cellUri}
-        lambda={data.json().lambda}
-        postMessage={context.postMessage}
-        onDidReceiveMessage={context.onDidReceiveMessage}
-      />,
-    );
-  },
-});
+    },
+  };
+};
