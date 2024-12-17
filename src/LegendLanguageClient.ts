@@ -24,25 +24,26 @@ import {
 import type { FunctionTDSRequest } from './model/FunctionTDSRequest';
 import { LegendExecutionResult } from './results/LegendExecutionResult';
 import {
-  REPL_CLASSPATH_REQUEST_ID,
-  TDS_JSON_REQUEST_ID,
-  TEST_CASES_REQUEST_ID,
-  EXECUTE_TESTS_REQUEST_ID,
-  VIRTUAL_FILE_SYSTEM_FILE_REQUEST_ID,
-  ENTITIES_REQUEST_ID,
-  ONE_ENTITY_PER_FILE_REQUEST_ID,
-  LEGEND_WRITE_ENTITY_REQUEST_ID,
   ANALYZE_MAPPING_MODEL_COVERAGE_COMMAND_ID,
-  GET_CLASSIFIER_PATH_MAP_REQUEST_ID,
-  GET_SUBTYPE_INFO_REQUEST_ID,
-  LEGEND_COMMAND,
+  CHECK_DATASET_ENTITLEMENTS_COMMAND_ID,
+  ENTITIES_REQUEST_ID,
   EXECUTE_QUERY_COMMAND_ID,
+  EXECUTE_TESTS_REQUEST_ID,
   GENERATE_EXECUTION_PLAN_COMMAND_ID,
+  GET_CLASSIFIER_PATH_MAP_REQUEST_ID,
   GET_LAMBDA_RETURN_TYPE_COMMAND_ID,
+  GET_QUERY_TYPEAHEAD_COMMAND_ID,
+  GET_SUBTYPE_INFO_REQUEST_ID,
   GRAMMAR_TO_JSON_LAMBDA_BATCH_COMMAND_ID,
   JSON_TO_GRAMMAR_LAMBDA_BATCH_COMMAND_ID,
-  CHECK_DATASET_ENTITLEMENTS_COMMAND_ID,
+  LEGEND_COMMAND,
+  LEGEND_WRITE_ENTITY_REQUEST_ID,
+  ONE_ENTITY_PER_FILE_REQUEST_ID,
+  REPL_CLASSPATH_REQUEST_ID,
   SURVEY_DATASETS_COMMAND_ID,
+  TDS_JSON_REQUEST_ID,
+  TEST_CASES_REQUEST_ID,
+  VIRTUAL_FILE_SYSTEM_FILE_REQUEST_ID,
 } from './utils/Const';
 import type { PlainObject } from './utils/SerializationUtils';
 import {
@@ -56,6 +57,7 @@ import { LegendEntity } from './model/LegendEntity';
 import {
   type EXECUTION_SERIALIZATION_FORMAT,
   type V1_GrammarParserBatchInputEntry,
+  type V1_Lambda,
   type V1_ParameterValue,
   type V1_RawExecutionContext,
   type V1_RawLambda,
@@ -485,6 +487,26 @@ export class LegendLanguageClient extends LanguageClient {
         runtime,
         lambda: JSON.stringify(lambda),
         reports: JSON.stringify(reports),
+      },
+    );
+  }
+
+  async getQueryTypeaheadByDocumentId(
+    documentUri: string,
+    sectionIndex: number,
+    entityId: string,
+    code: string,
+    baseQuery: PlainObject<V1_Lambda>,
+  ): Promise<LegendExecutionResult[]> {
+    return commands.executeCommand(
+      LEGEND_COMMAND,
+      documentUri,
+      sectionIndex,
+      entityId,
+      GET_QUERY_TYPEAHEAD_COMMAND_ID,
+      {
+        code,
+        baseQuery: JSON.stringify(baseQuery),
       },
     );
   }
