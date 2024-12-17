@@ -20,7 +20,7 @@ import type { ActivationFunction } from 'vscode-notebook-renderer';
 import { PurebookCubeRenderer } from './PurebookCubeRenderer';
 
 export const activate: ActivationFunction = (context) => {
-  let root: Root | null = null;
+  const roots: Record<string, Root> = {};
 
   return {
     renderOutputItem(data, element) {
@@ -34,11 +34,13 @@ export const activate: ActivationFunction = (context) => {
           'vscode extension context onDidReceiveMessage is required to render Purebook cube',
         );
       }
-      if (root) {
-        root.unmount();
+      const rootToUnmount: Root | undefined = roots[data.id];
+      if (rootToUnmount !== undefined) {
+        rootToUnmount.unmount();
       }
-      root = createRoot(element);
-      root.render(
+      const newRoot = createRoot(element);
+      roots[data.id] = newRoot;
+      newRoot.render(
         <PurebookCubeRenderer
           cellUri={data.json().cellUri}
           lambda={data.json().lambda}
