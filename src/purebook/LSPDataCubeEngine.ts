@@ -27,6 +27,7 @@ import {
   DataCubeQuery,
   DataCubeSource,
   guaranteeType,
+  uuid,
   V1_AppliedFunction,
   V1_deserializeRawValueSpecification,
   V1_deserializeValueSpecification,
@@ -50,7 +51,11 @@ export class LSPDataCubeEngine extends DataCubeEngine {
   lspEngine: V1_LSPEngine;
   rawLambda: V1_RawLambda;
   postMessage: (message: unknown) => void;
-  onDidReceiveMessage: VSCodeEvent<{ command: string; result: unknown }>;
+  onDidReceiveMessage: VSCodeEvent<{
+    command: string;
+    messageId: string;
+    result: unknown;
+  }>;
 
   postAndWaitForMessage =
     (cellUri: string) =>
@@ -58,14 +63,19 @@ export class LSPDataCubeEngine extends DataCubeEngine {
       requestMessage: { command: string; msg?: PlainObject },
       responseCommandId: string,
     ): Promise<T> => {
+      const messageId = uuid();
       this.postMessage({
         command: requestMessage.command,
         msg: requestMessage.msg,
         cellUri,
+        messageId,
       });
       return new Promise((resolve) => {
         this.onDidReceiveMessage((message) => {
-          if (message.command === responseCommandId) {
+          if (
+            message.command === responseCommandId &&
+            message.messageId === messageId
+          ) {
             resolve(message.result as T);
           }
         });
@@ -76,7 +86,11 @@ export class LSPDataCubeEngine extends DataCubeEngine {
     cellUri: string,
     lambdaJson: PlainObject<V1_RawLambda>,
     postMessage: (message: unknown) => void,
-    onDidReceiveMessage: VSCodeEvent<{ command: string; result: unknown }>,
+    onDidReceiveMessage: VSCodeEvent<{
+      command: string;
+      messageId: string;
+      result: unknown;
+    }>,
   ) {
     super();
     this.lspEngine = new V1_LSPEngine(this.postAndWaitForMessage(cellUri));
@@ -173,12 +187,16 @@ export class LSPDataCubeEngine extends DataCubeEngine {
     throw new Error('getValueSpecificationCode has not been implemented');
   }
 
-  override getQueryTypeahead(
+  override async getQueryTypeahead(
     code: string,
     baseQuery: V1_Lambda,
     source: DataCubeSource,
   ): Promise<CompletionItem[]> {
-    throw new Error('getQueryTypeahead has not been implemented');
+    const response = await this.lspEngine.getQueryTypeahead(
+      code,
+      V1_serializeValueSpecification(baseQuery, []),
+    );
+    return response.completions;
   }
 
   override getQueryRelationType(
@@ -194,12 +212,28 @@ export class LSPDataCubeEngine extends DataCubeEngine {
     });
   }
 
-  override getQueryCodeRelationReturnType(
+  override async getQueryCodeRelationReturnType(
     code: string,
     baseQuery: V1_ValueSpecification,
     source: DataCubeSource,
   ): Promise<RelationType> {
-    throw new Error('getQueryCodeRelationReturnType has not been implemented');
+    // TODO: Determine if this function should ever expect to receive
+    // a V1_ValueSpecification that is not a V1_Lambda as the baseQuery
+    if (!(baseQuery instanceof V1_Lambda)) {
+      throw new Error('Base query must be a V1_Lambda');
+    }
+    const queryString = await this.lspEngine.transformV1RawLambdaToCode(
+      V1_serializeValueSpecification(baseQuery, []),
+      false,
+    );
+    const fullQuery =
+      queryString.charAt(0) === '{' &&
+      queryString.charAt(queryString.length - 1) === '}'
+        ? `${queryString.substring(0, queryString.length - 1)}${code}}`
+        : queryString + code;
+    return this.getRelationalType(
+      await this.lspEngine.transformCodeToLambda(fullQuery),
+    );
   }
 
   private buildRawLambdaFromValueSpec(query: V1_Lambda): V1_RawLambda {

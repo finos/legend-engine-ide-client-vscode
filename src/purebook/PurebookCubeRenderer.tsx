@@ -26,7 +26,7 @@ export const PurebookCubeRenderer = (props: {
   cellUri: string;
   lambda: PlainObject<V1_RawLambda>;
   postMessage: (message: unknown) => void;
-  onDidReceiveMessage: VSCodeEvent<{ command: string; result: unknown }>;
+  onDidReceiveMessage: VSCodeEvent<{ command: string; messageId: string; result: unknown }>;
 }): React.ReactNode => {
   const { cellUri, lambda, postMessage, onDidReceiveMessage } = props;
   const engine = new LSPDataCubeEngine(

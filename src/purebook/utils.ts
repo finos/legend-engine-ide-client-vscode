@@ -25,6 +25,8 @@ import {
   GET_CURRENT_USER_ID_RESPONSE,
   GET_LAMBDA_RETURN_TYPE_COMMAND_ID,
   GET_LAMBDA_RETURN_TYPE_RESPONSE,
+  GET_QUERY_TYPEAHEAD_COMMAND_ID,
+  GET_QUERY_TYPEAHEAD_RESPONSE,
   GET_SUBTYPE_INFO_REQUEST_ID,
   GET_SUBTYPE_INFO_RESPONSE,
   GRAMMAR_TO_JSON_LAMBDA_BATCH_COMMAND_ID,
@@ -62,7 +64,7 @@ export const handleV1LSPEngineMessage = async (
   context: ExtensionContext,
   legendConceptTree: LegendConceptTreeProvider,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  message: { command: string; msg: any },
+  message: { command: string; msg: any; messageId: string },
 ): Promise<boolean> => {
   switch (message.command) {
     case GET_CURRENT_USER_ID_REQUEST_ID: {
@@ -70,6 +72,7 @@ export const handleV1LSPEngineMessage = async (
       postMessage({
         command: GET_CURRENT_USER_ID_RESPONSE,
         result,
+        messageId: message.messageId,
       });
       return true;
     }
@@ -78,6 +81,7 @@ export const handleV1LSPEngineMessage = async (
       postMessage({
         command: GET_CLASSIFIER_PATH_MAP_RESPONSE,
         result,
+        messageId: message.messageId,
       });
       return true;
     }
@@ -86,6 +90,7 @@ export const handleV1LSPEngineMessage = async (
       postMessage({
         command: GET_SUBTYPE_INFO_RESPONSE,
         result,
+        messageId: message.messageId,
       });
       return true;
     }
@@ -112,6 +117,7 @@ export const handleV1LSPEngineMessage = async (
       postMessage({
         command: EXECUTE_QUERY_RESPONSE,
         result,
+        messageId: message.messageId,
       });
       return true;
     }
@@ -126,6 +132,7 @@ export const handleV1LSPEngineMessage = async (
       postMessage({
         command: GRAMMAR_TO_JSON_LAMBDA_BATCH_RESPONSE,
         result,
+        messageId: message.messageId,
       });
       return true;
     }
@@ -141,6 +148,7 @@ export const handleV1LSPEngineMessage = async (
       postMessage({
         command: JSON_TO_GRAMMAR_LAMBDA_BATCH_RESPONSE,
         result,
+        messageId: message.messageId,
       });
       return true;
     }
@@ -155,6 +163,23 @@ export const handleV1LSPEngineMessage = async (
       postMessage({
         command: GET_LAMBDA_RETURN_TYPE_RESPONSE,
         result,
+        messageId: message.messageId,
+      });
+      return true;
+    }
+    case GET_QUERY_TYPEAHEAD_COMMAND_ID: {
+      const { code, baseQuery } = message.msg;
+      const result = await client.getQueryTypeaheadByDocumentId(
+        documentUri,
+        sectionIndex,
+        entityid,
+        code,
+        baseQuery,
+      );
+      postMessage({
+        command: GET_QUERY_TYPEAHEAD_RESPONSE,
+        result,
+        messageId: message.messageId,
       });
       return true;
     }

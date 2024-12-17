@@ -128,7 +128,7 @@ export const handleV1LSPEngineMessage = async (
   context: ExtensionContext,
   legendConceptTree: LegendConceptTreeProvider,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  message: { command: string; msg: any },
+  message: { command: string; msg: any; messageId: string },
 ): Promise<boolean> => {
   switch (message.command) {
     case GET_CURRENT_USER_ID_REQUEST_ID: {
@@ -136,6 +136,7 @@ export const handleV1LSPEngineMessage = async (
       webview.postMessage({
         command: GET_CURRENT_USER_ID_RESPONSE,
         result,
+        messageId: message.messageId,
       });
       return true;
     }
@@ -144,6 +145,7 @@ export const handleV1LSPEngineMessage = async (
       webview.postMessage({
         command: GET_CLASSIFIER_PATH_MAP_RESPONSE,
         result,
+        messageId: message.messageId,
       });
       return true;
     }
@@ -152,6 +154,7 @@ export const handleV1LSPEngineMessage = async (
       webview.postMessage({
         command: GET_SUBTYPE_INFO_RESPONSE,
         result,
+        messageId: message.messageId,
       });
       return true;
     }
@@ -180,6 +183,7 @@ export const handleV1LSPEngineMessage = async (
       webview.postMessage({
         command: ANALYZE_MAPPING_MODEL_COVERAGE_RESPONSE,
         result,
+        messageId: message.messageId,
       });
       break;
     }
@@ -204,6 +208,7 @@ export const handleV1LSPEngineMessage = async (
       webview.postMessage({
         command: EXECUTE_QUERY_RESPONSE,
         result,
+        messageId: message.messageId,
       });
       return true;
     }
@@ -230,6 +235,7 @@ export const handleV1LSPEngineMessage = async (
       webview.postMessage({
         command: EXPORT_DATA_RESPONSE,
         result,
+        messageId: message.messageId,
       });
       return true;
     }
@@ -252,6 +258,7 @@ export const handleV1LSPEngineMessage = async (
       webview.postMessage({
         command: GENERATE_EXECUTION_PLAN_RESPONSE,
         result,
+        messageId: message.messageId,
       });
       return true;
     }
@@ -274,6 +281,7 @@ export const handleV1LSPEngineMessage = async (
       webview.postMessage({
         command: DEBUG_GENERATE_EXECUTION_PLAN_RESPONSE,
         result,
+        messageId: message.messageId,
       });
       return true;
     }
@@ -286,6 +294,7 @@ export const handleV1LSPEngineMessage = async (
       webview.postMessage({
         command: GRAMMAR_TO_JSON_LAMBDA_BATCH_RESPONSE,
         result,
+        messageId: message.messageId,
       });
       return true;
     }
@@ -299,6 +308,7 @@ export const handleV1LSPEngineMessage = async (
       webview.postMessage({
         command: JSON_TO_GRAMMAR_LAMBDA_BATCH_RESPONSE,
         result,
+        messageId: message.messageId,
       });
       return true;
     }
@@ -311,6 +321,7 @@ export const handleV1LSPEngineMessage = async (
       webview.postMessage({
         command: GET_LAMBDA_RETURN_TYPE_RESPONSE,
         result,
+        messageId: message.messageId,
       });
       return true;
     }
@@ -325,6 +336,7 @@ export const handleV1LSPEngineMessage = async (
       webview.postMessage({
         command: SURVEY_DATASETS_RESPONSE,
         result,
+        messageId: message.messageId,
       });
       return true;
     }
@@ -340,6 +352,7 @@ export const handleV1LSPEngineMessage = async (
       webview.postMessage({
         command: CHECK_DATASET_ENTITLEMENTS_RESPONSE,
         result,
+        messageId: message.messageId,
       });
       return true;
     }
@@ -371,6 +384,7 @@ export const handleQueryBuilderWebviewMessage = async (
     msg: any;
     entityPath: string;
     updatedEntityId?: string;
+    messageId: string;
   },
 ): Promise<boolean> => {
   switch (message.command) {
@@ -387,6 +401,7 @@ export const handleQueryBuilderWebviewMessage = async (
         command: GET_PROJECT_ENTITIES_RESPONSE,
         result: entities,
         updatedEntityId: message.updatedEntityId,
+        messageId: message.messageId,
       });
       return true;
     }
