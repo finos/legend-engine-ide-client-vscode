@@ -184,7 +184,10 @@ export class LSPDataCubeEngine extends DataCubeEngine {
     value: V1_ValueSpecification,
     pretty?: boolean | undefined,
   ): Promise<string> {
-    throw new Error('getValueSpecificationCode has not been implemented');
+    return this.lspEngine.transformValueSpecToCode(
+      V1_serializeValueSpecification(value, []),
+      Boolean(pretty),
+    );
   }
 
   override async getQueryTypeahead(

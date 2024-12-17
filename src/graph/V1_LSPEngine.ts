@@ -25,7 +25,6 @@ import {
   type PlainObject,
   type PostValidationAssertionResult,
   type PureProtocolProcessorPlugin,
-  type RawLambda,
   type RawRelationalOperationElement,
   type ServiceExecutionMode,
   type SubtypeInfo,
@@ -50,7 +49,6 @@ import {
   type V1_GenerationOutput,
   type V1_GrammarParserBatchInputEntry,
   type V1_GraphManagerEngine,
-  type V1_Lambda,
   type V1_LambdaReturnTypeResult,
   type V1_LightQuery,
   type V1_PureModelContext,
@@ -82,6 +80,7 @@ import {
   guaranteeNonNullable,
   isLossSafeNumber,
   parseLosslessJSON,
+  RawLambda,
   RelationTypeColumnMetadata,
   RelationTypeMetadata,
   returnUndefOnError,
@@ -93,9 +92,11 @@ import {
   V1_DELEGATED_EXPORT_HEADER,
   V1_deserializeDatasetEntitlementReport,
   V1_deserializeDatasetSpecification,
+  V1_deserializeValueSpecification,
   V1_EXECUTION_RESULT,
   V1_ExecutionError,
   V1_GraphTransformerContextBuilder,
+  V1_Lambda,
   V1_LambdaReturnTypeInput,
   V1_MappingModelCoverageAnalysisInput,
   V1_MappingModelCoverageAnalysisResult,
@@ -264,38 +265,47 @@ export class V1_LSPEngine implements V1_GraphManagerEngine {
     input: Record<string, PlainObject<V1_ValueSpecification>>,
     pretty: boolean,
   ): Promise<Map<string, string>> {
-    // console.log('transformValueSpecsToCode:', input);
-    // // Convert value specs to lambdas since LSP only supports lambda conversion.
-    // const mappedInput = Object.keys(input).reduce((acc, key) => {
-    //   acc.set(key, new RawLambda([], input[key]));
-    //   return acc;
-    // }, new Map<string, RawLambda>());
-    // console.log('mappedInput:', mappedInput);
-    // const resultLambdas: Map<string, string> =
-    //   await this.transformLambdasToCode(mappedInput, pretty, []);
-    // console.log('resultLambdas:', resultLambdas);
+    // Convert value specs to lambdas since LSP only supports lambda conversion.
+    const mappedInput = Object.keys(input).reduce((acc, key) => {
+      const valueSpec = V1_deserializeValueSpecification(
+        guaranteeNonNullable(input[key]),
+        [],
+      );
+      if (valueSpec instanceof V1_Lambda) {
+        acc.set(key, new RawLambda(valueSpec.parameters, valueSpec.body));
+      } else {
+        acc.set(key, new RawLambda([], input[key]));
+      }
+      return acc;
+    }, new Map<string, RawLambda>());
+    const resultLambdas: Map<string, string> =
+      await this.transformLambdasToCode(mappedInput, pretty, []);
 
-    // // Remove the | from each response to convert back to value specs
-    // const mappedResult = new Map<string, string>();
-    // resultLambdas.forEach((value, key) => {
-    //   mappedResult.set(key, value.substring(1));
-    // });
-    // console.log('mappedResult:', mappedResult);
-    // return mappedResult;
-    throw new Error('transformValueSpecsToCode not implemented');
+    // Remove the | from each response to convert back to value specs
+    const mappedResult = new Map<string, string>();
+    resultLambdas.forEach((value, key) => {
+      const valueSpec = V1_deserializeValueSpecification(
+        guaranteeNonNullable(input[key]),
+        [],
+      );
+      if (valueSpec instanceof V1_Lambda) {
+        mappedResult.set(key, value);
+      } else {
+        mappedResult.set(key, value.substring(1));
+      }
+    });
+    return mappedResult;
   }
 
   async transformValueSpecToCode(
     input: PlainObject<V1_ValueSpecification>,
     pretty: boolean,
   ): Promise<string> {
-    // console.log('V1_LSPEngine transformValueSpecToCode:', input);
-    // const batchInput: Record<string, PlainObject<V1_ValueSpecification>> = {
-    //   valueSpec: input,
-    // };
-    // const result = await this.transformValueSpecsToCode(batchInput, pretty);
-    // return guaranteeNonNullable(result.get('valueSpec'));
-    throw new Error('transformValueSpecToCode not implemented');
+    const batchInput: Record<string, PlainObject<V1_ValueSpecification>> = {
+      valueSpec: input,
+    };
+    const result = await this.transformValueSpecsToCode(batchInput, pretty);
+    return guaranteeNonNullable(result.get('valueSpec'));
   }
 
   async transformCodeToValueSpeces(
