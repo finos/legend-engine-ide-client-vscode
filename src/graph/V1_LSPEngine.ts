@@ -16,7 +16,6 @@
 
 import {
   type ClassifierPathMapping,
-  type CodeCompletionResult,
   type DeploymentResult,
   type ExecutionOptions,
   type ExternalFormatDescription,
@@ -51,6 +50,7 @@ import {
   type V1_GenerationOutput,
   type V1_GrammarParserBatchInputEntry,
   type V1_GraphManagerEngine,
+  type V1_Lambda,
   type V1_LambdaReturnTypeResult,
   type V1_LightQuery,
   type V1_PureModelContext,
@@ -75,6 +75,7 @@ import {
   type V1_TestDataGenerationResult,
   type V1_TextCompilationResult,
   type V1_ValueSpecification,
+  CodeCompletionResult,
   ContentType,
   deserializeMap,
   getContentTypeFileExtension,
@@ -126,6 +127,8 @@ import {
   GET_CURRENT_USER_ID_RESPONSE,
   GET_LAMBDA_RETURN_TYPE_COMMAND_ID,
   GET_LAMBDA_RETURN_TYPE_RESPONSE,
+  GET_QUERY_TYPEAHEAD_COMMAND_ID,
+  GET_QUERY_TYPEAHEAD_RESPONSE,
   GET_SUBTYPE_INFO_REQUEST_ID,
   GET_SUBTYPE_INFO_RESPONSE,
   GRAMMAR_TO_JSON_LAMBDA_BATCH_COMMAND_ID,
@@ -261,6 +264,24 @@ export class V1_LSPEngine implements V1_GraphManagerEngine {
     input: Record<string, PlainObject<V1_ValueSpecification>>,
     pretty: boolean,
   ): Promise<Map<string, string>> {
+    // console.log('transformValueSpecsToCode:', input);
+    // // Convert value specs to lambdas since LSP only supports lambda conversion.
+    // const mappedInput = Object.keys(input).reduce((acc, key) => {
+    //   acc.set(key, new RawLambda([], input[key]));
+    //   return acc;
+    // }, new Map<string, RawLambda>());
+    // console.log('mappedInput:', mappedInput);
+    // const resultLambdas: Map<string, string> =
+    //   await this.transformLambdasToCode(mappedInput, pretty, []);
+    // console.log('resultLambdas:', resultLambdas);
+
+    // // Remove the | from each response to convert back to value specs
+    // const mappedResult = new Map<string, string>();
+    // resultLambdas.forEach((value, key) => {
+    //   mappedResult.set(key, value.substring(1));
+    // });
+    // console.log('mappedResult:', mappedResult);
+    // return mappedResult;
     throw new Error('transformValueSpecsToCode not implemented');
   }
 
@@ -268,6 +289,12 @@ export class V1_LSPEngine implements V1_GraphManagerEngine {
     input: PlainObject<V1_ValueSpecification>,
     pretty: boolean,
   ): Promise<string> {
+    // console.log('V1_LSPEngine transformValueSpecToCode:', input);
+    // const batchInput: Record<string, PlainObject<V1_ValueSpecification>> = {
+    //   valueSpec: input,
+    // };
+    // const result = await this.transformValueSpecsToCode(batchInput, pretty);
+    // return guaranteeNonNullable(result.get('valueSpec'));
     throw new Error('transformValueSpecToCode not implemented');
   }
 
@@ -525,6 +552,41 @@ export class V1_LSPEngine implements V1_GraphManagerEngine {
     rawInput: V1_CompleteCodeInput,
   ): Promise<CodeCompletionResult> {
     throw new Error('getCodeCompletion not implemented');
+  }
+
+  async getQueryTypeahead(
+    code: string,
+    baseQuery: PlainObject<V1_Lambda>,
+  ): Promise<CodeCompletionResult> {
+    const response = await this.postAndWaitForMessage<LegendExecutionResult[]>(
+      {
+        command: GET_QUERY_TYPEAHEAD_COMMAND_ID,
+        msg: {
+          code,
+          baseQuery,
+        },
+      },
+      GET_QUERY_TYPEAHEAD_RESPONSE,
+    );
+    if (response?.[0]?.type === LegendExecutionResultType.ERROR) {
+      const sourceInformation = response[0].location
+        ? textLocationToSourceInformation(response[0].location)
+        : undefined;
+      throw V1_buildCompilationError(
+        V1_CompilationError.serialization.fromJson({
+          message: response[0].message,
+          sourceInformation,
+        }),
+      );
+    }
+    // LSP returns an object with property "completion" but the CodeCompleetionResult
+    // expects it to be named "completions", so we rename it here.
+    const rawJson = JSON.parse(guaranteeNonNullable(response?.[0]?.message));
+    const res = CodeCompletionResult.serialization.fromJson({
+      ...rawJson,
+      completions: rawJson.completion,
+    });
+    return res;
   }
 
   // --------------------------------------------- Execution ---------------------------------------------
