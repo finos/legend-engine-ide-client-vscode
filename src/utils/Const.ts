@@ -69,6 +69,7 @@ export const GET_LAMBDA_RETURN_TYPE_COMMAND_ID = 'legend.lambda.returnType';
 export const SURVEY_DATASETS_COMMAND_ID = 'legend.entitlements.surveyDatasets';
 export const CHECK_DATASET_ENTITLEMENTS_COMMAND_ID =
   'legend.entitlements.checkDatasetEntitlements';
+export const GET_QUERY_TYPEAHEAD_COMMAND_ID = 'legend.query.typeahead';
 
 // LSP Request IDs
 export const GET_CURRENT_USER_ID_REQUEST_ID = 'legend/getCurrentUserId';
@@ -105,6 +106,7 @@ export const GET_LAMBDA_RETURN_TYPE_RESPONSE = `${GET_LAMBDA_RETURN_TYPE_COMMAND
 export const EXPORT_DATA_RESPONSE = `${EXPORT_DATA_COMMAND_ID}/response`;
 export const SURVEY_DATASETS_RESPONSE = `${SURVEY_DATASETS_COMMAND_ID}/response`;
 export const CHECK_DATASET_ENTITLEMENTS_RESPONSE = `${CHECK_DATASET_ENTITLEMENTS_COMMAND_ID}/response`;
+export const GET_QUERY_TYPEAHEAD_RESPONSE = `${GET_QUERY_TYPEAHEAD_COMMAND_ID}/response`;
 
 // Context variables
 export const SHOW_EXECUTION_RESULTS = 'showExecutionResults';
