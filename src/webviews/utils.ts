@@ -45,6 +45,8 @@ import {
   GET_LAMBDA_RETURN_TYPE_RESPONSE,
   GET_PROJECT_ENTITIES,
   GET_PROJECT_ENTITIES_RESPONSE,
+  GET_QUERY_TYPEAHEAD_COMMAND_ID,
+  GET_QUERY_TYPEAHEAD_RESPONSE,
   GET_SUBTYPE_INFO_REQUEST_ID,
   GET_SUBTYPE_INFO_RESPONSE,
   GRAMMAR_TO_JSON_LAMBDA_BATCH_COMMAND_ID,
@@ -122,8 +124,10 @@ export const getCurrentUserId = (
  * @returns true if the message is handled, false otherwise
  */
 export const handleV1LSPEngineMessage = async (
-  webview: Webview,
-  entityTextLocation: TextLocation,
+  postMessage: (message: PlainObject) => Thenable<boolean>,
+  entityDetails:
+    | TextLocation
+    | { documentUri: string; sectionIndex: number; entityId: string },
   client: LegendLanguageClient,
   context: ExtensionContext,
   legendConceptTree: LegendConceptTreeProvider,
@@ -133,7 +137,7 @@ export const handleV1LSPEngineMessage = async (
   switch (message.command) {
     case GET_CURRENT_USER_ID_REQUEST_ID: {
       const result = getCurrentUserId(context);
-      webview.postMessage({
+      postMessage({
         command: GET_CURRENT_USER_ID_RESPONSE,
         result,
         messageId: message.messageId,
@@ -142,7 +146,7 @@ export const handleV1LSPEngineMessage = async (
     }
     case GET_CLASSIFIER_PATH_MAP_REQUEST_ID: {
       const result = await client.getClassifierPathMap();
-      webview.postMessage({
+      postMessage({
         command: GET_CLASSIFIER_PATH_MAP_RESPONSE,
         result,
         messageId: message.messageId,
@@ -151,7 +155,7 @@ export const handleV1LSPEngineMessage = async (
     }
     case GET_SUBTYPE_INFO_REQUEST_ID: {
       const result = await client.getSubtypeInfo();
-      webview.postMessage({
+      postMessage({
         command: GET_SUBTYPE_INFO_RESPONSE,
         result,
         messageId: message.messageId,
@@ -180,7 +184,7 @@ export const handleV1LSPEngineMessage = async (
 
       const result =
         await client.analyzeMappingModelCoverage(mappingTextLocation);
-      webview.postMessage({
+      postMessage({
         command: ANALYZE_MAPPING_MODEL_COVERAGE_RESPONSE,
         result,
         messageId: message.messageId,
@@ -197,7 +201,7 @@ export const handleV1LSPEngineMessage = async (
         serializationFormat,
       } = message.msg;
       const result = await client.executeQuery(
-        entityTextLocation,
+        entityDetails,
         lambda,
         mapping,
         runtime,
@@ -205,7 +209,7 @@ export const handleV1LSPEngineMessage = async (
         parameterValues ?? {},
         serializationFormat,
       );
-      webview.postMessage({
+      postMessage({
         command: EXECUTE_QUERY_RESPONSE,
         result,
         messageId: message.messageId,
@@ -223,7 +227,7 @@ export const handleV1LSPEngineMessage = async (
         downloadFileName,
       } = message.msg;
       const result = await client.exportData(
-        entityTextLocation,
+        entityDetails,
         lambda,
         mapping,
         runtime,
@@ -232,7 +236,7 @@ export const handleV1LSPEngineMessage = async (
         downloadFileName,
         serializationFormat,
       );
-      webview.postMessage({
+      postMessage({
         command: EXPORT_DATA_RESPONSE,
         result,
         messageId: message.messageId,
@@ -248,14 +252,14 @@ export const handleV1LSPEngineMessage = async (
         parameterValues,
       } = message.msg;
       const result = await client.generateExecutionPlan(
-        entityTextLocation,
+        entityDetails,
         lambda,
         mapping,
         runtime,
         executionContext,
         parameterValues ?? [],
       );
-      webview.postMessage({
+      postMessage({
         command: GENERATE_EXECUTION_PLAN_RESPONSE,
         result,
         messageId: message.messageId,
@@ -271,14 +275,14 @@ export const handleV1LSPEngineMessage = async (
         parameterValues,
       } = message.msg;
       const result = await client.debugGenerateExecutionPlan(
-        entityTextLocation,
+        entityDetails,
         lambda,
         mapping,
         runtime,
         executionContext,
         parameterValues ?? [],
       );
-      webview.postMessage({
+      postMessage({
         command: DEBUG_GENERATE_EXECUTION_PLAN_RESPONSE,
         result,
         messageId: message.messageId,
@@ -288,10 +292,10 @@ export const handleV1LSPEngineMessage = async (
     case GRAMMAR_TO_JSON_LAMBDA_BATCH_COMMAND_ID: {
       const { input } = message.msg;
       const result = await client.grammarToJson_lambda_batch(
-        entityTextLocation,
+        entityDetails,
         input,
       );
-      webview.postMessage({
+      postMessage({
         command: GRAMMAR_TO_JSON_LAMBDA_BATCH_RESPONSE,
         result,
         messageId: message.messageId,
@@ -301,11 +305,11 @@ export const handleV1LSPEngineMessage = async (
     case JSON_TO_GRAMMAR_LAMBDA_BATCH_COMMAND_ID: {
       const { lambdas, renderStyle } = message.msg;
       const result = await client.jsonToGrammar_lambda_batch(
-        entityTextLocation,
+        entityDetails,
         lambdas,
         renderStyle,
       );
-      webview.postMessage({
+      postMessage({
         command: JSON_TO_GRAMMAR_LAMBDA_BATCH_RESPONSE,
         result,
         messageId: message.messageId,
@@ -315,10 +319,10 @@ export const handleV1LSPEngineMessage = async (
     case GET_LAMBDA_RETURN_TYPE_COMMAND_ID: {
       const { lambda } = message.msg;
       const result = await client.getLambdaReturnType(
-        entityTextLocation,
+        entityDetails,
         lambda,
       );
-      webview.postMessage({
+      postMessage({
         command: GET_LAMBDA_RETURN_TYPE_RESPONSE,
         result,
         messageId: message.messageId,
@@ -328,12 +332,12 @@ export const handleV1LSPEngineMessage = async (
     case SURVEY_DATASETS_COMMAND_ID: {
       const { mapping, runtime, lambda } = message.msg;
       const result = await client.generateDatasetSpecifications(
-        entityTextLocation,
+        entityDetails,
         mapping,
         runtime,
         lambda,
       );
-      webview.postMessage({
+      postMessage({
         command: SURVEY_DATASETS_RESPONSE,
         result,
         messageId: message.messageId,
@@ -343,14 +347,28 @@ export const handleV1LSPEngineMessage = async (
     case CHECK_DATASET_ENTITLEMENTS_COMMAND_ID: {
       const { mapping, runtime, lambda, reports } = message.msg;
       const result = await client.generateEntitlementReports(
-        entityTextLocation,
+        entityDetails,
         mapping,
         runtime,
         lambda,
         reports,
       );
-      webview.postMessage({
+      postMessage({
         command: CHECK_DATASET_ENTITLEMENTS_RESPONSE,
+        result,
+        messageId: message.messageId,
+      });
+      return true;
+    }
+    case GET_QUERY_TYPEAHEAD_COMMAND_ID: {
+      const { code, baseQuery } = message.msg;
+      const result = await client.getQueryTypeahead(
+        entityDetails,
+        code,
+        baseQuery,
+      );
+      postMessage({
+        command: GET_QUERY_TYPEAHEAD_RESPONSE,
         result,
         messageId: message.messageId,
       });

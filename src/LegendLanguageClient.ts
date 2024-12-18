@@ -245,7 +245,9 @@ export class LegendLanguageClient extends LanguageClient {
   }
 
   async exportData(
-    entityTextLocation: TextLocation,
+    entityDetails:
+      | TextLocation
+      | { documentUri: string; sectionIndex: number; entityId: string },
     lambda: V1_RawLambda,
     mapping: string | undefined,
     runtime: V1_Runtime | undefined,
@@ -254,19 +256,32 @@ export class LegendLanguageClient extends LanguageClient {
     downloadFileName: string,
     serializationFormat?: EXECUTION_SERIALIZATION_FORMAT | undefined,
   ): Promise<LegendExecutionResult> {
-    const response = (await commands.executeCommand(
-      LEGEND_COMMAND,
-      entityTextLocation,
-      EXECUTE_QUERY_COMMAND_ID,
-      {
-        lambda: JSON.stringify(lambda),
-        mapping,
-        runtime: JSON.stringify(runtime),
-        context: JSON.stringify(context),
-        serializationFormat,
-      },
-      parameterValues,
-    )) as LegendExecutionResult[];
+    const executableArgs = {
+      lambda: JSON.stringify(lambda),
+      mapping,
+      runtime: JSON.stringify(runtime),
+      context: JSON.stringify(context),
+      serializationFormat,
+    };
+    const response = (
+      entityDetails instanceof TextLocation
+        ? await commands.executeCommand(
+            LEGEND_COMMAND,
+            entityDetails,
+            EXECUTE_QUERY_COMMAND_ID,
+            executableArgs,
+            parameterValues,
+          )
+        : await commands.executeCommand(
+            LEGEND_COMMAND,
+            entityDetails.documentUri,
+            entityDetails.sectionIndex,
+            entityDetails.entityId,
+            EXECUTE_QUERY_COMMAND_ID,
+            executableArgs,
+            parameterValues,
+          )
+    ) as LegendExecutionResult[];
     if (!response[0] || response[0].type === LegendExecutionResultType.ERROR) {
       return (
         response[0] ??
@@ -294,48 +309,74 @@ export class LegendLanguageClient extends LanguageClient {
   }
 
   async generateExecutionPlan(
-    entityTextLocation: TextLocation,
+    entityDetails:
+      | TextLocation
+      | { documentUri: string; sectionIndex: number; entityId: string },
     lambda: V1_RawLambda,
     mapping: string | undefined,
     runtime: V1_Runtime | undefined,
     context: V1_RawExecutionContext,
     parameterValues: V1_ParameterValue[],
   ): Promise<LegendExecutionResult[]> {
-    return commands.executeCommand(
-      LEGEND_COMMAND,
-      entityTextLocation,
-      GENERATE_EXECUTION_PLAN_COMMAND_ID,
-      {
-        lambda: JSON.stringify(lambda),
-        mapping,
-        runtime: JSON.stringify(runtime),
-        context: JSON.stringify(context),
-      },
-      parameterValues,
-    );
+    const executableArgs = {
+      lambda: JSON.stringify(lambda),
+      mapping,
+      runtime: JSON.stringify(runtime),
+      context: JSON.stringify(context),
+    };
+    return entityDetails instanceof TextLocation
+      ? commands.executeCommand(
+          LEGEND_COMMAND,
+          entityDetails,
+          GENERATE_EXECUTION_PLAN_COMMAND_ID,
+          executableArgs,
+          parameterValues,
+        )
+      : commands.executeCommand(
+          LEGEND_COMMAND,
+          entityDetails.documentUri,
+          entityDetails.sectionIndex,
+          entityDetails.entityId,
+          GENERATE_EXECUTION_PLAN_COMMAND_ID,
+          executableArgs,
+          parameterValues,
+        );
   }
 
   async debugGenerateExecutionPlan(
-    entityTextLocation: TextLocation,
+    entityDetails:
+      | TextLocation
+      | { documentUri: string; sectionIndex: number; entityId: string },
     lambda: V1_RawLambda,
     mapping: string | undefined,
     runtime: V1_Runtime | undefined,
     context: V1_RawExecutionContext,
     parameterValues: V1_ParameterValue[],
   ): Promise<LegendExecutionResult[]> {
-    return commands.executeCommand(
-      LEGEND_COMMAND,
-      entityTextLocation,
-      GENERATE_EXECUTION_PLAN_COMMAND_ID,
-      {
-        lambda: JSON.stringify(lambda),
-        mapping,
-        runtime: JSON.stringify(runtime),
-        context: JSON.stringify(context),
-        debug: true,
-      },
-      parameterValues,
-    );
+    const executableArgs = {
+      lambda: JSON.stringify(lambda),
+      mapping,
+      runtime: JSON.stringify(runtime),
+      context: JSON.stringify(context),
+      debug: true,
+    };
+    return entityDetails instanceof TextLocation
+      ? commands.executeCommand(
+          LEGEND_COMMAND,
+          entityDetails,
+          GENERATE_EXECUTION_PLAN_COMMAND_ID,
+          executableArgs,
+          parameterValues,
+        )
+      : commands.executeCommand(
+          LEGEND_COMMAND,
+          entityDetails.documentUri,
+          entityDetails.sectionIndex,
+          entityDetails.entityId,
+          GENERATE_EXECUTION_PLAN_COMMAND_ID,
+          executableArgs,
+          parameterValues,
+        );
   }
 
   async grammarToJson_lambda_batch(
@@ -419,41 +460,65 @@ export class LegendLanguageClient extends LanguageClient {
   }
 
   async generateDatasetSpecifications(
-    entityTextLocation: TextLocation,
+    entityDetails:
+      | TextLocation
+      | { documentUri: string; sectionIndex: number; entityId: string },
     mapping: string,
     runtime: string,
     lambda: V1_RawLambda,
   ): Promise<LegendExecutionResult[]> {
-    return commands.executeCommand(
-      LEGEND_COMMAND,
-      entityTextLocation,
-      SURVEY_DATASETS_COMMAND_ID,
-      {
-        mapping,
-        runtime,
-        lambda: JSON.stringify(lambda),
-      },
-    );
+    const executableArgs = {
+      mapping,
+      runtime,
+      lambda: JSON.stringify(lambda),
+    };
+    return entityDetails instanceof TextLocation
+      ? commands.executeCommand(
+          LEGEND_COMMAND,
+          entityDetails,
+          SURVEY_DATASETS_COMMAND_ID,
+          executableArgs,
+        )
+      : commands.executeCommand(
+          LEGEND_COMMAND,
+          entityDetails.documentUri,
+          entityDetails.sectionIndex,
+          entityDetails.entityId,
+          SURVEY_DATASETS_COMMAND_ID,
+          executableArgs,
+        );
   }
 
   async generateEntitlementReports(
-    entityTextLocation: TextLocation,
+    entityDetails:
+      | TextLocation
+      | { documentUri: string; sectionIndex: number; entityId: string },
     mapping: string,
     runtime: string,
     lambda: V1_RawLambda,
     reports: { name: string; type: string }[],
   ): Promise<LegendExecutionResult[]> {
-    return commands.executeCommand(
-      LEGEND_COMMAND,
-      entityTextLocation,
-      CHECK_DATASET_ENTITLEMENTS_COMMAND_ID,
-      {
-        mapping,
-        runtime,
-        lambda: JSON.stringify(lambda),
-        reports: JSON.stringify(reports),
-      },
-    );
+    const executableArgs = {
+      mapping,
+      runtime,
+      lambda: JSON.stringify(lambda),
+      reports: JSON.stringify(reports),
+    };
+    return entityDetails instanceof TextLocation
+      ? commands.executeCommand(
+          LEGEND_COMMAND,
+          entityDetails,
+          CHECK_DATASET_ENTITLEMENTS_COMMAND_ID,
+          executableArgs,
+        )
+      : commands.executeCommand(
+          LEGEND_COMMAND,
+          entityDetails.documentUri,
+          entityDetails.sectionIndex,
+          entityDetails.entityId,
+          CHECK_DATASET_ENTITLEMENTS_COMMAND_ID,
+          executableArgs,
+        );
   }
 
   async getQueryTypeahead(

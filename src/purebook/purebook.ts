@@ -30,9 +30,9 @@ import {
 } from 'vscode';
 import { LEGEND_LANGUAGE_ID } from '../utils/Const';
 import { PurebookController } from './PurebookController';
-import { handleV1LSPEngineMessage } from './utils';
 import { type LegendLanguageClient } from '../LegendLanguageClient';
 import { type LegendConceptTreeProvider } from '../conceptTree';
+import { handleV1LSPEngineMessage } from '../webviews/utils';
 
 interface RawNotebookCell {
   source: string[];
@@ -111,9 +111,11 @@ export function enableLegendBook(
   messageChannel.onDidReceiveMessage(async (e) => {
     await handleV1LSPEngineMessage(
       messageChannel.postMessage,
-      e.message.cellUri,
-      0,
-      'notebook_cell',
+      {
+        documentUri: e.message.cellUri,
+        sectionIndex: 0,
+        entityId: 'notebook_cell',
+      },
       client,
       context,
       legendConceptTree,

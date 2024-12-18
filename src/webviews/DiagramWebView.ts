@@ -79,7 +79,7 @@ export const renderDiagramRendererWebView = (
   webview.onDidReceiveMessage(async (message) => {
     if (
       await handleV1LSPEngineMessage(
-        webview,
+        (response: PlainObject) => webview.postMessage(response),
         diagramTextLocation,
         client,
         context,

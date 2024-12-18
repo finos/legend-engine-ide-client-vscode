@@ -77,7 +77,7 @@ export const renderQueryBuilderWebView = async (
   webview.onDidReceiveMessage(async (message) => {
     if (
       await handleV1LSPEngineMessage(
-        webview,
+        (response: PlainObject) => webview.postMessage(response),
         entityTextLocation,
         client,
         context,
