@@ -22,11 +22,15 @@ import {
   type PlainObject,
   type RelationType,
   type V1_ValueSpecification,
+  _elementPtr,
+  _function,
   assertTrue,
   DataCubeEngine,
+  DataCubeFunction,
   DataCubeQuery,
   DataCubeSource,
   guaranteeType,
+  isNonNullable,
   uuid,
   V1_AppliedFunction,
   V1_deserializeRawValueSpecification,
@@ -297,6 +301,18 @@ export class LSPDataCubeEngine extends DataCubeEngine {
   override buildExecutionContext(
     source: DataCubeSource,
   ): V1_AppliedFunction | undefined {
+    if (source instanceof LSPDataCubeSource) {
+      const appendFromFunc = Boolean(source.mapping ?? source.runtime);
+      return appendFromFunc
+        ? _function(
+            DataCubeFunction.FROM,
+            [
+              source.mapping ? _elementPtr(source.mapping) : undefined,
+              source.runtime ? _elementPtr(source.runtime) : undefined,
+            ].filter(isNonNullable),
+          )
+        : undefined;
+    }
     return undefined;
   }
 }
