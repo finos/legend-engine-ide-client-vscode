@@ -84,7 +84,7 @@ export class LSPDataCubeEngine extends DataCubeEngine {
 
   constructor(
     cellUri: string,
-    lambdaJson: PlainObject<V1_RawLambda>,
+    rawLambdaJson: PlainObject<V1_RawLambda>,
     postMessage: (message: unknown) => void,
     onDidReceiveMessage: VSCodeEvent<{
       command: string;
@@ -95,20 +95,10 @@ export class LSPDataCubeEngine extends DataCubeEngine {
     super();
     this.lspEngine = new V1_LSPEngine(this.postAndWaitForMessage(cellUri));
     this.rawLambda = V1_deserializeRawValueSpecification(
-      lambdaJson,
+      rawLambdaJson,
     ) as V1_RawLambda;
     this.postMessage = postMessage;
     this.onDidReceiveMessage = onDidReceiveMessage;
-  }
-
-  async getRelationalType(query: V1_RawLambda): Promise<RelationType> {
-    const relationType = await this.lspEngine.getLambdaRelationTypeFromRawInput(
-      {
-        lambda: query,
-        model: {},
-      },
-    );
-    return relationType;
   }
 
   // ------------------------------- CORE OPERATIONS -------------------------------
@@ -229,14 +219,24 @@ export class LSPDataCubeEngine extends DataCubeEngine {
       V1_serializeValueSpecification(baseQuery, []),
       false,
     );
+
+    // If the query string is wrapped in braces, we need to append the code string
+    // within the braces.
     const fullQuery =
       queryString.charAt(0) === '{' &&
       queryString.charAt(queryString.length - 1) === '}'
         ? `${queryString.substring(0, queryString.length - 1)}${code}}`
         : queryString + code;
-    return this.getRelationalType(
-      await this.lspEngine.transformCodeToLambda(fullQuery),
+    const fullQueryLambda =
+      await this.lspEngine.transformCodeToLambda(fullQuery);
+
+    const relationType = await this.lspEngine.getLambdaRelationTypeFromRawInput(
+      {
+        lambda: fullQueryLambda,
+        model: {},
+      },
     );
+    return relationType;
   }
 
   private buildRawLambdaFromValueSpec(query: V1_Lambda): V1_RawLambda {
