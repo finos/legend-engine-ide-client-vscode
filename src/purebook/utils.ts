@@ -59,7 +59,7 @@ export const handleV1LSPEngineMessage = async (
   postMessage: (message: PlainObject) => Thenable<boolean>,
   documentUri: string,
   sectionIndex: number,
-  entityid: string,
+  entityId: string,
   client: LegendLanguageClient,
   context: ExtensionContext,
   legendConceptTree: LegendConceptTreeProvider,
@@ -103,10 +103,8 @@ export const handleV1LSPEngineMessage = async (
         parameterValues,
         serializationFormat,
       } = message.msg;
-      const result = await client.executeQueryByDocumentId(
-        documentUri,
-        sectionIndex,
-        entityid,
+      const result = await client.executeQuery(
+        { documentUri, sectionIndex, entityId },
         lambda,
         mapping,
         runtime,
@@ -123,10 +121,8 @@ export const handleV1LSPEngineMessage = async (
     }
     case GRAMMAR_TO_JSON_LAMBDA_BATCH_COMMAND_ID: {
       const { input } = message.msg;
-      const result = await client.grammarToJson_lambda_batchByDocumentId(
-        documentUri,
-        sectionIndex,
-        entityid,
+      const result = await client.grammarToJson_lambda_batch(
+        { documentUri, sectionIndex, entityId },
         input,
       );
       postMessage({
@@ -138,10 +134,8 @@ export const handleV1LSPEngineMessage = async (
     }
     case JSON_TO_GRAMMAR_LAMBDA_BATCH_COMMAND_ID: {
       const { lambdas, renderStyle } = message.msg;
-      const result = await client.jsonToGrammar_lambda_batchByDocumentId(
-        documentUri,
-        sectionIndex,
-        entityid,
+      const result = await client.jsonToGrammar_lambda_batch(
+        { documentUri, sectionIndex, entityId },
         lambdas,
         renderStyle,
       );
@@ -154,10 +148,8 @@ export const handleV1LSPEngineMessage = async (
     }
     case GET_LAMBDA_RETURN_TYPE_COMMAND_ID: {
       const { lambda } = message.msg;
-      const result = await client.getLambdaReturnTypeByDocumentId(
-        documentUri,
-        sectionIndex,
-        entityid,
+      const result = await client.getLambdaReturnType(
+        { documentUri, sectionIndex, entityId },
         lambda,
       );
       postMessage({
@@ -169,10 +161,8 @@ export const handleV1LSPEngineMessage = async (
     }
     case GET_QUERY_TYPEAHEAD_COMMAND_ID: {
       const { code, baseQuery } = message.msg;
-      const result = await client.getQueryTypeaheadByDocumentId(
-        documentUri,
-        sectionIndex,
-        entityid,
+      const result = await client.getQueryTypeahead(
+        { documentUri, sectionIndex, entityId },
         code,
         baseQuery,
       );
