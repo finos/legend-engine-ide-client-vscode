@@ -25,15 +25,7 @@ import {
   V1_rawBaseExecutionContextModelSchema,
   type EXECUTION_SERIALIZATION_FORMAT,
 } from '@finos/legend-vscode-extension-dependencies';
-import {
-  createModelSchema,
-  custom,
-  map,
-  optional,
-  primitive,
-  raw,
-  SKIP,
-} from 'serializr';
+import { createModelSchema, custom, map, raw } from 'serializr';
 
 export class V1_LSPExecuteInput {
   lambda!: V1_RawLambda;
@@ -46,16 +38,19 @@ export class V1_LSPExecuteInput {
   static readonly serialization = new SerializationFactory(
     createModelSchema(V1_LSPExecuteInput, {
       lambda: usingModelSchema(V1_rawLambdaModelSchema),
-      mapping: optional(primitive()),
+      mapping: custom(
+        (val) => (val ? val : undefined),
+        () => undefined,
+      ),
       runtime: custom(
-        (val) => (val ? V1_serializeRuntime(val) : SKIP),
-        () => SKIP,
+        (val) => (val ? V1_serializeRuntime(val) : undefined),
+        () => undefined,
       ),
       context: usingModelSchema(V1_rawBaseExecutionContextModelSchema),
       parameterValues: map(raw()),
       serializationFormat: custom(
         (val) => (val ? val : undefined),
-        () => SKIP,
+        () => undefined,
       ),
     }),
   );

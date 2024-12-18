@@ -21,7 +21,8 @@ const webpack = require('webpack');
 const webviewConfig = {
   entry: {
     AgGridRenderer: './src/components/grid/AgGridRenderer.tsx',
-    FunctionResultsEditorRenderer: './src/components/function/FunctionResultsEditorRenderer.tsx',
+    FunctionResultsEditorRenderer:
+      './src/components/function/FunctionResultsEditorRenderer.tsx',
     WebViewRoot: './src/components/WebViewRoot.tsx',
   },
   externals: {
@@ -30,7 +31,7 @@ const webviewConfig = {
   output: {
     filename: '[name].js',
     path: path.resolve(__dirname, 'dist'),
-    assetModuleFilename: 'assets/[hash][ext][query]'
+    assetModuleFilename: 'assets/[hash][ext][query]',
   },
   devtool: 'nosources-source-map',
   module: {
@@ -53,12 +54,12 @@ const webviewConfig = {
       {
         test: /\.(woff|woff2|eot|ttf|otf)$/i,
         type: 'asset',
-      }
+      },
     ],
   },
   plugins: [
     new webpack.ProvidePlugin({
-           process: 'process/browser',
+      process: 'process/browser',
     }),
     new webpack.DefinePlugin({
       AG_GRID_LICENSE: null,
@@ -67,53 +68,41 @@ const webviewConfig = {
   resolve: {
     extensions: ['.tsx', '.ts', '.js', '.css', '.scss'],
     fallback: {
-      stream: require.resolve("stream-browserify"),
-      crypto: require.resolve("crypto-browserify"),
-      vm: require.resolve("vm-browserify")
+      stream: require.resolve('stream-browserify'),
+      crypto: require.resolve('crypto-browserify'),
+      vm: require.resolve('vm-browserify'),
     },
     alias: {
       react: path.resolve('./node_modules/react'),
-      process: "process/browser"
-    }
+      process: 'process/browser',
+    },
   },
 };
 
-const extensionConfig = {
-  target: 'webworker',
-  entry: './src/extension.ts',
-  output: {
-    path: path.resolve(__dirname, 'dist'),
-    filename: 'extension.js',
-    libraryTarget: 'commonjs2',
-    devtoolModuleFilenameTemplate: '../[resource-path]'
+const purebookRendererConfig = {
+  entry: {
+    PureBookRendererRoot: './src/purebook/PurebookRendererRoot.tsx',
   },
-  devtool: 'nosources-source-map',
   externals: {
     vscode: 'commonjs vscode',
-    'vscode-languageclient/node': 'vscode-languageclient/node'
   },
-  resolve: {
-    mainFields: ['browser', 'module', 'main'],
-    extensions: ['.tsx', '.ts', '.js', '.css', '.scss'],
-    fallback: {
-      // see https://webpack.js.org/configuration/resolve/#resolvefallback
-      console: require.resolve('console-browserify'),
-      assert: require.resolve('assert'),
-    },
-    alias: {
-      react: path.resolve('./node_modules/react')
-    }
+  target: 'web',
+  output: {
+    filename: '[name].js',
+    path: path.resolve(__dirname, 'dist'),
+    libraryTarget: 'module',
+    assetModuleFilename: 'assets/[hash][ext][query]',
   },
+  experiments: {
+    outputModule: true,
+  },
+  devtool: 'nosources-source-map',
   module: {
     rules: [
       {
         test: /\.tsx?$/,
+        use: 'ts-loader',
         exclude: /node_modules/,
-        use: [
-          {
-            loader: 'ts-loader'
-          }
-        ]
       },
       {
         test: /\.s?(a|c)ss$/,
@@ -125,9 +114,83 @@ const extensionConfig = {
           },
         ],
       },
-    ]
-  }
+      {
+        test: /\.(woff|woff2|eot|ttf|otf)$/i,
+        type: 'asset',
+      },
+    ],
+  },
+  plugins: [
+    new webpack.ProvidePlugin({
+      process: 'process/browser',
+    }),
+    new webpack.DefinePlugin({
+      AG_GRID_LICENSE: null,
+    }),
+  ],
+  resolve: {
+    extensions: ['.tsx', '.ts', '.js', '.css', '.scss'],
+    fallback: {
+      stream: require.resolve('stream-browserify'),
+      crypto: require.resolve('crypto-browserify'),
+      vm: require.resolve('vm-browserify'),
+    },
+    alias: {
+      react: path.resolve('./node_modules/react'),
+      process: 'process/browser',
+    },
+  },
 };
 
+const extensionConfig = {
+  target: 'webworker',
+  entry: './src/extension.ts',
+  output: {
+    path: path.resolve(__dirname, 'dist'),
+    filename: 'extension.js',
+    libraryTarget: 'commonjs2',
+    devtoolModuleFilenameTemplate: '../[resource-path]',
+  },
+  devtool: 'nosources-source-map',
+  externals: {
+    vscode: 'commonjs vscode',
+    'vscode-languageclient/node': 'vscode-languageclient/node',
+  },
+  resolve: {
+    mainFields: ['browser', 'module', 'main'],
+    extensions: ['.tsx', '.ts', '.js', '.css', '.scss'],
+    fallback: {
+      // see https://webpack.js.org/configuration/resolve/#resolvefallback
+      console: require.resolve('console-browserify'),
+      assert: require.resolve('assert'),
+    },
+    alias: {
+      react: path.resolve('./node_modules/react'),
+    },
+  },
+  module: {
+    rules: [
+      {
+        test: /\.tsx?$/,
+        exclude: /node_modules/,
+        use: [
+          {
+            loader: 'ts-loader',
+          },
+        ],
+      },
+      {
+        test: /\.s?(a|c)ss$/,
+        use: [
+          'style-loader',
+          'css-loader',
+          {
+            loader: 'sass-loader',
+          },
+        ],
+      },
+    ],
+  },
+};
 
-module.exports = [webviewConfig, extensionConfig]
+module.exports = [webviewConfig, purebookRendererConfig, extensionConfig];

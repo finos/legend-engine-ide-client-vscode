@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+import { uuid } from '@finos/legend-vscode-extension-dependencies';
 import { type PlainObject } from './SerializationUtils';
 
 interface Vscode {
@@ -30,9 +31,11 @@ export const postAndWaitForMessage = <T>(
   requestMessage: { command: string; msg?: PlainObject },
   responseCommandId: string,
 ): Promise<T> => {
+  const messageId = uuid();
   postMessage({
     command: requestMessage.command,
     msg: requestMessage.msg,
+    messageId,
   });
   return new Promise((resolve) => {
     const handleMessage = (
