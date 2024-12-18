@@ -217,11 +217,6 @@ export class LSPDataCubeEngine extends DataCubeEngine {
     baseQuery: V1_ValueSpecification,
     source: DataCubeSource,
   ): Promise<RelationType> {
-    // TODO: Determine if this function should ever expect to receive
-    // a V1_ValueSpecification that is not a V1_Lambda as the baseQuery
-    if (!(baseQuery instanceof V1_Lambda)) {
-      throw new Error('Base query must be a V1_Lambda');
-    }
     const queryString = await this.lspEngine.transformV1RawLambdaToCode(
       V1_serializeValueSpecification(baseQuery, []),
       false,
