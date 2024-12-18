@@ -274,7 +274,7 @@ export class V1_LSPEngine implements V1_GraphManagerEngine {
       if (valueSpec instanceof V1_Lambda) {
         acc.set(key, new RawLambda(valueSpec.parameters, valueSpec.body));
       } else {
-        acc.set(key, new RawLambda([], input[key]));
+        acc.set(key, new RawLambda([], [input[key]]));
       }
       return acc;
     }, new Map<string, RawLambda>());
