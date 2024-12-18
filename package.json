@@ -330,7 +330,7 @@
         "displayName": "Legend Cube Renderer",
         "entrypoint": "./dist/PurebookRendererRoot.js",
         "mimeTypes": [
-          "application/legend-relational-result"
+          "application/legend-datacube"
         ],
         "requiresMessaging": "always"
       }
