@@ -113,8 +113,7 @@ export class LSPDataCubeEngine extends DataCubeEngine {
       V1_serializeRawValueSpecification(this.rawLambda),
       [],
     );
-    // We could do a further check here to ensure the experssion is an applied funciton
-    // this is because data cube expects an expression to be able to built further upon the queery
+
     if (
       source.query instanceof V1_Lambda &&
       source.query.body.length === 1 &&
@@ -122,7 +121,11 @@ export class LSPDataCubeEngine extends DataCubeEngine {
     ) {
       source.query = source.query.body[0];
     }
-    const queryFunc = guaranteeType(source.query, V1_AppliedFunction);
+    const queryFunc = guaranteeType(
+      source.query,
+      V1_AppliedFunction,
+      `Only functions returning TDS/graph fetch using the from() function can be opened in Data Cube`,
+    );
     assertTrue(
       queryFunc.function === 'from',
       `Only functions returning TDS/graph fetch using the from() function can be opened in Data Cube`,
