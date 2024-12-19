@@ -14,21 +14,22 @@
  * limitations under the License.
  */
 
+import { AgGridReact, type AgGridReactProps } from 'ag-grid-react';
 import {
-  AgGridReact,
-  type AgGridReactProps,
-  type AgReactUiProps,
-} from '@ag-grid-community/react';
-import { ClientSideRowModelModule } from '@ag-grid-community/client-side-row-model';
-import { CsvExportModule } from '@ag-grid-community/csv-export';
-import { ModuleRegistry } from '@ag-grid-community/core';
-import { ServerSideRowModelModule } from '@ag-grid-enterprise/server-side-row-model';
-import { RowGroupingModule } from '@ag-grid-enterprise/row-grouping';
-import { MenuModule } from '@ag-grid-enterprise/menu';
+  ClientSideRowModelModule,
+  CsvExportModule,
+  ModuleRegistry,
+} from 'ag-grid-community';
+import {
+  ServerSideRowModelModule,
+  RowGroupingModule,
+  MenuModule,
+  LicenseManager,
+} from 'ag-grid-enterprise';
 import { type TDSRowDataType, getDefaultColumnDefintions } from './GridUtils';
 import { ServerSideDataSource } from './ServerSideDataSource';
-import { LicenseManager } from '@ag-grid-enterprise/core';
 import type { INTERNAL__TDSColumn } from '../../results/TDSLegendExecutionResult';
+import { type JSX } from 'react';
 
 const communityModules = [ClientSideRowModelModule, CsvExportModule];
 const enterpriseModules = [
@@ -39,7 +40,7 @@ const enterpriseModules = [
 const allModules = communityModules.concat(enterpriseModules);
 
 export function AgGridComponent<TData = unknown>(
-  props: (AgGridReactProps<TData> | AgReactUiProps<TData>) & {
+  props: AgGridReactProps<TData> & {
     licenseKey: string;
     columns: INTERNAL__TDSColumn[];
   },

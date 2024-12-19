@@ -27,7 +27,7 @@
   },
   "include": [
     "src",
-    "./.eslintrc.cjs",
+    "./.eslint.config.mjs",
   ],
   "exclude": ["node_modules", ".vscode-test"]
 }
