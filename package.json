@@ -355,22 +355,24 @@
     "release:openvsx": "ovsx publish -i legend-engine-ide-client-vscode.vsix"
   },
   "dependencies": {
+    "@finos/legend-vscode-extension-dependencies": "4.0.44",
+    "@types/vscode": "1.83.0",
     "ag-grid-community": "33.0.2",
     "ag-grid-enterprise": "33.0.2",
     "ag-grid-react": "33.0.2",
-    "@finos/legend-vscode-extension-dependencies": "4.0.44",
-    "@types/vscode": "1.83.0",
     "glob": "11.0.0",
-    "mobx-react-lite": "4.1.0",
     "mobx": "6.13.5",
+    "mobx-react-lite": "4.1.0",
     "path": "0.12.7",
+    "react": "19.0.0",
     "react-dom": "19.0.0",
     "react-select": "5.9.0",
-    "react": "19.0.0",
     "serializr": "3.0.3",
     "vscode-languageclient": "9.0.1"
   },
   "devDependencies": {
+    "@eslint/compat": "^1.2.4",
+    "@eslint/js": "9.17.0",
     "@types/mocha": "10.0.1",
     "@types/node": "22.10.2",
     "@types/react": "19.0.2",
