@@ -40,7 +40,7 @@ const enterpriseModules = [
 const allModules = communityModules.concat(enterpriseModules);
 
 export function AgGridComponent<TData = unknown>(
-  props: (AgGridReactProps<TData>) & {
+  props: AgGridReactProps<TData> & {
     licenseKey: string;
     columns: INTERNAL__TDSColumn[];
   },
