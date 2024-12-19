@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import '@ag-grid-community/styles/ag-grid.css';
-import '@ag-grid-community/styles/ag-theme-balham.min.css';
+import 'ag-grid-community/styles/ag-grid.css';
+import 'ag-grid-community/styles/ag-theme-balham.min.css';
 import { createRoot } from 'react-dom/client';
 import { AgGridComponent, configureAgGridComponent } from './AgGrid';
 

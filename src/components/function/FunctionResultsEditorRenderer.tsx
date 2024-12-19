@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import '@ag-grid-community/styles/ag-grid.css';
-import '@ag-grid-community/styles/ag-theme-balham.min.css';
+import 'ag-grid-community/styles/ag-grid.css';
+import 'ag-grid-community/styles/ag-theme-balham.min.css';
 import { createRoot } from 'react-dom/client';
 import {
   type PlainObject,
