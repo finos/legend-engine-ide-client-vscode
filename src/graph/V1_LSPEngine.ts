@@ -80,6 +80,7 @@ import {
   guaranteeNonNullable,
   isLossSafeNumber,
   parseLosslessJSON,
+  PersistentDataCubeQuery,
   RawLambda,
   RelationTypeColumnMetadata,
   RelationTypeMetadata,
@@ -893,6 +894,22 @@ export class V1_LSPEngine implements V1_GraphManagerEngine {
 
   getCurrentUserId(): string | undefined {
     return this.currentUserId;
+  }
+
+  // ------------------------------------------ Query Data Cube ------------------------------------------
+
+  async getDataCubeQuery(id: string): Promise<PersistentDataCubeQuery> {
+    throw new Error('getDataCubeQuery not implemented');
+  }
+
+  async createDataCubeQuery(
+    query: PersistentDataCubeQuery,
+  ): Promise<PersistentDataCubeQuery> {
+    throw new Error('createDataCubeQuery not implemented');
+  }
+
+  async deleteDataCubeQuery(queryId: string): Promise<void> {
+    throw new Error('deleteDataCubeQuery not implemented');
   }
 
   // ------------------------------------------ Analysis ------------------------------------------
