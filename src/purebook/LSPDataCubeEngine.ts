@@ -18,7 +18,6 @@ import {
   type CompletionItem,
   type DataCubeAPI,
   type DataCubeExecutionResult,
-  type DataCubeInitialInput,
   type PlainObject,
   type RelationType,
   type V1_ValueSpecification,
@@ -61,9 +60,30 @@ export class LSPDataCubeEngine extends DataCubeEngine {
     result: unknown;
   }>;
 
-  postAndWaitForMessage =
+  constructor(
+    cellUri: string,
+    rawLambdaJson: PlainObject<V1_RawLambda>,
+    postMessage: (message: unknown) => void,
+    onDidReceiveMessage: VSCodeEvent<{
+      command: string;
+      messageId: string;
+      result: unknown;
+    }>,
+  ) {
+    super();
+    this.lspEngine = new V1_LSPEngine(this.postAndWaitForMessage(cellUri));
+    this.rawLambda = V1_deserializeRawValueSpecification(
+      rawLambdaJson,
+    ) as V1_RawLambda;
+    this.postMessage = postMessage;
+    this.onDidReceiveMessage = onDidReceiveMessage;
+  }
+
+  // ------------------------------- HELPER FUNCTIONS ------------------------------
+
+  private postAndWaitForMessage =
     (cellUri: string) =>
-    <T>(
+    async <T>(
       requestMessage: { command: string; msg?: PlainObject },
       responseCommandId: string,
     ): Promise<T> => {
@@ -86,82 +106,102 @@ export class LSPDataCubeEngine extends DataCubeEngine {
       });
     };
 
-  constructor(
-    cellUri: string,
-    rawLambdaJson: PlainObject<V1_RawLambda>,
-    postMessage: (message: unknown) => void,
-    onDidReceiveMessage: VSCodeEvent<{
-      command: string;
-      messageId: string;
-      result: unknown;
-    }>,
-  ) {
-    super();
-    this.lspEngine = new V1_LSPEngine(this.postAndWaitForMessage(cellUri));
-    this.rawLambda = V1_deserializeRawValueSpecification(
-      rawLambdaJson,
-    ) as V1_RawLambda;
-    this.postMessage = postMessage;
-    this.onDidReceiveMessage = onDidReceiveMessage;
+  private getSourceFunctionExpression(): V1_ValueSpecification {
+    let srcFuncExp = V1_deserializeValueSpecification(
+      V1_serializeRawValueSpecification(this.rawLambda),
+      [],
+    );
+    // We could do a further check here to ensure the experssion is an applied funciton
+    // this is because data cube expects an expression to be able to built further upon the queery
+    if (
+      srcFuncExp instanceof V1_Lambda &&
+      srcFuncExp.body.length === 1 &&
+      srcFuncExp.body[0]
+    ) {
+      srcFuncExp = srcFuncExp.body[0];
+    }
+    return srcFuncExp;
+  }
+
+  private getFromFunctionMappingAndRuntime(srcFuncExp: V1_AppliedFunction): {
+    mapping?: string;
+    runtime: string;
+  } {
+    if (srcFuncExp.parameters.length === 2) {
+      return {
+        runtime: guaranteeType(
+          srcFuncExp.parameters[1],
+          V1_PackageableElementPtr,
+        ).fullPath,
+      };
+    } else if (srcFuncExp.parameters.length === 3) {
+      return {
+        runtime: guaranteeType(
+          srcFuncExp.parameters[2],
+          V1_PackageableElementPtr,
+        ).fullPath,
+        mapping: guaranteeType(
+          srcFuncExp.parameters[1],
+          V1_PackageableElementPtr,
+        ).fullPath,
+      };
+    } else {
+      throw new Error(`Expected 'from' function to have 2 or 3 parameters`);
+    }
+  }
+
+  private async getRawLambdaRelationType(
+    lambda: V1_RawLambda,
+  ): Promise<RelationType> {
+    return this.lspEngine.getLambdaRelationTypeFromRawInput({
+      lambda,
+      model: {},
+    });
+  }
+
+  private buildRawLambdaFromValueSpec(query: V1_Lambda): V1_RawLambda {
+    const json = guaranteeType(
+      V1_deserializeRawValueSpecification(
+        V1_serializeValueSpecification(query, []),
+      ),
+      V1_RawLambda,
+    );
+    const rawLambda = new V1_RawLambda();
+    rawLambda.parameters = json.parameters;
+    rawLambda.body = json.body;
+    return rawLambda;
   }
 
   // ------------------------------- CORE OPERATIONS -------------------------------
 
-  override async getInitialInput(): Promise<DataCubeInitialInput | undefined> {
-    const source = new LSPDataCubeSource();
-    source.query = V1_deserializeValueSpecification(
-      V1_serializeRawValueSpecification(this.rawLambda),
-      [],
-    );
+  override async getBaseQuery(): Promise<DataCubeQuery | undefined> {
+    const columns = (await this.getRawLambdaRelationType(this.rawLambda))
+      .columns;
+    const query = new DataCubeQuery();
+    query.query = `~[${columns.map((e) => `'${e.name}'`)}]->select()`;
+    return query;
+  }
 
-    if (
-      source.query instanceof V1_Lambda &&
-      source.query.body.length === 1 &&
-      source.query.body[0]
-    ) {
-      source.query = source.query.body[0];
-    }
-    const queryFunc = guaranteeType(
-      source.query,
+  override async processQuerySource(value: PlainObject) {
+    const srcFuncExp = guaranteeType(
+      this.getSourceFunctionExpression(),
       V1_AppliedFunction,
       `Only functions returning TDS/graph fetch using the from() function can be opened in Data Cube`,
     );
     assertTrue(
-      queryFunc.function === 'from',
+      srcFuncExp.function === 'from',
       `Only functions returning TDS/graph fetch using the from() function can be opened in Data Cube`,
     );
-    if (queryFunc.parameters.length === 2) {
-      source.runtime = guaranteeType(
-        queryFunc.parameters[1],
-        V1_PackageableElementPtr,
-      ).fullPath;
-    } else if (queryFunc.parameters.length === 3) {
-      source.mapping = guaranteeType(
-        queryFunc.parameters[1],
-        V1_PackageableElementPtr,
-      ).fullPath;
-      source.runtime = guaranteeType(
-        queryFunc.parameters[2],
-        V1_PackageableElementPtr,
-      ).fullPath;
-    } else {
-      throw new Error(`Expected 'from' function to have 2 or 3 parameters`);
-    }
-
+    const source = new LSPDataCubeSource();
     source.sourceColumns = (
-      await this.lspEngine.getLambdaRelationTypeFromRawInput({
-        lambda: this.rawLambda,
-        model: {},
-      })
+      await this.getRawLambdaRelationType(this.rawLambda)
     ).columns;
-
-    const query = new DataCubeQuery();
-    query.query = `~[${source.sourceColumns.map((e) => `'${e.name}'`)}]->select()`;
-
-    return {
-      query,
-      source,
-    };
+    const { mapping, runtime } =
+      this.getFromFunctionMappingAndRuntime(srcFuncExp);
+    source.mapping = mapping;
+    source.runtime = runtime;
+    source.query = srcFuncExp;
+    return source;
   }
 
   override async parseValueSpecification(
@@ -177,7 +217,7 @@ export class LSPDataCubeEngine extends DataCubeEngine {
     );
   }
 
-  override getValueSpecificationCode(
+  override async getValueSpecificationCode(
     value: V1_ValueSpecification,
     pretty?: boolean | undefined,
   ): Promise<string> {
@@ -199,17 +239,11 @@ export class LSPDataCubeEngine extends DataCubeEngine {
     return response.completions;
   }
 
-  override getQueryRelationType(
-    query: V1_Lambda,
-    source: DataCubeSource,
-  ): Promise<RelationType> {
+  override async getQueryRelationType(query: V1_Lambda): Promise<RelationType> {
     const rawLambda = new V1_RawLambda();
     rawLambda.body = query.body;
     rawLambda.parameters = query.parameters;
-    return this.lspEngine.getLambdaRelationTypeFromRawInput({
-      lambda: rawLambda,
-      model: {},
-    });
+    return this.getRawLambdaRelationType(rawLambda);
   }
 
   override async getQueryCodeRelationReturnType(
@@ -232,32 +266,11 @@ export class LSPDataCubeEngine extends DataCubeEngine {
     const fullQueryLambda =
       await this.lspEngine.transformCodeToLambda(fullQuery);
 
-    const relationType = await this.lspEngine.getLambdaRelationTypeFromRawInput(
-      {
-        lambda: fullQueryLambda,
-        model: {},
-      },
-    );
-    return relationType;
-  }
-
-  private buildRawLambdaFromValueSpec(query: V1_Lambda): V1_RawLambda {
-    const json = guaranteeType(
-      V1_deserializeRawValueSpecification(
-        V1_serializeValueSpecification(query, []),
-      ),
-      V1_RawLambda,
-    );
-    const rawLambda = new V1_RawLambda();
-    rawLambda.parameters = json.parameters;
-    rawLambda.body = json.body;
-    return rawLambda;
+    return this.getRawLambdaRelationType(fullQueryLambda);
   }
 
   override async executeQuery(
     query: V1_Lambda,
-    source: DataCubeSource,
-    api: DataCubeAPI,
   ): Promise<DataCubeExecutionResult> {
     const rawLambda = this.buildRawLambdaFromValueSpec(query);
 
