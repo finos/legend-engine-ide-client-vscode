@@ -39,9 +39,12 @@ export const postAndWaitForMessage = <T>(
   });
   return new Promise((resolve) => {
     const handleMessage = (
-      event: MessageEvent<{ result: T; command: string }>,
+      event: MessageEvent<{ result: T; command: string; messageId: string }>,
     ): void => {
-      if (event.data.command === responseCommandId) {
+      if (
+        event.data.command === responseCommandId &&
+        event.data.messageId === messageId
+      ) {
         window.removeEventListener('message', handleMessage);
         resolve(event.data.result);
       }
