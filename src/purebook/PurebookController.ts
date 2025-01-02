@@ -15,13 +15,14 @@
  */
 
 import {
-  commands,
   type NotebookCell,
+  type NotebookController,
   type NotebookDocument,
+  commands,
   NotebookCellOutput,
   NotebookCellOutputItem,
-  type NotebookController,
   notebooks,
+  workspace,
 } from 'vscode';
 import { LEGEND_COMMAND_V2, LEGEND_LANGUAGE_ID } from '../utils/Const';
 import { LegendExecutionResult } from '../results/LegendExecutionResult';
@@ -81,6 +82,10 @@ export class PurebookController {
       execution.end(undefined, Date.now());
     });
 
+    const enableDatacube = workspace
+      .getConfiguration('legend')
+      .get('purebook.enableDatacube', true);
+
     return commands
       .executeCommand(
         LEGEND_COMMAND_V2,
@@ -89,7 +94,9 @@ export class PurebookController {
         0,
         'notebook_cell',
         'executeCell',
-        {},
+        {
+          enableDatacube,
+        },
         {},
       )
       .then(
