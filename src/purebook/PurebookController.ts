@@ -82,9 +82,9 @@ export class PurebookController {
       execution.end(undefined, Date.now());
     });
 
-    const enableDatacube = workspace
+    const enableDataCube = workspace
       .getConfiguration('legend')
-      .get('purebook.enableDatacube', true);
+      .get('purebook.enableDataCube', true);
 
     return commands
       .executeCommand(
@@ -95,7 +95,7 @@ export class PurebookController {
         'notebook_cell',
         'executeCell',
         {
-          enableDatacube,
+          enableDataCube,
         },
         {},
       )
