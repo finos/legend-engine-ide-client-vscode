@@ -296,7 +296,7 @@ export class LSPDataCubeEngine extends DataCubeEngine {
     );
 
     const sql = expectedTDS.activities?.[0];
-    let sqlString = '### NO SQL FOUND';
+    let sqlString = '# NO SQL FOUND';
     if (sql instanceof RelationalExecutionActivities) {
       sqlString = sql.sql;
     }
