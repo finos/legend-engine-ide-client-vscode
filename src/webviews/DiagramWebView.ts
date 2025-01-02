@@ -28,11 +28,12 @@ import {
   WRITE_ENTITY,
 } from '../utils/Const';
 import type { LegendLanguageClient } from '../LegendLanguageClient';
-import { getWebviewHtml, handleV1LSPEngineMessage } from './utils';
+import { getWebviewHtml } from './utils';
 import { type PlainObject } from '@finos/legend-vscode-extension-dependencies';
 import { guaranteeNonNullable } from '../utils/AssertionUtils';
 import { type LegendConceptTreeProvider } from '../conceptTree';
 import { TextLocation } from '../model/TextLocation';
+import { handleV1LSPEngineMessage } from '../graph/utils';
 
 export const renderDiagramRendererWebView = (
   diagramRendererWebViewPanel: WebviewPanel,

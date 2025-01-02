@@ -32,7 +32,7 @@ import { LEGEND_LANGUAGE_ID } from '../utils/Const';
 import { PurebookController } from './PurebookController';
 import { type LegendLanguageClient } from '../LegendLanguageClient';
 import { type LegendConceptTreeProvider } from '../conceptTree';
-import { handleV1LSPEngineMessage } from '../webviews/utils';
+import { handleV1LSPEngineMessage } from '../graph/utils';
 
 interface RawNotebookCell {
   source: string[];
