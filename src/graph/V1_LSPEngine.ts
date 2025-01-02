@@ -602,7 +602,7 @@ export class V1_LSPEngine implements V1_GraphManagerEngine {
         }),
       );
     }
-    // LSP returns an object with property "completion" but the CodeCompleetionResult
+    // LSP returns an object with property "completion" but the CodeCompletionResult class
     // expects it to be named "completions", so we rename it here.
     const rawJson = JSON.parse(guaranteeNonNullable(response?.[0]?.message));
     const result = CodeCompletionResult.serialization.fromJson({
