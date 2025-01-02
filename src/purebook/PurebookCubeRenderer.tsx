@@ -80,9 +80,12 @@ export const PurebookCubeRenderer = (props: {
         </div>
       )}
       {!engine && !query && !isLoading && error && (
-        <div>
-          Error setting up purebook cube renderer. Could not create engine.
-        </div>
+        <>
+          <div>
+            Failed creating engine and query for Purebook Datacube renderer
+          </div>
+          <div>{error}</div>
+        </>
       )}
     </>
   );
