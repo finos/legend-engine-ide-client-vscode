@@ -15,12 +15,12 @@
  */
 
 import {
+  type DataCubeQuery,
   type PlainObject,
   type V1_RawLambda,
   CubesLoadingIndicator,
   CubesLoadingIndicatorIcon,
   DataCube,
-  DataCubeQuery,
 } from '@finos/legend-vscode-extension-dependencies';
 import { LSPDataCubeEngine } from './LSPDataCubeEngine';
 import { type VSCodeEvent } from 'vscode-notebook-renderer/events';
