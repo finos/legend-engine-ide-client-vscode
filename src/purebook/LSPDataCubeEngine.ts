@@ -160,7 +160,7 @@ export class LSPDataCubeEngine extends DataCubeEngine {
     });
   }
 
-  private buildRawLambdaFromValueSpec(query: V1_Lambda): V1_RawLambda {
+  private buildRawLambdaFromLambda(query: V1_Lambda): V1_RawLambda {
     return guaranteeType(
       V1_deserializeRawValueSpecification(
         V1_serializeValueSpecification(query, []),
@@ -239,9 +239,7 @@ export class LSPDataCubeEngine extends DataCubeEngine {
   override async getQueryRelationType(
     query: V1_Lambda,
   ): Promise<DataCubeRelationType> {
-    const rawLambda = new V1_RawLambda();
-    rawLambda.body = query.body;
-    rawLambda.parameters = query.parameters;
+    const rawLambda = this.buildRawLambdaFromLambda(query);
     return this.getRawLambdaRelationType(rawLambda);
   }
 
@@ -271,7 +269,7 @@ export class LSPDataCubeEngine extends DataCubeEngine {
   override async executeQuery(
     query: V1_Lambda,
   ): Promise<DataCubeExecutionResult> {
-    const rawLambda = this.buildRawLambdaFromValueSpec(query);
+    const rawLambda = this.buildRawLambdaFromLambda(query);
 
     const [executionWithMetadata, queryString] = await Promise.all([
       this.lspEngine.runQuery({
