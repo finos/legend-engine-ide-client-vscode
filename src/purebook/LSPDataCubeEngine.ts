@@ -112,8 +112,8 @@ export class LSPDataCubeEngine extends DataCubeEngine {
       V1_serializeRawValueSpecification(this.rawLambda),
       [],
     );
-    // We could do a further check here to ensure the experssion is an applied funciton
-    // this is because data cube expects an expression to be able to built further upon the queery
+    // We could do a further check here to ensure the experssion is an applied function.
+    // This is because data cube expects an expression to be able to built further upon the queery.
     if (
       srcFuncExp instanceof V1_Lambda &&
       srcFuncExp.body.length === 1 &&
