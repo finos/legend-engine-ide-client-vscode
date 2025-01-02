@@ -161,16 +161,12 @@ export class LSPDataCubeEngine extends DataCubeEngine {
   }
 
   private buildRawLambdaFromValueSpec(query: V1_Lambda): V1_RawLambda {
-    const json = guaranteeType(
+    return guaranteeType(
       V1_deserializeRawValueSpecification(
         V1_serializeValueSpecification(query, []),
       ),
       V1_RawLambda,
     );
-    const rawLambda = new V1_RawLambda();
-    rawLambda.parameters = json.parameters;
-    rawLambda.body = json.body;
-    return rawLambda;
   }
 
   async generateInitialQuery(): Promise<DataCubeQuery> {
