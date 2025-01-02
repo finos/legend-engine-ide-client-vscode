@@ -106,7 +106,6 @@ import {
   V1_MappingModelCoverageAnalysisResult,
   V1_ParserError,
   V1_relationTypeModelSchema,
-  V1_RelationType,
   V1_RenderStyle,
   V1_serializeRawValueSpecification,
   V1_transformRawLambda,

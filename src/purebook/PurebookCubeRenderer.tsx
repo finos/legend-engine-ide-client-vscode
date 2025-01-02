@@ -43,7 +43,7 @@ export const PurebookCubeRenderer = (props: {
   const [error, setError] = useState('');
 
   useEffect(() => {
-    const initialize = async () => {
+    const initialize = async (): Promise<void> => {
       try {
         setIsLoading(true);
         const newEngine = new LSPDataCubeEngine(
