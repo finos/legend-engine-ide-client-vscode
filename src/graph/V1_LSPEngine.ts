@@ -187,6 +187,31 @@ export class V1_LSPEngine implements V1_GraphManagerEngine {
     );
   };
 
+  checkAndHandleError = (
+    response: LegendExecutionResult[],
+    type: 'compilation' | 'execution',
+  ): void => {
+    if (response?.[0]?.type === LegendExecutionResultType.ERROR) {
+      if (type === 'compilation') {
+        const sourceInformation = response[0].location
+          ? textLocationToSourceInformation(response[0].location)
+          : undefined;
+        throw V1_buildCompilationError(
+          V1_CompilationError.serialization.fromJson({
+            message: response[0].message,
+            sourceInformation,
+          }),
+        );
+      } else {
+        throw V1_buildExecutionError(
+          V1_ExecutionError.serialization.fromJson({
+            message: response[0].message,
+          }),
+        );
+      }
+    }
+  };
+
   // ------------------------------------------- Protocol -------------------------------------------
 
   async getClassifierPathMapping(): Promise<ClassifierPathMapping[]> {
@@ -505,17 +530,7 @@ export class V1_LSPEngine implements V1_GraphManagerEngine {
       },
       GET_LAMBDA_RETURN_TYPE_RESPONSE,
     );
-    if (response?.[0]?.type === LegendExecutionResultType.ERROR) {
-      const sourceInformation = response[0].location
-        ? textLocationToSourceInformation(response[0].location)
-        : undefined;
-      throw V1_buildCompilationError(
-        V1_CompilationError.serialization.fromJson({
-          message: response[0].message,
-          sourceInformation,
-        }),
-      );
-    }
+    this.checkAndHandleError(response, 'compilation');
     return (
       JSON.parse(
         guaranteeNonNullable(response?.[0]?.message),
@@ -535,17 +550,7 @@ export class V1_LSPEngine implements V1_GraphManagerEngine {
       },
       GET_LAMBDA_RETURN_TYPE_RESPONSE,
     );
-    if (response?.[0]?.type === LegendExecutionResultType.ERROR) {
-      const sourceInformation = response[0].location
-        ? textLocationToSourceInformation(response[0].location)
-        : undefined;
-      throw V1_buildCompilationError(
-        V1_CompilationError.serialization.fromJson({
-          message: response[0].message,
-          sourceInformation,
-        }),
-      );
-    }
+    this.checkAndHandleError(response, 'compilation');
     const v1_relationType = deserialize(
       V1_relationTypeModelSchema,
       guaranteeNonNullable(
@@ -591,17 +596,7 @@ export class V1_LSPEngine implements V1_GraphManagerEngine {
       },
       GET_QUERY_TYPEAHEAD_RESPONSE,
     );
-    if (response?.[0]?.type === LegendExecutionResultType.ERROR) {
-      const sourceInformation = response[0].location
-        ? textLocationToSourceInformation(response[0].location)
-        : undefined;
-      throw V1_buildCompilationError(
-        V1_CompilationError.serialization.fromJson({
-          message: response[0].message,
-          sourceInformation,
-        }),
-      );
-    }
+    this.checkAndHandleError(response, 'compilation');
     // LSP returns an object with property "completion" but the CodeCompletionResult class
     // expects it to be named "completions", so we rename it here.
     const rawJson = JSON.parse(guaranteeNonNullable(response?.[0]?.message));
@@ -675,13 +670,7 @@ export class V1_LSPEngine implements V1_GraphManagerEngine {
       },
       EXECUTE_QUERY_RESPONSE,
     );
-    if (response?.[0]?.type === LegendExecutionResultType.ERROR) {
-      throw V1_buildExecutionError(
-        V1_ExecutionError.serialization.fromJson({
-          message: response[0].message,
-        }),
-      );
-    }
+    this.checkAndHandleError(response, 'execution');
     result.set(
       V1_EXECUTION_RESULT,
       JSON.parse(guaranteeNonNullable(response?.[0]?.message)),
@@ -971,13 +960,7 @@ export class V1_LSPEngine implements V1_GraphManagerEngine {
       },
       SURVEY_DATASETS_RESPONSE,
     );
-    if (response?.[0]?.type === LegendExecutionResultType.ERROR) {
-      throw V1_buildExecutionError(
-        V1_ExecutionError.serialization.fromJson({
-          message: response[0].message,
-        }),
-      );
-    }
+    this.checkAndHandleError(response, 'execution');
     return JSON.parse(guaranteeNonNullable(response?.[0]?.message)).map(
       (specification: PlainObject<V1_DatasetSpecification>) =>
         V1_deserializeDatasetSpecification(specification, plugins),
@@ -995,13 +978,7 @@ export class V1_LSPEngine implements V1_GraphManagerEngine {
       },
       CHECK_DATASET_ENTITLEMENTS_RESPONSE,
     );
-    if (response?.[0]?.type === LegendExecutionResultType.ERROR) {
-      throw V1_buildExecutionError(
-        V1_ExecutionError.serialization.fromJson({
-          message: response[0].message,
-        }),
-      );
-    }
+    this.checkAndHandleError(response, 'execution');
     return JSON.parse(guaranteeNonNullable(response?.[0]?.message)).map(
       (report: PlainObject<V1_DatasetEntitlementReport>) =>
         V1_deserializeDatasetEntitlementReport(report, plugins),
