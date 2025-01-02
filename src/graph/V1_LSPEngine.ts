@@ -16,19 +16,18 @@
 
 import {
   type ClassifierPathMapping,
-  type CodeCompletionResult,
   type DeploymentResult,
   type ExecutionOptions,
   type ExternalFormatDescription,
   type GenerationConfigurationDescription,
   type GenerationMode,
   type GraphManagerOperationReport,
+  type LightPersistentDataCubeQuery,
+  type PersistentDataCubeQuery,
   type PlainObject,
   type PostValidationAssertionResult,
   type PureProtocolProcessorPlugin,
-  type RawLambda,
   type RawRelationalOperationElement,
-  type RelationTypeMetadata,
   type ServiceExecutionMode,
   type SubtypeInfo,
   type TEMPORARY__EngineSetupConfig,
@@ -62,6 +61,7 @@ import {
   type V1_RawRelationalOperationElement,
   type V1_RawSQLExecuteInput,
   type V1_RelationalConnectionBuilder,
+  type V1_RelationTypeColumn,
   type V1_RunTestsInput,
   type V1_RunTestsResult,
   type V1_ServiceConfigurationInfo,
@@ -75,12 +75,16 @@ import {
   type V1_TestDataGenerationResult,
   type V1_TextCompilationResult,
   type V1_ValueSpecification,
+  CodeCompletionResult,
   ContentType,
   deserializeMap,
   getContentTypeFileExtension,
   guaranteeNonNullable,
   isLossSafeNumber,
   parseLosslessJSON,
+  RawLambda,
+  RelationTypeColumnMetadata,
+  RelationTypeMetadata,
   returnUndefOnError,
   TEMPORARY__AbstractEngineConfig,
   V1_buildCompilationError,
@@ -90,20 +94,24 @@ import {
   V1_DELEGATED_EXPORT_HEADER,
   V1_deserializeDatasetEntitlementReport,
   V1_deserializeDatasetSpecification,
+  V1_deserializeExecutionResult,
+  V1_deserializeValueSpecification,
   V1_EXECUTION_RESULT,
   V1_ExecutionError,
+  V1_getGenericTypeFullPath,
   V1_GraphTransformerContextBuilder,
+  V1_Lambda,
   V1_LambdaReturnTypeInput,
   V1_MappingModelCoverageAnalysisInput,
   V1_MappingModelCoverageAnalysisResult,
   V1_ParserError,
+  V1_relationTypeModelSchema,
   V1_RenderStyle,
-  V1_serializeExecutionResult,
   V1_serializeRawValueSpecification,
   V1_transformRawLambda,
 } from '@finos/legend-vscode-extension-dependencies';
 import { deserialize } from 'serializr';
-import { postAndWaitForMessage } from '../utils/VsCodeUtils';
+import { postAndWaitForMessage as defaultPostAndWaitForMessage } from '../utils/VsCodeUtils';
 import {
   ANALYZE_MAPPING_MODEL_COVERAGE_COMMAND_ID,
   ANALYZE_MAPPING_MODEL_COVERAGE_RESPONSE,
@@ -123,10 +131,12 @@ import {
   GET_CURRENT_USER_ID_RESPONSE,
   GET_LAMBDA_RETURN_TYPE_COMMAND_ID,
   GET_LAMBDA_RETURN_TYPE_RESPONSE,
+  GET_QUERY_TYPEAHEAD_COMMAND_ID,
+  GET_QUERY_TYPEAHEAD_RESPONSE,
   GET_SUBTYPE_INFO_REQUEST_ID,
   GET_SUBTYPE_INFO_RESPONSE,
-  GRAMMAR_TO_JSON_LAMBDA_COMMAND_ID,
-  GRAMMAR_TO_JSON_LAMBDA_RESPONSE,
+  GRAMMAR_TO_JSON_LAMBDA_BATCH_COMMAND_ID,
+  GRAMMAR_TO_JSON_LAMBDA_BATCH_RESPONSE,
   JSON_TO_GRAMMAR_LAMBDA_BATCH_COMMAND_ID,
   JSON_TO_GRAMMAR_LAMBDA_BATCH_RESPONSE,
   SURVEY_DATASETS_COMMAND_ID,
@@ -140,6 +150,10 @@ import {
   executeInputToLSPInput,
   surveyDatasetsInputToLSPInput,
 } from '../utils/GraphUtils';
+import {
+  type V1_LSPLambdaReturnTypeResult,
+  V1_LSPLambdaReturnTypeInput,
+} from '../model/engine/LambdaReturnType';
 
 class V1_LSPEngine_Config extends TEMPORARY__AbstractEngineConfig {}
 
@@ -149,9 +163,23 @@ class V1_LSPEngine_Config extends TEMPORARY__AbstractEngineConfig {}
 export class V1_LSPEngine implements V1_GraphManagerEngine {
   config = new V1_LSPEngine_Config();
   currentUserId: string | undefined;
+  postAndWaitForMessage: <T>(
+    requestMessage: { command: string; msg?: PlainObject },
+    responseCommandId: string,
+  ) => Promise<T>;
+
+  constructor(
+    postAndWaitForMessage?: <T>(
+      requestMessage: { command: string; msg?: PlainObject },
+      responseCommandId: string,
+    ) => Promise<T>,
+  ) {
+    this.postAndWaitForMessage =
+      postAndWaitForMessage ?? defaultPostAndWaitForMessage;
+  }
 
   setup = async (_: TEMPORARY__EngineSetupConfig): Promise<void> => {
-    this.currentUserId = await postAndWaitForMessage<string>(
+    this.currentUserId = await this.postAndWaitForMessage<string>(
       {
         command: GET_CURRENT_USER_ID_REQUEST_ID,
       },
@@ -159,10 +187,35 @@ export class V1_LSPEngine implements V1_GraphManagerEngine {
     );
   };
 
+  checkAndHandleError = (
+    response: LegendExecutionResult[],
+    type: 'compilation' | 'execution',
+  ): void => {
+    if (response?.[0]?.type === LegendExecutionResultType.ERROR) {
+      if (type === 'compilation') {
+        const sourceInformation = response[0].location
+          ? textLocationToSourceInformation(response[0].location)
+          : undefined;
+        throw V1_buildCompilationError(
+          V1_CompilationError.serialization.fromJson({
+            message: response[0].message,
+            sourceInformation,
+          }),
+        );
+      } else {
+        throw V1_buildExecutionError(
+          V1_ExecutionError.serialization.fromJson({
+            message: response[0].message,
+          }),
+        );
+      }
+    }
+  };
+
   // ------------------------------------------- Protocol -------------------------------------------
 
   async getClassifierPathMapping(): Promise<ClassifierPathMapping[]> {
-    const response = await postAndWaitForMessage<string>(
+    const response = await this.postAndWaitForMessage<string>(
       { command: GET_CLASSIFIER_PATH_MAP_REQUEST_ID },
       GET_CLASSIFIER_PATH_MAP_RESPONSE,
     );
@@ -170,7 +223,7 @@ export class V1_LSPEngine implements V1_GraphManagerEngine {
   }
 
   async getSubtypeInfo(): Promise<SubtypeInfo> {
-    return postAndWaitForMessage<SubtypeInfo>(
+    return this.postAndWaitForMessage<SubtypeInfo>(
       { command: GET_SUBTYPE_INFO_REQUEST_ID },
       GET_SUBTYPE_INFO_RESPONSE,
     );
@@ -178,21 +231,45 @@ export class V1_LSPEngine implements V1_GraphManagerEngine {
 
   // ------------------------------------------- Grammar -------------------------------------------
 
-  pureModelContextDataToPureCode(
+  transformPureModelContextDataToCode(
     graph: V1_PureModelContextData,
     pretty: boolean,
   ): Promise<string> {
-    throw new Error('pureModelContextDataToPureCode not implemented');
+    throw new Error('transformPureModelContextDataToCode not implemented');
   }
 
-  async pureCodeToPureModelContextData(
+  async transformCodeToPureModelContextData(
     code: string,
     options?: {
       sourceInformationIndex?: Map<string, V1_SourceInformation> | undefined;
       onError?: () => void;
     },
   ): Promise<V1_PureModelContextData> {
-    throw new Error('pureCodeToPureModelContextData not implemented');
+    throw new Error('transformCodeToPureModelContextData not implemented');
+  }
+
+  async transformV1RawLambdasToCode(
+    input: Record<string, PlainObject<V1_RawLambda>>,
+    pretty: boolean,
+  ): Promise<Map<string, string>> {
+    const response = await this.postAndWaitForMessage<LegendExecutionResult[]>(
+      {
+        command: JSON_TO_GRAMMAR_LAMBDA_BATCH_COMMAND_ID,
+        msg: {
+          lambdas: input,
+          renderStyle: pretty ? V1_RenderStyle.PRETTY : V1_RenderStyle.STANDARD,
+        },
+      },
+      JSON_TO_GRAMMAR_LAMBDA_BATCH_RESPONSE,
+    );
+    const result = deserializeMap(
+      JSON.parse(guaranteeNonNullable(response?.[0]?.message)) as Record<
+        string,
+        string
+      >,
+      (v) => v,
+    );
+    return result;
   }
 
   async transformLambdasToCode(
@@ -209,50 +286,119 @@ export class V1_LSPEngine implements V1_GraphManagerEngine {
         ),
       );
     });
-    const response = await postAndWaitForMessage<LegendExecutionResult[]>(
-      {
-        command: JSON_TO_GRAMMAR_LAMBDA_BATCH_COMMAND_ID,
-        msg: {
-          lambdas,
-          renderStyle: pretty ? V1_RenderStyle.PRETTY : V1_RenderStyle.STANDARD,
-        },
-      },
-      JSON_TO_GRAMMAR_LAMBDA_BATCH_RESPONSE,
-    );
-    const result = deserializeMap(
-      JSON.parse(guaranteeNonNullable(response?.[0]?.message)) as Record<
-        string,
-        string
-      >,
-      (v) => v,
-    );
-    return result;
+    return this.transformV1RawLambdasToCode(lambdas, pretty);
   }
 
-  async transformValueSpecsToCode(
+  async transformValueSpecificationsToCode(
     input: Record<string, PlainObject<V1_ValueSpecification>>,
     pretty: boolean,
   ): Promise<Map<string, string>> {
-    throw new Error('transformValueSpecsToCode not implemented');
+    // Convert value specs to lambdas since LSP only supports lambda conversion.
+    const mappedInput = Object.keys(input).reduce((acc, key) => {
+      const valueSpec = V1_deserializeValueSpecification(
+        guaranteeNonNullable(input[key]),
+        [],
+      );
+      if (valueSpec instanceof V1_Lambda) {
+        acc.set(key, new RawLambda(valueSpec.parameters, valueSpec.body));
+      } else {
+        acc.set(key, new RawLambda([], [input[key]]));
+      }
+      return acc;
+    }, new Map<string, RawLambda>());
+    const resultLambdas: Map<string, string> =
+      await this.transformLambdasToCode(mappedInput, pretty, []);
+
+    // Remove the | from each response to convert back to value specs
+    const mappedResult = new Map<string, string>();
+    resultLambdas.forEach((value, key) => {
+      const valueSpec = V1_deserializeValueSpecification(
+        guaranteeNonNullable(input[key]),
+        [],
+      );
+      if (valueSpec instanceof V1_Lambda) {
+        mappedResult.set(key, value);
+      } else {
+        mappedResult.set(key, value.substring(1));
+      }
+    });
+    return mappedResult;
   }
 
-  async transformValueSpecToCode(
+  async transformValueSpecificationToCode(
     input: PlainObject<V1_ValueSpecification>,
     pretty: boolean,
   ): Promise<string> {
-    throw new Error('transformValueSpecToCode not implemented');
+    const batchInput: Record<string, PlainObject<V1_ValueSpecification>> = {
+      valueSpec: input,
+    };
+    const result = await this.transformValueSpecificationsToCode(
+      batchInput,
+      pretty,
+    );
+    return guaranteeNonNullable(result.get('valueSpec'));
   }
 
-  async transformCodeToValueSpeces(
+  async transformCodeToValueSpecifications(
     input: Record<string, V1_GrammarParserBatchInputEntry>,
-  ): Promise<Map<string, PlainObject>> {
-    throw new Error('transformCodeToValueSpeces not implemented');
+    throwOnFirstError?: boolean,
+  ): Promise<Map<string, PlainObject<V1_ValueSpecification>>> {
+    // Convert value spec strings to lambdas by prepending | since LSP only supports
+    // lambda conversion.
+    const mappedInput = Object.keys(input).reduce(
+      (acc, key) => {
+        acc[key] = {
+          ...input[key],
+          value: `|${input[key]?.value}`,
+        };
+        return acc;
+      },
+      {} as Record<string, V1_GrammarParserBatchInputEntry>,
+    );
+    const resultLambdas: Map<
+      string,
+      PlainObject<V1_RawLambda>
+    > = await this.transformCodeToLambdas(mappedInput, throwOnFirstError);
+    // Grab the first element of the returned lambdas' bodies, which represent
+    // the value specs.
+    const mappedResult = new Map<string, PlainObject<V1_ValueSpecification>>();
+    resultLambdas.forEach((value, key) => {
+      const lambdaValueSpec = (
+        value?.body as object[]
+      )?.[0] as PlainObject<V1_ValueSpecification>;
+      if (lambdaValueSpec) {
+        mappedResult.set(key, lambdaValueSpec);
+      }
+    });
+    return mappedResult;
   }
 
-  async transformCodeToValueSpec(
+  async transformCodeToValueSpecification(
     input: string,
+    returnSourceInformation?: boolean,
   ): Promise<PlainObject<V1_ValueSpecification>> {
-    throw new Error('transformCodeToValueSpec not implemented');
+    const batchInput: Record<string, V1_GrammarParserBatchInputEntry> = {
+      valueSpec: {
+        value: input,
+        returnSourceInformation,
+      },
+    };
+    const result = await this.transformCodeToValueSpecifications(
+      batchInput,
+      true,
+    );
+    return guaranteeNonNullable(result.get('valueSpec'));
+  }
+
+  async transformV1RawLambdaToCode(
+    lambda: PlainObject<V1_RawLambda>,
+    pretty: boolean,
+  ): Promise<string> {
+    const lambdas: Record<string, PlainObject<V1_RawLambda>> = {
+      lambda,
+    };
+    const result = await this.transformV1RawLambdasToCode(lambdas, pretty);
+    return guaranteeNonNullable(result.get('lambda'));
   }
 
   async transformLambdaToCode(
@@ -270,6 +416,44 @@ export class V1_LSPEngine implements V1_GraphManagerEngine {
     throw new Error('prettyLambdaContent not implemented');
   }
 
+  async transformCodeToLambdas(
+    input: Record<string, V1_GrammarParserBatchInputEntry>,
+    throwOnFirstError?: boolean,
+  ): Promise<Map<string, PlainObject<V1_RawLambda>>> {
+    const response = await this.postAndWaitForMessage<LegendExecutionResult[]>(
+      {
+        command: GRAMMAR_TO_JSON_LAMBDA_BATCH_COMMAND_ID,
+        msg: {
+          input,
+        },
+      },
+      GRAMMAR_TO_JSON_LAMBDA_BATCH_RESPONSE,
+    );
+    if (throwOnFirstError) {
+      const firstError = response?.find(
+        (r) => r.type === LegendExecutionResultType.ERROR,
+      );
+      if (firstError) {
+        const sourceInformation = firstError.location
+          ? textLocationToSourceInformation(firstError.location)
+          : undefined;
+        throw V1_buildParserError(
+          V1_ParserError.serialization.fromJson({
+            message: firstError.message,
+            sourceInformation,
+          }),
+        );
+      }
+    }
+    return deserializeMap(
+      JSON.parse(guaranteeNonNullable(response?.[0]?.message)) as Record<
+        string,
+        PlainObject<V1_RawLambda>
+      >,
+      (v) => v,
+    );
+  }
+
   async transformCodeToLambda(
     code: string,
     lambdaId?: string,
@@ -277,29 +461,19 @@ export class V1_LSPEngine implements V1_GraphManagerEngine {
       pruneSourceInformation?: boolean;
     },
   ): Promise<V1_RawLambda> {
-    const response = await postAndWaitForMessage<LegendExecutionResult[]>(
-      {
-        command: GRAMMAR_TO_JSON_LAMBDA_COMMAND_ID,
-        msg: {
-          code,
-          lambdaId: lambdaId ?? '',
-          options,
+    const batchInput: Record<string, V1_GrammarParserBatchInputEntry> = {
+      lambda: {
+        value: code,
+        sourceInformationOffset: {
+          sourceId: lambdaId,
         },
+        returnSourceInformation: !options?.pruneSourceInformation,
       },
-      GRAMMAR_TO_JSON_LAMBDA_RESPONSE,
-    );
-    if (response?.[0]?.type === LegendExecutionResultType.ERROR) {
-      const sourceInformation = response[0].location
-        ? textLocationToSourceInformation(response[0].location)
-        : undefined;
-      throw V1_buildParserError(
-        V1_ParserError.serialization.fromJson({
-          message: response[0].message,
-          sourceInformation,
-        }),
-      );
-    }
-    return JSON.parse(guaranteeNonNullable(response?.[0]?.message));
+    };
+    const result = await this.transformCodeToLambdas(batchInput, true);
+    return guaranteeNonNullable(
+      result.get('lambda'),
+    ) as unknown as V1_RawLambda;
   }
 
   async transformRelationalOperationElementsToPureCode(
@@ -349,24 +523,14 @@ export class V1_LSPEngine implements V1_GraphManagerEngine {
   async getLambdaReturnTypeFromRawInput(
     rawInput: PlainObject<V1_LambdaReturnTypeInput>,
   ): Promise<string> {
-    const response = await postAndWaitForMessage<LegendExecutionResult[]>(
+    const response = await this.postAndWaitForMessage<LegendExecutionResult[]>(
       {
         command: GET_LAMBDA_RETURN_TYPE_COMMAND_ID,
         msg: rawInput,
       },
       GET_LAMBDA_RETURN_TYPE_RESPONSE,
     );
-    if (response?.[0]?.type === LegendExecutionResultType.ERROR) {
-      const sourceInformation = response[0].location
-        ? textLocationToSourceInformation(response[0].location)
-        : undefined;
-      throw V1_buildCompilationError(
-        V1_CompilationError.serialization.fromJson({
-          message: response[0].message,
-          sourceInformation,
-        }),
-      );
-    }
+    this.checkAndHandleError(response, 'compilation');
     return (
       JSON.parse(
         guaranteeNonNullable(response?.[0]?.message),
@@ -377,13 +541,70 @@ export class V1_LSPEngine implements V1_GraphManagerEngine {
   async getLambdaRelationTypeFromRawInput(
     rawInput: V1_LambdaReturnTypeInput,
   ): Promise<RelationTypeMetadata> {
-    throw new Error('getLambdaRelationTypeFromRawInput not implemented');
+    const response = await this.postAndWaitForMessage<LegendExecutionResult[]>(
+      {
+        command: GET_LAMBDA_RETURN_TYPE_COMMAND_ID,
+        msg: V1_LSPLambdaReturnTypeInput.serialization.toJson({
+          lambda: rawInput.lambda,
+        }),
+      },
+      GET_LAMBDA_RETURN_TYPE_RESPONSE,
+    );
+    this.checkAndHandleError(response, 'compilation');
+    const v1_relationType = deserialize(
+      V1_relationTypeModelSchema,
+      guaranteeNonNullable(
+        (
+          JSON.parse(
+            guaranteeNonNullable(
+              response?.[0]?.message,
+              'Lambda return type response is empty',
+            ),
+          ) as V1_LSPLambdaReturnTypeResult
+        ).relationType,
+        'Lambda return type response does not contain relationType',
+      ),
+    );
+    const relationType = new RelationTypeMetadata();
+    relationType.columns = v1_relationType.columns.map(
+      (column: V1_RelationTypeColumn) =>
+        new RelationTypeColumnMetadata(
+          V1_getGenericTypeFullPath(column.genericType),
+          column.name,
+        ),
+    );
+    return relationType;
   }
 
   async getCodeCompletion(
     rawInput: V1_CompleteCodeInput,
   ): Promise<CodeCompletionResult> {
     throw new Error('getCodeCompletion not implemented');
+  }
+
+  async getQueryTypeahead(
+    code: string,
+    baseQuery: PlainObject<V1_Lambda>,
+  ): Promise<CodeCompletionResult> {
+    const response = await this.postAndWaitForMessage<LegendExecutionResult[]>(
+      {
+        command: GET_QUERY_TYPEAHEAD_COMMAND_ID,
+        msg: {
+          code,
+          baseQuery,
+        },
+      },
+      GET_QUERY_TYPEAHEAD_RESPONSE,
+    );
+    this.checkAndHandleError(response, 'compilation');
+    // LSP returns an object with property "completion" but the CodeCompletionResult class
+    // expects it to be named "completions", so we rename it here.
+    const rawJson = JSON.parse(guaranteeNonNullable(response?.[0]?.message));
+    const result = CodeCompletionResult.serialization.fromJson({
+      ...rawJson,
+      completions: rawJson.completion,
+    });
+    return result;
   }
 
   // --------------------------------------------- Execution ---------------------------------------------
@@ -402,7 +623,7 @@ export class V1_LSPEngine implements V1_GraphManagerEngine {
       returnUndefOnError(() =>
         this.parseExecutionResults(executionResultInText, options),
       ) ?? executionResultInText;
-    const executionResult = V1_serializeExecutionResult(rawExecutionResult);
+    const executionResult = V1_deserializeExecutionResult(rawExecutionResult);
     return { executionResult };
   }
 
@@ -413,7 +634,7 @@ export class V1_LSPEngine implements V1_GraphManagerEngine {
   ): Promise<Response> {
     const downloadFileName = `result.${getContentTypeFileExtension(contentType ?? ContentType.TEXT_CSV)}`;
     const response = guaranteeNonNullable(
-      await postAndWaitForMessage<LegendExecutionResult>(
+      await this.postAndWaitForMessage<LegendExecutionResult>(
         {
           command: EXPORT_DATA_COMMAND_ID,
           msg: {
@@ -442,20 +663,14 @@ export class V1_LSPEngine implements V1_GraphManagerEngine {
     options?: ExecutionOptions,
   ): Promise<Map<string, string>> {
     const result = new Map<string, string>();
-    const response = await postAndWaitForMessage<LegendExecutionResult[]>(
+    const response = await this.postAndWaitForMessage<LegendExecutionResult[]>(
       {
         command: EXECUTE_QUERY_COMMAND_ID,
         msg: executeInputToLSPInput(input, options),
       },
       EXECUTE_QUERY_RESPONSE,
     );
-    if (response?.[0]?.type === LegendExecutionResultType.ERROR) {
-      throw V1_buildExecutionError(
-        V1_ExecutionError.serialization.fromJson({
-          message: response[0].message,
-        }),
-      );
-    }
+    this.checkAndHandleError(response, 'execution');
     result.set(
       V1_EXECUTION_RESULT,
       JSON.parse(guaranteeNonNullable(response?.[0]?.message)),
@@ -502,7 +717,7 @@ export class V1_LSPEngine implements V1_GraphManagerEngine {
   async generateExecutionPlan(
     input: V1_ExecuteInput,
   ): Promise<PlainObject<V1_ExecutionPlan>> {
-    const response = await postAndWaitForMessage<LegendExecutionResult[]>(
+    const response = await this.postAndWaitForMessage<LegendExecutionResult[]>(
       {
         command: GENERATE_EXECUTION_PLAN_COMMAND_ID,
         msg: executeInputToLSPInput(input),
@@ -515,7 +730,7 @@ export class V1_LSPEngine implements V1_GraphManagerEngine {
   async debugExecutionPlanGeneration(
     input: V1_ExecuteInput,
   ): Promise<{ plan: PlainObject<V1_ExecutionPlan>; debug: string[] }> {
-    const response = await postAndWaitForMessage<LegendExecutionResult[]>(
+    const response = await this.postAndWaitForMessage<LegendExecutionResult[]>(
       {
         command: DEBUG_GENERATE_EXECUTION_PLAN_COMMAND_ID,
         msg: executeInputToLSPInput(input),
@@ -682,12 +897,46 @@ export class V1_LSPEngine implements V1_GraphManagerEngine {
     return this.currentUserId;
   }
 
+  // ------------------------------------------ Query Data Cube ------------------------------------------
+
+  searchDataCubeQueries(
+    searchSpecification: V1_QuerySearchSpecification,
+  ): Promise<LightPersistentDataCubeQuery[]> {
+    throw new Error('searchDataCubeQueries not implemented');
+  }
+
+  getDataCubeQueries(
+    queryIds: string[],
+  ): Promise<LightPersistentDataCubeQuery[]> {
+    throw new Error('getDataCubeQueries not implemented');
+  }
+
+  getDataCubeQuery(id: string): Promise<PersistentDataCubeQuery> {
+    throw new Error('getDataCubeQuery not implemented');
+  }
+
+  createDataCubeQuery(
+    query: PersistentDataCubeQuery,
+  ): Promise<PersistentDataCubeQuery> {
+    throw new Error('createDataCubeQuery not implemented');
+  }
+
+  updateDataCubeQuery(
+    query: PersistentDataCubeQuery,
+  ): Promise<PersistentDataCubeQuery> {
+    throw new Error('updateDataCubeQuery not implemented');
+  }
+
+  deleteDataCubeQuery(id: string): Promise<void> {
+    throw new Error('deleteDataCubeQuery not implemented');
+  }
+
   // ------------------------------------------ Analysis ------------------------------------------
 
   async analyzeMappingModelCoverage(
     input: V1_MappingModelCoverageAnalysisInput,
   ): Promise<V1_MappingModelCoverageAnalysisResult> {
-    const response = await postAndWaitForMessage<LegendExecutionResult[]>(
+    const response = await this.postAndWaitForMessage<LegendExecutionResult[]>(
       {
         command: ANALYZE_MAPPING_MODEL_COVERAGE_COMMAND_ID,
         msg: V1_MappingModelCoverageAnalysisInput.serialization.toJson(input),
@@ -704,20 +953,14 @@ export class V1_LSPEngine implements V1_GraphManagerEngine {
     input: V1_StoreEntitlementAnalysisInput,
     plugins: PureProtocolProcessorPlugin[],
   ): Promise<V1_DatasetSpecification[]> {
-    const response = await postAndWaitForMessage<LegendExecutionResult[]>(
+    const response = await this.postAndWaitForMessage<LegendExecutionResult[]>(
       {
         command: SURVEY_DATASETS_COMMAND_ID,
         msg: surveyDatasetsInputToLSPInput(input),
       },
       SURVEY_DATASETS_RESPONSE,
     );
-    if (response?.[0]?.type === LegendExecutionResultType.ERROR) {
-      throw V1_buildExecutionError(
-        V1_ExecutionError.serialization.fromJson({
-          message: response[0].message,
-        }),
-      );
-    }
+    this.checkAndHandleError(response, 'execution');
     return JSON.parse(guaranteeNonNullable(response?.[0]?.message)).map(
       (specification: PlainObject<V1_DatasetSpecification>) =>
         V1_deserializeDatasetSpecification(specification, plugins),
@@ -728,20 +971,14 @@ export class V1_LSPEngine implements V1_GraphManagerEngine {
     input: V1_EntitlementReportAnalyticsInput,
     plugins: PureProtocolProcessorPlugin[],
   ): Promise<V1_DatasetEntitlementReport[]> {
-    const response = await postAndWaitForMessage<LegendExecutionResult[]>(
+    const response = await this.postAndWaitForMessage<LegendExecutionResult[]>(
       {
         command: CHECK_DATASET_ENTITLEMENTS_COMMAND_ID,
         msg: entitlementReportAnalyticsInputToLSPInput(input, plugins),
       },
       CHECK_DATASET_ENTITLEMENTS_RESPONSE,
     );
-    if (response?.[0]?.type === LegendExecutionResultType.ERROR) {
-      throw V1_buildExecutionError(
-        V1_ExecutionError.serialization.fromJson({
-          message: response[0].message,
-        }),
-      );
-    }
+    this.checkAndHandleError(response, 'execution');
     return JSON.parse(guaranteeNonNullable(response?.[0]?.message)).map(
       (report: PlainObject<V1_DatasetEntitlementReport>) =>
         V1_deserializeDatasetEntitlementReport(report, plugins),

@@ -18,26 +18,21 @@ import {
   type CancellationToken,
   commands,
   type ExtensionContext,
-  type NotebookCell,
-  type NotebookDocument,
   NotebookCellData,
   NotebookCellKind,
-  NotebookCellOutput,
-  NotebookCellOutputItem,
-  type NotebookController,
   NotebookData,
-  notebooks,
   type NotebookSerializer,
   workspace,
   window,
   WorkspaceEdit,
   Uri,
+  notebooks,
 } from 'vscode';
-import { LEGEND_COMMAND_V2, LEGEND_LANGUAGE_ID } from '../utils/Const';
-import type { PlainObject } from '@finos/legend-vscode-extension-dependencies';
-import { LegendExecutionResult } from '../results/LegendExecutionResult';
-import { LegendExecutionResultType } from '../results/LegendExecutionResultType';
-import { withCancellationSupport } from '../utils/cancellationSupport';
+import { LEGEND_LANGUAGE_ID } from '../utils/Const';
+import { PurebookController } from './PurebookController';
+import { type LegendLanguageClient } from '../LegendLanguageClient';
+import { type LegendConceptTreeProvider } from '../conceptTree';
+import { handleV1LSPEngineMessage } from '../graph/utils';
 
 interface RawNotebookCell {
   source: string[];
@@ -92,133 +87,41 @@ class LegendBookSerializer implements NotebookSerializer {
   }
 }
 
-export function enableLegendBook(context: ExtensionContext): void {
+export function enableLegendBook(
+  context: ExtensionContext,
+  client: LegendLanguageClient,
+  legendConceptTree: LegendConceptTreeProvider,
+): void {
+  const controller = new PurebookController();
+
   context.subscriptions.push(
     workspace.registerNotebookSerializer(
-      'legend-book',
+      controller.notebookType,
       new LegendBookSerializer(),
     ),
   );
 
-  const controller = notebooks.createNotebookController(
-    'legend-book-controller-id',
-    'legend-book',
-    'Legend Notebook',
-    executeCells,
-  );
-
-  controller.supportedLanguages = [LEGEND_LANGUAGE_ID];
-  controller.supportsExecutionOrder = true;
-  controller.description = 'Legend Notebook REPL';
-
-  context.subscriptions.push(controller);
-
   context.subscriptions.push(
     commands.registerCommand('legend.createNotebook', createNotebook),
   );
-}
 
-async function executeCells(
-  cells: NotebookCell[],
-  _document: NotebookDocument,
-  controller: NotebookController,
-): Promise<void> {
-  return cells.reduce(
-    (prev, cell) => prev.then(() => executeCell(cell, controller)),
-    Promise.resolve(),
+  const messageChannel = notebooks.createRendererMessaging(
+    'legend-cube-renderer',
   );
-}
-
-let executionOrder = 0;
-
-async function executeCell(
-  cell: NotebookCell,
-  controller: NotebookController,
-): Promise<void> {
-  const execution = controller.createNotebookCellExecution(cell);
-  execution.executionOrder = ++executionOrder;
-  execution.start(Date.now());
-
-  const requestId = withCancellationSupport(execution.token, () => {
-    execution.replaceOutput(
-      new NotebookCellOutput([
-        NotebookCellOutputItem.stdout('Execution canceled!'),
-      ]),
+  messageChannel.onDidReceiveMessage(async (e) => {
+    await handleV1LSPEngineMessage(
+      messageChannel.postMessage,
+      {
+        documentUri: e.message.cellUri,
+        sectionIndex: 0,
+        entityId: 'notebook_cell',
+      },
+      client,
+      context,
+      legendConceptTree,
+      e.message,
     );
-    execution.end(undefined, Date.now());
   });
-
-  return commands
-    .executeCommand(
-      LEGEND_COMMAND_V2,
-      requestId,
-      cell.document.uri.toString(),
-      0,
-      'notebook_cell',
-      'executeCell',
-      {},
-      {},
-    )
-    .then(
-      (result) => {
-        const r = result as PlainObject<LegendExecutionResult>[];
-        const funcResult = LegendExecutionResult.serialization.fromJson(r[0]!);
-
-        if (funcResult.type !== LegendExecutionResultType.SUCCESS) {
-          execution.replaceOutput([
-            new NotebookCellOutput([
-              NotebookCellOutputItem.stdout(funcResult.message!),
-              NotebookCellOutputItem.stderr(funcResult.logMessage!),
-            ]),
-          ]);
-          execution.end(false, Date.now());
-        } else {
-          try {
-            let output: NotebookCellOutputItem;
-            switch (funcResult.messageType) {
-              case 'text':
-                output = NotebookCellOutputItem.text(funcResult.message);
-                break;
-              case 'json':
-                output = NotebookCellOutputItem.json(
-                  JSON.parse(funcResult.message),
-                );
-                break;
-              default:
-                output = NotebookCellOutputItem.stderr(
-                  `Not supported ${funcResult.messageType}`,
-                );
-            }
-
-            execution.replaceOutput([new NotebookCellOutput([output])]);
-            execution.end(true, Date.now());
-          } catch (e) {
-            execution.replaceOutput([
-              new NotebookCellOutput([
-                NotebookCellOutputItem.error(e as Error),
-              ]),
-            ]);
-            execution.end(false, Date.now());
-          }
-        }
-      },
-      (error) => {
-        if (!execution.token.isCancellationRequested) {
-          execution.replaceOutput([
-            new NotebookCellOutput([NotebookCellOutputItem.error(error)]),
-          ]);
-
-          execution.end(false, Date.now());
-        } else {
-          execution.replaceOutput(
-            new NotebookCellOutput([
-              NotebookCellOutputItem.stdout('Execution canceled!'),
-            ]),
-          );
-          execution.end(undefined, Date.now());
-        }
-      },
-    );
 }
 
 async function createNotebook(): Promise<void> {

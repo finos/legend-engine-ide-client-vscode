@@ -16,6 +16,24 @@
 
 /* eslint-env node */
 
+import { fixupConfigRules, fixupPluginRules } from '@eslint/compat';
+import prettier from 'eslint-plugin-prettier';
+import reactHooks from 'eslint-plugin-react-hooks';
+import typescriptEslint from '@typescript-eslint/eslint-plugin';
+import tsParser from '@typescript-eslint/parser';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import js from '@eslint/js';
+import { FlatCompat } from '@eslint/eslintrc';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const compat = new FlatCompat({
+  baseDirectory: __dirname,
+  recommendedConfig: js.configs.recommended,
+  allConfig: js.configs.all,
+});
+
 const OFF = 0;
 const WARN = 1;
 const ERROR = 2;
@@ -115,7 +133,6 @@ const ES_RULES = {
   'space-in-parens': [WARN, 'never'],
   'space-infix-ops': WARN,
   'space-unary-ops': WARN,
-  strict: ERROR,
   'switch-colon-spacing': WARN,
   'template-curly-spacing': WARN,
   'template-tag-spacing': WARN,
@@ -170,7 +187,6 @@ const TYPESCRIPT_RULES = {
     { allowExpressions: true, allowTypedFunctionExpressions: true },
   ],
   '@typescript-eslint/no-inferrable-types': [WARN, { ignoreParameters: true }],
-  '@typescript-eslint/no-redeclare': [ERROR, { ignoreDeclarationMerge: true }],
   '@typescript-eslint/no-var-requires': OFF,
   '@typescript-eslint/no-unused-vars': [
     WARN,
@@ -186,33 +202,49 @@ const TYPESCRIPT_RULES = {
   '@typescript-eslint/no-useless-constructor': WARN,
 };
 
-module.exports = {
-  parser: '@typescript-eslint/parser',
-  plugins: ['prettier', 'react-hooks', '@typescript-eslint'],
-  parserOptions: {
-    tsconfigRootDir: __dirname,
-    project: './tsconfig.json',
+export default [
+  {
+    ignores: ['**/node_modules', 'build/', 'lib/'],
   },
-  settings: {
-    react: {
-      version: 'detect',
+  ...fixupConfigRules(
+    compat.extends(
+      'eslint:recommended',
+      'plugin:@typescript-eslint/eslint-recommended',
+      'plugin:@typescript-eslint/recommended',
+      'plugin:react/recommended',
+      'plugin:import/errors',
+      'plugin:import/typescript',
+    ),
+  ),
+  {
+    plugins: {
+      prettier,
+      'react-hooks': fixupPluginRules(reactHooks),
+      '@typescript-eslint': fixupPluginRules(typescriptEslint),
+    },
+    languageOptions: {
+      parser: tsParser,
+      ecmaVersion: 6,
+      sourceType: 'script',
+
+      parserOptions: {
+        tsconfigRootDir: __dirname,
+        project: './tsconfig.json',
+      },
+    },
+    settings: {
+      react: {
+        version: 'detect',
+      },
+    },
+    files: ['**/*.ts', '**/*.tsx'],
+    rules: {
+      ...ES_RULES,
+      ...TYPESCRIPT_RULES,
+      ...IMPORT_RULES,
+      ...REACT_RULES,
+      '@typescript-eslint/no-unsafe-argument': OFF,
+      '@typescript-eslint/no-unsafe-member-access': OFF,
     },
   },
-  extends: [
-    'eslint:recommended',
-    'plugin:@typescript-eslint/eslint-recommended',
-    'plugin:@typescript-eslint/recommended',
-    'plugin:react/recommended',
-    'plugin:import/errors', // See https://github.com/benmosher/eslint-plugin-import/blob/master/config/errors.js
-    'plugin:import/typescript', // See https://github.com/benmosher/eslint-plugin-import/blob/master/config/typescript.js
-  ],
-   rules: {
-    ...ES_RULES,
-    ...TYPESCRIPT_RULES,
-    ...IMPORT_RULES,
-    ...REACT_RULES,
-    '@typescript-eslint/no-unsafe-argument': OFF,
-    '@typescript-eslint/no-unsafe-member-access': OFF,
-  },
-  root: true,
-};
+];

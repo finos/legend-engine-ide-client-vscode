@@ -626,7 +626,7 @@ export function activate(context: ExtensionContext): void {
     createLegendConceptTreeProvider(client);
   context.subscriptions.push(...disposables);
   legendConceptTreeProvider = treeDataProvider;
-  enableLegendBook(context);
+  enableLegendBook(context, client, legendConceptTreeProvider);
   const legendCodelensProvider = new LegendCodelensProvider(client);
   languages.registerCodeLensProvider(
     LEGEND_LANGUAGE_ID,

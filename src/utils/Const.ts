@@ -61,13 +61,15 @@ export const GENERATE_EXECUTION_PLAN_COMMAND_ID =
   'legend.executionPlan.generate';
 export const DEBUG_GENERATE_EXECUTION_PLAN_COMMAND_ID =
   'legend.executionPlan.generate.debug';
-export const GRAMMAR_TO_JSON_LAMBDA_COMMAND_ID = 'legend.grammarToJson.lambda';
+export const GRAMMAR_TO_JSON_LAMBDA_BATCH_COMMAND_ID =
+  'legend.grammarToJson.lambda.batch';
 export const JSON_TO_GRAMMAR_LAMBDA_BATCH_COMMAND_ID =
   'legend.jsonToGrammar.lambda.batch';
 export const GET_LAMBDA_RETURN_TYPE_COMMAND_ID = 'legend.lambda.returnType';
 export const SURVEY_DATASETS_COMMAND_ID = 'legend.entitlements.surveyDatasets';
 export const CHECK_DATASET_ENTITLEMENTS_COMMAND_ID =
   'legend.entitlements.checkDatasetEntitlements';
+export const GET_QUERY_TYPEAHEAD_COMMAND_ID = 'legend.query.typeahead';
 
 // LSP Request IDs
 export const GET_CURRENT_USER_ID_REQUEST_ID = 'legend/getCurrentUserId';
@@ -98,12 +100,13 @@ export const ANALYZE_MAPPING_MODEL_COVERAGE_RESPONSE = `${ANALYZE_MAPPING_MODEL_
 export const EXECUTE_QUERY_RESPONSE = `${EXECUTE_QUERY_COMMAND_ID}/response`;
 export const GENERATE_EXECUTION_PLAN_RESPONSE = `${GENERATE_EXECUTION_PLAN_COMMAND_ID}/response`;
 export const DEBUG_GENERATE_EXECUTION_PLAN_RESPONSE = `${DEBUG_GENERATE_EXECUTION_PLAN_COMMAND_ID}/response`;
-export const GRAMMAR_TO_JSON_LAMBDA_RESPONSE = `${GRAMMAR_TO_JSON_LAMBDA_COMMAND_ID}/response`;
+export const GRAMMAR_TO_JSON_LAMBDA_BATCH_RESPONSE = `${GRAMMAR_TO_JSON_LAMBDA_BATCH_COMMAND_ID}/response`;
 export const JSON_TO_GRAMMAR_LAMBDA_BATCH_RESPONSE = `${JSON_TO_GRAMMAR_LAMBDA_BATCH_COMMAND_ID}/response`;
 export const GET_LAMBDA_RETURN_TYPE_RESPONSE = `${GET_LAMBDA_RETURN_TYPE_COMMAND_ID}/response`;
 export const EXPORT_DATA_RESPONSE = `${EXPORT_DATA_COMMAND_ID}/response`;
 export const SURVEY_DATASETS_RESPONSE = `${SURVEY_DATASETS_COMMAND_ID}/response`;
 export const CHECK_DATASET_ENTITLEMENTS_RESPONSE = `${CHECK_DATASET_ENTITLEMENTS_COMMAND_ID}/response`;
+export const GET_QUERY_TYPEAHEAD_RESPONSE = `${GET_QUERY_TYPEAHEAD_COMMAND_ID}/response`;
 
 // Context variables
 export const SHOW_EXECUTION_RESULTS = 'showExecutionResults';

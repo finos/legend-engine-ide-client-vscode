@@ -28,7 +28,7 @@ import {
   getAggregationTDSColumnCustomizations,
   getTDSRowData,
 } from '../grid/GridUtils';
-import type { ColDef } from '@ag-grid-community/core';
+import type { ColDef } from 'ag-grid-community';
 import {
   type INTERNAL__TDSColumn,
   TDSLegendExecutionResult,
