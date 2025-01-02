@@ -17,31 +17,73 @@
 import {
   type PlainObject,
   type V1_RawLambda,
+  CubesLoadingIndicator,
+  CubesLoadingIndicatorIcon,
   DataCube,
+  DataCubeQuery,
 } from '@finos/legend-vscode-extension-dependencies';
 import { LSPDataCubeEngine } from './LSPDataCubeEngine';
 import { type VSCodeEvent } from 'vscode-notebook-renderer/events';
+import { useEffect, useState } from 'react';
 
 export const PurebookCubeRenderer = (props: {
   cellUri: string;
   lambda: PlainObject<V1_RawLambda>;
   postMessage: (message: unknown) => void;
-  onDidReceiveMessage: VSCodeEvent<{ command: string; messageId: string; result: unknown }>;
+  onDidReceiveMessage: VSCodeEvent<{
+    command: string;
+    messageId: string;
+    result: unknown;
+  }>;
 }): React.ReactNode => {
   const { cellUri, lambda, postMessage, onDidReceiveMessage } = props;
-  const engine = new LSPDataCubeEngine(
-    cellUri,
-    lambda,
-    postMessage,
-    onDidReceiveMessage,
-  );
+  const [engine, setEngine] = useState<LSPDataCubeEngine | null>(null);
+  const [query, setQuery] = useState<DataCubeQuery | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    const initialize = async () => {
+      try {
+        setIsLoading(true);
+        const newEngine = new LSPDataCubeEngine(
+          cellUri,
+          lambda,
+          postMessage,
+          onDidReceiveMessage,
+        );
+        setEngine(newEngine);
+        setQuery(await newEngine.generateInitialQuery());
+      } catch (e) {
+        if (e instanceof Error) {
+          setError(e.message);
+        }
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    initialize();
+  }, [cellUri, lambda, postMessage, onDidReceiveMessage]);
+
   return (
-    <div
-      id={`purebook-cube-renderer-${cellUri}`}
-      className="purebook-cube-renderer-container"
-      style={{ height: '500px' }}
-    >
-      <DataCube engine={engine} />
-    </div>
+    <>
+      <CubesLoadingIndicator isLoading={isLoading}>
+        <CubesLoadingIndicatorIcon />
+      </CubesLoadingIndicator>
+      {engine && query && !isLoading && (
+        <div
+          id={`purebook-cube-renderer-${cellUri}`}
+          className="purebook-cube-renderer-container"
+          style={{ height: '500px' }}
+        >
+          <DataCube engine={engine} query={query} />
+        </div>
+      )}
+      {!engine && !query && !isLoading && error && (
+        <div>
+          Error setting up purebook cube renderer. Could not create engine.
+        </div>
+      )}
+    </>
   );
 };

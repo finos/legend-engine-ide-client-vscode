@@ -16,10 +16,8 @@
 
 import {
   type CompletionItem,
-  type DataCubeAPI,
   type DataCubeExecutionResult,
   type PlainObject,
-  type RelationType,
   type V1_ValueSpecification,
   _elementPtr,
   _function,
@@ -27,20 +25,23 @@ import {
   DataCubeEngine,
   DataCubeFunction,
   DataCubeQuery,
+  DataCubeRelationType,
   DataCubeSource,
   guaranteeType,
   isNonNullable,
+  RelationalExecutionActivities,
+  RelationTypeMetadata,
+  TDSExecutionResult,
   uuid,
   V1_AppliedFunction,
+  V1_buildExecutionResult,
   V1_deserializeRawValueSpecification,
   V1_deserializeValueSpecification,
   V1_Lambda,
   V1_PackageableElementPtr,
   V1_RawLambda,
-  V1_RelationalExecutionActivities,
   V1_serializeRawValueSpecification,
   V1_serializeValueSpecification,
-  V1_TDSExecutionResult,
 } from '@finos/legend-vscode-extension-dependencies';
 import { V1_LSPEngine } from '../graph/V1_LSPEngine';
 import { type VSCodeEvent } from 'vscode-notebook-renderer/events';
@@ -152,7 +153,7 @@ export class LSPDataCubeEngine extends DataCubeEngine {
 
   private async getRawLambdaRelationType(
     lambda: V1_RawLambda,
-  ): Promise<RelationType> {
+  ): Promise<RelationTypeMetadata> {
     return this.lspEngine.getLambdaRelationTypeFromRawInput({
       lambda,
       model: {},
@@ -172,17 +173,17 @@ export class LSPDataCubeEngine extends DataCubeEngine {
     return rawLambda;
   }
 
-  // ------------------------------- CORE OPERATIONS -------------------------------
-
-  override async getBaseQuery(): Promise<DataCubeQuery | undefined> {
+  async generateInitialQuery(): Promise<DataCubeQuery> {
+    const query = new DataCubeQuery();
     const columns = (await this.getRawLambdaRelationType(this.rawLambda))
       .columns;
-    const query = new DataCubeQuery();
     query.query = `~[${columns.map((e) => `'${e.name}'`)}]->select()`;
     return query;
   }
 
-  override async processQuerySource(value: PlainObject) {
+  // ---------------------------------- INTERFACE ----------------------------------
+
+  override async processQuerySource(): Promise<DataCubeSource> {
     const srcFuncExp = guaranteeType(
       this.getSourceFunctionExpression(),
       V1_AppliedFunction,
@@ -193,7 +194,7 @@ export class LSPDataCubeEngine extends DataCubeEngine {
       `Only functions returning TDS/graph fetch using the from() function can be opened in Data Cube`,
     );
     const source = new LSPDataCubeSource();
-    source.sourceColumns = (
+    source.columns = (
       await this.getRawLambdaRelationType(this.rawLambda)
     ).columns;
     const { mapping, runtime } =
@@ -209,7 +210,7 @@ export class LSPDataCubeEngine extends DataCubeEngine {
     returnSourceInformation?: boolean | undefined,
   ): Promise<V1_ValueSpecification> {
     return V1_deserializeValueSpecification(
-      await this.lspEngine.transformCodeToValueSpec(
+      await this.lspEngine.transformCodeToValueSpecification(
         code,
         returnSourceInformation,
       ),
@@ -221,7 +222,7 @@ export class LSPDataCubeEngine extends DataCubeEngine {
     value: V1_ValueSpecification,
     pretty?: boolean | undefined,
   ): Promise<string> {
-    return this.lspEngine.transformValueSpecToCode(
+    return this.lspEngine.transformValueSpecificationToCode(
       V1_serializeValueSpecification(value, []),
       Boolean(pretty),
     );
@@ -239,7 +240,9 @@ export class LSPDataCubeEngine extends DataCubeEngine {
     return response.completions;
   }
 
-  override async getQueryRelationType(query: V1_Lambda): Promise<RelationType> {
+  override async getQueryRelationType(
+    query: V1_Lambda,
+  ): Promise<DataCubeRelationType> {
     const rawLambda = new V1_RawLambda();
     rawLambda.body = query.body;
     rawLambda.parameters = query.parameters;
@@ -250,7 +253,7 @@ export class LSPDataCubeEngine extends DataCubeEngine {
     code: string,
     baseQuery: V1_ValueSpecification,
     source: DataCubeSource,
-  ): Promise<RelationType> {
+  ): Promise<DataCubeRelationType> {
     const queryString = await this.lspEngine.transformV1RawLambdaToCode(
       V1_serializeValueSpecification(baseQuery, []),
       false,
@@ -293,13 +296,14 @@ export class LSPDataCubeEngine extends DataCubeEngine {
       ),
     ]);
     const expectedTDS = guaranteeType(
-      executionWithMetadata.executionResult,
-      V1_TDSExecutionResult,
+      V1_buildExecutionResult(executionWithMetadata.executionResult),
+      TDSExecutionResult,
       'Query returned expected to be of tabular data set',
     );
+
     const sql = expectedTDS.activities?.[0];
     let sqlString = '### NO SQL FOUND';
-    if (sql instanceof V1_RelationalExecutionActivities) {
+    if (sql instanceof RelationalExecutionActivities) {
       sqlString = sql.sql;
     }
     return {

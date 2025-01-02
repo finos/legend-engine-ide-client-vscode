@@ -79,6 +79,7 @@ import {
   getContentTypeFileExtension,
   guaranteeNonNullable,
   isLossSafeNumber,
+  LightPersistentDataCubeQuery,
   parseLosslessJSON,
   PersistentDataCubeQuery,
   RawLambda,
@@ -93,18 +94,19 @@ import {
   V1_DELEGATED_EXPORT_HEADER,
   V1_deserializeDatasetEntitlementReport,
   V1_deserializeDatasetSpecification,
+  V1_deserializeExecutionResult,
   V1_deserializeValueSpecification,
   V1_EXECUTION_RESULT,
   V1_ExecutionError,
+  V1_getGenericTypeFullPath,
   V1_GraphTransformerContextBuilder,
   V1_Lambda,
   V1_LambdaReturnTypeInput,
   V1_MappingModelCoverageAnalysisInput,
   V1_MappingModelCoverageAnalysisResult,
   V1_ParserError,
-  V1_RelationType,
+  V1_relationTypeModelSchema,
   V1_RenderStyle,
-  V1_serializeExecutionResult,
   V1_serializeRawValueSpecification,
   V1_transformRawLambda,
 } from '@finos/legend-vscode-extension-dependencies';
@@ -204,21 +206,21 @@ export class V1_LSPEngine implements V1_GraphManagerEngine {
 
   // ------------------------------------------- Grammar -------------------------------------------
 
-  pureModelContextDataToPureCode(
+  transformPureModelContextDataToCode(
     graph: V1_PureModelContextData,
     pretty: boolean,
   ): Promise<string> {
-    throw new Error('pureModelContextDataToPureCode not implemented');
+    throw new Error('transformPureModelContextDataToCode not implemented');
   }
 
-  async pureCodeToPureModelContextData(
+  async transformCodeToPureModelContextData(
     code: string,
     options?: {
       sourceInformationIndex?: Map<string, V1_SourceInformation> | undefined;
       onError?: () => void;
     },
   ): Promise<V1_PureModelContextData> {
-    throw new Error('pureCodeToPureModelContextData not implemented');
+    throw new Error('transformCodeToPureModelContextData not implemented');
   }
 
   async transformV1RawLambdasToCode(
@@ -262,7 +264,7 @@ export class V1_LSPEngine implements V1_GraphManagerEngine {
     return this.transformV1RawLambdasToCode(lambdas, pretty);
   }
 
-  async transformValueSpecsToCode(
+  async transformValueSpecificationsToCode(
     input: Record<string, PlainObject<V1_ValueSpecification>>,
     pretty: boolean,
   ): Promise<Map<string, string>> {
@@ -298,18 +300,21 @@ export class V1_LSPEngine implements V1_GraphManagerEngine {
     return mappedResult;
   }
 
-  async transformValueSpecToCode(
+  async transformValueSpecificationToCode(
     input: PlainObject<V1_ValueSpecification>,
     pretty: boolean,
   ): Promise<string> {
     const batchInput: Record<string, PlainObject<V1_ValueSpecification>> = {
       valueSpec: input,
     };
-    const result = await this.transformValueSpecsToCode(batchInput, pretty);
+    const result = await this.transformValueSpecificationsToCode(
+      batchInput,
+      pretty,
+    );
     return guaranteeNonNullable(result.get('valueSpec'));
   }
 
-  async transformCodeToValueSpeces(
+  async transformCodeToValueSpecifications(
     input: Record<string, V1_GrammarParserBatchInputEntry>,
     throwOnFirstError?: boolean,
   ): Promise<Map<string, PlainObject<V1_ValueSpecification>>> {
@@ -343,7 +348,7 @@ export class V1_LSPEngine implements V1_GraphManagerEngine {
     return mappedResult;
   }
 
-  async transformCodeToValueSpec(
+  async transformCodeToValueSpecification(
     input: string,
     returnSourceInformation?: boolean,
   ): Promise<PlainObject<V1_ValueSpecification>> {
@@ -353,7 +358,10 @@ export class V1_LSPEngine implements V1_GraphManagerEngine {
         returnSourceInformation,
       },
     };
-    const result = await this.transformCodeToValueSpeces(batchInput, true);
+    const result = await this.transformCodeToValueSpecifications(
+      batchInput,
+      true,
+    );
     return guaranteeNonNullable(result.get('valueSpec'));
   }
 
@@ -538,7 +546,8 @@ export class V1_LSPEngine implements V1_GraphManagerEngine {
         }),
       );
     }
-    const v1_relationType = V1_RelationType.serialization.fromJson(
+    const v1_relationType = deserialize(
+      V1_relationTypeModelSchema,
       guaranteeNonNullable(
         (
           JSON.parse(
@@ -551,12 +560,15 @@ export class V1_LSPEngine implements V1_GraphManagerEngine {
         'Lambda return type response does not contain relationType',
       ),
     );
-    const result = new RelationTypeMetadata();
-    result.columns = v1_relationType.columns.map(
-      (e: V1_RelationTypeColumn) =>
-        new RelationTypeColumnMetadata(e.type, e.name),
+    const relationType = new RelationTypeMetadata();
+    relationType.columns = v1_relationType.columns.map(
+      (column: V1_RelationTypeColumn) =>
+        new RelationTypeColumnMetadata(
+          V1_getGenericTypeFullPath(column.genericType),
+          column.name,
+        ),
     );
-    return result;
+    return relationType;
   }
 
   async getCodeCompletion(
@@ -616,7 +628,7 @@ export class V1_LSPEngine implements V1_GraphManagerEngine {
       returnUndefOnError(() =>
         this.parseExecutionResults(executionResultInText, options),
       ) ?? executionResultInText;
-    const executionResult = V1_serializeExecutionResult(rawExecutionResult);
+    const executionResult = V1_deserializeExecutionResult(rawExecutionResult);
     return { executionResult };
   }
 
@@ -898,17 +910,35 @@ export class V1_LSPEngine implements V1_GraphManagerEngine {
 
   // ------------------------------------------ Query Data Cube ------------------------------------------
 
-  async getDataCubeQuery(id: string): Promise<PersistentDataCubeQuery> {
+  searchDataCubeQueries(
+    searchSpecification: V1_QuerySearchSpecification,
+  ): Promise<LightPersistentDataCubeQuery[]> {
+    throw new Error('searchDataCubeQueries not implemented');
+  }
+
+  getDataCubeQueries(
+    queryIds: string[],
+  ): Promise<LightPersistentDataCubeQuery[]> {
+    throw new Error('getDataCubeQueries not implemented');
+  }
+
+  getDataCubeQuery(id: string): Promise<PersistentDataCubeQuery> {
     throw new Error('getDataCubeQuery not implemented');
   }
 
-  async createDataCubeQuery(
+  createDataCubeQuery(
     query: PersistentDataCubeQuery,
   ): Promise<PersistentDataCubeQuery> {
     throw new Error('createDataCubeQuery not implemented');
   }
 
-  async deleteDataCubeQuery(queryId: string): Promise<void> {
+  updateDataCubeQuery(
+    query: PersistentDataCubeQuery,
+  ): Promise<PersistentDataCubeQuery> {
+    throw new Error('updateDataCubeQuery not implemented');
+  }
+
+  deleteDataCubeQuery(id: string): Promise<void> {
     throw new Error('deleteDataCubeQuery not implemented');
   }
 
