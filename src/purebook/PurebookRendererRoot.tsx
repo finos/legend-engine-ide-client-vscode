@@ -26,12 +26,12 @@ export const activate: ActivationFunction = (context) => {
     renderOutputItem(data, element) {
       if (!context.postMessage) {
         throw new Error(
-          'vscode extension context postMessage is required to render Purebook cube',
+          'vscode extension context postMessage is required to render Purebook Datacube',
         );
       }
       if (!context.onDidReceiveMessage) {
         throw new Error(
-          'vscode extension context onDidReceiveMessage is required to render Purebook cube',
+          'vscode extension context onDidReceiveMessage is required to render Purebook Datacube',
         );
       }
       const rootToUnmount: Root | undefined = roots[data.id];
