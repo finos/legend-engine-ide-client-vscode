@@ -24,6 +24,7 @@ import {
 } from '../utils/Const';
 import {
   type PlainObject,
+  V1_RawLambda,
   guaranteeNonEmptyString,
   guaranteeNonNullable,
 } from '@finos/legend-vscode-extension-dependencies';
@@ -32,6 +33,10 @@ import { WebviewQueryBuilder } from './query/WebviewQueryBuilder';
 import { DiagramEditor } from './diagram/DiagramEditor';
 import { DiagramEditorState } from '../stores/DiagramEditorState';
 import { type LegendVSCodeApplicationConfigurationData } from '../application/LegendVSCodeApplicationConfig';
+import { PurebookCubeRenderer } from '../purebook/PurebookCubeRenderer';
+import { postMessage } from '../utils/VsCodeUtils';
+import { handleV1LSPEngineMessage } from '../graph/utils';
+import { VSCodeEvent, Disposable } from 'vscode-notebook-renderer/events';
 
 export const ComponentRouter = (props: PlainObject): React.ReactNode => {
   const webviewType = guaranteeNonEmptyString(
@@ -90,7 +95,33 @@ export const ComponentRouter = (props: PlainObject): React.ReactNode => {
       break;
     }
     case DATACUBE: {
-      component = <p>DataCube!</p>;
+      const cellUri = guaranteeNonNullable(props.cellUri as string);
+      const lambda = guaranteeNonNullable(
+        props.lambda as PlainObject<V1_RawLambda>,
+      );
+      const handleEvent: VSCodeEvent<{
+        command: string;
+        messageId: string;
+        result: unknown;
+      }> = (
+        listener: (e: {
+          command: string;
+          messageId: string;
+          result: unknown;
+        }) => any,
+      ): Disposable => {
+        return {
+          dispose: () => {},
+        }
+      };
+      component = (
+        <PurebookCubeRenderer
+          cellUri={cellUri}
+          lambda={lambda}
+          postMessage={postMessage}
+          onDidReceiveMessage={handleEvent}
+        />
+      );
       break;
     }
     default: {
