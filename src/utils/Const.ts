@@ -52,6 +52,7 @@ export const ONE_ENTITY_PER_FILE_REQUEST_ID =
   'legend/oneEntityPerFileRefactoring';
 export const ONE_ENTITY_PER_FILE_COMMAND_ID =
   'legend.refactor.oneEntityPerFile';
+export const OPEN_DATACUBE_IN_NEW_TAB_COMMAND_ID = 'legend.datacube.openInNewTab';
 
 // LSP Commands
 export const ANALYZE_MAPPING_MODEL_COVERAGE_COMMAND_ID =
@@ -127,6 +128,7 @@ export const FUNCTION_PARAMTER_VALUES_ID = 'functionParameterValues';
 export const DIAGRAM_RENDERER = 'diagramRenderer';
 export const SERVICE_QUERY_EDITOR = 'serviceQueryEditor';
 export const FUNCTION_QUERY_EDITOR = 'functionQueryEditor';
+export const DATACUBE = 'datacube';
 
 // Classifier paths
 export enum CLASSIFIER_PATH {

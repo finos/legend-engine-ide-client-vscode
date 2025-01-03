@@ -25,6 +25,7 @@ import {
 import { LSPDataCubeEngine } from './LSPDataCubeEngine';
 import { type VSCodeEvent } from 'vscode-notebook-renderer/events';
 import { useEffect, useState } from 'react';
+import { OPEN_DATACUBE_IN_NEW_TAB_COMMAND_ID } from '../utils/Const';
 
 export const PurebookCubeRenderer = (props: {
   cellUri: string;
@@ -65,6 +66,14 @@ export const PurebookCubeRenderer = (props: {
     initialize();
   }, [cellUri, lambda, postMessage, onDidReceiveMessage]);
 
+  const handleOpenInNewTab = (): void => {
+    postMessage({
+      command: OPEN_DATACUBE_IN_NEW_TAB_COMMAND_ID,
+      cellUri,
+      lambda,
+    });
+  };
+
   return (
     <>
       <CubesLoadingIndicator isLoading={isLoading}>
@@ -76,6 +85,7 @@ export const PurebookCubeRenderer = (props: {
           className="purebook-cube-renderer-container"
           style={{ height: '500px' }}
         >
+          <button onClick={handleOpenInNewTab}>Open in New Tab</button>
           <DataCube engine={engine} query={query} />
         </div>
       )}

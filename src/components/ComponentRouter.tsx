@@ -17,6 +17,7 @@
 import React from 'react';
 import {
   CLASSIFIER_PATH,
+  DATACUBE,
   DIAGRAM_RENDERER,
   FUNCTION_QUERY_EDITOR,
   SERVICE_QUERY_EDITOR,
@@ -86,6 +87,10 @@ export const ComponentRouter = (props: PlainObject): React.ReactNode => {
           />
         </LegendVSCodeApplication>
       );
+      break;
+    }
+    case DATACUBE: {
+      component = <p>DataCube!</p>;
       break;
     }
     default: {

@@ -63,9 +63,9 @@ export const getWebviewHtml = (
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
       </head>
       <body>
-        <div id="root" style="height: 100vh; width: 100%;" data-input-parameters=${JSON.stringify(
+        <div id="root" style="height: 100vh; width: 100%;" data-input-parameters='${JSON.stringify(
           { webviewType, ...dataInputParams },
-        )}></div>
+        )}'></div>
         <script src=${webviewRootScript}></script>
         <script>
           const vscode = acquireVsCodeApi();
