@@ -230,7 +230,7 @@
         "legend.purebook.enableDataCube": {
           "type": "boolean",
           "default": true,
-          "description": "Show purebook execution relational results in DataCube"
+          "description": "Show purebook execution relation results in DataCube"
         }
       }
     },
