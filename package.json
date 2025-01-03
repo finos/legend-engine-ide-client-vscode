@@ -226,6 +226,11 @@
           "type": "string",
           "default": "vX_X_X",
           "description": "Defines the protocol version to use"
+        },
+        "legend.purebook.enableDataCube": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show purebook execution relational results in DataCube"
         }
       }
     },
