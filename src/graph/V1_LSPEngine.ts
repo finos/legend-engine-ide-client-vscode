@@ -579,12 +579,12 @@ export class V1_LSPEngine implements V1_GraphManagerEngine {
   async getCodeCompletion(
     rawInput: V1_CompleteCodeInput,
   ): Promise<CodeCompletionResult> {
-    throw new Error('getCodeCompletion not implemented');
+    return this.getQueryTypeahead(rawInput.codeBlock, null);
   }
 
   async getQueryTypeahead(
     code: string,
-    baseQuery: PlainObject<V1_Lambda>,
+    baseQuery: PlainObject<V1_Lambda> | null,
   ): Promise<CodeCompletionResult> {
     const response = await this.postAndWaitForMessage<LegendExecutionResult[]>(
       {

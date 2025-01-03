@@ -175,7 +175,7 @@ export const useQueryBuilderState = (
             undefined,
             undefined,
             undefined,
-            undefined,
+            applicationStore.config.queryBuilderConfig,
             {
               service: serviceEntity.path,
             },

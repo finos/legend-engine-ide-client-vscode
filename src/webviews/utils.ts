@@ -16,7 +16,6 @@
 
 import {
   type ExtensionContext,
-  type Location,
   type Webview,
   Uri,
   window,
@@ -35,8 +34,7 @@ import {
   type LegendLanguageClient,
 } from '../LegendLanguageClient';
 import { type LegendConceptTreeProvider } from '../conceptTree';
-import { guaranteeNonNullable } from '../utils/AssertionUtils';
-import { TextLocation } from '../model/TextLocation';
+import { type TextLocation } from '../model/TextLocation';
 import { TextDocumentIdentifier } from 'vscode-languageclient';
 
 export const getWebviewHtml = (
