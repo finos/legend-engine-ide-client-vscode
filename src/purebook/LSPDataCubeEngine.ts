@@ -54,58 +54,22 @@ class LSPDataCubeSource extends DataCubeSource {
 export class LSPDataCubeEngine extends DataCubeEngine {
   lspEngine: V1_LSPEngine;
   rawLambda: V1_RawLambda;
-  postMessage: (message: unknown) => void;
-  onDidReceiveMessage: VSCodeEvent<{
-    command: string;
-    messageId: string;
-    result: unknown;
-  }>;
 
   constructor(
-    cellUri: string,
     rawLambdaJson: PlainObject<V1_RawLambda>,
-    postMessage: (message: unknown) => void,
-    onDidReceiveMessage: VSCodeEvent<{
-      command: string;
-      messageId: string;
-      result: unknown;
-    }>,
+    postAndWaitForMessage: <T>(
+      requestMessage: { command: string; msg?: PlainObject },
+      responseCommandId: string,
+    ) => Promise<T>,
   ) {
     super();
-    this.lspEngine = new V1_LSPEngine(this.postAndWaitForMessage(cellUri));
+    this.lspEngine = new V1_LSPEngine(postAndWaitForMessage);
     this.rawLambda = V1_deserializeRawValueSpecification(
       rawLambdaJson,
     ) as V1_RawLambda;
-    this.postMessage = postMessage;
-    this.onDidReceiveMessage = onDidReceiveMessage;
   }
 
   // ------------------------------- HELPER FUNCTIONS ------------------------------
-
-  private postAndWaitForMessage =
-    (cellUri: string) =>
-    async <T>(
-      requestMessage: { command: string; msg?: PlainObject },
-      responseCommandId: string,
-    ): Promise<T> => {
-      const messageId = uuid();
-      this.postMessage({
-        command: requestMessage.command,
-        msg: requestMessage.msg,
-        cellUri,
-        messageId,
-      });
-      return new Promise((resolve) => {
-        this.onDidReceiveMessage((message) => {
-          if (
-            message.command === responseCommandId &&
-            message.messageId === messageId
-          ) {
-            resolve(message.result as T);
-          }
-        });
-      });
-    };
 
   private getSourceFunctionExpression(): V1_ValueSpecification {
     let srcFuncExp = V1_deserializeValueSpecification(

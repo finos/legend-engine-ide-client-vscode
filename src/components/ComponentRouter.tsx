@@ -33,10 +33,9 @@ import { WebviewQueryBuilder } from './query/WebviewQueryBuilder';
 import { DiagramEditor } from './diagram/DiagramEditor';
 import { DiagramEditorState } from '../stores/DiagramEditorState';
 import { type LegendVSCodeApplicationConfigurationData } from '../application/LegendVSCodeApplicationConfig';
-import { PurebookCubeRenderer } from '../purebook/PurebookCubeRenderer';
-import { postMessage } from '../utils/VsCodeUtils';
-import { handleV1LSPEngineMessage } from '../graph/utils';
+import { postAndWaitForMessage } from '../utils/VsCodeUtils';
 import { VSCodeEvent, Disposable } from 'vscode-notebook-renderer/events';
+import { DataCubeRenderer } from './dataCube/DataCubeRenderer';
 
 export const ComponentRouter = (props: PlainObject): React.ReactNode => {
   const webviewType = guaranteeNonEmptyString(
@@ -115,11 +114,10 @@ export const ComponentRouter = (props: PlainObject): React.ReactNode => {
         }
       };
       component = (
-        <PurebookCubeRenderer
+        <DataCubeRenderer
           cellUri={cellUri}
           lambda={lambda}
-          postMessage={postMessage}
-          onDidReceiveMessage={handleEvent}
+          postAndWaitForMessage={postAndWaitForMessage}
         />
       );
       break;

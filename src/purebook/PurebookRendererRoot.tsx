@@ -18,6 +18,7 @@ import '@finos/legend-vscode-extension-dependencies/style/index.css';
 import { type Root, createRoot } from 'react-dom/client';
 import type { ActivationFunction } from 'vscode-notebook-renderer';
 import { PurebookCubeRenderer } from './PurebookCubeRenderer';
+import { PlainObject, uuid } from '@finos/legend-vscode-extension-dependencies';
 
 export const activate: ActivationFunction = (context) => {
   const roots: Record<string, Root> = {};
@@ -40,12 +41,39 @@ export const activate: ActivationFunction = (context) => {
       }
       const newRoot = createRoot(element);
       roots[data.id] = newRoot;
+
+      const cellUri = data.json().cellUri;
+      const lambda = data.json().lambda;
+
+      const postAndWaitForMessage = async <T,>(
+        requestMessage: { command: string; msg?: PlainObject },
+        responseCommandId: string,
+      ): Promise<T> => {
+        const messageId = uuid();
+        context.postMessage!({
+          command: requestMessage.command,
+          msg: requestMessage.msg,
+          cellUri,
+          messageId,
+        });
+        return new Promise((resolve) => {
+          context.onDidReceiveMessage!((message) => {
+            if (
+              message.command === responseCommandId &&
+              message.messageId === messageId
+            ) {
+              resolve(message.result as T);
+            }
+          });
+        });
+      };
+
       newRoot.render(
         <PurebookCubeRenderer
-          cellUri={data.json().cellUri}
-          lambda={data.json().lambda}
+          cellUri={cellUri}
+          lambda={lambda}
           postMessage={context.postMessage}
-          onDidReceiveMessage={context.onDidReceiveMessage}
+          postAndWaitForMessage={postAndWaitForMessage}
         />,
       );
     },
