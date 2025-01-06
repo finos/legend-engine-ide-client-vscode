@@ -15,22 +15,26 @@
  */
 
 import {
+  uuid,
   type PlainObject,
   type V1_RawLambda,
 } from '@finos/legend-vscode-extension-dependencies';
 import { OPEN_DATACUBE_IN_NEW_TAB_COMMAND_ID } from '../utils/Const';
 import { DataCubeRenderer } from '../components/dataCube/DataCubeRenderer';
+import { type VSCodeEvent } from 'vscode-notebook-renderer/events';
+import { useCallback } from 'react';
 
 export const PurebookCubeRenderer = (props: {
   cellUri: string;
   lambda: PlainObject<V1_RawLambda>;
   postMessage: (message: unknown) => void;
-  postAndWaitForMessage: <T>(
-    requestMessage: { command: string; msg?: PlainObject },
-    responseCommandId: string,
-  ) => Promise<T>;
+  onDidReceiveMessage: VSCodeEvent<{
+    command: string;
+    messageId: string;
+    result: unknown;
+  }>;
 }): React.ReactNode => {
-  const { cellUri, lambda, postMessage, postAndWaitForMessage } = props;
+  const { cellUri, lambda, postMessage, onDidReceiveMessage } = props;
 
   const handleOpenInNewTab = (): void => {
     postMessage({
@@ -39,6 +43,32 @@ export const PurebookCubeRenderer = (props: {
       lambda,
     });
   };
+
+  const postAndWaitForMessage = useCallback(
+    async <T,>(
+      requestMessage: { command: string; msg?: PlainObject },
+      responseCommandId: string,
+    ): Promise<T> => {
+      const messageId = uuid();
+      postMessage!({
+        command: requestMessage.command,
+        msg: requestMessage.msg,
+        cellUri,
+        messageId,
+      });
+      return new Promise((resolve) => {
+        onDidReceiveMessage!((message) => {
+          if (
+            message.command === responseCommandId &&
+            message.messageId === messageId
+          ) {
+            resolve(message.result as T);
+          }
+        });
+      });
+    },
+    [cellUri, onDidReceiveMessage, postMessage],
+  );
 
   return (
     <>
