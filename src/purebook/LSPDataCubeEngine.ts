@@ -30,7 +30,9 @@ import {
   DataCubeSource,
   guaranteeType,
   isNonNullable,
+  isNullable,
   RelationalExecutionActivities,
+  SerializationFactory,
   TDSExecutionResult,
   V1_AppliedFunction,
   V1_buildExecutionResult,
@@ -43,10 +45,20 @@ import {
   V1_serializeValueSpecification,
 } from '@finos/legend-vscode-extension-dependencies';
 import { V1_LSPEngine } from '../graph/V1_LSPEngine';
+import { createModelSchema, list, optional, primitive, raw } from 'serializr';
 
 class LSPDataCubeSource extends DataCubeSource {
   mapping?: string | undefined;
   runtime: string | undefined;
+
+  static readonly serialization = new SerializationFactory(
+    createModelSchema(LSPDataCubeSource, {
+      columns: list(raw()),
+      mapping: optional(primitive()),
+      query: primitive(),
+      runtime: primitive(),
+    }),
+  );
 }
 
 export class LSPDataCubeEngine extends DataCubeEngine {
@@ -69,9 +81,11 @@ export class LSPDataCubeEngine extends DataCubeEngine {
 
   // ------------------------------- HELPER FUNCTIONS ------------------------------
 
-  private getSourceFunctionExpression(): V1_ValueSpecification {
+  private getSourceFunctionExpression(
+    rawLambda: V1_RawLambda,
+  ): V1_ValueSpecification {
     let srcFuncExp = V1_deserializeValueSpecification(
-      V1_serializeRawValueSpecification(this.rawLambda),
+      V1_serializeRawValueSpecification(rawLambda),
       [],
     );
     // We could do a further check here to ensure the experssion is an applied function.
@@ -139,11 +153,40 @@ export class LSPDataCubeEngine extends DataCubeEngine {
     return query;
   }
 
+  async populateSourceForQuery(query: DataCubeQuery): Promise<DataCubeQuery> {
+    if (!isNullable(query.source)) {
+      return query;
+    }
+    const queryRawLambda = guaranteeType(
+      await this.lspEngine.transformCodeToLambda(query.query),
+      V1_RawLambda,
+      `Only functions returning TDS/graph fetch using the from() function can be opened in Data Cube`,
+    );
+    const srcFuncExp = guaranteeType(
+      this.getSourceFunctionExpression(queryRawLambda),
+      V1_AppliedFunction,
+      `Only functions returning TDS/graph fetch using the from() function can be opened in Data Cube`,
+    );
+    const source = new LSPDataCubeSource();
+    source.columns = (
+      await this.getRawLambdaRelationType(queryRawLambda)
+    ).columns;
+    // const { mapping, runtime } =
+    //   this.getFromFunctionMappingAndRuntime(this.rawLambda);
+    // source.mapping = mapping;
+    // source.runtime = runtime;
+    source.query = srcFuncExp;
+    query.source = LSPDataCubeSource.serialization.toJson(source);
+    return query;
+  }
+
   // ---------------------------------- INTERFACE ----------------------------------
 
-  override async processQuerySource(): Promise<DataCubeSource> {
+  override async processQuerySource(
+    value: PlainObject,
+  ): Promise<DataCubeSource> {
     const srcFuncExp = guaranteeType(
-      this.getSourceFunctionExpression(),
+      this.getSourceFunctionExpression(this.rawLambda),
       V1_AppliedFunction,
       `Only functions returning TDS/graph fetch using the from() function can be opened in Data Cube`,
     );
