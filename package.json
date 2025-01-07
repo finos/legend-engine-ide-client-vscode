@@ -13,7 +13,7 @@
   "icon": "icons/legend_full.png",
   "homepage": "https://legend.finos.org/",
   "publisher": "FINOS",
-  "version": "0.21.1",
+  "version": "0.21.2",
   "type": "commonjs",
   "repository": {
     "type": "git",
