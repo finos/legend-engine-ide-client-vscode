@@ -15,12 +15,13 @@
  */
 
 import {
-  type DataCubeQuery,
+  type DataCubeOptions,
   type PlainObject,
   type V1_RawLambda,
   CubesLoadingIndicator,
   CubesLoadingIndicatorIcon,
   DataCube,
+  DataCubeQuery,
 } from '@finos/legend-vscode-extension-dependencies';
 import { useEffect, useState } from 'react';
 import { LSPDataCubeEngine } from '../../purebook/LSPDataCubeEngine';
@@ -32,8 +33,11 @@ export const DataCubeRenderer = (props: {
     requestMessage: { command: string; msg?: PlainObject },
     responseCommandId: string,
   ) => Promise<T>;
+  options?: DataCubeOptions;
+  initialQuery?: PlainObject<DataCubeQuery> | undefined;
 }): React.ReactNode => {
-  const { cellUri, lambda, postAndWaitForMessage } = props;
+  const { cellUri, lambda, postAndWaitForMessage, options, initialQuery } =
+    props;
   const [engine, setEngine] = useState<LSPDataCubeEngine | null>(null);
   const [query, setQuery] = useState<DataCubeQuery | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -45,7 +49,13 @@ export const DataCubeRenderer = (props: {
         setIsLoading(true);
         const newEngine = new LSPDataCubeEngine(lambda, postAndWaitForMessage);
         setEngine(newEngine);
-        setQuery(await newEngine.generateInitialQuery());
+        setQuery(
+          initialQuery
+            ? await newEngine.populateSourceForQuery(
+                DataCubeQuery.serialization.fromJson(initialQuery),
+              )
+            : await newEngine.generateInitialQuery(),
+        );
       } catch (e) {
         if (e instanceof Error) {
           setError(e.message);
@@ -55,7 +65,7 @@ export const DataCubeRenderer = (props: {
       }
     };
     initialize();
-  }, [cellUri, lambda, postAndWaitForMessage]);
+  }, [cellUri, lambda, postAndWaitForMessage, initialQuery]);
 
   return (
     <>
@@ -68,7 +78,7 @@ export const DataCubeRenderer = (props: {
           className="datacube-renderer-container"
           style={{ height: '100%' }}
         >
-          <DataCube engine={engine} query={query} />
+          <DataCube engine={engine} query={query} options={options} />
         </div>
       )}
       {!engine && !query && !isLoading && error && (

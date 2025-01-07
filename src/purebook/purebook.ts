@@ -16,19 +16,19 @@
 
 import {
   type CancellationToken,
-  commands,
   type ExtensionContext,
+  type NotebookSerializer,
+  type WebviewPanel,
+  commands,
   NotebookCellData,
   NotebookCellKind,
   NotebookData,
-  type NotebookSerializer,
-  workspace,
-  window,
-  WorkspaceEdit,
-  Uri,
   notebooks,
-  WebviewPanel,
+  Uri,
   ViewColumn,
+  window,
+  workspace,
+  WorkspaceEdit,
 } from 'vscode';
 import {
   DATACUBE,
@@ -41,6 +41,7 @@ import { type LegendConceptTreeProvider } from '../conceptTree';
 import { handleV1LSPEngineMessage } from '../graph/utils';
 import { renderDataCubeWebView } from '../webviews/DataCubeWebView';
 import {
+  type DataCubeQuery,
   type PlainObject,
   type V1_RawLambda,
 } from '@finos/legend-vscode-extension-dependencies';
@@ -106,6 +107,7 @@ const showDatacubeWebView = async (
   legendConceptTree: LegendConceptTreeProvider,
   cellUri: string,
   lambda: PlainObject<V1_RawLambda>,
+  query: PlainObject<DataCubeQuery>,
 ): Promise<void> => {
   if (openedWebViews[cellUri]) {
     openedWebViews[cellUri]?.reveal();
@@ -134,6 +136,7 @@ const showDatacubeWebView = async (
       legendConceptTree,
       cellUri,
       lambda,
+      query,
       workspace.getConfiguration('legend').get('studio.forms.file', ''),
     );
   }
@@ -183,6 +186,7 @@ export function enableLegendBook(
         legendConceptTree,
         e.message.cellUri,
         e.message.lambda,
+        e.message.query,
       );
     }
   });
