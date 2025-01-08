@@ -15,9 +15,11 @@
  */
 
 import {
+  type DataCubeInnerHeaderComponentParams,
   type PlainObject,
   type V1_RawLambda,
   BoxArrowUpRightIcon,
+  DataCubeQuery,
   uuid,
 } from '@finos/legend-vscode-extension-dependencies';
 import { OPEN_DATACUBE_IN_NEW_TAB_COMMAND_ID } from '../utils/Const';
@@ -63,16 +65,24 @@ export const PurebookCubeRenderer = (props: {
     [cellUri, onDidReceiveMessage, postMessage],
   );
 
-  const handleOpenInNewTab = async (): Promise<void> => {
+  const handleOpenInNewTab = async (query: DataCubeQuery): Promise<void> => {
     postMessage({
       command: OPEN_DATACUBE_IN_NEW_TAB_COMMAND_ID,
       cellUri,
       lambda,
+      query: DataCubeQuery.serialization.toJson(query),
     });
   };
 
-  const innerHeaderRenderer = (): React.ReactNode => (
-    <button title="Open in New Tab" onClick={async () => handleOpenInNewTab()}>
+  const innerHeaderRenderer = (
+    params: DataCubeInnerHeaderComponentParams,
+  ): React.ReactNode => (
+    <button
+      title="Open in New Tab"
+      onClick={async () =>
+        handleOpenInNewTab(await params.api.generateDataCubeQuery())
+      }
+    >
       <BoxArrowUpRightIcon />
     </button>
   );

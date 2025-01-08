@@ -20,7 +20,10 @@ import { getWebviewHtml } from './utils';
 import { type LegendConceptTreeProvider } from '../conceptTree';
 import { type PlainObject } from '../utils/SerializationUtils';
 import { handleV1LSPEngineMessage } from '../graph/utils';
-import { type V1_RawLambda } from '@finos/legend-vscode-extension-dependencies';
+import {
+  type DataCubeQuery,
+  type V1_RawLambda,
+} from '@finos/legend-vscode-extension-dependencies';
 
 export const renderDataCubeWebView = async (
   webViewPanel: WebviewPanel,
@@ -29,6 +32,7 @@ export const renderDataCubeWebView = async (
   legendConceptTree: LegendConceptTreeProvider,
   cellUri: string,
   lambda: PlainObject<V1_RawLambda>,
+  query: PlainObject<DataCubeQuery>,
   renderFilePath: string,
 ): Promise<void> => {
   const { webview } = webViewPanel;
@@ -37,6 +41,7 @@ export const renderDataCubeWebView = async (
   const dataInputParams: PlainObject = {
     cellUri,
     lambda,
+    query,
   };
 
   webview.html = getWebviewHtml(
