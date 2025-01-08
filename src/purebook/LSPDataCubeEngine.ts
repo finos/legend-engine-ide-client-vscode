@@ -32,7 +32,6 @@ import {
   isNonNullable,
   RelationalExecutionActivities,
   TDSExecutionResult,
-  uuid,
   V1_AppliedFunction,
   V1_buildExecutionResult,
   V1_deserializeRawValueSpecification,
@@ -44,7 +43,6 @@ import {
   V1_serializeValueSpecification,
 } from '@finos/legend-vscode-extension-dependencies';
 import { V1_LSPEngine } from '../graph/V1_LSPEngine';
-import { type VSCodeEvent } from 'vscode-notebook-renderer/events';
 
 class LSPDataCubeSource extends DataCubeSource {
   mapping?: string | undefined;
@@ -198,13 +196,6 @@ export class LSPDataCubeEngine extends DataCubeEngine {
       V1_serializeValueSpecification(baseQuery, []),
     );
     return response.completions;
-  }
-
-  override async getQueryRelationType(
-    query: V1_Lambda,
-  ): Promise<DataCubeRelationType> {
-    const rawLambda = this.buildRawLambdaFromLambda(query);
-    return this.getRawLambdaRelationType(rawLambda);
   }
 
   override async getQueryCodeRelationReturnType(
