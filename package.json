@@ -373,7 +373,7 @@
     "release:openvsx": "ovsx publish -i legend-engine-ide-client-vscode.vsix"
   },
   "dependencies": {
-    "@finos/legend-vscode-extension-dependencies": "4.0.50",
+    "@finos/legend-vscode-extension-dependencies": "4.0.54",
     "@types/vscode": "1.83.0",
     "ag-grid-community": "33.0.2",
     "ag-grid-enterprise": "33.0.2",
