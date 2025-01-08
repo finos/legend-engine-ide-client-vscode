@@ -16,18 +16,18 @@
 
 import {
   type CancellationToken,
-  commands,
   type ExtensionContext,
+  type NotebookSerializer,
+  type WebviewPanel,
+  commands,
   NotebookCellData,
   NotebookCellKind,
   NotebookData,
-  type NotebookSerializer,
   workspace,
   window,
   WorkspaceEdit,
   Uri,
   notebooks,
-  WebviewPanel,
   ViewColumn,
 } from 'vscode';
 import {
