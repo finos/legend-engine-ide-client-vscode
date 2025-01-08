@@ -32,7 +32,6 @@ import {
   isNonNullable,
   RelationalExecutionActivities,
   TDSExecutionResult,
-  uuid,
   V1_AppliedFunction,
   V1_buildExecutionResult,
   V1_deserializeRawValueSpecification,
@@ -44,7 +43,6 @@ import {
   V1_serializeValueSpecification,
 } from '@finos/legend-vscode-extension-dependencies';
 import { V1_LSPEngine } from '../graph/V1_LSPEngine';
-import { type VSCodeEvent } from 'vscode-notebook-renderer/events';
 
 class LSPDataCubeSource extends DataCubeSource {
   mapping?: string | undefined;
@@ -54,58 +52,22 @@ class LSPDataCubeSource extends DataCubeSource {
 export class LSPDataCubeEngine extends DataCubeEngine {
   lspEngine: V1_LSPEngine;
   rawLambda: V1_RawLambda;
-  postMessage: (message: unknown) => void;
-  onDidReceiveMessage: VSCodeEvent<{
-    command: string;
-    messageId: string;
-    result: unknown;
-  }>;
 
   constructor(
-    cellUri: string,
     rawLambdaJson: PlainObject<V1_RawLambda>,
-    postMessage: (message: unknown) => void,
-    onDidReceiveMessage: VSCodeEvent<{
-      command: string;
-      messageId: string;
-      result: unknown;
-    }>,
+    postAndWaitForMessage: <T>(
+      requestMessage: { command: string; msg?: PlainObject },
+      responseCommandId: string,
+    ) => Promise<T>,
   ) {
     super();
-    this.lspEngine = new V1_LSPEngine(this.postAndWaitForMessage(cellUri));
+    this.lspEngine = new V1_LSPEngine(postAndWaitForMessage);
     this.rawLambda = V1_deserializeRawValueSpecification(
       rawLambdaJson,
     ) as V1_RawLambda;
-    this.postMessage = postMessage;
-    this.onDidReceiveMessage = onDidReceiveMessage;
   }
 
   // ------------------------------- HELPER FUNCTIONS ------------------------------
-
-  private postAndWaitForMessage =
-    (cellUri: string) =>
-    async <T>(
-      requestMessage: { command: string; msg?: PlainObject },
-      responseCommandId: string,
-    ): Promise<T> => {
-      const messageId = uuid();
-      this.postMessage({
-        command: requestMessage.command,
-        msg: requestMessage.msg,
-        cellUri,
-        messageId,
-      });
-      return new Promise((resolve) => {
-        this.onDidReceiveMessage((message) => {
-          if (
-            message.command === responseCommandId &&
-            message.messageId === messageId
-          ) {
-            resolve(message.result as T);
-          }
-        });
-      });
-    };
 
   private getSourceFunctionExpression(): V1_ValueSpecification {
     let srcFuncExp = V1_deserializeValueSpecification(
@@ -234,13 +196,6 @@ export class LSPDataCubeEngine extends DataCubeEngine {
       V1_serializeValueSpecification(baseQuery, []),
     );
     return response.completions;
-  }
-
-  override async getQueryRelationType(
-    query: V1_Lambda,
-  ): Promise<DataCubeRelationType> {
-    const rawLambda = this.buildRawLambdaFromLambda(query);
-    return this.getRawLambdaRelationType(rawLambda);
   }
 
   override async getQueryCodeRelationReturnType(

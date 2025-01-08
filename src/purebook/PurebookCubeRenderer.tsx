@@ -15,16 +15,15 @@
  */
 
 import {
-  type DataCubeQuery,
   type PlainObject,
   type V1_RawLambda,
-  CubesLoadingIndicator,
-  CubesLoadingIndicatorIcon,
-  DataCube,
+  BoxArrowUpRightIcon,
+  uuid,
 } from '@finos/legend-vscode-extension-dependencies';
-import { LSPDataCubeEngine } from './LSPDataCubeEngine';
+import { OPEN_DATACUBE_IN_NEW_TAB_COMMAND_ID } from '../utils/Const';
+import { DataCubeRenderer } from '../components/dataCube/DataCubeRenderer';
 import { type VSCodeEvent } from 'vscode-notebook-renderer/events';
-import { useEffect, useState } from 'react';
+import { useCallback } from 'react';
 
 export const PurebookCubeRenderer = (props: {
   cellUri: string;
@@ -37,56 +36,61 @@ export const PurebookCubeRenderer = (props: {
   }>;
 }): React.ReactNode => {
   const { cellUri, lambda, postMessage, onDidReceiveMessage } = props;
-  const [engine, setEngine] = useState<LSPDataCubeEngine | null>(null);
-  const [query, setQuery] = useState<DataCubeQuery | null>(null);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [error, setError] = useState('');
 
-  useEffect(() => {
-    const initialize = async (): Promise<void> => {
-      try {
-        setIsLoading(true);
-        const newEngine = new LSPDataCubeEngine(
-          cellUri,
-          lambda,
-          postMessage,
-          onDidReceiveMessage,
-        );
-        setEngine(newEngine);
-        setQuery(await newEngine.generateInitialQuery());
-      } catch (e) {
-        if (e instanceof Error) {
-          setError(e.message);
-        }
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    initialize();
-  }, [cellUri, lambda, postMessage, onDidReceiveMessage]);
+  const postAndWaitForMessage = useCallback(
+    async <T,>(
+      requestMessage: { command: string; msg?: PlainObject },
+      responseCommandId: string,
+    ): Promise<T> => {
+      const messageId = uuid();
+      postMessage!({
+        command: requestMessage.command,
+        msg: requestMessage.msg,
+        cellUri,
+        messageId,
+      });
+      return new Promise((resolve) => {
+        onDidReceiveMessage!((message) => {
+          if (
+            message.command === responseCommandId &&
+            message.messageId === messageId
+          ) {
+            resolve(message.result as T);
+          }
+        });
+      });
+    },
+    [cellUri, onDidReceiveMessage, postMessage],
+  );
+
+  const handleOpenInNewTab = async (): Promise<void> => {
+    postMessage({
+      command: OPEN_DATACUBE_IN_NEW_TAB_COMMAND_ID,
+      cellUri,
+      lambda,
+    });
+  };
+
+  const innerHeaderRenderer = (): React.ReactNode => (
+    <button title="Open in New Tab" onClick={async () => handleOpenInNewTab()}>
+      <BoxArrowUpRightIcon />
+    </button>
+  );
 
   return (
     <>
-      <CubesLoadingIndicator isLoading={isLoading}>
-        <CubesLoadingIndicatorIcon />
-      </CubesLoadingIndicator>
-      {engine && query && !isLoading && (
-        <div
-          id={`purebook-cube-renderer-${cellUri}`}
-          className="purebook-cube-renderer-container"
-          style={{ height: '500px' }}
-        >
-          <DataCube engine={engine} query={query} />
-        </div>
-      )}
-      {!engine && !query && !isLoading && error && (
-        <>
-          <div>
-            Failed creating engine and query for Purebook Datacube renderer
-          </div>
-          <div>{error}</div>
-        </>
-      )}
+      <div
+        id={`purebook-datacube-renderer-${cellUri}`}
+        className="purebook-datacube-renderer-container"
+        style={{ height: '500px' }}
+      >
+        <DataCubeRenderer
+          cellUri={cellUri}
+          lambda={lambda}
+          postAndWaitForMessage={postAndWaitForMessage}
+          options={{ innerHeaderRenderer }}
+        />
+      </div>
     </>
   );
 };

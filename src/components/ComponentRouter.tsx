@@ -17,12 +17,14 @@
 import React from 'react';
 import {
   CLASSIFIER_PATH,
+  DATACUBE,
   DIAGRAM_RENDERER,
   FUNCTION_QUERY_EDITOR,
   SERVICE_QUERY_EDITOR,
 } from '../utils/Const';
 import {
   type PlainObject,
+  type V1_RawLambda,
   guaranteeNonEmptyString,
   guaranteeNonNullable,
 } from '@finos/legend-vscode-extension-dependencies';
@@ -31,6 +33,8 @@ import { WebviewQueryBuilder } from './query/WebviewQueryBuilder';
 import { DiagramEditor } from './diagram/DiagramEditor';
 import { DiagramEditorState } from '../stores/DiagramEditorState';
 import { type LegendVSCodeApplicationConfigurationData } from '../application/LegendVSCodeApplicationConfig';
+import { postAndWaitForMessage } from '../utils/VsCodeUtils';
+import { DataCubeRenderer } from './dataCube/DataCubeRenderer';
 
 export const ComponentRouter = (props: PlainObject): React.ReactNode => {
   const webviewType = guaranteeNonEmptyString(
@@ -85,6 +89,20 @@ export const ComponentRouter = (props: PlainObject): React.ReactNode => {
             diagramEditorState={new DiagramEditorState(diagramId)}
           />
         </LegendVSCodeApplication>
+      );
+      break;
+    }
+    case DATACUBE: {
+      const cellUri = guaranteeNonNullable(props.cellUri as string);
+      const lambda = guaranteeNonNullable(
+        props.lambda as PlainObject<V1_RawLambda>,
+      );
+      component = (
+        <DataCubeRenderer
+          cellUri={cellUri}
+          lambda={lambda}
+          postAndWaitForMessage={postAndWaitForMessage}
+        />
       );
       break;
     }

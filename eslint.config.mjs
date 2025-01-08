@@ -19,7 +19,9 @@
 import { fixupConfigRules, fixupPluginRules } from '@eslint/compat';
 import prettier from 'eslint-plugin-prettier';
 import reactHooks from 'eslint-plugin-react-hooks';
+// eslint-disable-next-line import/no-unresolved
 import typescriptEslint from '@typescript-eslint/eslint-plugin';
+// eslint-disable-next-line import/no-unresolved
 import tsParser from '@typescript-eslint/parser';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -51,7 +53,6 @@ const ES_RULES = {
   'block-spacing': [WARN, 'always'],
   'brace-style': OFF, // this will be managed by `prettier`
   'comma-dangle': [ERROR, 'only-multiline'],
-  'comma-spacing': [WARN, { before: false, after: true }],
   'comma-style': [ERROR, 'last'],
   'consistent-return': ERROR,
   'consistent-this': [ERROR, 'self'],
