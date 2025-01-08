@@ -24,7 +24,7 @@ import {
 } from '../utils/Const';
 import {
   type PlainObject,
-  V1_RawLambda,
+  type V1_RawLambda,
   guaranteeNonEmptyString,
   guaranteeNonNullable,
 } from '@finos/legend-vscode-extension-dependencies';
@@ -34,7 +34,6 @@ import { DiagramEditor } from './diagram/DiagramEditor';
 import { DiagramEditorState } from '../stores/DiagramEditorState';
 import { type LegendVSCodeApplicationConfigurationData } from '../application/LegendVSCodeApplicationConfig';
 import { postAndWaitForMessage } from '../utils/VsCodeUtils';
-import { VSCodeEvent, Disposable } from 'vscode-notebook-renderer/events';
 import { DataCubeRenderer } from './dataCube/DataCubeRenderer';
 
 export const ComponentRouter = (props: PlainObject): React.ReactNode => {
@@ -98,21 +97,6 @@ export const ComponentRouter = (props: PlainObject): React.ReactNode => {
       const lambda = guaranteeNonNullable(
         props.lambda as PlainObject<V1_RawLambda>,
       );
-      const handleEvent: VSCodeEvent<{
-        command: string;
-        messageId: string;
-        result: unknown;
-      }> = (
-        listener: (e: {
-          command: string;
-          messageId: string;
-          result: unknown;
-        }) => any,
-      ): Disposable => {
-        return {
-          dispose: () => {},
-        }
-      };
       component = (
         <DataCubeRenderer
           cellUri={cellUri}
