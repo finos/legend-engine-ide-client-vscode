@@ -19,7 +19,6 @@ import {
   type PlainObject,
   type V1_RawLambda,
   BoxArrowUpRightIcon,
-  Button,
   DataCubeQuery,
   uuid,
 } from '@finos/legend-vscode-extension-dependencies';
@@ -78,14 +77,14 @@ export const PurebookCubeRenderer = (props: {
   const innerHeaderRenderer = (
     params: DataCubeInnerHeaderComponentParams,
   ): React.ReactNode => (
-    <Button
+    <button
       title="Open in New Tab"
       onClick={async () =>
         handleOpenInNewTab(await params.api.generateDataCubeQuery())
       }
     >
       <BoxArrowUpRightIcon />
-    </Button>
+    </button>
   );
 
   return (
