@@ -745,6 +745,12 @@ export function createReplTerminal(context: ExtensionContext): void {
     coderVSCodeProxyURLTemplate
       ? `-Dlegend.repl.dataCube.urlTemplate=${coderVSCodeProxyURLTemplate}`
       : undefined,
+    `-Dlegend.repl.dataCube.queryServerBaseUrl=${workspace
+      .getConfiguration('legend')
+      .get('dataCube.queryServerBaseUrl', '')}`,
+    `-Dlegend.repl.dataCube.hostedApplicationBaseUrl=${workspace
+      .getConfiguration('legend')
+      .get('dataCube.hostedApplicationBaseUrl', '')}`,
     `-Dlegend.repl.dataCube.gridLicenseKey=${workspace
       .getConfiguration('legend')
       .get('agGridLicense', '')}`,

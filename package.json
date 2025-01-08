@@ -162,7 +162,17 @@
         "legend.agGridLicense": {
           "type": "string",
           "default": "",
-          "description": "Set the AgGrid License to enable enterprise features.  Without a licence, only community features are available"
+          "description": "Set the AgGrid License to enable enterprise features. Without a licence, only community features are available"
+        },
+        "legend.dataCube.queryServerBaseUrl": {
+          "type": "string",
+          "default": "",
+          "description": "Set the DataCube query server base url to enable publishing queries."
+        },
+        "legend.dataCube.hostedApplicationBaseUrl": {
+          "type": "string",
+          "default": "",
+          "description": "Set the hosted DataCube web application to enable viewing published queries."
         },
         "legend.extensions.dependencies.pom": {
           "type": "string",
@@ -187,7 +197,7 @@
         "legend.engine.server.remoteExecution": {
           "type": "boolean",
           "default": "true",
-          "description": "Defines if executions should happen locally or remotely.  Only used if server url is provided."
+          "description": "Defines if executions should happen locally or remotely. Only used if server url is provided."
         },
         "legend.sdlc.server.url": {
           "type": "string",
