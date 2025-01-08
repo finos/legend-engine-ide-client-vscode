@@ -52,7 +52,8 @@ export const ONE_ENTITY_PER_FILE_REQUEST_ID =
   'legend/oneEntityPerFileRefactoring';
 export const ONE_ENTITY_PER_FILE_COMMAND_ID =
   'legend.refactor.oneEntityPerFile';
-export const OPEN_DATACUBE_IN_NEW_TAB_COMMAND_ID = 'legend.datacube.openInNewTab';
+export const OPEN_DATACUBE_IN_NEW_TAB_COMMAND_ID =
+  'legend.datacube.openInNewTab';
 
 // LSP Commands
 export const ANALYZE_MAPPING_MODEL_COVERAGE_COMMAND_ID =
