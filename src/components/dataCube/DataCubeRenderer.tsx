@@ -15,6 +15,7 @@
  */
 
 import {
+  type DataCubeOptions,
   type DataCubeQuery,
   type PlainObject,
   type V1_RawLambda,
@@ -32,8 +33,9 @@ export const DataCubeRenderer = (props: {
     requestMessage: { command: string; msg?: PlainObject },
     responseCommandId: string,
   ) => Promise<T>;
+  options?: DataCubeOptions;
 }): React.ReactNode => {
-  const { cellUri, lambda, postAndWaitForMessage } = props;
+  const { cellUri, lambda, postAndWaitForMessage, options } = props;
   const [engine, setEngine] = useState<LSPDataCubeEngine | null>(null);
   const [query, setQuery] = useState<DataCubeQuery | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -68,7 +70,7 @@ export const DataCubeRenderer = (props: {
           className="datacube-renderer-container"
           style={{ height: '100%' }}
         >
-          <DataCube engine={engine} query={query} />
+          <DataCube engine={engine} query={query} options={options} />
         </div>
       )}
       {!engine && !query && !isLoading && error && (
