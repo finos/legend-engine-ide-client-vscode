@@ -30,6 +30,7 @@ import {
   DataCubeSource,
   guaranteeType,
   isNonNullable,
+  isNullable,
   RelationalExecutionActivities,
   SerializationFactory,
   TDSExecutionResult,
@@ -44,23 +45,17 @@ import {
   V1_serializeValueSpecification,
 } from '@finos/legend-vscode-extension-dependencies';
 import { V1_LSPEngine } from '../graph/V1_LSPEngine';
-import { createModelSchema, custom, list, primitive, raw } from 'serializr';
+import { createModelSchema, list, optional, primitive, raw } from 'serializr';
 
-export class LSPDataCubeSource extends DataCubeSource {
+class LSPDataCubeSource extends DataCubeSource {
   mapping?: string | undefined;
   runtime: string | undefined;
 
   static readonly serialization = new SerializationFactory(
     createModelSchema(LSPDataCubeSource, {
       columns: list(raw()),
-      mapping: custom(
-        (val) => (val ? val : undefined),
-        () => undefined,
-      ),
-      query: custom(
-        (val) => V1_serializeValueSpecification(val, []),
-        (val) => V1_deserializeValueSpecification(val, []),
-      ),
+      mapping: optional(primitive()),
+      query: primitive(),
       runtime: primitive(),
     }),
   );
@@ -152,26 +147,35 @@ export class LSPDataCubeEngine extends DataCubeEngine {
 
   async generateInitialQuery(): Promise<DataCubeQuery> {
     const query = new DataCubeQuery();
-    const srcFuncExp = guaranteeType(
-      this.getSourceFunctionExpression(this.rawLambda),
-      V1_AppliedFunction,
-      `Only functions returning TDS/graph fetch using the from() function can be opened in Data Cube`,
-    );
     const columns = (await this.getRawLambdaRelationType(this.rawLambda))
       .columns;
     query.query = `~[${columns.map((e) => `'${e.name}'`)}]->select()`;
-    const source = new LSPDataCubeSource();
-    source.columns = columns;
-    source.query = srcFuncExp;
-    const { mapping, runtime } = this.getFromFunctionMappingAndRuntime(
-      guaranteeType(
-        this.getSourceFunctionExpression(this.rawLambda),
-        V1_AppliedFunction,
-        `Only functions returning TDS/graph fetch using the from() function can be opened in Data Cube`,
-      ),
+    return query;
+  }
+
+  async populateSourceForQuery(query: DataCubeQuery): Promise<DataCubeQuery> {
+    if (!isNullable(query.source)) {
+      return query;
+    }
+    const queryRawLambda = guaranteeType(
+      await this.lspEngine.transformCodeToLambda(query.query),
+      V1_RawLambda,
+      `Only functions returning TDS/graph fetch using the from() function can be opened in Data Cube`,
     );
-    source.mapping = mapping;
-    source.runtime = runtime;
+    const srcFuncExp = guaranteeType(
+      this.getSourceFunctionExpression(queryRawLambda),
+      V1_AppliedFunction,
+      `Only functions returning TDS/graph fetch using the from() function can be opened in Data Cube`,
+    );
+    const source = new LSPDataCubeSource();
+    source.columns = (
+      await this.getRawLambdaRelationType(queryRawLambda)
+    ).columns;
+    // const { mapping, runtime } =
+    //   this.getFromFunctionMappingAndRuntime(this.rawLambda);
+    // source.mapping = mapping;
+    // source.runtime = runtime;
+    source.query = srcFuncExp;
     query.source = LSPDataCubeSource.serialization.toJson(source);
     return query;
   }

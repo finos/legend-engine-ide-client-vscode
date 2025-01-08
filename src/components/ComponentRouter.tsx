@@ -98,9 +98,7 @@ export const ComponentRouter = (props: PlainObject): React.ReactNode => {
       const lambda = guaranteeNonNullable(
         props.lambda as PlainObject<V1_RawLambda>,
       );
-      const query = props.query
-        ? (props.query as PlainObject<DataCubeQuery>)
-        : undefined;
+      const query = props.query ? props.query as PlainObject<DataCubeQuery> : undefined;
       component = (
         <DataCubeRenderer
           cellUri={cellUri}

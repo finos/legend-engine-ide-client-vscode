@@ -51,7 +51,9 @@ export const DataCubeRenderer = (props: {
         setEngine(newEngine);
         setQuery(
           initialQuery
-            ? DataCubeQuery.serialization.fromJson(initialQuery)
+            ? await newEngine.populateSourceForQuery(
+                DataCubeQuery.serialization.fromJson(initialQuery),
+              )
             : await newEngine.generateInitialQuery(),
         );
       } catch (e) {
