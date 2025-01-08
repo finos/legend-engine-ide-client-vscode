@@ -40,7 +40,6 @@ export const activate: ActivationFunction = (context) => {
       }
       const newRoot = createRoot(element);
       roots[data.id] = newRoot;
-
       newRoot.render(
         <PurebookCubeRenderer
           cellUri={data.json().cellUri}
