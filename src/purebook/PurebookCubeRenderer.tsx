@@ -15,11 +15,9 @@
  */
 
 import {
-  type DataCubeInnerHeaderComponentParams,
+  uuid,
   type PlainObject,
   type V1_RawLambda,
-  DataCubeQuery,
-  uuid,
 } from '@finos/legend-vscode-extension-dependencies';
 import { OPEN_DATACUBE_IN_NEW_TAB_COMMAND_ID } from '../utils/Const';
 import { DataCubeRenderer } from '../components/dataCube/DataCubeRenderer';
@@ -37,6 +35,14 @@ export const PurebookCubeRenderer = (props: {
   }>;
 }): React.ReactNode => {
   const { cellUri, lambda, postMessage, onDidReceiveMessage } = props;
+
+  const handleOpenInNewTab = (): void => {
+    postMessage({
+      command: OPEN_DATACUBE_IN_NEW_TAB_COMMAND_ID,
+      cellUri,
+      lambda,
+    });
+  };
 
   const postAndWaitForMessage = useCallback(
     async <T,>(
@@ -64,39 +70,18 @@ export const PurebookCubeRenderer = (props: {
     [cellUri, onDidReceiveMessage, postMessage],
   );
 
-  const handleOpenInNewTab = async (query: DataCubeQuery): Promise<void> => {
-    postMessage({
-      command: OPEN_DATACUBE_IN_NEW_TAB_COMMAND_ID,
-      cellUri,
-      lambda,
-      query: DataCubeQuery.serialization.toJson(query),
-    });
-  };
-
-  const innerHeaderRenderer = (
-    params: DataCubeInnerHeaderComponentParams,
-  ): React.ReactNode => (
-    <button
-      onClick={async () =>
-        handleOpenInNewTab(await params.api.generateDataCubeQuery())
-      }
-    >
-      Open in New Tab
-    </button>
-  );
-
   return (
     <>
       <div
-        id={`purebook-datacube-renderer-${cellUri}`}
-        className="purebook-datacube-renderer-container"
+        id={`purebook-cube-renderer-${cellUri}`}
+        className="purebook-cube-renderer-container"
         style={{ height: '500px' }}
       >
+        <button onClick={handleOpenInNewTab}>Open in New Tab</button>
         <DataCubeRenderer
           cellUri={cellUri}
           lambda={lambda}
           postAndWaitForMessage={postAndWaitForMessage}
-          options={{ innerHeaderRenderer }}
         />
       </div>
     </>

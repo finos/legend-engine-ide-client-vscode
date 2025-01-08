@@ -95,7 +95,6 @@ import {
   V1_deserializeDatasetEntitlementReport,
   V1_deserializeDatasetSpecification,
   V1_deserializeExecutionResult,
-  V1_deserializeRawValueSpecification,
   V1_deserializeValueSpecification,
   V1_EXECUTION_RESULT,
   V1_ExecutionError,
@@ -356,16 +355,16 @@ export class V1_LSPEngine implements V1_GraphManagerEngine {
       },
       {} as Record<string, V1_GrammarParserBatchInputEntry>,
     );
-    const resultLambdas: Map<string, V1_RawLambda> =
-      await this.transformCodeToLambdas(mappedInput, throwOnFirstError);
+    const resultLambdas: Map<
+      string,
+      PlainObject<V1_RawLambda>
+    > = await this.transformCodeToLambdas(mappedInput, throwOnFirstError);
     // Grab the first element of the returned lambdas' bodies, which represent
     // the value specs.
     const mappedResult = new Map<string, PlainObject<V1_ValueSpecification>>();
     resultLambdas.forEach((value, key) => {
-      const lambdaPlainObject: PlainObject<V1_RawLambda> =
-        V1_serializeRawValueSpecification(value);
       const lambdaValueSpec = (
-        lambdaPlainObject?.body as object[]
+        value?.body as object[]
       )?.[0] as PlainObject<V1_ValueSpecification>;
       if (lambdaValueSpec) {
         mappedResult.set(key, lambdaValueSpec);
@@ -420,7 +419,7 @@ export class V1_LSPEngine implements V1_GraphManagerEngine {
   async transformCodeToLambdas(
     input: Record<string, V1_GrammarParserBatchInputEntry>,
     throwOnFirstError?: boolean,
-  ): Promise<Map<string, V1_RawLambda>> {
+  ): Promise<Map<string, PlainObject<V1_RawLambda>>> {
     const response = await this.postAndWaitForMessage<LegendExecutionResult[]>(
       {
         command: GRAMMAR_TO_JSON_LAMBDA_BATCH_COMMAND_ID,
@@ -446,18 +445,13 @@ export class V1_LSPEngine implements V1_GraphManagerEngine {
         );
       }
     }
-    const jsonResult = JSON.parse(
-      guaranteeNonNullable(response?.[0]?.message),
-    ) as Record<string, PlainObject<V1_RawLambda>>;
-    const resultMap = new Map<string, V1_RawLambda>();
-    Object.entries(jsonResult).forEach(
-      ([key, value]: [string, PlainObject<V1_RawLambda>]) =>
-        resultMap.set(
-          key,
-          V1_deserializeRawValueSpecification(value) as V1_RawLambda,
-        ),
+    return deserializeMap(
+      JSON.parse(guaranteeNonNullable(response?.[0]?.message)) as Record<
+        string,
+        PlainObject<V1_RawLambda>
+      >,
+      (v) => v,
     );
-    return resultMap;
   }
 
   async transformCodeToLambda(
