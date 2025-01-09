@@ -28,9 +28,13 @@ import { DiagramEditorToolPanel } from './DiagramEditorToolPanel';
 import { DiagramEditorCanvas } from './DiagramEditorCanvas';
 import { type LegendVSCodeApplicationConfig } from '../../application/LegendVSCodeApplicationConfig';
 import { type LegendVSCodePluginManager } from '../../application/LegendVSCodePluginManager';
-import { GET_PROJECT_ENTITIES, GET_PROJECT_ENTITIES_RESPONSE } from '../../../extension/utils/Const';
+import {
+  GET_PROJECT_ENTITIES,
+  GET_PROJECT_ENTITIES_RESPONSE,
+} from '../../../extension/utils/Const';
 import { buildGraphManagerStateFromEntities } from '../../utils/GraphUtils';
 import { V1_LSPEngine } from '../../graph/V1_LSPEngine';
+import { postMessage } from '../../../extension/utils/VsCodeUtils';
 
 export const DiagramEditor = observer(
   ({ diagramEditorState }: { diagramEditorState: DiagramEditorState }) => {

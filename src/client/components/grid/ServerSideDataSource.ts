@@ -43,6 +43,7 @@ import {
   GET_TDS_REQUEST_RESULTS_ID,
   SEND_TDS_REQUEST_ID,
 } from '../../../extension/utils/Const';
+import { postMessage } from '../../../extension/utils/VsCodeUtils';
 
 export class ServerSideDataSource implements IServerSideDatasource {
   executions = 0;

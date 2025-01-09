@@ -35,6 +35,7 @@ import {
   GET_TDS_REQUEST_RESULTS_ID,
   LEGEND_EXECUTE_COMMAND,
 } from '../../../extension/utils/Const';
+import { postMessage } from '../../../extension/utils/VsCodeUtils';
 
 export const FunctionResultsEditor: React.FC<{
   inputParameters: InputParamter[];

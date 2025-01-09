@@ -38,6 +38,7 @@ import {
 } from '@finos/legend-vscode-extension-dependencies';
 import { LegendVSCodeApplicationPlugin } from './LegendVSCodeApplicationPlugin';
 import { WRITE_ENTITY } from '../../extension/utils/Const';
+import { postMessage } from '../../extension/utils/VsCodeUtils';
 
 export class Core_LegendVSCodeApplicationPlugin extends LegendVSCodeApplicationPlugin {
   static NAME = packageJson.extensions.applicationVSCodePlugin;

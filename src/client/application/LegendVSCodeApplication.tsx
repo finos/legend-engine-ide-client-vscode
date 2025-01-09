@@ -34,6 +34,7 @@ import { LegendVSCodePluginManager } from './LegendVSCodePluginManager';
 import { Core_LegendVSCodeApplicationPlugin } from './Core_LegendVSCodeApplicationPlugin';
 import packageJson from '../../../package.json';
 import { QUERY_BUILDER_CONFIG_ERROR } from '../../extension/utils/Const';
+import { postMessage } from '../../extension/utils/VsCodeUtils';
 
 export const LegendVSCodeApplication = (props: {
   configData: LegendApplicationConfigurationData;

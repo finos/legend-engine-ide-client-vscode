@@ -37,6 +37,7 @@ import {
   DIAGRAM_DROP_CLASS_ERROR,
   WRITE_ENTITY,
 } from '../../../extension/utils/Const';
+import { postMessage } from '../../../extension/utils/VsCodeUtils';
 
 export const DiagramEditorCanvas = observer(
   forwardRef<

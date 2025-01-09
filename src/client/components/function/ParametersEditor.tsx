@@ -25,6 +25,7 @@ import {
 } from '@finos/legend-vscode-extension-dependencies';
 import { type InputParamter } from '../../../extension/model/InputParameter';
 import { LEGEND_EXECUTE_COMMAND } from '../../../extension/utils/Const';
+import { postMessage } from '../../../extension/utils/VsCodeUtils';
 
 export const ParametersEditor: React.FC<{
   inputParameters: InputParamter[];
