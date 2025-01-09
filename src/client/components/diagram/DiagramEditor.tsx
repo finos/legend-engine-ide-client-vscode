@@ -20,21 +20,21 @@ import {
   useApplicationStore,
 } from '@finos/legend-vscode-extension-dependencies';
 import { useRef, useState, useEffect } from 'react';
+import {
+  GET_PROJECT_ENTITIES_RESPONSE,
+  GET_PROJECT_ENTITIES,
+} from '../../../extension/utils/Const';
 import { observer } from 'mobx-react-lite';
+import { postMessage } from '../../../extension/utils/VsCodeUtils';
 
 import type { DiagramEditorState } from '../../stores/DiagramEditorState';
 import { DiagramEditorHeader } from './DiagramEditorHeader';
 import { DiagramEditorToolPanel } from './DiagramEditorToolPanel';
 import { DiagramEditorCanvas } from './DiagramEditorCanvas';
+import { buildGraphManagerStateFromEntities } from '../../utils/GraphUtils';
 import { type LegendVSCodeApplicationConfig } from '../../application/LegendVSCodeApplicationConfig';
 import { type LegendVSCodePluginManager } from '../../application/LegendVSCodePluginManager';
-import {
-  GET_PROJECT_ENTITIES,
-  GET_PROJECT_ENTITIES_RESPONSE,
-} from '../../../extension/utils/Const';
-import { buildGraphManagerStateFromEntities } from '../../utils/GraphUtils';
 import { V1_LSPEngine } from '../../graph/V1_LSPEngine';
-import { postMessage } from '../../../extension/utils/VsCodeUtils';
 
 export const DiagramEditor = observer(
   ({ diagramEditorState }: { diagramEditorState: DiagramEditorState }) => {

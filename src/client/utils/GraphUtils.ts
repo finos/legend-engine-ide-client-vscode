@@ -34,12 +34,12 @@ import {
 import { type LegendVSCodeApplicationConfig } from '../application/LegendVSCodeApplicationConfig';
 import { type LegendVSCodePluginManager } from '../application/LegendVSCodePluginManager';
 import { type V1_LSPEngine } from '../graph/V1_LSPEngine';
-import { serialize } from 'serializr';
 import { V1_LSPExecuteInput } from '../model/engine/ExecuteQueryInput';
 import {
   type V1_LSPEntitlementReportAnallyticsInput,
   V1_LSPEntitlementReportAnallyticsInputModelSchema,
 } from '../model/engine/EntitlementReportAnalyticsInput';
+import { serialize } from 'serializr';
 import { V1_LSPStoreEntitlementAnalysisInput } from '../model/engine/StoreEntitlementAnalysisInput';
 
 export const buildGraphManagerStateFromEntities = async (

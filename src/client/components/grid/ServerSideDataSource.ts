@@ -20,20 +20,14 @@ import type {
   IServerSideGetRowsParams,
 } from 'ag-grid-community';
 import {
-  type TDSRowDataType,
-  getTDSRowData,
-  getTDSSortOrder,
-  getTDSFilterOperation,
-  getAggregationFunction,
-} from './GridUtils';
-import { guaranteeNonNullable } from '@finos/legend-vscode-extension-dependencies';
-import {
   LegendTDSRequest,
   TDSSort,
   TDSAggregation,
   TDSGroupby,
   TDSFilter,
 } from '../../../extension/model/TDSRequest';
+import { guaranteeNonNullable } from '@finos/legend-vscode-extension-dependencies';
+import { postMessage } from '../../../extension/utils/VsCodeUtils';
 import {
   type INTERNAL__TDSColumn,
   type TDSLegendExecutionResult,
@@ -43,7 +37,13 @@ import {
   GET_TDS_REQUEST_RESULTS_ID,
   SEND_TDS_REQUEST_ID,
 } from '../../../extension/utils/Const';
-import { postMessage } from '../../../extension/utils/VsCodeUtils';
+import {
+  type TDSRowDataType,
+  getAggregationFunction,
+  getTDSFilterOperation,
+  getTDSRowData,
+  getTDSSortOrder,
+} from './GridUtils';
 
 export class ServerSideDataSource implements IServerSideDatasource {
   executions = 0;

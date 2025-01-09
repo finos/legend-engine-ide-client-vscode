@@ -50,14 +50,14 @@ import { LegendExecutionResultType } from './LegendExecutionResultType';
 import { guaranteeType } from '../utils/AssertionUtils';
 import type { LegendWebViewProvider } from '../utils/LegendWebViewProvider';
 import type { PlainObject } from '../utils/SerializationUtils';
-import {
-  type TabularDataSet,
-  TDSLegendExecutionResult,
-} from './TDSLegendExecutionResult';
+import { TDSLegendExecutionResult } from './TDSLegendExecutionResult';
 import * as path from 'path';
+import {
+  getAggregationTDSColumnCustomizations,
+  getTDSRowData,
+} from '../../client/components/grid/GridUtils';
 import { type LegendExecutionResult } from './LegendExecutionResult';
 import { FunctionLegendExecutionResult } from './FunctionLegendExecutionResult';
-import { getAggregationTDSColumnCustomizations } from '../../client/components/grid/GridUtils';
 
 const renderTDSResultMessage = (
   legendExecutionResult: LegendExecutionResult,
@@ -253,6 +253,3 @@ export const renderTestResults = (
   // Refresh the tree view to reflect the changes
   resultsTreeDataProvider.refresh();
 };
-function getTDSRowData(tds: TabularDataSet) {
-  throw new Error('Function not implemented.');
-}

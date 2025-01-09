@@ -14,16 +14,16 @@
  * limitations under the License.
  */
 
-import { isBoolean } from '../../../extension/utils/AssertionUtils';
 import {
-  TDS_SORT_ORDER,
   TDS_AGGREGATION_FUNCTION,
   TDS_FILTER_OPERATION,
+  TDS_SORT_ORDER,
 } from '../../../extension/model/TDSRequest';
 import {
   type TDSLegendExecutionResult,
   type TabularDataSet,
 } from '../../../extension/results/TDSLegendExecutionResult';
+import { isBoolean } from '../../../extension/utils/AssertionUtils';
 import { PRIMITIVE_TYPE } from '../../../extension/utils/Const';
 
 export type TDSResultCellDataType =

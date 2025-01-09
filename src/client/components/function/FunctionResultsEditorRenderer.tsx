@@ -16,13 +16,13 @@
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-balham.min.css';
 import { createRoot } from 'react-dom/client';
-import { configureAgGridComponent } from '../grid/AgGrid';
-import { FunctionResultsEditor } from './FunctionResultsEditor';
 import {
   type PlainObject,
   deserializeMap,
 } from '@finos/legend-vscode-extension-dependencies';
 import { InputParamter } from '../../../extension/model/InputParameter';
+import { configureAgGridComponent } from '../grid/AgGrid';
+import { FunctionResultsEditor } from './FunctionResultsEditor';
 
 configureAgGridComponent();
 const rootElement = document.getElementById('root');

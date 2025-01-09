@@ -15,10 +15,10 @@
  */
 
 import { useState, type ClipboardEvent, useRef, useEffect } from 'react';
+import { PRIMITIVE_TYPE } from '../../../extension/utils/Const';
 import Select from 'react-select';
 import { type Enumeration } from '../../../extension/model/Enumeration';
 import { type Multiplicity } from '../../../extension/model/VariableExpression';
-import { PRIMITIVE_TYPE } from '../../../extension/utils/Const';
 
 export const getDefaultValueForPrimitiveType = (
   type: string,

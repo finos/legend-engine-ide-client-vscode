@@ -16,26 +16,26 @@
 
 import '../../../../style/index.scss';
 import { useEffect, useState } from 'react';
+import { type PlainObject } from '@finos/legend-vscode-extension-dependencies';
+import {
+  GET_TDS_REQUEST_RESULTS_ID,
+  LEGEND_EXECUTE_COMMAND,
+} from '../../../extension/utils/Const';
+import { type InputParamter } from '../../../extension/model/InputParameter';
+import { postMessage } from '../../../extension/utils/VsCodeUtils';
 import {
   type TDSRowDataType,
   getAggregationTDSColumnCustomizations,
   getTDSRowData,
 } from '../grid/GridUtils';
 import type { ColDef } from 'ag-grid-community';
-import { AgGridComponent } from '../grid/AgGrid';
-import { ParametersEditor } from './ParametersEditor';
-import { type PlainObject } from '@finos/legend-vscode-extension-dependencies';
-import { type InputParamter } from '../../../extension/model/InputParameter';
-import { type LegendExecutionResult } from '../../../extension/results/LegendExecutionResult';
 import {
   type INTERNAL__TDSColumn,
   TDSLegendExecutionResult,
 } from '../../../extension/results/TDSLegendExecutionResult';
-import {
-  GET_TDS_REQUEST_RESULTS_ID,
-  LEGEND_EXECUTE_COMMAND,
-} from '../../../extension/utils/Const';
-import { postMessage } from '../../../extension/utils/VsCodeUtils';
+import { AgGridComponent } from '../grid/AgGrid';
+import { type LegendExecutionResult } from '../../../extension/results/LegendExecutionResult';
+import { ParametersEditor } from './ParametersEditor';
 
 export const FunctionResultsEditor: React.FC<{
   inputParameters: InputParamter[];

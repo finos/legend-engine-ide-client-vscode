@@ -28,8 +28,8 @@ import {
 } from 'ag-grid-enterprise';
 import { type TDSRowDataType, getDefaultColumnDefintions } from './GridUtils';
 import { ServerSideDataSource } from './ServerSideDataSource';
-import { type JSX } from 'react';
 import { type INTERNAL__TDSColumn } from '../../../extension/results/TDSLegendExecutionResult';
+import { type JSX } from 'react';
 
 const communityModules = [ClientSideRowModelModule, CsvExportModule];
 const enterpriseModules = [

@@ -43,8 +43,8 @@ import { useState } from 'react';
 import { serialize } from 'serializr';
 import { observer } from 'mobx-react-lite';
 import { flowResult } from 'mobx';
-import type { DiagramEditorState } from '../../stores/DiagramEditorState';
 import { WRITE_ENTITY } from '../../../extension/utils/Const';
+import type { DiagramEditorState } from '../../stores/DiagramEditorState';
 import { postMessage } from '../../../extension/utils/VsCodeUtils';
 
 export const DiagramEditorHeader = observer(

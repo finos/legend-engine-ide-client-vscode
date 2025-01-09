@@ -29,15 +29,15 @@ import {
   type DragEvent,
   type KeyboardEvent,
 } from 'react';
-import { observer } from 'mobx-react-lite';
-import { flowResult } from 'mobx';
-import { serialize } from 'serializr';
-import type { DiagramEditorState } from '../../stores/DiagramEditorState';
 import {
   DIAGRAM_DROP_CLASS_ERROR,
   WRITE_ENTITY,
 } from '../../../extension/utils/Const';
+import { observer } from 'mobx-react-lite';
+import { flowResult } from 'mobx';
+import { serialize } from 'serializr';
 import { postMessage } from '../../../extension/utils/VsCodeUtils';
+import type { DiagramEditorState } from '../../stores/DiagramEditorState';
 
 export const DiagramEditorCanvas = observer(
   forwardRef<

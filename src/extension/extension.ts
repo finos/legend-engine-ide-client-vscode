@@ -81,6 +81,11 @@ import type { FunctionTDSRequest } from './model/FunctionTDSRequest';
 import { LegendExecutionResult } from './results/LegendExecutionResult';
 import { TDSLegendExecutionResult } from './results/TDSLegendExecutionResult';
 import {
+  LegendEntitiesRequest,
+  LegendLanguageClient,
+} from './LegendLanguageClient';
+import { createTestController } from './testController';
+import {
   type LegendConceptTreeItem,
   type LegendConceptTreeProvider,
   createLegendConceptTreeProvider,
@@ -90,12 +95,7 @@ import { enableLegendBook } from './purebook/purebook';
 import { V1_getFunctionNameWithoutSignature } from './utils/V1_ProtocolUtils';
 import { type LegendEntity } from './model/LegendEntity';
 import { renderQueryBuilderWebView } from './webviews/QueryBuilderWebView';
-import {
-  LegendEntitiesRequest,
-  LegendLanguageClient,
-} from './LegendLanguageClient';
 import { LegendCodelensProvider } from './LegendCodelensProvider';
-import { createTestController } from './testController';
 
 let client: LegendLanguageClient;
 const openedWebViews: Record<string, WebviewPanel> = {};

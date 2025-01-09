@@ -41,6 +41,10 @@ import {
   V1_PureGraphManager,
   V1_serviceModelSchema,
 } from '@finos/legend-vscode-extension-dependencies';
+import {
+  CLASSIFIER_PATH,
+  LEGEND_REFRESH_QUERY_BUILDER,
+} from '../../../extension/utils/Const';
 import { QueryBuilderVSCodeWorkflowState } from './QueryBuilderWorkflowState';
 import { type LegendVSCodeApplicationConfig } from '../../application/LegendVSCodeApplicationConfig';
 import { type LegendVSCodePluginManager } from '../../application/LegendVSCodePluginManager';
@@ -51,10 +55,6 @@ import {
 import { V1_LSPEngine } from '../../graph/V1_LSPEngine';
 import { deserialize } from 'serializr';
 import { getMinimalEntities } from './QueryBuilderStateUtils';
-import {
-  CLASSIFIER_PATH,
-  LEGEND_REFRESH_QUERY_BUILDER,
-} from '../../../extension/utils/Const';
 
 export const useQueryBuilderState = (
   initialId: string,

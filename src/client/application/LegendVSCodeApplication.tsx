@@ -32,9 +32,9 @@ import { useMemo } from 'react';
 import { LegendVSCodeApplicationConfig } from './LegendVSCodeApplicationConfig';
 import { LegendVSCodePluginManager } from './LegendVSCodePluginManager';
 import { Core_LegendVSCodeApplicationPlugin } from './Core_LegendVSCodeApplicationPlugin';
-import packageJson from '../../../package.json';
-import { QUERY_BUILDER_CONFIG_ERROR } from '../../extension/utils/Const';
 import { postMessage } from '../../extension/utils/VsCodeUtils';
+import { QUERY_BUILDER_CONFIG_ERROR } from '../../extension/utils/Const';
+import packageJson from '../../../package.json';
 
 export const LegendVSCodeApplication = (props: {
   configData: LegendApplicationConfigurationData;

@@ -143,6 +143,9 @@ import {
   SURVEY_DATASETS_COMMAND_ID,
   SURVEY_DATASETS_RESPONSE,
 } from '../../extension/utils/Const';
+import { type LegendExecutionResult } from '../../extension/results/LegendExecutionResult';
+import { LegendExecutionResultType } from '../../extension/results/LegendExecutionResultType';
+import { textLocationToSourceInformation } from '../../extension/utils/SourceInformationUtils';
 import {
   entitlementReportAnalyticsInputToLSPInput,
   executeInputToLSPInput,
@@ -152,9 +155,6 @@ import {
   type V1_LSPLambdaReturnTypeResult,
   V1_LSPLambdaReturnTypeInput,
 } from '../model/engine/LambdaReturnType';
-import { type LegendExecutionResult } from '../../extension/results/LegendExecutionResult';
-import { LegendExecutionResultType } from '../../extension/results/LegendExecutionResultType';
-import { textLocationToSourceInformation } from '../../extension/utils/SourceInformationUtils';
 
 class V1_LSPEngine_Config extends TEMPORARY__AbstractEngineConfig {}
 

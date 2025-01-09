@@ -39,17 +39,17 @@ import {
   V1_PureMultiExecution,
   uniq,
 } from '@finos/legend-vscode-extension-dependencies';
-import { type LegendVSCodePluginManager } from '../../application/LegendVSCodePluginManager';
-import { V1_LSPMappingModelCoverageAnalysisResult } from '../../model/engine/MappingModelCoverageAnalysisResult';
 import {
   ANALYZE_MAPPING_MODEL_COVERAGE_COMMAND_ID,
   ANALYZE_MAPPING_MODEL_COVERAGE_RESPONSE,
   CLASSIFIER_PATH,
-  GET_PROJECT_ENTITIES,
   GET_PROJECT_ENTITIES_RESPONSE,
+  GET_PROJECT_ENTITIES,
 } from '../../../extension/utils/Const';
 import { postAndWaitForMessage } from '../../../extension/utils/VsCodeUtils';
+import { type LegendVSCodePluginManager } from '../../application/LegendVSCodePluginManager';
 import { type LegendExecutionResult } from '../../../extension/results/LegendExecutionResult';
+import { V1_LSPMappingModelCoverageAnalysisResult } from '../../model/engine/MappingModelCoverageAnalysisResult';
 
 const isServiceWithNonPointerRuntime = (
   entity: Entity,

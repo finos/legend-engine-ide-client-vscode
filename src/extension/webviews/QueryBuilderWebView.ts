@@ -19,13 +19,13 @@ import {
   type Location,
   type WebviewPanel,
 } from 'vscode';
+import { type LegendLanguageClient } from '../LegendLanguageClient';
 import { getWebviewHtml, handleQueryBuilderWebviewMessage } from './utils';
+import { type LegendConceptTreeProvider } from '../conceptTree';
 import { type PlainObject } from '../utils/SerializationUtils';
 import { guaranteeNonNullable } from '../utils/AssertionUtils';
 import { TextLocation } from '../model/TextLocation';
 import { handleV1LSPEngineMessage } from '../graph/utils';
-import { type LegendLanguageClient } from '../LegendLanguageClient';
-import { type LegendConceptTreeProvider } from '../conceptTree';
 
 export const renderQueryBuilderWebView = async (
   webViewPanel: WebviewPanel,

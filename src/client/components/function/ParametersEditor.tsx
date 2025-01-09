@@ -14,17 +14,17 @@
  * limitations under the License.
  */
 
+import '../../../../style/index.scss';
 import {
   InstanceValueEditor,
   getDefaultValueForPrimitiveType,
 } from './InstanceValueEditor';
-import '../../../../style/index.scss';
 import {
-  serializeMap,
   guaranteeNonNullable,
+  serializeMap,
 } from '@finos/legend-vscode-extension-dependencies';
-import { type InputParamter } from '../../../extension/model/InputParameter';
 import { LEGEND_EXECUTE_COMMAND } from '../../../extension/utils/Const';
+import { type InputParamter } from '../../../extension/model/InputParameter';
 import { postMessage } from '../../../extension/utils/VsCodeUtils';
 
 export const ParametersEditor: React.FC<{

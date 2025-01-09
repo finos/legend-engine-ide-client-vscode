@@ -16,6 +16,13 @@
 
 import React from 'react';
 import {
+  CLASSIFIER_PATH,
+  DATACUBE,
+  DIAGRAM_RENDERER,
+  FUNCTION_QUERY_EDITOR,
+  SERVICE_QUERY_EDITOR,
+} from '../../extension/utils/Const';
+import {
   type PlainObject,
   type V1_RawLambda,
   guaranteeNonEmptyString,
@@ -26,15 +33,8 @@ import { WebviewQueryBuilder } from './query/WebviewQueryBuilder';
 import { DiagramEditor } from './diagram/DiagramEditor';
 import { DiagramEditorState } from '../stores/DiagramEditorState';
 import { type LegendVSCodeApplicationConfigurationData } from '../application/LegendVSCodeApplicationConfig';
-import { DataCubeRenderer } from './dataCube/DataCubeRenderer';
-import {
-  CLASSIFIER_PATH,
-  DATACUBE,
-  DIAGRAM_RENDERER,
-  FUNCTION_QUERY_EDITOR,
-  SERVICE_QUERY_EDITOR,
-} from '../../extension/utils/Const';
 import { postAndWaitForMessage } from '../../extension/utils/VsCodeUtils';
+import { DataCubeRenderer } from './dataCube/DataCubeRenderer';
 
 export const ComponentRouter = (props: PlainObject): React.ReactNode => {
   const webviewType = guaranteeNonEmptyString(
