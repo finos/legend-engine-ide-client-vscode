@@ -20,10 +20,10 @@ const webpack = require('webpack');
 
 const webviewConfig = {
   entry: {
-    AgGridRenderer: './src/components/grid/AgGridRenderer.tsx',
+    AgGridRenderer: './src/client/components/grid/AgGridRenderer.tsx',
     FunctionResultsEditorRenderer:
-      './src/components/function/FunctionResultsEditorRenderer.tsx',
-    WebViewRoot: './src/components/WebViewRoot.tsx',
+      './src/client/components/function/FunctionResultsEditorRenderer.tsx',
+    WebViewRoot: './src/client/components/WebViewRoot.tsx',
   },
   externals: {
     vscode: 'commonjs vscode',
@@ -81,7 +81,7 @@ const webviewConfig = {
 
 const purebookRendererConfig = {
   entry: {
-    PurebookRendererRoot: './src/purebook/PurebookRendererRoot.tsx',
+    PurebookRendererRoot: './src/client/purebook/PurebookRendererRoot.tsx',
   },
   externals: {
     vscode: 'commonjs vscode',
@@ -144,7 +144,7 @@ const purebookRendererConfig = {
 
 const extensionConfig = {
   target: 'webworker',
-  entry: './src/extension.ts',
+  entry: './src/extension/extension.ts',
   output: {
     path: path.resolve(__dirname, 'dist'),
     filename: 'extension.js',
