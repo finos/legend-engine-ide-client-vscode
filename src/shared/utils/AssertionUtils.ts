@@ -34,7 +34,7 @@ export const guaranteeNonNullable = <T>(
 };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-function-type
-export type GenericClazz<T> = { new (...args: any[]): T } | Function;
+type GenericClazz<T> = { new (...args: any[]): T } | Function;
 
 // Aserts typing doesn't work with all arrow function type declaration form
 // So we can use this: export const assertType: <T>(value: unknown, clazz: Clazz<T>, message: string) => asserts value is T = (value, clazz, message = '') => {
