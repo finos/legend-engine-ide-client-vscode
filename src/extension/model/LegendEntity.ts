@@ -16,11 +16,11 @@
 
 import { createModelSchema, primitive, raw } from 'serializr';
 import {
-  usingModelSchema,
-  SerializationFactory,
   type PlainObject,
-} from '../utils/SerializationUtils';
-import { TextLocation } from './TextLocation';
+  SerializationFactory,
+  usingModelSchema,
+} from '../../shared/utils/SerializationUtils';
+import { TextLocation } from '../../shared/model/TextLocation';
 
 export class LegendEntity {
   path!: string;

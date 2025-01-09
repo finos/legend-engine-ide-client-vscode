@@ -20,7 +20,7 @@ import {
   type PlainObject,
   deserializeMap,
 } from '@finos/legend-vscode-extension-dependencies';
-import { InputParamter } from '../../../extension/model/InputParameter';
+import { InputParamter } from '../../../shared/model/InputParameter';
 import { configureAgGridComponent } from '../grid/AgGrid';
 import { FunctionResultsEditor } from './FunctionResultsEditor';
 

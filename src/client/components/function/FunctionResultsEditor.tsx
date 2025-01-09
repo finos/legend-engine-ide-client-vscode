@@ -20,21 +20,21 @@ import { type PlainObject } from '@finos/legend-vscode-extension-dependencies';
 import {
   GET_TDS_REQUEST_RESULTS_ID,
   LEGEND_EXECUTE_COMMAND,
-} from '../../../extension/utils/Const';
-import { type InputParamter } from '../../../extension/model/InputParameter';
-import { postMessage } from '../../../extension/utils/VsCodeUtils';
+} from '../../../shared/utils/Const';
+import { type InputParamter } from '../../../shared/model/InputParameter';
+import { postMessage } from '../../../shared/utils/VsCodeUtils';
 import {
   type TDSRowDataType,
   getAggregationTDSColumnCustomizations,
   getTDSRowData,
-} from '../grid/GridUtils';
+} from '../../../shared/utils/GridUtils';
 import type { ColDef } from 'ag-grid-community';
 import {
   type INTERNAL__TDSColumn,
   TDSLegendExecutionResult,
-} from '../../../extension/results/TDSLegendExecutionResult';
+} from '../../../shared/model/TDSLegendExecutionResult';
 import { AgGridComponent } from '../grid/AgGrid';
-import { type LegendExecutionResult } from '../../../extension/results/LegendExecutionResult';
+import { type LegendExecutionResult } from '../../../shared/model/LegendExecutionResult';
 import { ParametersEditor } from './ParametersEditor';
 
 export const FunctionResultsEditor: React.FC<{

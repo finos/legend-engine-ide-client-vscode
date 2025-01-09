@@ -20,7 +20,7 @@ import {
   QueryBuilder,
 } from '@finos/legend-vscode-extension-dependencies';
 import { useQueryBuilderState } from './useQueryBuilderState';
-import { type CLASSIFIER_PATH } from '../../../extension/utils/Const';
+import { type CLASSIFIER_PATH } from '../../../shared/utils/Const';
 
 export const WebviewQueryBuilder: React.FC<{
   entityId: string;

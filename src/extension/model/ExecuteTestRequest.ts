@@ -18,8 +18,8 @@ import { createModelSchema, primitive, list } from 'serializr';
 import {
   SerializationFactory,
   usingModelSchema,
-} from '../utils/SerializationUtils';
-import { TextLocation } from './TextLocation';
+} from '../../shared/utils/SerializationUtils';
+import { TextLocation } from '../../shared/model/TextLocation';
 
 export class ExecuteTestRequest {
   location!: TextLocation;

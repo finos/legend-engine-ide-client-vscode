@@ -14,39 +14,30 @@
  * limitations under the License.
  */
 
+import { createModelSchema, list, optional, primitive } from 'serializr';
 import {
-  createModelSchema,
-  custom,
-  list,
-  optional,
-  primitive,
-} from 'serializr';
-import {
+  usingModelSchema,
   SerializationFactory,
-  deserializeMap,
-  serializeMap,
 } from '../utils/SerializationUtils';
-import { LegendExecutionResult } from './LegendExecutionResult';
+import type { LegendExecutionResultType } from './LegendExecutionResultType';
+import { TextLocation } from './TextLocation';
 
-export class FunctionLegendExecutionResult extends LegendExecutionResult {
-  sectionNum!: number;
-  uri!: string;
-  inputParameters?: Map<string, object> | undefined;
+export class LegendExecutionResult {
+  ids!: string[];
+  type!: LegendExecutionResultType;
+  message!: string;
+  logMessage?: string | undefined;
+  location?: TextLocation | undefined;
+  messageType?: string | undefined;
 
-  static override readonly serialization = new SerializationFactory(
-    createModelSchema(FunctionLegendExecutionResult, {
+  static readonly serialization = new SerializationFactory(
+    createModelSchema(LegendExecutionResult, {
       ids: list(primitive()),
       type: primitive(),
       message: primitive(),
       logMessage: optional(primitive()),
-      sectionNum: primitive(),
-      uri: primitive(),
-      inputParameters: optional(
-        custom(
-          (value) => serializeMap(value, (val: unknown) => val),
-          (value) => deserializeMap(value, (val: unknown) => val),
-        ),
-      ),
+      location: usingModelSchema(TextLocation.serialization.schema),
+      messageType: optional(primitive()),
     }),
   );
 }

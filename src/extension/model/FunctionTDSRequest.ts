@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import type { LegendTDSRequest } from './TDSRequest';
+import type { LegendTDSRequest } from '../../shared/model/TDSRequest';
 
 export class FunctionTDSRequest {
   entity!: string;

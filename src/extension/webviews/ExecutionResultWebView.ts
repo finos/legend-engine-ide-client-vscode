@@ -38,26 +38,26 @@ import {
   IS_EXECUTION_HAPPENNG,
   SEND_TDS_REQUEST_ID,
   GET_TDS_REQUEST_RESULTS_ID,
-} from '../utils/Const';
-import type { LanguageClientProgressResult } from './LanguageClientProgressResult';
+} from '../../shared/utils/Const';
+import type { LanguageClientProgressResult } from '../model/LanguageClientProgressResult';
 import {
   type LegendTreeDataProvider,
   TreeChildNodeData,
   TreeRootNodeData,
   buildTreeNodeId,
 } from '../utils/LegendTreeProvider';
-import { LegendExecutionResultType } from './LegendExecutionResultType';
-import { guaranteeType } from '../utils/AssertionUtils';
+import { LegendExecutionResultType } from '../../shared/model/LegendExecutionResultType';
+import { guaranteeType } from '../../shared/utils/AssertionUtils';
 import type { LegendWebViewProvider } from '../utils/LegendWebViewProvider';
-import type { PlainObject } from '../utils/SerializationUtils';
-import { TDSLegendExecutionResult } from './TDSLegendExecutionResult';
+import type { PlainObject } from '../../shared/utils/SerializationUtils';
+import { TDSLegendExecutionResult } from '../../shared/model/TDSLegendExecutionResult';
 import * as path from 'path';
 import {
   getAggregationTDSColumnCustomizations,
   getTDSRowData,
-} from '../../client/components/grid/GridUtils';
-import { type LegendExecutionResult } from './LegendExecutionResult';
-import { FunctionLegendExecutionResult } from './FunctionLegendExecutionResult';
+} from '../../shared/utils/GridUtils';
+import { type LegendExecutionResult } from '../../shared/model/LegendExecutionResult';
+import { FunctionLegendExecutionResult } from '../model/FunctionLegendExecutionResult';
 
 const renderTDSResultMessage = (
   legendExecutionResult: LegendExecutionResult,

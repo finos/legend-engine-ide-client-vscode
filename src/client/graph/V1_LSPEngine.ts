@@ -112,7 +112,7 @@ import {
   V1_transformRawLambda,
 } from '@finos/legend-vscode-extension-dependencies';
 import { deserialize } from 'serializr';
-import { postAndWaitForMessage as defaultPostAndWaitForMessage } from '../../extension/utils/VsCodeUtils';
+import { postAndWaitForMessage as defaultPostAndWaitForMessage } from '../../shared/utils/VsCodeUtils';
 import {
   ANALYZE_MAPPING_MODEL_COVERAGE_COMMAND_ID,
   ANALYZE_MAPPING_MODEL_COVERAGE_RESPONSE,
@@ -142,10 +142,10 @@ import {
   JSON_TO_GRAMMAR_LAMBDA_BATCH_RESPONSE,
   SURVEY_DATASETS_COMMAND_ID,
   SURVEY_DATASETS_RESPONSE,
-} from '../../extension/utils/Const';
-import { type LegendExecutionResult } from '../../extension/results/LegendExecutionResult';
-import { LegendExecutionResultType } from '../../extension/results/LegendExecutionResultType';
-import { textLocationToSourceInformation } from '../../extension/utils/SourceInformationUtils';
+} from '../../shared/utils/Const';
+import { type LegendExecutionResult } from '../../shared/model/LegendExecutionResult';
+import { LegendExecutionResultType } from '../../shared/model/LegendExecutionResultType';
+import { textLocationToSourceInformation } from '../../shared/utils/SourceInformationUtils';
 import {
   entitlementReportAnalyticsInputToLSPInput,
   executeInputToLSPInput,

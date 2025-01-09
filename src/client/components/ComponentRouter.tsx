@@ -21,7 +21,7 @@ import {
   DIAGRAM_RENDERER,
   FUNCTION_QUERY_EDITOR,
   SERVICE_QUERY_EDITOR,
-} from '../../extension/utils/Const';
+} from '../../shared/utils/Const';
 import {
   type PlainObject,
   type V1_RawLambda,
@@ -33,7 +33,7 @@ import { WebviewQueryBuilder } from './query/WebviewQueryBuilder';
 import { DiagramEditor } from './diagram/DiagramEditor';
 import { DiagramEditorState } from '../stores/DiagramEditorState';
 import { type LegendVSCodeApplicationConfigurationData } from '../application/LegendVSCodeApplicationConfig';
-import { postAndWaitForMessage } from '../../extension/utils/VsCodeUtils';
+import { postAndWaitForMessage } from '../../shared/utils/VsCodeUtils';
 import { DataCubeRenderer } from './dataCube/DataCubeRenderer';
 
 export const ComponentRouter = (props: PlainObject): React.ReactNode => {

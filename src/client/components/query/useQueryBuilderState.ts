@@ -44,7 +44,7 @@ import {
 import {
   CLASSIFIER_PATH,
   LEGEND_REFRESH_QUERY_BUILDER,
-} from '../../../extension/utils/Const';
+} from '../../../shared/utils/Const';
 import { QueryBuilderVSCodeWorkflowState } from './QueryBuilderWorkflowState';
 import { type LegendVSCodeApplicationConfig } from '../../application/LegendVSCodeApplicationConfig';
 import { type LegendVSCodePluginManager } from '../../application/LegendVSCodePluginManager';

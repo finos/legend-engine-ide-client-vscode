@@ -16,10 +16,10 @@
 
 import { createModelSchema, list, optional, primitive } from 'serializr';
 import {
-  usingModelSchema,
   SerializationFactory,
-} from '../utils/SerializationUtils';
-import type { LegendExecutionResultType } from '../results/LegendExecutionResultType';
+  usingModelSchema,
+} from '../../shared/utils/SerializationUtils';
+import type { LegendExecutionResultType } from '../../shared/model/LegendExecutionResultType';
 import { LegendTestAssertionResult } from './LegendTestAssertionResult';
 
 export class LegendTestExecutionResult {

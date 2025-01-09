@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-import { type LegendExecutionResult } from './LegendExecutionResult';
-import { SerializationFactory } from '../utils/SerializationUtils';
+import { type LegendExecutionResult } from '../../shared/model/LegendExecutionResult';
+import { SerializationFactory } from '../../shared/utils/SerializationUtils';
 import { createModelSchema, custom, list, primitive } from 'serializr';
 import {
   deserializeLegendExecutionResult,
   serializeLegendExecutionResult,
-} from './LegendExecutionResultSerializationHelper';
+} from '../utils/LegendExecutionResultSerializationHelper';
 
 export class LanguageClientProgressResult {
   token?: string | number;

@@ -45,10 +45,10 @@ import {
   CLASSIFIER_PATH,
   GET_PROJECT_ENTITIES_RESPONSE,
   GET_PROJECT_ENTITIES,
-} from '../../../extension/utils/Const';
-import { postAndWaitForMessage } from '../../../extension/utils/VsCodeUtils';
+} from '../../../shared/utils/Const';
+import { postAndWaitForMessage } from '../../../shared/utils/VsCodeUtils';
 import { type LegendVSCodePluginManager } from '../../application/LegendVSCodePluginManager';
-import { type LegendExecutionResult } from '../../../extension/results/LegendExecutionResult';
+import { type LegendExecutionResult } from '../../../shared/model/LegendExecutionResult';
 import { V1_LSPMappingModelCoverageAnalysisResult } from '../../model/engine/MappingModelCoverageAnalysisResult';
 
 const isServiceWithNonPointerRuntime = (

@@ -16,11 +16,11 @@
 
 import { createModelSchema, optional, primitive } from 'serializr';
 import {
-  usingModelSchema,
   SerializationFactory,
-} from '../utils/SerializationUtils';
-import { TextLocation } from './TextLocation';
-import type { LegendExecutionResultType } from '../results/LegendExecutionResultType';
+  usingModelSchema,
+} from '../../shared/utils/SerializationUtils';
+import { TextLocation } from '../../shared/model/TextLocation';
+import type { LegendExecutionResultType } from '../../shared/model/LegendExecutionResultType';
 
 export class LegendTestAssertionResult {
   assertId!: string;

@@ -18,8 +18,8 @@ import { createModelSchema, list, object, primitive } from 'serializr';
 import {
   usingModelSchema,
   SerializationFactory,
-} from '../utils/SerializationUtils';
-import { TextLocation } from './TextLocation';
+} from '../../shared/utils/SerializationUtils';
+import { TextLocation } from '../../shared/model/TextLocation';
 
 export class LegendTest {
   id!: string;

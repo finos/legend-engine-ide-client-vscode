@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-import type { PlainObject } from '../utils/SerializationUtils';
-import { FunctionLegendExecutionResult } from './FunctionLegendExecutionResult';
-import { LegendExecutionResult } from './LegendExecutionResult';
+import type { PlainObject } from '../../shared/utils/SerializationUtils';
+import { FunctionLegendExecutionResult } from '../model/FunctionLegendExecutionResult';
+import { LegendExecutionResult } from '../../shared/model/LegendExecutionResult';
 
 export const serializeLegendExecutionResult = (
   model: LegendExecutionResult,

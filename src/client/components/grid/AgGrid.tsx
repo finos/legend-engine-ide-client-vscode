@@ -26,9 +26,9 @@ import {
   MenuModule,
   LicenseManager,
 } from 'ag-grid-enterprise';
-import { type TDSRowDataType, getDefaultColumnDefintions } from './GridUtils';
+import { type TDSRowDataType, getDefaultColumnDefintions } from '../../../shared/utils/GridUtils';
 import { ServerSideDataSource } from './ServerSideDataSource';
-import { type INTERNAL__TDSColumn } from '../../../extension/results/TDSLegendExecutionResult';
+import { type INTERNAL__TDSColumn } from '../../../shared/model/TDSLegendExecutionResult';
 import { type JSX } from 'react';
 
 const communityModules = [ClientSideRowModelModule, CsvExportModule];

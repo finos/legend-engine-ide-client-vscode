@@ -20,7 +20,7 @@ import {
   BoxArrowUpRightIcon,
   uuid,
 } from '@finos/legend-vscode-extension-dependencies';
-import { OPEN_DATACUBE_IN_NEW_TAB_COMMAND_ID } from '../../extension/utils/Const';
+import { OPEN_DATACUBE_IN_NEW_TAB_COMMAND_ID } from '../../shared/utils/Const';
 import { DataCubeRenderer } from '../components/dataCube/DataCubeRenderer';
 import { type VSCodeEvent } from 'vscode-notebook-renderer/events';
 import { useCallback } from 'react';

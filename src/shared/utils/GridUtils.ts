@@ -18,13 +18,13 @@ import {
   TDS_AGGREGATION_FUNCTION,
   TDS_FILTER_OPERATION,
   TDS_SORT_ORDER,
-} from '../../../extension/model/TDSRequest';
+} from '../model/TDSRequest';
 import {
   type TDSLegendExecutionResult,
   type TabularDataSet,
-} from '../../../extension/results/TDSLegendExecutionResult';
-import { isBoolean } from '../../../extension/utils/AssertionUtils';
-import { PRIMITIVE_TYPE } from '../../../extension/utils/Const';
+} from '../model/TDSLegendExecutionResult';
+import { PRIMITIVE_TYPE } from './Const';
+import { isBoolean } from './AssertionUtils';
 
 export type TDSResultCellDataType =
   | string

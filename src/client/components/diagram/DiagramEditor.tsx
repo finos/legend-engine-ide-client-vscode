@@ -23,9 +23,9 @@ import { useRef, useState, useEffect } from 'react';
 import {
   GET_PROJECT_ENTITIES_RESPONSE,
   GET_PROJECT_ENTITIES,
-} from '../../../extension/utils/Const';
+} from '../../../shared/utils/Const';
 import { observer } from 'mobx-react-lite';
-import { postMessage } from '../../../extension/utils/VsCodeUtils';
+import { postMessage } from '../../../shared/utils/VsCodeUtils';
 
 import type { DiagramEditorState } from '../../stores/DiagramEditorState';
 import { DiagramEditorHeader } from './DiagramEditorHeader';

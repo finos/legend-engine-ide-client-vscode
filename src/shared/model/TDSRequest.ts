@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import type { PRIMITIVE_TYPE } from '../utils/Const';
+import type { PRIMITIVE_TYPE } from '../../shared/utils/Const';
 
 export enum TDS_FILTER_OPERATION {
   EQUALS = 'EQUALS',

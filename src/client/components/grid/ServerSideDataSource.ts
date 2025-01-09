@@ -25,25 +25,25 @@ import {
   TDSAggregation,
   TDSGroupby,
   TDSFilter,
-} from '../../../extension/model/TDSRequest';
+} from '../../../shared/model/TDSRequest';
 import { guaranteeNonNullable } from '@finos/legend-vscode-extension-dependencies';
-import { postMessage } from '../../../extension/utils/VsCodeUtils';
+import { postMessage } from '../../../shared/utils/VsCodeUtils';
 import {
   type INTERNAL__TDSColumn,
   type TDSLegendExecutionResult,
-} from '../../../extension/results/TDSLegendExecutionResult';
+} from '../../../shared/model/TDSLegendExecutionResult';
 import {
   type PRIMITIVE_TYPE,
   GET_TDS_REQUEST_RESULTS_ID,
   SEND_TDS_REQUEST_ID,
-} from '../../../extension/utils/Const';
+} from '../../../shared/utils/Const';
 import {
   type TDSRowDataType,
   getAggregationFunction,
   getTDSFilterOperation,
   getTDSRowData,
   getTDSSortOrder,
-} from './GridUtils';
+} from '../../../shared/utils/GridUtils';
 
 export class ServerSideDataSource implements IServerSideDatasource {
   executions = 0;
