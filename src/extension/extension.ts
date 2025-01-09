@@ -76,9 +76,9 @@ import { LegendWebViewProvider } from './utils/LegendWebViewProvider';
 import {
   renderTestResults,
   resetExecutionTab,
-} from './webviews/ExecutionResultWebView';
+} from './webviews/TestExecutionResultWebView';
 import { guaranteeNonNullable, isPlainObject } from '../shared/utils/AssertionUtils';
-import { renderFunctionResultsWebView } from './webviews/FunctionResultsWebView';
+import { renderFunctionResultsWebView } from './webviews/FunctionExecutionResultsWebView';
 import type { FunctionTDSRequest } from './model/FunctionTDSRequest';
 import { LegendExecutionResult } from '../shared/model/LegendExecutionResult';
 import { TDSLegendExecutionResult } from '../shared/model/TDSLegendExecutionResult';
