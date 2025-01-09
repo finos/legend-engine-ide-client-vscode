@@ -347,7 +347,7 @@
     }
   },
   "scripts": {
-    "test": "npm run build && node ./lib/tests/runTest.js",
+    "test": "npm run build && node ./lib/extension/__tests__/runTest.js",
     "compile": "tsc -b",
     "dev": "npm-run-all --parallel dev:ts dev:webpack",
     "dev:setup": "npm run release:prepare",
