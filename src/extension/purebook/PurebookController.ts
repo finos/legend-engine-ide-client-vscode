@@ -24,10 +24,10 @@ import {
   notebooks,
   workspace,
 } from 'vscode';
-import { LEGEND_COMMAND_V2, LEGEND_LANGUAGE_ID } from '../utils/Const';
-import { LegendExecutionResult } from '../results/LegendExecutionResult';
-import { type PlainObject } from '../utils/SerializationUtils';
-import { LegendExecutionResultType } from '../results/LegendExecutionResultType';
+import { LEGEND_COMMAND_V2, LEGEND_LANGUAGE_ID } from '../../shared/utils/Const';
+import { LegendExecutionResult } from '../../shared/model/LegendExecutionResult';
+import { type PlainObject } from '@finos/legend-vscode-extension-dependencies';
+import { LegendExecutionResultType } from '../../shared/model/LegendExecutionResultType';
 import { withCancellationSupport } from '../utils/cancellationSupport';
 
 export class PurebookController {

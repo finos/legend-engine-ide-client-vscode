@@ -28,13 +28,13 @@ import {
   GET_PROJECT_ENTITIES_RESPONSE,
   QUERY_BUILDER_CONFIG_ERROR,
   WRITE_ENTITY,
-} from '../utils/Const';
+} from '../../shared/utils/Const';
 import {
   type LegendLanguageClient,
   LegendEntitiesRequest,
 } from '../LegendLanguageClient';
 import { type LegendConceptTreeProvider } from '../conceptTree';
-import { type TextLocation } from '../model/TextLocation';
+import { type TextLocation } from '../../shared/model/TextLocation';
 import { TextDocumentIdentifier } from 'vscode-languageclient';
 
 export const getWebviewHtml = (

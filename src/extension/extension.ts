@@ -45,10 +45,12 @@ import {
   type ServerOptions,
   TextDocumentIdentifier,
 } from 'vscode-languageclient/node';
-import { type V1_ConcreteFunctionDefinition } from '@finos/legend-vscode-extension-dependencies';
+import {
+  type PlainObject,
+  type V1_ConcreteFunctionDefinition,
+} from '@finos/legend-vscode-extension-dependencies';
 import { LegendTreeDataProvider } from './utils/LegendTreeProvider';
-import { LanguageClientProgressResult } from './results/LanguageClientProgressResult';
-import type { PlainObject } from './utils/SerializationUtils';
+import { LanguageClientProgressResult } from './model/LanguageClientProgressResult';
 import {
   ACTIVATE_FUNCTION_ID,
   CLASSIFIER_PATH,
@@ -69,17 +71,17 @@ import {
   SEND_TDS_REQUEST_ID,
   SERVICE_QUERY_EDITOR,
   SHOW_RESULTS_COMMAND_ID,
-} from './utils/Const';
+} from '../shared/utils/Const';
 import { LegendWebViewProvider } from './utils/LegendWebViewProvider';
 import {
   renderTestResults,
   resetExecutionTab,
-} from './results/ExecutionResultHelper';
-import { guaranteeNonNullable, isPlainObject } from './utils/AssertionUtils';
+} from './webviews/ExecutionResultWebView';
+import { guaranteeNonNullable, isPlainObject } from '../shared/utils/AssertionUtils';
 import { renderFunctionResultsWebView } from './webviews/FunctionResultsWebView';
 import type { FunctionTDSRequest } from './model/FunctionTDSRequest';
-import { LegendExecutionResult } from './results/LegendExecutionResult';
-import { TDSLegendExecutionResult } from './results/TDSLegendExecutionResult';
+import { LegendExecutionResult } from '../shared/model/LegendExecutionResult';
+import { TDSLegendExecutionResult } from '../shared/model/TDSLegendExecutionResult';
 import {
   LegendEntitiesRequest,
   LegendLanguageClient,

@@ -22,18 +22,18 @@ import {
   TEST_FAIL_ICON,
   TEST_PASS_COLOR,
   TEST_PASS_ICON,
-} from '../../../utils/Const';
+} from '../../../../shared/utils/Const';
 import { deepStrictEqual, strictEqual } from 'assert';
 import {
   Mock_ExecutionContext,
   Mock_Webview,
 } from '../../mockUtils/Mock_LanguageClient';
-import type { PlainObject } from '../../../utils/SerializationUtils';
-import { LegendExecutionResultType } from '../../../results/LegendExecutionResultType';
+import { type PlainObject } from '@finos/legend-vscode-extension-dependencies';
+import { LegendExecutionResultType } from '../../../../shared/model/LegendExecutionResultType';
 import { LegendTreeDataProvider } from '../../../utils/LegendTreeProvider';
 import { LegendWebViewProvider } from '../../../utils/LegendWebViewProvider';
-import { renderTestResults } from '../../../results/ExecutionResultHelper';
-import { LanguageClientProgressResult } from '../../../results/LanguageClientProgressResult';
+import { renderTestResults } from '../../../webviews/ExecutionResultWebView';
+import { LanguageClientProgressResult } from '../../../model/LanguageClientProgressResult';
 
 const TEST_LEGEND_EXECUTION_RESULTS_DATA_SUCCESS: PlainObject<LanguageClientProgressResult> =
   {

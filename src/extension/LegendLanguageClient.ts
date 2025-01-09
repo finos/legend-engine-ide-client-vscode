@@ -22,7 +22,7 @@ import {
   type CancellationToken,
 } from 'vscode';
 import type { FunctionTDSRequest } from './model/FunctionTDSRequest';
-import { LegendExecutionResult } from './results/LegendExecutionResult';
+import { LegendExecutionResult } from '../shared/model/LegendExecutionResult';
 import {
   ANALYZE_MAPPING_MODEL_COVERAGE_COMMAND_ID,
   CHECK_DATASET_ENTITLEMENTS_COMMAND_ID,
@@ -44,8 +44,7 @@ import {
   TDS_JSON_REQUEST_ID,
   TEST_CASES_REQUEST_ID,
   VIRTUAL_FILE_SYSTEM_FILE_REQUEST_ID,
-} from './utils/Const';
-import type { PlainObject } from './utils/SerializationUtils';
+} from '../shared/utils/Const';
 import {
   LanguageClient,
   type TextDocumentIdentifier,
@@ -56,6 +55,7 @@ import type { LegendTestExecutionResult } from './model/LegendTestExecutionResul
 import { LegendEntity } from './model/LegendEntity';
 import {
   type EXECUTION_SERIALIZATION_FORMAT,
+  type PlainObject,
   type V1_GrammarParserBatchInputEntry,
   type V1_Lambda,
   type V1_ParameterValue,
@@ -64,8 +64,8 @@ import {
   type V1_RenderStyle,
   type V1_Runtime,
 } from '@finos/legend-vscode-extension-dependencies';
-import { LegendExecutionResultType } from './results/LegendExecutionResultType';
-import { TextLocation } from './model/TextLocation';
+import { LegendExecutionResultType } from '../shared/model/LegendExecutionResultType';
+import { TextLocation } from '../shared/model/TextLocation';
 
 export class LegendEntitiesRequest {
   private textDocuments!: TextDocumentIdentifier[];

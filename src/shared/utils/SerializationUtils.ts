@@ -21,9 +21,7 @@ import {
   deserialize,
   serialize,
 } from 'serializr';
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export type PlainObject<T = unknown> = Record<PropertyKey, unknown>;
+import { type PlainObject } from '@finos/legend-vscode-extension-dependencies';
 
 export class SerializationFactory<T> {
   readonly schema: ModelSchema<T>;

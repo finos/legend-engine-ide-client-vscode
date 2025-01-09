@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import type { PlainObject } from '../../shared/utils/SerializationUtils';
+import { type PlainObject } from '@finos/legend-vscode-extension-dependencies';
 import { FunctionLegendExecutionResult } from '../model/FunctionLegendExecutionResult';
 import { LegendExecutionResult } from '../../shared/model/LegendExecutionResult';
 

@@ -34,7 +34,7 @@ import {
   DATACUBE,
   LEGEND_LANGUAGE_ID,
   OPEN_DATACUBE_IN_NEW_TAB_COMMAND_ID,
-} from '../utils/Const';
+} from '../../shared/utils/Const';
 import { PurebookController } from './PurebookController';
 import { type LegendLanguageClient } from '../LegendLanguageClient';
 import { type LegendConceptTreeProvider } from '../conceptTree';

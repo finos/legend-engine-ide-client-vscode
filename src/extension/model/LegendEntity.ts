@@ -16,11 +16,11 @@
 
 import { createModelSchema, primitive, raw } from 'serializr';
 import {
-  type PlainObject,
   SerializationFactory,
   usingModelSchema,
 } from '../../shared/utils/SerializationUtils';
 import { TextLocation } from '../../shared/model/TextLocation';
+import { type PlainObject } from '@finos/legend-vscode-extension-dependencies';
 
 export class LegendEntity {
   path!: string;

@@ -22,9 +22,9 @@ import {
 import { type LegendLanguageClient } from '../LegendLanguageClient';
 import { getWebviewHtml, handleQueryBuilderWebviewMessage } from './utils';
 import { type LegendConceptTreeProvider } from '../conceptTree';
-import { type PlainObject } from '../utils/SerializationUtils';
-import { guaranteeNonNullable } from '../utils/AssertionUtils';
-import { TextLocation } from '../model/TextLocation';
+import { type PlainObject } from '@finos/legend-vscode-extension-dependencies';
+import { guaranteeNonNullable } from '../../shared/utils/AssertionUtils';
+import { TextLocation } from '../../shared/model/TextLocation';
 import { handleV1LSPEngineMessage } from '../graph/utils';
 
 export const renderQueryBuilderWebView = async (

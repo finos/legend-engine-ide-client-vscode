@@ -18,9 +18,11 @@ import { type ExtensionContext, type WebviewPanel } from 'vscode';
 import { type LegendLanguageClient } from '../LegendLanguageClient';
 import { getWebviewHtml } from './utils';
 import { type LegendConceptTreeProvider } from '../conceptTree';
-import { type PlainObject } from '../utils/SerializationUtils';
 import { handleV1LSPEngineMessage } from '../graph/utils';
-import { type V1_RawLambda } from '@finos/legend-vscode-extension-dependencies';
+import {
+  type PlainObject,
+  type V1_RawLambda,
+} from '@finos/legend-vscode-extension-dependencies';
 
 export const renderDataCubeWebView = async (
   webViewPanel: WebviewPanel,

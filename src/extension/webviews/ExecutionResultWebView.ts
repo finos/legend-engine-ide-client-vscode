@@ -49,7 +49,7 @@ import {
 import { LegendExecutionResultType } from '../../shared/model/LegendExecutionResultType';
 import { guaranteeType } from '../../shared/utils/AssertionUtils';
 import type { LegendWebViewProvider } from '../utils/LegendWebViewProvider';
-import type { PlainObject } from '../../shared/utils/SerializationUtils';
+import { type PlainObject } from '@finos/legend-vscode-extension-dependencies';
 import { TDSLegendExecutionResult } from '../../shared/model/TDSLegendExecutionResult';
 import * as path from 'path';
 import {

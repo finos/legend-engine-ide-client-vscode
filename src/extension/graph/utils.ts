@@ -45,11 +45,11 @@ import {
   JSON_TO_GRAMMAR_LAMBDA_BATCH_RESPONSE,
   SURVEY_DATASETS_COMMAND_ID,
   SURVEY_DATASETS_RESPONSE,
-} from '../utils/Const';
+} from '../../shared/utils/Const';
 import { type LegendLanguageClient } from '../LegendLanguageClient';
 import { type LegendConceptTreeProvider } from '../conceptTree';
-import { guaranteeNonNullable } from '../utils/AssertionUtils';
-import { TextLocation } from '../model/TextLocation';
+import { guaranteeNonNullable } from '../../shared/utils/AssertionUtils';
+import { TextLocation } from '../../shared/model/TextLocation';
 
 export const getCurrentUserId = (
   context: ExtensionContext,

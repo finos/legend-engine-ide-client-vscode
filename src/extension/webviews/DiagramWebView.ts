@@ -26,13 +26,13 @@ import {
   GET_PROJECT_ENTITIES,
   GET_PROJECT_ENTITIES_RESPONSE,
   WRITE_ENTITY,
-} from '../utils/Const';
+} from '../../shared/utils/Const';
 import type { LegendLanguageClient } from '../LegendLanguageClient';
 import { getWebviewHtml } from './utils';
 import { type PlainObject } from '@finos/legend-vscode-extension-dependencies';
-import { guaranteeNonNullable } from '../utils/AssertionUtils';
+import { guaranteeNonNullable } from '../../shared/utils/AssertionUtils';
 import { type LegendConceptTreeProvider } from '../conceptTree';
-import { TextLocation } from '../model/TextLocation';
+import { TextLocation } from '../../shared/model/TextLocation';
 import { handleV1LSPEngineMessage } from '../graph/utils';
 
 export const renderDiagramRendererWebView = (
