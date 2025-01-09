@@ -19,7 +19,7 @@ import { window, commands } from 'vscode';
 import {
   RESULTS_WEB_VIEW,
   SHOW_RESULTS_COMMAND_ID,
-} from '../../../utils/Const';
+} from '../../../../shared/utils/Const';
 import { strictEqual } from 'assert';
 import { Mock_Webview } from '../../mockUtils/Mock_LanguageClient';
 import { LegendWebViewProvider } from '../../../utils/LegendWebViewProvider';

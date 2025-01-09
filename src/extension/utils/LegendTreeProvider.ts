@@ -23,7 +23,7 @@ import {
   TreeItemCollapsibleState,
   type Command,
 } from 'vscode';
-import { guaranteeNonNullable } from './AssertionUtils';
+import { guaranteeNonNullable } from '../../shared/utils/AssertionUtils';
 
 export const buildTreeNodeId = (ids: string[]): string => {
   let nodeId = ids[0]!;

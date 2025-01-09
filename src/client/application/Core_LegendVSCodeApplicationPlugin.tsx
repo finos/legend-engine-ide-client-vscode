@@ -37,7 +37,7 @@ import {
   V1_serializePackageableElement,
 } from '@finos/legend-vscode-extension-dependencies';
 import { LegendVSCodeApplicationPlugin } from './LegendVSCodeApplicationPlugin';
-import { postMessage } from '../../shared/utils/VsCodeUtils';
+import { postMessage } from '../utils/VsCodeUtils';
 import { WRITE_ENTITY } from '../../shared/utils/Const';
 
 export class Core_LegendVSCodeApplicationPlugin extends LegendVSCodeApplicationPlugin {

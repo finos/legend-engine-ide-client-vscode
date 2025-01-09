@@ -46,7 +46,7 @@ import {
   GET_PROJECT_ENTITIES_RESPONSE,
   GET_PROJECT_ENTITIES,
 } from '../../../shared/utils/Const';
-import { postAndWaitForMessage } from '../../../shared/utils/VsCodeUtils';
+import { postAndWaitForMessage } from '../../utils/VsCodeUtils';
 import { type LegendVSCodePluginManager } from '../../application/LegendVSCodePluginManager';
 import { type LegendExecutionResult } from '../../../shared/model/LegendExecutionResult';
 import { V1_LSPMappingModelCoverageAnalysisResult } from '../../model/engine/MappingModelCoverageAnalysisResult';

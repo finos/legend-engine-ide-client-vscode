@@ -26,7 +26,7 @@ import {
 } from 'vscode';
 import type { LegendLanguageClient } from './LegendLanguageClient';
 import { LegendTest } from './model/LegendTest';
-import { LegendExecutionResultType } from './results/LegendExecutionResultType';
+import { LegendExecutionResultType } from '../shared/model/LegendExecutionResultType';
 import { LegendTestExecutionResult } from './model/LegendTestExecutionResult';
 
 type TestTuple = { legendTest: LegendTest; testItem: TestItem };

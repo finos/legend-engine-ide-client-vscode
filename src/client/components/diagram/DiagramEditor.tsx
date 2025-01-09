@@ -25,7 +25,7 @@ import {
   GET_PROJECT_ENTITIES,
 } from '../../../shared/utils/Const';
 import { observer } from 'mobx-react-lite';
-import { postMessage } from '../../../shared/utils/VsCodeUtils';
+import { postMessage } from '../../utils/VsCodeUtils';
 
 import type { DiagramEditorState } from '../../stores/DiagramEditorState';
 import { DiagramEditorHeader } from './DiagramEditorHeader';

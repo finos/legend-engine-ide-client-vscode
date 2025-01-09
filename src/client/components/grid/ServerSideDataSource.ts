@@ -27,7 +27,7 @@ import {
   TDSFilter,
 } from '../../../shared/model/TDSRequest';
 import { guaranteeNonNullable } from '@finos/legend-vscode-extension-dependencies';
-import { postMessage } from '../../../shared/utils/VsCodeUtils';
+import { postMessage } from '../../utils/VsCodeUtils';
 import {
   type INTERNAL__TDSColumn,
   type TDSLegendExecutionResult,

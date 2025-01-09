@@ -27,7 +27,7 @@ import {
 } from './LegendLanguageClient';
 import { TextDocumentIdentifier } from 'vscode-languageclient';
 import { type LegendEntity } from './model/LegendEntity';
-import { CLASSIFIER_PATH } from './utils/Const';
+import { CLASSIFIER_PATH } from '../shared/utils/Const';
 
 export class LegendCodelensProvider implements CodeLensProvider {
   private client: LegendLanguageClient;

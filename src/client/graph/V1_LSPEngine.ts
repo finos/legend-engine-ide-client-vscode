@@ -112,7 +112,7 @@ import {
   V1_transformRawLambda,
 } from '@finos/legend-vscode-extension-dependencies';
 import { deserialize } from 'serializr';
-import { postAndWaitForMessage as defaultPostAndWaitForMessage } from '../../shared/utils/VsCodeUtils';
+import { postAndWaitForMessage as defaultPostAndWaitForMessage } from '../utils/VsCodeUtils';
 import {
   ANALYZE_MAPPING_MODEL_COVERAGE_COMMAND_ID,
   ANALYZE_MAPPING_MODEL_COVERAGE_RESPONSE,
@@ -145,7 +145,7 @@ import {
 } from '../../shared/utils/Const';
 import { type LegendExecutionResult } from '../../shared/model/LegendExecutionResult';
 import { LegendExecutionResultType } from '../../shared/model/LegendExecutionResultType';
-import { textLocationToSourceInformation } from '../../shared/utils/SourceInformationUtils';
+import { textLocationToSourceInformation } from '../utils/SourceInformationUtils';
 import {
   entitlementReportAnalyticsInputToLSPInput,
   executeInputToLSPInput,

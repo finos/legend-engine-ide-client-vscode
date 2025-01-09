@@ -36,7 +36,7 @@ import {
 import { observer } from 'mobx-react-lite';
 import { flowResult } from 'mobx';
 import { serialize } from 'serializr';
-import { postMessage } from '../../../shared/utils/VsCodeUtils';
+import { postMessage } from '../../utils/VsCodeUtils';
 import type { DiagramEditorState } from '../../stores/DiagramEditorState';
 
 export const DiagramEditorCanvas = observer(

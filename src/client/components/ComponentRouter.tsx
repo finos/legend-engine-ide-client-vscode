@@ -33,7 +33,7 @@ import { WebviewQueryBuilder } from './query/WebviewQueryBuilder';
 import { DiagramEditor } from './diagram/DiagramEditor';
 import { DiagramEditorState } from '../stores/DiagramEditorState';
 import { type LegendVSCodeApplicationConfigurationData } from '../application/LegendVSCodeApplicationConfig';
-import { postAndWaitForMessage } from '../../shared/utils/VsCodeUtils';
+import { postAndWaitForMessage } from '../utils/VsCodeUtils';
 import { DataCubeRenderer } from './dataCube/DataCubeRenderer';
 
 export const ComponentRouter = (props: PlainObject): React.ReactNode => {

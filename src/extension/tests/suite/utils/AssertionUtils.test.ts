@@ -19,7 +19,7 @@ import {
   guaranteeNonNullable,
   isBoolean,
   isObject,
-} from '../../../utils/AssertionUtils';
+} from '../../../../shared/utils/AssertionUtils';
 
 suite('Assertion Test Suite', () => {
   test('Assert non nullable value', async () => {

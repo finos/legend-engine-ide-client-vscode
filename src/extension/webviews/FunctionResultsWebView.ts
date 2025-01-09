@@ -29,7 +29,7 @@ import {
   LEGEND_COMMAND,
   LEGEND_EXECUTE_COMMAND,
   SEND_TDS_REQUEST_ID,
-} from '../utils/Const';
+} from '../../shared/utils/Const';
 
 export const renderFunctionResultsWebView = (
   functionResultsWebViewPanel: WebviewPanel,

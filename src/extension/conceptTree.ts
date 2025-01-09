@@ -42,7 +42,7 @@ import {
   TextDocumentIdentifier,
 } from 'vscode-languageclient';
 import type { LegendEntity } from './model/LegendEntity';
-import { LEGEND_LANGUAGE_ID } from './utils/Const';
+import { LEGEND_LANGUAGE_ID } from '../shared/utils/Const';
 
 const TREE_ID = 'legendConceptTree';
 const MIME_TYPE = `application/vnd.code.tree.${TREE_ID.toLowerCase()}`;

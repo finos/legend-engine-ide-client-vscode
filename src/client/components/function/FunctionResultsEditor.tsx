@@ -21,8 +21,8 @@ import {
   GET_TDS_REQUEST_RESULTS_ID,
   LEGEND_EXECUTE_COMMAND,
 } from '../../../shared/utils/Const';
-import { type InputParamter } from '../../../shared/model/InputParameter';
-import { postMessage } from '../../../shared/utils/VsCodeUtils';
+import { type InputParamter } from '../../model/InputParameter';
+import { postMessage } from '../../utils/VsCodeUtils';
 import {
   type TDSRowDataType,
   getAggregationTDSColumnCustomizations,

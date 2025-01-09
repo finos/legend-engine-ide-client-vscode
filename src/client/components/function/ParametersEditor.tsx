@@ -24,8 +24,8 @@ import {
   serializeMap,
 } from '@finos/legend-vscode-extension-dependencies';
 import { LEGEND_EXECUTE_COMMAND } from '../../../shared/utils/Const';
-import { type InputParamter } from '../../../shared/model/InputParameter';
-import { postMessage } from '../../../shared/utils/VsCodeUtils';
+import { type InputParamter } from '../../model/InputParameter';
+import { postMessage } from '../../utils/VsCodeUtils';
 
 export const ParametersEditor: React.FC<{
   inputParameters: InputParamter[];
