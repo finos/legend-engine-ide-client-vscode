@@ -32,7 +32,7 @@ import { type PlainObject } from '@finos/legend-vscode-extension-dependencies';
 import { LegendExecutionResultType } from '../../../../shared/model/LegendExecutionResultType';
 import { LegendTreeDataProvider } from '../../../utils/LegendTreeProvider';
 import { LegendWebViewProvider } from '../../../utils/LegendWebViewProvider';
-import { renderTestResults } from '../../../webviews/ExecutionResultWebView';
+import { renderTestResults } from '../../../webviews/TestExecutionResultWebView';
 import { LanguageClientProgressResult } from '../../../model/LanguageClientProgressResult';
 
 const TEST_LEGEND_EXECUTION_RESULTS_DATA_SUCCESS: PlainObject<LanguageClientProgressResult> =
