@@ -15,13 +15,13 @@
  */
 
 import {
+  type Command,
+  type Event,
+  type ThemeIcon,
   type TreeDataProvider,
   EventEmitter,
-  type Event,
   TreeItem,
-  type ThemeIcon,
   TreeItemCollapsibleState,
-  type Command,
 } from 'vscode';
 import { guaranteeNonNullable } from '../../shared/utils/AssertionUtils';
 
