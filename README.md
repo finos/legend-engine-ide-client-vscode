@@ -36,6 +36,14 @@ To start using the extension, create a `hello.pure` file in your workspace, and 
 
 Please read our [contributing guide](./CONTRIBUTING.md).
 
+## Project Structure
+
+The project is structured into 3 main parts within the `src` directory:
+
+- `extension`: This directory contains code that runs exclusively on the extension host and interacts directly with the VS Code APIs. Nothing in this directory should import anything from `@finos/legend-vscode-extension-dependencies` unless it is simply a `type` import, as doing so will cause the webpack bundling to break, since components from the `@finos/legend-vscode-extension-dependencies` library require polyfills that we don't provide when bundling the extension code.
+- `client`: This directory contains code that runs within iframes in VS Code. Most of the core UI logic lives here, and all the components that we import from `@finos/legend-vscode-extension-dependencies` are implemented here. You can safely import from `@finos/legend-vscode-extension-dependencies` in this directory.
+- `shared`: This directory contains code that is shared between the `extension` and `client` directories. Because code here is used within the `extension` directory, nothing in the `shared` directory should import anything from `@finos/legend-vscode-extension-dependencies` unless it is simply a `type` import.
+
 ## License
 
 Copyright 2020 Goldman Sachs
