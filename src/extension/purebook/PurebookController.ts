@@ -24,7 +24,10 @@ import {
   notebooks,
   workspace,
 } from 'vscode';
-import { LEGEND_COMMAND_V2, LEGEND_LANGUAGE_ID } from '../../shared/utils/Const';
+import {
+  LEGEND_COMMAND_V2,
+  LEGEND_LANGUAGE_ID,
+} from '../../shared/utils/Const';
 import { LegendExecutionResult } from '../../shared/model/LegendExecutionResult';
 import { type PlainObject } from '@finos/legend-vscode-extension-dependencies';
 import { LegendExecutionResultType } from '../../shared/model/LegendExecutionResultType';

@@ -26,7 +26,10 @@ import {
   MenuModule,
   LicenseManager,
 } from 'ag-grid-enterprise';
-import { type TDSRowDataType, getDefaultColumnDefintions } from '../../../shared/utils/GridUtils';
+import {
+  type TDSRowDataType,
+  getDefaultColumnDefintions,
+} from '../../../shared/utils/GridUtils';
 import { ServerSideDataSource } from './ServerSideDataSource';
 import { type INTERNAL__TDSColumn } from '../../../shared/model/TDSLegendExecutionResult';
 import { type JSX } from 'react';

@@ -77,7 +77,10 @@ import {
   renderTestResults,
   resetExecutionTab,
 } from './webviews/TestExecutionResultWebView';
-import { guaranteeNonNullable, isPlainObject } from '../shared/utils/AssertionUtils';
+import {
+  guaranteeNonNullable,
+  isPlainObject,
+} from '../shared/utils/AssertionUtils';
 import { renderFunctionResultsWebView } from './webviews/FunctionExecutionResultsWebView';
 import type { FunctionTDSRequest } from './model/FunctionTDSRequest';
 import { LegendExecutionResult } from '../shared/model/LegendExecutionResult';
