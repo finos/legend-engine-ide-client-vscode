@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import type { PlainObject } from './SerializationUtils';
+import { type PlainObject } from '@finos/legend-vscode-extension-dependencies';
 
 export function assertNonNullable<T>(
   value: T | null | undefined,
