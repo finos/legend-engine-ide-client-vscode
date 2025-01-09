@@ -15,12 +15,12 @@
  */
 
 import { createModelSchema, optional } from 'serializr';
+import { Variable } from './VariableExpression';
+import { Enumeration } from './Enumeration';
 import {
   SerializationFactory,
   usingModelSchema,
-} from '../utils/SerializationUtils';
-import { Variable } from './VariableExpression';
-import { Enumeration } from './Enumeration';
+} from '@finos/legend-vscode-extension-dependencies';
 
 export class InputParamter {
   variable!: Variable;

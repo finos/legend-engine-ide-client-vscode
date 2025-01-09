@@ -18,7 +18,16 @@ import {
   type PlainObject,
   uuid,
 } from '@finos/legend-vscode-extension-dependencies';
-import { postMessage } from '../../shared/utils/VsCodeUtils';
+
+interface Vscode {
+  postMessage(message: unknown): void;
+}
+
+declare const vscode: Vscode;
+
+export const postMessage = (message: unknown): void => {
+  vscode.postMessage(message);
+};
 
 export const postAndWaitForMessage = <T>(
   requestMessage: { command: string; msg?: PlainObject },

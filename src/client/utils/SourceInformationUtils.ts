@@ -15,7 +15,7 @@
  */
 
 import { V1_SourceInformation } from '@finos/legend-vscode-extension-dependencies';
-import { type TextLocation } from '../model/TextLocation';
+import { type TextLocation } from '../../shared/model/TextLocation';
 
 export const textLocationToSourceInformation = (
   textLocation: TextLocation,

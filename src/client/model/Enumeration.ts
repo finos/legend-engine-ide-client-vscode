@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-import { createModelSchema, list, primitive } from 'serializr';
 import {
   SerializationFactory,
   usingModelSchema,
-} from '../utils/SerializationUtils';
+} from '@finos/legend-vscode-extension-dependencies';
+import { createModelSchema, list, primitive } from 'serializr';
 
 class EnumValue {
   value!: string;

@@ -18,7 +18,7 @@ import { createModelSchema, optional, primitive } from 'serializr';
 import {
   SerializationFactory,
   usingModelSchema,
-} from '../utils/SerializationUtils';
+} from '@finos/legend-vscode-extension-dependencies';
 
 export class Multiplicity {
   readonly lowerBound: number;
