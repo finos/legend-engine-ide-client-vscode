@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import '../../../../style/index.scss';
+import '../../../style/index.scss';
 import { useEffect, useState } from 'react';
 import { type PlainObject } from '@finos/legend-vscode-extension-dependencies';
 import {
