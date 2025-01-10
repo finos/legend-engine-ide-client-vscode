@@ -23,6 +23,8 @@ import {
   SERVICE_QUERY_EDITOR,
 } from '../../shared/utils/Const';
 import {
+  type AbstractPlugin,
+  type AbstractPreset,
   type PlainObject,
   type V1_RawLambda,
   guaranteeNonEmptyString,
@@ -36,7 +38,11 @@ import { type LegendVSCodeApplicationConfigurationData } from '../application/Le
 import { postAndWaitForMessage } from '../utils/VsCodeUtils';
 import { DataCubeRenderer } from './dataCube/DataCubeRenderer';
 
-export const ComponentRouter = (props: PlainObject): React.ReactNode => {
+export const ComponentRouter = (
+  props: PlainObject,
+  presets?: AbstractPreset[],
+  plugins?: AbstractPlugin[],
+): React.ReactNode => {
   const webviewType = guaranteeNonEmptyString(
     props.webviewType as string,
     'webviewType is required to render a web view',
@@ -60,7 +66,11 @@ export const ComponentRouter = (props: PlainObject): React.ReactNode => {
     case SERVICE_QUERY_EDITOR: {
       const entityId = guaranteeNonNullable(props.entityId as string);
       component = (
-        <LegendVSCodeApplication configData={configData}>
+        <LegendVSCodeApplication
+          configData={configData}
+          presets={presets}
+          plugins={plugins}
+        >
           <WebviewQueryBuilder
             entityId={entityId}
             classifierPath={CLASSIFIER_PATH.SERVICE}
@@ -72,7 +82,11 @@ export const ComponentRouter = (props: PlainObject): React.ReactNode => {
     case FUNCTION_QUERY_EDITOR: {
       const entityId = guaranteeNonNullable(props.entityId as string);
       component = (
-        <LegendVSCodeApplication configData={configData}>
+        <LegendVSCodeApplication
+          configData={configData}
+          presets={presets}
+          plugins={plugins}
+        >
           <WebviewQueryBuilder
             entityId={entityId}
             classifierPath={CLASSIFIER_PATH.FUNCTION}
@@ -84,7 +98,11 @@ export const ComponentRouter = (props: PlainObject): React.ReactNode => {
     case DIAGRAM_RENDERER: {
       const diagramId = guaranteeNonNullable(props.diagramId as string);
       component = (
-        <LegendVSCodeApplication configData={configData}>
+        <LegendVSCodeApplication
+          configData={configData}
+          presets={presets}
+          plugins={plugins}
+        >
           <DiagramEditor
             diagramEditorState={new DiagramEditorState(diagramId)}
           />
