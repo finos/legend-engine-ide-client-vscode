@@ -15,6 +15,8 @@
  */
 
 import {
+  type AbstractPlugin,
+  type AbstractPreset,
   type LegendApplicationConfigurationData,
   type LegendApplicationConfigurationInput,
   ApplicationFrameworkProvider,
@@ -38,9 +40,11 @@ import packageJson from '../../../package.json';
 
 export const LegendVSCodeApplication = (props: {
   configData: LegendApplicationConfigurationData;
+  presets?: AbstractPreset[] | undefined;
+  plugins?: AbstractPlugin[] | undefined;
   children: React.ReactNode;
 }): React.ReactNode => {
-  const { configData, children } = props;
+  const { configData, presets, plugins, children } = props;
 
   const applicationStore = useMemo(() => {
     const input: LegendApplicationConfigurationInput<LegendApplicationConfigurationData> =
@@ -60,11 +64,13 @@ export const LegendVSCodeApplication = (props: {
           new Core_GraphManagerPreset(),
           new QueryBuilder_GraphManagerPreset(),
           new DSL_Diagram_GraphManagerPreset(),
+          ...(presets ?? []),
         ])
         .usePlugins([
           new Core_LegendApplicationPlugin(),
           new QueryBuilder_LegendApplicationPlugin(),
           new Core_LegendVSCodeApplicationPlugin(),
+          ...(plugins ?? []),
         ])
         .install();
       return new ApplicationStore(config, pluginManager);
@@ -73,7 +79,7 @@ export const LegendVSCodeApplication = (props: {
       postMessage({ command: QUERY_BUILDER_CONFIG_ERROR, msg: e.message });
       return null;
     }
-  }, [configData]);
+  }, [configData, presets, plugins]);
 
   return (
     applicationStore && (
