@@ -1,0 +1,89 @@
+{
+  "name": "@finos/legend-engine-ide-client-vscode",
+  "version": "0.1.0",
+  "description": "Legend Extension client-side code",
+  "homepage": "https://legend.finos.org/",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/finos/legend-engine-ide-client-vscode.git"
+  },
+  "sideEffects": false,
+  "type": "module",
+  "exports": {
+    ".": "./lib/index.js"
+  },
+  "module": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "scripts": {
+    "compile": "tsc -b",
+    "dev": "npm run dev:ts",
+    "dev:setup": "npm run release:prepare",
+    "dev:ts": "tsc -b --watch",
+    "build": "npm run compile",
+    "bundle": "npm run compile",
+    "check:copyright": "license-check-and-add check -f license-check-and-add-config.json",
+    "check:format": "prettier --list-different \"(scripts|docs)/**/*.{md,json,mjs,cjs,js,ts,tsx,html,scss,css}\" \"src/**/*.{md,json,mjs,cjs,js,ts,tsx,html,scss,css}\"",
+    "check:ci": "npm run check:format && npm run check:copyright",
+    "lint": "npm run lint:js && npm run lint:style",
+    "lint:ci": "npm run lint:js --max-warnings=0 && npm run lint:style --max-warnings=0",
+    "lint:js": "cross-env eslint --cache --cache-location ./build/.eslintcache --report-unused-disable-directives --parser-options=project:\"./tsconfig.json\" \"./src/**/*.{js,ts,tsx}\"",
+    "lint:style": "stylelint --cache --cache-location ./build/.stylelintcache \"style/**/*.{scss,css}\" \"style/scss/**/*.scss\"",
+    "fix:format": "prettier --write \"(scripts|docs)/**/*.{md,json,mjs,cjs,js,ts,tsx,html,scss,css}\" \"src/**/*.{md,json,mjs,cjs,js,ts,tsx,html,scss,css}\""
+  },
+  "dependencies": {
+    "@finos/legend-engine-ide-client-vscode-shared": "0.1.0",
+    "@finos/legend-vscode-extension-dependencies": "4.0.54",
+    "ag-grid-community": "33.0.2",
+    "ag-grid-enterprise": "33.0.2",
+    "ag-grid-react": "33.0.2",
+    "mobx": "6.13.5",
+    "mobx-react-lite": "4.1.0",
+    "react": "19.0.0",
+    "react-dom": "19.0.0",
+    "react-select": "5.9.0",
+    "serializr": "3.0.3"
+  },
+  "devDependencies": {
+    "@eslint/compat": "^1.2.4",
+    "@eslint/js": "9.17.0",
+    "@types/react": "19.0.2",
+    "@types/react-dom": "19.0.2",
+    "@types/react-select": "5.0.1",
+    "@types/vscode-notebook-renderer": "^1.72.3",
+    "@typescript-eslint/eslint-plugin": "8.18.1",
+    "@typescript-eslint/parser": "8.18.1",
+    "console-browserify": "1.2.0",
+    "cross-env": "7.0.3",
+    "crypto-browserify": "3.12.0",
+    "css-loader": "7.1.2",
+    "eslint": "9.17.0",
+    "eslint-config-prettier": "9.1.0",
+    "eslint-plugin-import": "2.31.0",
+    "eslint-plugin-prettier": "5.2.1",
+    "eslint-plugin-react": "7.37.2",
+    "eslint-plugin-react-hooks": "5.1.0",
+    "license-check-and-add": "4.0.5",
+    "npm-run-all": "4.1.5",
+    "postcss": "8.4.49",
+    "postcss-scss": "4.0.9",
+    "prettier": "3.4.2",
+    "sass": "1.83.0",
+    "sass-loader": "14.0.0",
+    "stream-browserify": "3.0.0",
+    "style-loader": "1.2.1",
+    "stylelint": "16.12.0",
+    "stylelint-config-standard": "36.0.1",
+    "stylelint-scss": "6.10.0",
+    "ts-jest": "29.1.2",
+    "ts-loader": "9.5.1",
+    "typescript": "5.7.2",
+    "vm-browserify": "1.1.2"
+  },
+  "overrides": {
+    "react": "19.0.0",
+    "react-dom": "19.0.0"
+  },
+  "extensions": {
+    "applicationVSCodePlugin": "@finos/legend-application-vs-code-plugin-core"
+  }
+}
