@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import '../../../../style/index.scss';
+import '../../../style/index.scss';
 import {
   InstanceValueEditor,
   getDefaultValueForPrimitiveType,
