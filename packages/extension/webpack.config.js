@@ -20,10 +20,10 @@ const webpack = require('webpack');
 
 const webviewConfig = {
   entry: {
-    AgGridRenderer: './packages/client/src/components/grid/AgGridRenderer.tsx',
+    AgGridRenderer: '@finos/legend-engine-ide-client-vscode/src/components/grid/AgGridRenderer.tsx',
     FunctionResultsEditorRenderer:
-      './packages/client/src/components/function/FunctionResultsEditorRenderer.tsx',
-    WebViewRoot: './packages/client/src/components/WebViewRoot.tsx',
+      '@finos/legend-engine-ide-client-vscode/src/components/function/FunctionResultsEditorRenderer.tsx',
+    WebViewRoot: '@finos/legend-engine-ide-client-vscode/src/components/WebViewRoot.tsx',
   },
   externals: {
     vscode: 'commonjs vscode',
@@ -73,15 +73,16 @@ const webviewConfig = {
       vm: require.resolve('vm-browserify'),
     },
     alias: {
-      react: path.resolve('./node_modules/react'),
+      react: path.resolve(__dirname, '../../node_modules/react'),
       process: 'process/browser',
+      '@finos/legend-engine-ide-client-vscode': path.resolve(__dirname, '../../node_modules/@finos/legend-engine-ide-client-vscode'),
     },
   },
 };
 
 const purebookRendererConfig = {
   entry: {
-    PurebookRendererRoot: './packages/client/src/purebook/PurebookRendererRoot.tsx',
+    PurebookRendererRoot: '@finos/legend-engine-ide-client-vscode/src/purebook/PurebookRendererRoot.tsx',
   },
   externals: {
     vscode: 'commonjs vscode',
@@ -136,15 +137,16 @@ const purebookRendererConfig = {
       vm: require.resolve('vm-browserify'),
     },
     alias: {
-      react: path.resolve('./node_modules/react'),
+      react: path.resolve(__dirname, '../../node_modules/react'),
       process: 'process/browser',
+      '@finos/legend-engine-ide-client-vscode': path.resolve(__dirname, '../../node_modules/@finos/legend-engine-ide-client-vscode'),
     },
   },
 };
 
 const extensionConfig = {
   target: 'webworker',
-  entry: './src/extension/extension.ts',
+  entry: './src/extension.ts',
   output: {
     path: path.resolve(__dirname, 'dist'),
     filename: 'extension.js',
@@ -165,7 +167,7 @@ const extensionConfig = {
       assert: require.resolve('assert'),
     },
     alias: {
-      react: path.resolve('./node_modules/react'),
+      react: path.resolve(__dirname, '../../node_modules/react'),
     },
   },
   module: {
