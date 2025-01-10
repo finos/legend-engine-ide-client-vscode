@@ -17,9 +17,9 @@ Thumbs.db
 # Build
 npm-debug.log
 npm-debug.log*
-/build/
-/lib
-/dist
+**/build/
+**/lib
+**/dist
 
 # Dependencies
 **/node_modules
