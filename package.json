@@ -1,5 +1,6 @@
 {
   "name": "legend-engine-ide-client-vscode-root",
+  "version": "0.1.0",
   "private": true,
   "workspaces": [
     "packages/*"
@@ -26,9 +27,7 @@
     "lint:js": "cross-env eslint --cache --cache-location ./build/.eslintcache --report-unused-disable-directives --parser-options=project:\"./tsconfig.json\" \"./packages/**/src/**/*.{js,ts,tsx}\"",
     "lint:style": "stylelint --cache --cache-location ./build/.stylelintcache \"style/**/*.{scss,css}\" \"packages/**/style/*.scss\"",
     "fix:format": "prettier --write \"(scripts|docs)/**/*.{md,json,mjs,cjs,js,ts,tsx,html,scss,css}\" \"packages/**/src/**/*.{md,json,mjs,cjs,js,ts,tsx,html,scss,css}\"",
-    "mvn:downloadServerJar": "node ./scripts/maven/downloadLspServerJar.js",
-    "mvn:updateEngineVersion": "node ./scripts/maven/updateEngineVersion.js",
-    "mvn:prepare": "npm run mvn:downloadServerJar && npm run mvn:updateEngineVersion",
+    "mvn:prepare": "cd packages/extension && npm run mvn:prepare",
     "release:prepare": "npm run mvn:prepare && npm run bundle && vsce package -o legend-engine-ide-client-vscode.vsix",
     "release:marketPlace": "vsce publish -i legend-engine-ide-client-vscode.vsix",
     "release:openvsx": "ovsx publish -i legend-engine-ide-client-vscode.vsix"

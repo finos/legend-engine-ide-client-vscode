@@ -20,10 +20,12 @@ const webpack = require('webpack');
 
 const webviewConfig = {
   entry: {
-    AgGridRenderer: '@finos/legend-engine-ide-client-vscode/src/components/grid/AgGridRenderer.tsx',
+    AgGridRenderer:
+      '@finos/legend-engine-ide-client-vscode/src/components/grid/AgGridRenderer.tsx',
     FunctionResultsEditorRenderer:
       '@finos/legend-engine-ide-client-vscode/src/components/function/FunctionResultsEditorRenderer.tsx',
-    WebViewRoot: '@finos/legend-engine-ide-client-vscode/src/components/WebViewRoot.tsx',
+    WebViewRoot:
+      '@finos/legend-engine-ide-client-vscode/src/components/WebViewRoot.tsx',
   },
   externals: {
     vscode: 'commonjs vscode',
@@ -75,14 +77,18 @@ const webviewConfig = {
     alias: {
       react: path.resolve(__dirname, '../../node_modules/react'),
       process: 'process/browser',
-      '@finos/legend-engine-ide-client-vscode': path.resolve(__dirname, '../../node_modules/@finos/legend-engine-ide-client-vscode'),
+      '@finos/legend-engine-ide-client-vscode': path.resolve(
+        __dirname,
+        '../../node_modules/@finos/legend-engine-ide-client-vscode',
+      ),
     },
   },
 };
 
 const purebookRendererConfig = {
   entry: {
-    PurebookRendererRoot: '@finos/legend-engine-ide-client-vscode/src/purebook/PurebookRendererRoot.tsx',
+    PurebookRendererRoot:
+      '@finos/legend-engine-ide-client-vscode/src/purebook/PurebookRendererRoot.tsx',
   },
   externals: {
     vscode: 'commonjs vscode',
@@ -139,7 +145,10 @@ const purebookRendererConfig = {
     alias: {
       react: path.resolve(__dirname, '../../node_modules/react'),
       process: 'process/browser',
-      '@finos/legend-engine-ide-client-vscode': path.resolve(__dirname, '../../node_modules/@finos/legend-engine-ide-client-vscode'),
+      '@finos/legend-engine-ide-client-vscode': path.resolve(
+        __dirname,
+        '../../node_modules/@finos/legend-engine-ide-client-vscode',
+      ),
     },
   },
 };
@@ -161,6 +170,10 @@ const extensionConfig = {
   resolve: {
     mainFields: ['browser', 'module', 'main'],
     extensions: ['.tsx', '.ts', '.js', '.css', '.scss'],
+    // modules: [
+    //   path.resolve(__dirname, 'src'),
+    //   path.resolve(__dirname, '../shared/src'),
+    // ],
     fallback: {
       // see https://webpack.js.org/configuration/resolve/#resolvefallback
       console: require.resolve('console-browserify'),
@@ -168,12 +181,22 @@ const extensionConfig = {
     },
     alias: {
       react: path.resolve(__dirname, '../../node_modules/react'),
+      // '@finos/legend-engine-ide-client-vscode-shared': path.resolve(__dirname, '../../node_modules/@finos/legend-engine-ide-client-vscode-shared'),
+      '@finos/legend-engine-ide-client-vscode-shared': path.resolve(
+        __dirname,
+        '../shared/lib',
+      ),
     },
+    symlinks: false,
   },
   module: {
     rules: [
       {
         test: /\.tsx?$/,
+        // include: [
+        //   path.resolve(__dirname, 'src'),
+        //   path.resolve(__dirname, '../shared/src'),
+        // ],
         exclude: /node_modules/,
         use: [
           {
@@ -195,4 +218,4 @@ const extensionConfig = {
   },
 };
 
-module.exports = [webviewConfig, purebookRendererConfig, extensionConfig];
+module.exports = [ extensionConfig];
