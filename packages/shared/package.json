@@ -16,7 +16,7 @@
   "module": "lib/index.js",
   "types": "lib/index.d.ts",
   "scripts": {
-    "compile": "tsc -b",
+    "compile": "tsc",
     "dev": "npm run dev:ts",
     "dev:setup": "npm run release:prepare",
     "dev:ts": "tsc -b --watch",
