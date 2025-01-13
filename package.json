@@ -1,8 +1,39 @@
 {
   "name": "legend-engine-ide-client-vscode-root",
   "private": true,
-  "type": "module",
   "workspaces": [
     "packages/*"
-  ]
+  ],
+  "scripts": {
+    "test": "cd extension && npm run build && node ./lib/__tests__/runTest.js",
+    "compile": "npm-run-all --parallel compile:shared compile:client compile:extension",
+    "compile:shared": "cd packages/shared && npm run compile",
+    "compile:client": "cd packages/client && npm run compile",
+    "compile:extension": "cd packages/extension && npm run compile",
+    "dev:webpack": "cd packages/extension && webpack --mode development --watch",
+    "webpack": "cd packages/extension && webpack --mode development",
+    "webpack:package": "cd packages/extension && webpack --mode production --devtool hidden-source-map",
+    "build": "npm run compile && npm run webpack",
+    "bundle": "npm run compile && npm run webpack:package",
+    "check:copyright": "npm-run-all --parallel check:copyright:shared check:copyright:client check:copyright:extension",
+    "check:copyright:shared": "cd packages/shared && npm run check:copyright",
+    "check:copyright:client": "cd packages/client && npm run check:copyright",
+    "check:copyright:extensino": "cd packages/extension && npm run check:copyright",
+    "check:format": "prettier --list-different \"(scripts|docs)/**/*.{md,json,mjs,cjs,js,ts,tsx,html,scss,css}\" \"packages/**/src/**/*.{md,json,mjs,cjs,js,ts,tsx,html,scss,css}\"",
+    "check:ci": "npm run check:format && npm run check:copyright",
+    "lint": "npm run lint:js && npm run lint:style",
+    "lint:ci": "npm run lint:js --max-warnings=0 && npm run lint:style --max-warnings=0",
+    "lint:js": "cross-env eslint --cache --cache-location ./build/.eslintcache --report-unused-disable-directives --parser-options=project:\"./tsconfig.json\" \"./packages/**/src/**/*.{js,ts,tsx}\"",
+    "lint:style": "stylelint --cache --cache-location ./build/.stylelintcache \"style/**/*.{scss,css}\" \"packages/**/style/*.scss\"",
+    "fix:format": "prettier --write \"(scripts|docs)/**/*.{md,json,mjs,cjs,js,ts,tsx,html,scss,css}\" \"packages/**/src/**/*.{md,json,mjs,cjs,js,ts,tsx,html,scss,css}\"",
+    "mvn:downloadServerJar": "node ./scripts/maven/downloadLspServerJar.js",
+    "mvn:updateEngineVersion": "node ./scripts/maven/updateEngineVersion.js",
+    "mvn:prepare": "npm run mvn:downloadServerJar && npm run mvn:updateEngineVersion",
+    "release:prepare": "npm run mvn:prepare && npm run bundle && vsce package -o legend-engine-ide-client-vscode.vsix",
+    "release:marketPlace": "vsce publish -i legend-engine-ide-client-vscode.vsix",
+    "release:openvsx": "ovsx publish -i legend-engine-ide-client-vscode.vsix"
+  },
+  "devDependencies": {
+    "npm-run-all": "4.1.5"
+  }
 }
