@@ -7,7 +7,7 @@
   ],
   "scripts": {
     "test": "cd extension && npm run build && node ./lib/__tests__/runTest.js",
-    "compile": "npm-run-all --parallel compile:shared compile:client compile:extension",
+    "compile": "npm run compile:shared && npm-run-all --parallel compile:client compile:extension",
     "compile:shared": "cd packages/shared && npm run compile",
     "compile:client": "cd packages/client && npm run compile",
     "compile:extension": "cd packages/extension && npm run compile",

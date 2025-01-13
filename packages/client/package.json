@@ -10,7 +10,10 @@
   "sideEffects": false,
   "type": "module",
   "exports": {
-    ".": "./lib/index.js"
+    ".": "./lib/index.js",
+    "./AgGridRenderer": "./src/components/grid/AgGridRenderer.tsx",
+    "./FunctionResultsEditorRenderer": "./src/components/function/FunctionResultsEditorRenderer.tsx",
+    "./WebViewRoot": "./lib/components/WebViewRoot.js"
   },
   "module": "lib/index.js",
   "types": "lib/index.d.ts",
