@@ -20,12 +20,12 @@ const webpack = require('webpack');
 
 const webviewConfig = {
   entry: {
-    AgGridRenderer:
-      '@finos/legend-engine-ide-client-vscode/src/components/grid/AgGridRenderer.tsx',
-    FunctionResultsEditorRenderer:
-      '@finos/legend-engine-ide-client-vscode/src/components/function/FunctionResultsEditorRenderer.tsx',
+    // AgGridRenderer:
+    //   '@finos/legend-engine-ide-client-vscode/AgGridRenderer',
+    // FunctionResultsEditorRenderer:
+    //   '@finos/legend-engine-ide-client-vscode/FunctionResultsEditorRenderer',
     WebViewRoot:
-      '@finos/legend-engine-ide-client-vscode/src/components/WebViewRoot.tsx',
+      '../client/src/components/WebViewRoot.tsx',
   },
   externals: {
     vscode: 'commonjs vscode',
@@ -77,10 +77,6 @@ const webviewConfig = {
     alias: {
       react: path.resolve(__dirname, '../../node_modules/react'),
       process: 'process/browser',
-      '@finos/legend-engine-ide-client-vscode': path.resolve(
-        __dirname,
-        '../../node_modules/@finos/legend-engine-ide-client-vscode',
-      ),
     },
   },
 };
@@ -144,11 +140,7 @@ const purebookRendererConfig = {
     },
     alias: {
       react: path.resolve(__dirname, '../../node_modules/react'),
-      process: 'process/browser',
-      '@finos/legend-engine-ide-client-vscode': path.resolve(
-        __dirname,
-        '../../node_modules/@finos/legend-engine-ide-client-vscode',
-      ),
+      process: 'process/browser.js',
     },
   },
 };
@@ -170,10 +162,6 @@ const extensionConfig = {
   resolve: {
     mainFields: ['browser', 'module', 'main'],
     extensions: ['.tsx', '.ts', '.js', '.css', '.scss'],
-    // modules: [
-    //   path.resolve(__dirname, 'src'),
-    //   path.resolve(__dirname, '../shared/src'),
-    // ],
     fallback: {
       // see https://webpack.js.org/configuration/resolve/#resolvefallback
       console: require.resolve('console-browserify'),
@@ -181,13 +169,7 @@ const extensionConfig = {
     },
     alias: {
       react: path.resolve(__dirname, '../../node_modules/react'),
-      // '@finos/legend-engine-ide-client-vscode-shared': path.resolve(__dirname, '../../node_modules/@finos/legend-engine-ide-client-vscode-shared'),
-      '@finos/legend-engine-ide-client-vscode-shared': path.resolve(
-        __dirname,
-        '../shared/lib',
-      ),
     },
-    symlinks: false,
   },
   module: {
     rules: [
@@ -218,4 +200,4 @@ const extensionConfig = {
   },
 };
 
-module.exports = [ extensionConfig];
+module.exports = [extensionConfig, webviewConfig];
