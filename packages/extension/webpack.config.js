@@ -20,12 +20,10 @@ const webpack = require('webpack');
 
 const webviewConfig = {
   entry: {
-    // AgGridRenderer:
-    //   '@finos/legend-engine-ide-client-vscode/AgGridRenderer',
-    // FunctionResultsEditorRenderer:
-    //   '@finos/legend-engine-ide-client-vscode/FunctionResultsEditorRenderer',
-    WebViewRoot:
-      '../client/src/components/WebViewRoot.tsx',
+    AgGridRenderer: '../client/src/components/grid/AgGridRenderer',
+    FunctionResultsEditorRenderer:
+      '../client/src/components/function/FunctionResultsEditorRenderer',
+    WebViewRoot: '../client/src/components/WebViewRoot.tsx',
   },
   externals: {
     vscode: 'commonjs vscode',
@@ -45,10 +43,7 @@ const webviewConfig = {
       },
       {
         test: /\.s?(a|c)ss$/,
-        use: [
-          'style-loader',
-          'css-loader',
-        ],
+        use: ['style-loader', 'css-loader'],
       },
       {
         test: /\.(woff|woff2|eot|ttf|otf)$/i,
@@ -80,8 +75,7 @@ const webviewConfig = {
 
 const purebookRendererConfig = {
   entry: {
-    PurebookRendererRoot:
-      '@finos/legend-engine-ide-client-vscode/src/purebook/PurebookRendererRoot.tsx',
+    PurebookRendererRoot: '../client/src/purebook/PurebookRendererRoot.tsx',
   },
   externals: {
     vscode: 'commonjs vscode',
@@ -106,13 +100,7 @@ const purebookRendererConfig = {
       },
       {
         test: /\.s?(a|c)ss$/,
-        use: [
-          'style-loader',
-          'css-loader',
-          {
-            loader: 'sass-loader',
-          },
-        ],
+        use: ['style-loader', 'css-loader'],
       },
       {
         test: /\.(woff|woff2|eot|ttf|otf)$/i,
@@ -137,7 +125,7 @@ const purebookRendererConfig = {
     },
     alias: {
       react: path.resolve(__dirname, '../../node_modules/react'),
-      process: 'process/browser.js',
+      process: 'process/browser',
     },
   },
 };
@@ -197,4 +185,4 @@ const extensionConfig = {
   },
 };
 
-module.exports = [extensionConfig, webviewConfig];
+module.exports = [extensionConfig, webviewConfig, purebookRendererConfig];
