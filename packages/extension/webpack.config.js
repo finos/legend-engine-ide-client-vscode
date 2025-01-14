@@ -48,9 +48,6 @@ const webviewConfig = {
         use: [
           'style-loader',
           'css-loader',
-          {
-            loader: 'sass-loader',
-          },
         ],
       },
       {
