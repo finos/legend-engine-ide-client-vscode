@@ -160,10 +160,6 @@ const extensionConfig = {
     rules: [
       {
         test: /\.tsx?$/,
-        // include: [
-        //   path.resolve(__dirname, 'src'),
-        //   path.resolve(__dirname, '../shared/src'),
-        // ],
         exclude: /node_modules/,
         use: [
           {
