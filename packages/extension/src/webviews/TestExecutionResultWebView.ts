@@ -56,7 +56,10 @@ import type { LegendWebViewProvider } from '../utils/LegendWebViewProvider';
 import { type PlainObject } from '@finos/legend-vscode-extension-dependencies';
 import * as path from 'path';
 import { FunctionLegendExecutionResult } from '../model/FunctionLegendExecutionResult';
-import { textIntervalToRange, textLocationToUri } from '../utils/TextLocationUtils';
+import {
+  textIntervalToRange,
+  textLocationToUri,
+} from '../utils/TextLocationUtils';
 
 const renderTDSResultMessage = (
   legendExecutionResult: LegendExecutionResult,
@@ -75,7 +78,13 @@ const renderTDSResultMessage = (
   }));
   const rowData = getTDSRowData(tds);
   const webviewScriptPath = Uri.file(
-    path.join(extensionPath, 'dist', 'AgGridRenderer.js'),
+    path.join(
+      extensionPath,
+      'packages',
+      'extension',
+      'dist',
+      'AgGridRenderer.js',
+    ),
   );
 
   const webviewScript = webview.asWebviewUri(webviewScriptPath);
