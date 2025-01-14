@@ -43,7 +43,7 @@ const webviewConfig = {
       },
       {
         test: /\.s?(a|c)ss$/,
-        use: ['style-loader', 'css-loader'],
+        use: ['style-loader', 'css-loader', { loader: 'sass-loader' }],
       },
       {
         test: /\.(woff|woff2|eot|ttf|otf)$/i,
