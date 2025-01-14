@@ -26,12 +26,7 @@
     "forceConsistentCasingInFileNames": true,
     "useDefineForClassFields": true
   },
-  "include": [
-    "src",
-    "./.eslint.config.mjs",
-  ],
+  "include": ["src", "./.eslint.config.mjs"],
   "exclude": ["node_modules", ".vscode-test"],
-  "references": [
-    { "path": "../shared" }
-  ]
+  "references": [{ "path": "../shared" }]
 }
