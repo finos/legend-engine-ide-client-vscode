@@ -15,7 +15,7 @@
  */
 
 import { babel } from '@rollup/plugin-babel';
-import resolve, { nodeResolve } from '@rollup/plugin-node-resolve';
+import resolve from '@rollup/plugin-node-resolve';
 import terser from '@rollup/plugin-terser';
 import json from '@rollup/plugin-json';
 import flow from 'rollup-plugin-flow';
@@ -31,9 +31,9 @@ export default {
   external: [
     '@jest/globals',
     'react-dom/server',
-    'vscode',
-    '@types/vscode',
-    'node_modules/@types/vscode',
+    // 'vscode',
+    // '@types/vscode',
+    // 'node_modules/@types/vscode',
   ],
   output: [
     {
@@ -41,20 +41,16 @@ export default {
       format: 'cjs',
       sourcemap: false,
       inlineDynamicImports: true,
-      // plugins: [terser()],
+      plugins: [terser()],
       globals: {
         'react/jsx-runtime': 'jsxRuntime',
         'react-dom/client': 'ReactDOM',
         react: 'React',
-        'vscode': 'vscode',
       },
     },
   ],
   plugins: [
-    nodeResolve({ rootDir: path.resolve('../..'), extensions: ['.ts', '.d.ts'] }),
-    commonjs({
-      exclude: ['vscode', '@types/vscode', 'node_modules/@types/vscode'],
-    }),
+    commonjs(),
     postcss({
       use: ['sass'],
       extensions: ['.css', '.scss'],
