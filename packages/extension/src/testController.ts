@@ -28,6 +28,11 @@ import type { LegendLanguageClient } from './LegendLanguageClient';
 import { LegendTest } from './model/LegendTest';
 import { LegendExecutionResultType } from '@finos/legend-engine-ide-client-vscode-shared';
 import { LegendTestExecutionResult } from './model/LegendTestExecutionResult';
+import {
+  textIntervalToRange,
+  textLocationToLocation,
+  textLocationToUri,
+} from './utils/TextLocationUtils';
 
 type TestTuple = { legendTest: LegendTest; testItem: TestItem };
 
@@ -112,8 +117,11 @@ function executeTests(
                       };
                     }
 
-                    if (assertion.location?.toLocation()) {
-                      msg.location = assertion.location.toLocation();
+                    if (
+                      assertion.location &&
+                      textLocationToLocation(assertion.location)
+                    ) {
+                      msg.location = textLocationToLocation(assertion.location);
                     }
 
                     return msg;
@@ -148,9 +156,9 @@ function legendTestToTestItem(
   const testItem = controller.createTestItem(
     legendTest.id,
     legendTest.label,
-    legendTest.location.uri(),
+    textLocationToUri(legendTest.location),
   );
-  testItem.range = legendTest.location.textInterval.toRange();
+  testItem.range = textIntervalToRange(legendTest.location.textInterval);
   testItem.children.replace(
     legendTest.children.map((childLegendTest) =>
       legendTestToTestItem(controller, testIdToCommand, childLegendTest),

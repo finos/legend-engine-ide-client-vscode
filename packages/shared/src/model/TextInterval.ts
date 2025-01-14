@@ -14,24 +14,16 @@
  * limitations under the License.
  */
 
-import { Range, Position } from 'vscode';
-import { createModelSchema } from 'serializr';
 import {
-  usingModelSchema,
   SerializationFactory,
-} from '../utils/SerializationUtils';
+  usingModelSchema,
+} from '@finos/legend-vscode-extension-dependencies';
 import { TextPosition } from './TextPosition';
+import { createModelSchema } from 'serializr';
 
 export class TextInterval {
   start!: TextPosition;
   end!: TextPosition;
-
-  toRange(): Range {
-    return new Range(
-      new Position(this.start.line, this.start.column),
-      new Position(this.end.line, this.end.column + 1),
-    );
-  }
 
   static readonly serialization = new SerializationFactory(
     createModelSchema(TextInterval, {

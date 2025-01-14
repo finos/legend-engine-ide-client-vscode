@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-import { Uri, Location } from 'vscode';
 import { createModelSchema, primitive } from 'serializr';
 import {
   usingModelSchema,
@@ -25,14 +24,6 @@ import { TextInterval } from './TextInterval';
 export class TextLocation {
   documentId!: string;
   textInterval!: TextInterval;
-
-  uri(): Uri {
-    return Uri.parse(this.documentId);
-  }
-
-  toLocation(): Location {
-    return new Location(this.uri(), this.textInterval.toRange());
-  }
 
   static readonly serialization = new SerializationFactory(
     createModelSchema(TextLocation, {
