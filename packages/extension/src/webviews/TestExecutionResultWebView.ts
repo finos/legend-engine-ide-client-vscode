@@ -56,6 +56,7 @@ import type { LegendWebViewProvider } from '../utils/LegendWebViewProvider';
 import { type PlainObject } from '@finos/legend-vscode-extension-dependencies';
 import * as path from 'path';
 import { FunctionLegendExecutionResult } from '../model/FunctionLegendExecutionResult';
+import { textIntervalToRange, textLocationToUri } from '../utils/TextLocationUtils';
 
 const renderTDSResultMessage = (
   legendExecutionResult: LegendExecutionResult,
@@ -216,8 +217,10 @@ export const renderTestResults = (
       command: SHOW_RESULTS_COMMAND_ID,
       arguments: [
         renderResultMessage(r, uri, extensionPath, webview),
-        r.location?.uri(),
-        r.location?.textInterval.toRange(),
+        r.location ? textLocationToUri(r.location) : undefined,
+        r.location?.textInterval
+          ? textIntervalToRange(r.location.textInterval)
+          : undefined,
       ],
     };
 

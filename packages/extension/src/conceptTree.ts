@@ -43,6 +43,7 @@ import {
 } from 'vscode-languageclient';
 import type { LegendEntity } from './model/LegendEntity';
 import { LEGEND_LANGUAGE_ID } from '@finos/legend-engine-ide-client-vscode-shared';
+import { textLocationToLocation } from './utils/TextLocationUtils';
 
 const TREE_ID = 'legendConceptTree';
 const MIME_TYPE = `application/vnd.code.tree.${TREE_ID.toLowerCase()}`;
@@ -304,7 +305,7 @@ export class LegendConceptTreeProvider
       name,
       entity.path,
       entity.classifierPath,
-      entity.location.toLocation(),
+      textLocationToLocation(entity.location),
     );
     currParent.childrenMap.set(name, element);
   }
