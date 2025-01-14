@@ -31,9 +31,6 @@ export default {
   external: [
     '@jest/globals',
     'react-dom/server',
-    // 'vscode',
-    // '@types/vscode',
-    // 'node_modules/@types/vscode',
   ],
   output: [
     {
