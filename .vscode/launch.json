@@ -6,14 +6,16 @@
   "configurations": [
     {
       "args": [
-        "--extensionDevelopmentPath=${workspaceFolder}/packages/extension"
+        "--extensionDevelopmentPath=${workspaceFolder}"
       ],
       "name": "Launch Extension",
       "outFiles": [
         "${workspaceFolder}/packages/extension/dist/**/*.js"
       ],
+      "runtimeExecutable": "${execPath}",
       "request": "launch",
-      "type": "extensionHost"
+      "type": "extensionHost",
+      "localRoot": "${workspaceFolder}"
     }
   ]
 }
