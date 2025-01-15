@@ -16,7 +16,7 @@
     "compile:extension": "cd packages/extension && yarn compile",
     "dev:webpack": "cd packages/extension && yarn dev:webpack",
     "webpack": "cd packages/extension && yarn webpack",
-    "webpack:package": "cd packages/extension && webpack:package",
+    "webpack:package": "cd packages/extension && yarn webpack:package",
     "build": "yarn compile && yarn webpack",
     "bundle": "yarn compile && yarn bundle:shared",
     "bundle:shared": "cd packages/shared && yarn bundle",
@@ -33,9 +33,12 @@
     "lint:style": "stylelint --cache --cache-location ./build/.stylelintcache \"style/**/*.{scss,css}\" \"packages/**/style/*.scss\"",
     "fix:format": "prettier --write \"(scripts|docs)/**/*.{md,json,mjs,cjs,js,ts,tsx,html,scss,css}\" \"packages/**/src/**/*.{md,json,mjs,cjs,js,ts,tsx,html,scss,css}\"",
     "mvn:prepare": "cd packages/extension && yarn mvn:prepare",
-    "release:prepare": "yarn mvn:prepare && yarn bundle && yarn webpack:package && cd packages/extension && vsce package -o legend-engine-ide-client-vscode.vsix",
+    "release:dry-run": "yarn mvn:prepare && yarn bundle && yarn webpack:package && cd packages/extension && yarn dlx @vscode/vsce ls",
+    "release:prepare": "yarn mvn:prepare && yarn bundle && yarn webpack:package && cd packages/extension && yarn dlx @vscode/vsce package -o legend-engine-ide-client-vscode.vsix",
     "release:marketPlace": "vsce publish -i legend-engine-ide-client-vscode.vsix",
-    "release:openvsx": "ovsx publish -i legend-engine-ide-client-vscode.vsix"
+    "release:openvsx": "ovsx publish -i legend-engine-ide-client-vscode.vsix",
+    "release:client:dry-run": "cd packages/client && yarn pack --dry-run",
+    "release:client": "cd packages/client && yarn npm publish --access=public"
   },
   "devDependencies": {
     "npm-run-all": "4.1.5"
