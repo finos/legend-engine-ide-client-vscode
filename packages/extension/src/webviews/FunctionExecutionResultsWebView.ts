@@ -40,8 +40,6 @@ export const renderFunctionResultsWebView = (
   const functionResultsEditorScriptPath = Uri.file(
     path.join(
       context.extensionPath,
-      'packages',
-      'extension',
       'dist',
       'FunctionResultsEditorRenderer.js',
     ),

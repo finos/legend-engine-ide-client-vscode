@@ -50,8 +50,6 @@ export const getWebviewHtml = (
     const webviewRootScriptPath = Uri.file(
       path.join(
         context.extensionPath,
-        'packages',
-        'extension',
         'dist',
         'WebViewRoot.js',
       ),
