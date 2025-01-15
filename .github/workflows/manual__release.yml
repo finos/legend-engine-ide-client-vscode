@@ -35,25 +35,24 @@ jobs:
           distribution: 'temurin'
           java-version: 21
           java-package: jdk
-      - name: Prepare for new release
+      - name: Prepare for new release (dry-run)
         run: |
             yarn workspaces foreach --all run version ${{ github.event.inputs.bump_type }}
             git add packages/**/package.json
             git commit -m "${{ github.event.inputs.bump_type }}: bump versions and release"
-            git push origin main                 
-      - name: Install dependencies and build project
+            git push origin feature-publish-npm                 
+      - name: Install dependencies and build project (dry-run)
         run: |
           yarn install
-          yarn compile
-          yarn release:prepare
-      - name: Publish to VS Code Marketplace        
-        run: yarn dlx -p @vscode/vsce release:marketPlace
-        env:
-          VSCE_PAT: ${{ secrets.VSCE_PAT }}
+          yarn release:dry-run
+      # - name: Publish to VS Code Marketplace        
+      #   run: yarn release:marketPlace
+      #   env:
+      #     VSCE_PAT: ${{ secrets.VSCE_PAT }}
       # - name: Publish to OpenVSX Marketplace
       #   run: yarn dlx -p ovsx release:openvsx -- -p ${{ secrets.OVSX_TOKEN }}
-      - name: Publish to NPM
-        run: yarn npm publish --access=public
+      - name: Publish to NPM (dry-run)
+        run: yarn release:client:dry-run
         env:
           GITHUB_TOKEN: ${{ secrets.FINOS_GITHUB_TOKEN }}
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
