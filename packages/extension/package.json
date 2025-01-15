@@ -2,6 +2,9 @@
   "name": "legend-engine-ide-client-vscode-extension-src",
   "private": true,
   "type": "commonjs",
+  "installConfig": {
+    "hoistingLimits": "workspaces"
+  },
   "scripts": {
     "test": "npm run build && node ./lib/extension/__tests__/runTest.js",
     "compile": "tsc -b",
