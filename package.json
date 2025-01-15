@@ -33,7 +33,7 @@
     "lint:style": "stylelint --cache --cache-location ./build/.stylelintcache \"style/**/*.{scss,css}\" \"packages/**/style/*.scss\"",
     "fix:format": "prettier --write \"(scripts|docs)/**/*.{md,json,mjs,cjs,js,ts,tsx,html,scss,css}\" \"packages/**/src/**/*.{md,json,mjs,cjs,js,ts,tsx,html,scss,css}\"",
     "mvn:prepare": "cd packages/extension && yarn mvn:prepare",
-    "release:prepare": "yarn mvn:prepare && yarn bundle && vsce package -o legend-engine-ide-client-vscode.vsix",
+    "release:prepare": "yarn mvn:prepare && yarn bundle && yarn webpack:package && cd packages/extension && vsce package -o legend-engine-ide-client-vscode.vsix",
     "release:marketPlace": "vsce publish -i legend-engine-ide-client-vscode.vsix",
     "release:openvsx": "ovsx publish -i legend-engine-ide-client-vscode.vsix"
   },
