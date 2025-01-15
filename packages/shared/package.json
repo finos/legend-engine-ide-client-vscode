@@ -20,11 +20,7 @@
   "types": "lib/index.d.ts",
   "scripts": {
     "compile": "tsc -b --force",
-    "dev": "yarn dev:ts",
-    "dev:setup": "yarn release:prepare",
-    "dev:ts": "tsc -b --watch",
-    "build": "yarn compile",
-    "bundle": "yarn clean && yarn build && rollup -c && echo '{\"type\": \"commonjs\"}' > lib/bundles/package.json",
+    "bundle": "yarn clean && yarn compile && rollup -c && echo '{\"type\": \"commonjs\"}' > lib/bundles/package.json",
     "clean": "rm -rf \"build\" && rm -rf \"lib\"",
     "check:copyright": "license-check-and-add check -f license-check-and-add-config.json",
     "check:format": "prettier --list-different \"(scripts|docs)/**/*.{md,json,mjs,cjs,js,ts,tsx,html,scss,css}\" \"src/**/*.{md,json,mjs,cjs,js,ts,tsx,html,scss,css}\"",

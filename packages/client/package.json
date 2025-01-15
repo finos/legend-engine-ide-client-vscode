@@ -19,11 +19,6 @@
   "types": "lib/index.d.ts",
   "scripts": {
     "compile": "tsc -b",
-    "dev": "yarn dev:ts",
-    "dev:setup": "yarn release:prepare",
-    "dev:ts": "tsc -b --watch",
-    "build": "yarn compile",
-    "bundle": "yarn compile",
     "check:copyright": "license-check-and-add check -f license-check-and-add-config.json",
     "check:format": "prettier --list-different \"(scripts|docs)/**/*.{md,json,mjs,cjs,js,ts,tsx,html,scss,css}\" \"src/**/*.{md,json,mjs,cjs,js,ts,tsx,html,scss,css}\"",
     "check:ci": "yarn check:format && yarn check:copyright",
