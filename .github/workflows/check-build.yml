@@ -56,7 +56,7 @@ jobs:
         run: |
           yarn release:prepare
           mkdir artifacts
-          cp legend-engine-ide-client-vscode.vsix artifacts/legend-engine-ide-client-vscode.vsix
+          cp ./packages/extension/legend-engine-ide-client-vscode.vsix artifacts/legend-engine-ide-client-vscode.vsix
 
       - name: Upload artifact
         uses: actions/upload-artifact@v3
