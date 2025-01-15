@@ -19,8 +19,8 @@
     "check:copyright": "yarn workspaces foreach --all run check:copyright",
     "check:format": "yarn workspaces foreach --all run check:format",
     "check:ci": "yarn check:format && yarn check:copyright",
-    "lint": "yarn lint:js && yarn lint:style",
-    "lint:ci": "yarn lint:js --max-warnings=0 && yarn lint:style --max-warnings=0",
+    "lint": "npm-run-all --parallel lint:js lint:style",
+    "lint:ci": "npm-run-all --parallel lint:js --max-warnings=0 lint:style --max-warnings=0",
     "lint:js": "yarn workspaces foreach --all run lint:js",
     "lint:style": "yarn workspaces foreach --all run lint:style",
     "fix:format": "yarn workspaces foreach --all run fix:format",
@@ -33,7 +33,7 @@
     "release:client": "yarn workspace @finos/legend-engine-ide-client-vscode yarn npm publish --access=public"
   },
   "devDependencies": {
-    "npm-run-all": "4.1.5"
+    "npm-run-all": "^4.1.5"
   },
   "packageManager": "yarn@4.6.0"
 }

@@ -13410,7 +13410,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "legend-engine-ide-client-vscode-root@workspace:."
   dependencies:
-    npm-run-all: "npm:4.1.5"
+    npm-run-all: "npm:^4.1.5"
   languageName: unknown
   linkType: soft
 
@@ -15683,7 +15683,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"npm-run-all@npm:4.1.5":
+"npm-run-all@npm:4.1.5, npm-run-all@npm:^4.1.5":
   version: 4.1.5
   resolution: "npm-run-all@npm:4.1.5"
   dependencies:
