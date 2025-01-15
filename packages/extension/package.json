@@ -370,7 +370,8 @@
     "mvn:prepare": "yarn mvn:downloadServerJar && yarn mvn:updateEngineVersion",
     "release:prepare": "yarn mvn:prepare && yarn bundle && vsce package -o legend-engine-ide-client-vscode.vsix",
     "release:marketPlace": "vsce publish -i legend-engine-ide-client-vscode.vsix",
-    "release:openvsx": "ovsx publish -i legend-engine-ide-client-vscode.vsix"
+    "release:openvsx": "ovsx publish -i legend-engine-ide-client-vscode.vsix",
+    "version": "yarn version"
   },
   "dependencies": {
     "@finos/legend-engine-ide-client-vscode-shared": "workspace:*",
