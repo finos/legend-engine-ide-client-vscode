@@ -44,6 +44,10 @@ jobs:
           java-version: 21
           java-package: jdk
 
+      - name: Set up yarn
+        run: |
+          corepack enable
+
       - name: Install dependencies
         run: |
           yarn install

@@ -35,6 +35,9 @@ jobs:
           distribution: 'temurin'
           java-version: 21
           java-package: jdk
+      - name: Set up yarn
+        run: |
+          corepack enable
       - name: Prepare for new release (dry-run)
         run: |
             yarn workspaces foreach --all run version ${{ github.event.inputs.bump_type }}
