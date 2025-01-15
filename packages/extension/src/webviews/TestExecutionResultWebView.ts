@@ -80,8 +80,6 @@ const renderTDSResultMessage = (
   const webviewScriptPath = Uri.file(
     path.join(
       extensionPath,
-      'packages',
-      'extension',
       'dist',
       'AgGridRenderer.js',
     ),

@@ -139,7 +139,7 @@ export function createClient(context: ExtensionContext): LanguageClient {
   params.push('-jar');
   params.push(
     context.asAbsolutePath(
-      path.join('packages', 'extension', 'server', 'legend-engine-ide-lsp-server-shaded.jar'),
+      path.join('server', 'legend-engine-ide-lsp-server-shaded.jar'),
     ),
   );
   params.push(context.asAbsolutePath(path.join('server', 'pom.xml')));
