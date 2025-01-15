@@ -31,7 +31,7 @@ npm-debug.log*
 /server/legend_extension_pom*.xml
 
 # Test
-/.vscode-test/
+**/.vscode-test/
 
 # Yarn
 # See https://yarnpkg.com/getting-started/qa#which-files-should-be-gitignored

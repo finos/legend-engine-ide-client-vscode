@@ -351,7 +351,7 @@
     }
   },
   "scripts": {
-    "test": "yarn build && yarn node ./lib/extension/__tests__/runTest.js",
+    "test": "yarn compile && yarn node ./lib/__tests__/runTest.js",
     "compile": "tsc -b",
     "dev": "npm-run-all --parallel dev:ts dev:webpack",
     "dev:setup": "yarn release:prepare",
@@ -406,6 +406,7 @@
     "eslint-plugin-prettier": "5.2.1",
     "license-check-and-add": "4.0.5",
     "maven": "5.0.0",
+    "mocha": "10.2.0",
     "npm-run-all": "4.1.5",
     "prettier": "3.4.2",
     "process": "0.11.10",
