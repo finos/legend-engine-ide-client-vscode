@@ -66,6 +66,7 @@
     "eslint-plugin-react": "7.37.2",
     "eslint-plugin-react-hooks": "5.1.0",
     "license-check-and-add": "4.0.5",
+    "postcss-scss": "4.0.9",
     "prettier": "3.4.2",
     "stream-browserify": "3.0.0",
     "stylelint": "16.12.0",
