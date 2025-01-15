@@ -32,3 +32,13 @@ npm-debug.log*
 
 # Test
 /.vscode-test/
+
+# Yarn
+# See https://yarnpkg.com/getting-started/qa#which-files-should-be-gitignored
+.yarn/*
+!.yarn/releases
+!.yarn/plugins
+!.yarn/sdks
+!.yarn/versions
+!.yarn/constraints.pro
+.pnp.*

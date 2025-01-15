@@ -386,5 +386,6 @@
   "activationEvents": [
     "onLanguage:legend",
     "workspaceContains:**/*.pure"
-  ]
+  ],
+  "packageManager": "yarn@4.6.0"
 }
