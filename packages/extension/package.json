@@ -4,6 +4,10 @@
   "type": "commonjs",
   "displayName": "Legend",
   "description": "Legend Language Support (parse, compile, execute)",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/finos/legend-engine-ide-client-vscode.git"
+  },
   "categories": [
     "Programming Languages",
     "Linters",
