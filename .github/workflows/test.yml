@@ -54,5 +54,5 @@ jobs:
 
       - name: Run tests
         run: |
-          xvfb-run -a yarn test        
+          xvfb-run -a yarn run test        
             
