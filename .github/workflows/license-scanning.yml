@@ -21,6 +21,9 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
+      - name: Set up yarn
+        run: |
+          corepack enable
       - run: yarn install --immutable
         working-directory: .
       - run: yarn dlx node-license-validator . --allow-licenses Apache Apache-2.0 MIT BSD-2-Clause BSD BSD-3-Clause Unlicense
