@@ -35,7 +35,7 @@
   },
   "dependencies": {
     "@finos/legend-engine-ide-client-vscode-shared": "*",
-    "@finos/legend-vscode-extension-dependencies": "4.0.54",
+    "@finos/legend-vscode-extension-dependencies": "4.0.57",
     "ag-grid-community": "33.0.2",
     "ag-grid-enterprise": "33.0.2",
     "ag-grid-react": "33.0.2",

@@ -30,7 +30,7 @@
   },
   "dependencies": {
     "@finos/legend-engine-ide-client-vscode-shared": "*",
-    "@finos/legend-vscode-extension-dependencies": "4.0.54",
+    "@finos/legend-vscode-extension-dependencies": "4.0.57",
     "glob": "11.0.0",
     "path": "0.12.7",
     "serializr": "3.0.3",

@@ -36,7 +36,7 @@
     "fix:format": "prettier --write \"(scripts|docs)/**/*.{md,json,mjs,cjs,js,ts,tsx,html,scss,css}\" \"src/**/*.{md,json,mjs,cjs,js,ts,tsx,html,scss,css}\""
   },
   "dependencies": {
-    "@finos/legend-vscode-extension-dependencies": "4.0.54",
+    "@finos/legend-vscode-extension-dependencies": "4.0.57",
     "@types/vscode": "1.83.0",
     "serializr": "3.0.3"
   },
