@@ -48,11 +48,7 @@ export const getWebviewHtml = (
   let webviewRootScript;
   if (renderFilePath.length === 0) {
     const webviewRootScriptPath = Uri.file(
-      path.join(
-        context.extensionPath,
-        'dist',
-        'WebViewRoot.js',
-      ),
+      path.join(context.extensionPath, 'dist', 'WebViewRoot.js'),
     );
     webviewRootScript = webview.asWebviewUri(webviewRootScriptPath);
   } else {
