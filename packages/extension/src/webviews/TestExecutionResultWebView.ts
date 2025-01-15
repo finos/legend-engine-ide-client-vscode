@@ -78,11 +78,7 @@ const renderTDSResultMessage = (
   }));
   const rowData = getTDSRowData(tds);
   const webviewScriptPath = Uri.file(
-    path.join(
-      extensionPath,
-      'dist',
-      'AgGridRenderer.js',
-    ),
+    path.join(extensionPath, 'dist', 'AgGridRenderer.js'),
   );
 
   const webviewScript = webview.asWebviewUri(webviewScriptPath);
