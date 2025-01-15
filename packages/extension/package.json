@@ -353,14 +353,9 @@
   "scripts": {
     "test": "yarn compile && yarn node ./lib/__tests__/runTest.js",
     "compile": "tsc -b",
-    "dev": "npm-run-all --parallel dev:ts dev:webpack",
-    "dev:setup": "yarn release:prepare",
-    "dev:ts": "tsc -b --watch",
     "dev:webpack": "webpack --mode development --watch",
     "webpack": "webpack --mode development",
     "webpack:package": "webpack --mode production --devtool hidden-source-map",
-    "build": "yarn compile && yarn webpack",
-    "bundle": "yarn compile && yarn webpack:package",
     "check:copyright": "license-check-and-add check -f license-check-and-add-config.json",
     "check:format": "prettier --list-different \"(scripts|docs)/**/*.{md,json,mjs,cjs,js,ts,tsx,html,scss,css}\" \"src/**/*.{md,json,mjs,cjs,js,ts,tsx,html,scss,css}\"",
     "check:ci": "yarn check:format && yarn check:copyright",
@@ -372,9 +367,6 @@
     "mvn:downloadServerJar": "yarn node ./scripts/maven/downloadLspServerJar.js",
     "mvn:updateEngineVersion": "yarn node ./scripts/maven/updateEngineVersion.js",
     "mvn:prepare": "yarn mvn:downloadServerJar && yarn mvn:updateEngineVersion",
-    "release:prepare": "yarn mvn:prepare && yarn bundle && vsce package -o legend-engine-ide-client-vscode.vsix",
-    "release:marketPlace": "vsce publish -i legend-engine-ide-client-vscode.vsix",
-    "release:openvsx": "ovsx publish -i legend-engine-ide-client-vscode.vsix",
     "version": "yarn version"
   },
   "dependencies": {
