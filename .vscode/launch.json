@@ -12,10 +12,8 @@
       "outFiles": [
         "${workspaceFolder}/packages/extension/dist/**/*.js"
       ],
-      "runtimeExecutable": "${execPath}",
       "request": "launch",
-      "type": "extensionHost",
-      "localRoot": "${workspaceFolder}/packages/extension"
+      "type": "extensionHost"
     }
   ]
 }
