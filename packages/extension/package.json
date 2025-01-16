@@ -22,7 +22,7 @@
   "icon": "icons/legend_full.png",
   "homepage": "https://legend.finos.org/",
   "publisher": "FINOS",
-  "version": "0.21.2",
+  "version": "0.21.3",
   "engines": {
     "vscode": "^1.90.0"
   },
