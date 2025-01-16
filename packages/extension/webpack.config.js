@@ -67,7 +67,7 @@ const webviewConfig = {
       vm: require.resolve('vm-browserify'),
     },
     alias: {
-      react: path.resolve('/node_modules/react'),
+      react: path.resolve('./node_modules/react'),
       process: 'process/browser',
     },
   },
@@ -181,4 +181,4 @@ const extensionConfig = {
   },
 };
 
-module.exports = [extensionConfig, webviewConfig, purebookRendererConfig];
+module.exports = [webviewConfig, purebookRendererConfig, extensionConfig];
