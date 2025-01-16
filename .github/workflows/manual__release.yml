@@ -38,15 +38,17 @@ jobs:
       - name: Set up yarn
         run: |
           corepack enable
-      - name: Prepare for new release (dry-run)
+      - name: Install dependencies
+        run: |
+          yarn install
+      - name: Bump versions
         run: |
             yarn workspaces foreach --all run version ${{ github.event.inputs.bump_type }}
             git add packages/**/package.json
             git commit -m "${{ github.event.inputs.bump_type }}: bump versions and release"
             git push origin feature-publish-npm                 
-      - name: Install dependencies and build project (dry-run)
+      - name: Build project and release (dry-run)
         run: |
-          yarn install
           yarn release:dry-run
       # - name: Publish to VS Code Marketplace        
       #   run: yarn release:marketPlace
