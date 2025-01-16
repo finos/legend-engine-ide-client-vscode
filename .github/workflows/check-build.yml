@@ -59,7 +59,7 @@ jobs:
           cp ./packages/extension/legend-engine-ide-client-vscode.vsix artifacts/legend-engine-ide-client-vscode.vsix
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: legend-engine-ide-client-vscode.vsix
           path: artifacts/legend-engine-ide-client-vscode.vsix
