@@ -1,0 +1,21 @@
+# Ignore
+**
+../
+../../
+
+# Keep
+!LICENSE
+!dist
+!icons/
+!server/
+!legend.tmlanguage
+!node_modules/vscode-languageclient
+!node_modules/vscode-jsonrpc
+!node_modules/vscode-languageserver-protocol
+!node_modules/vscode-languageserver-types
+!node_modules/minimatch
+!node_modules/brace-expansion
+!node_modules/semver
+!node_modules/balanced-match
+!node_modules/lru-cache
+!node_modules/yallist
