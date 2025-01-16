@@ -29,6 +29,7 @@ import {
   type V1_RawLambda,
   guaranteeNonEmptyString,
   guaranteeNonNullable,
+  LEGEND_APPLICATION_COLOR_THEME,
 } from '@finos/legend-vscode-extension-dependencies';
 import { LegendVSCodeApplication } from '../application/LegendVSCodeApplication';
 import { WebviewQueryBuilder } from './query/WebviewQueryBuilder';
@@ -47,12 +48,24 @@ export const ComponentRouter = (
     props.webviewType as string,
     'webviewType is required to render a web view',
   );
+  /**
+   * VS Code theme kinds:
+   * 1 - Light
+   * 2 - Dark
+   * 3 - HighContrast
+   * 4 - HighContrastLight
+   */
+  const themeKind = props.themeKind as number | undefined;
 
   let component: React.ReactNode = null;
 
   const configData: LegendVSCodeApplicationConfigurationData = {
     appName: 'legend-vs-code',
     env: 'dev',
+    colorTheme:
+      themeKind === 1 || themeKind === 4
+        ? LEGEND_APPLICATION_COLOR_THEME.LEGACY_LIGHT
+        : LEGEND_APPLICATION_COLOR_THEME.DEFAULT_DARK,
     extensions: {
       core: {
         queryBuilderConfig: {
