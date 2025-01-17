@@ -29,7 +29,6 @@ import {
   getFunctionSignature,
   graph_renameElement,
   guaranteeType,
-  LEGEND_APPLICATION_COLOR_THEME,
   pureExecution_setFunction,
   PureExecution,
   RawVariableExpression,
@@ -47,12 +46,9 @@ export class QueryBuilder_LegendVSCodeApplicationPlugin
   implements QueryBuilder_LegendApplicationPlugin_Extension
 {
   static NAME = packageJson.extensions.applicationVSCodePlugin;
-  colorTheme: LEGEND_APPLICATION_COLOR_THEME;
 
-  constructor(colorTheme?: LEGEND_APPLICATION_COLOR_THEME) {
+  constructor() {
     super(QueryBuilder_LegendVSCodeApplicationPlugin.NAME, packageJson.version);
-
-    this.colorTheme = colorTheme ?? LEGEND_APPLICATION_COLOR_THEME.DEFAULT_DARK;
   }
 
   getExtraQueryBuilderHeaderActionConfigurations?(): QueryBuilderHeaderActionConfiguration[] {
