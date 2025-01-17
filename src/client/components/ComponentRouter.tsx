@@ -23,7 +23,6 @@ import {
   SERVICE_QUERY_EDITOR,
 } from '../../shared/utils/Const';
 import {
-  LEGEND_APPLICATION_COLOR_THEME,
   type PlainObject,
   type V1_RawLambda,
   guaranteeNonEmptyString,
@@ -36,30 +35,22 @@ import { DiagramEditorState } from '../stores/DiagramEditorState';
 import { type LegendVSCodeApplicationConfigurationData } from '../application/LegendVSCodeApplicationConfig';
 import { postAndWaitForMessage } from '../utils/VsCodeUtils';
 import { DataCubeRenderer } from './dataCube/DataCubeRenderer';
+import { vsCodeThemeKindToLegendColorTheme } from '../utils/ThemeUtils';
 
 export const ComponentRouter = (props: PlainObject): React.ReactNode => {
   const webviewType = guaranteeNonEmptyString(
     props.webviewType as string,
     'webviewType is required to render a web view',
   );
-  /**
-   * VS Code theme kinds:
-   * 1 - Light
-   * 2 - Dark
-   * 3 - HighContrast
-   * 4 - HighContrastLight
-   */
-  const themeKind = props.themeKind as number | undefined;
 
   let component: React.ReactNode = null;
 
   const configData: LegendVSCodeApplicationConfigurationData = {
     appName: 'legend-vs-code',
     env: 'dev',
-    colorTheme:
-      themeKind === 1 || themeKind === 4
-        ? LEGEND_APPLICATION_COLOR_THEME.LEGACY_LIGHT
-        : LEGEND_APPLICATION_COLOR_THEME.DEFAULT_DARK,
+    colorTheme: vsCodeThemeKindToLegendColorTheme(
+      props.themeKind as number | undefined,
+    ),
     extensions: {
       core: {
         queryBuilderConfig: {
