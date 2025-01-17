@@ -57,7 +57,9 @@ jobs:
       # - name: Publish to OpenVSX Marketplace
       #   run: yarn dlx -p ovsx release:openvsx -- -p ${{ secrets.OVSX_TOKEN }}
       - name: Publish to NPM
-        run: yarn release:client
+        run: |
+          yarn config set npmAuthToken $NODE_AUTH_TOKEN
+          yarn release:client
         env:
           GITHUB_TOKEN: ${{ secrets.FINOS_GITHUB_TOKEN }}
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
