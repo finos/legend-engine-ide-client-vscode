@@ -44,6 +44,7 @@ import {
 import {
   CLASSIFIER_PATH,
   LEGEND_REFRESH_QUERY_BUILDER,
+  LEGEND_UPDATE_COLOR_THEME_KIND_COMMAND_ID,
 } from '@finos/legend-engine-ide-client-vscode-shared';
 import { QueryBuilderVSCodeWorkflowState } from './QueryBuilderWorkflowState';
 import { type LegendVSCodeApplicationConfig } from '../../application/LegendVSCodeApplicationConfig';
@@ -55,6 +56,7 @@ import {
 import { V1_LSPEngine } from '../../graph/V1_LSPEngine';
 import { deserialize } from 'serializr';
 import { getMinimalEntities } from './QueryBuilderStateUtils';
+import { vsCodeThemeKindToLegendColorTheme } from '../../utils/ThemeUtils';
 
 export const useQueryBuilderState = (
   initialId: string,
@@ -108,6 +110,7 @@ export const useQueryBuilderState = (
         command: string;
         result: Entity[];
         updatedEntityId?: string;
+        colorThemeKind?: number;
       }>,
     ): Promise<void> => {
       const message = event.data;
@@ -137,6 +140,14 @@ export const useQueryBuilderState = (
           }
           break;
         }
+        case LEGEND_UPDATE_COLOR_THEME_KIND_COMMAND_ID: {
+          if (queryBuilderState && message.colorThemeKind) {
+            queryBuilderState.applicationStore.layoutService.setColorTheme(
+              vsCodeThemeKindToLegendColorTheme(message.colorThemeKind),
+            );
+          }
+          break;
+        }
         default:
           break;
       }
@@ -145,7 +156,7 @@ export const useQueryBuilderState = (
     return () => {
       window.removeEventListener('message', handleMessage);
     };
-  }, [currentId, applicationStore.pluginManager]);
+  }, [currentId, queryBuilderState, applicationStore.pluginManager]);
 
   useEffect(() => {
     const buildGraphManagerStateAndInitializeQuery =
