@@ -30,7 +30,7 @@
     "release:marketPlace": "yarn workspace legend-engine-ide-client-vscode dlx @vscode/vsce publish -i legend-engine-ide-client-vscode.vsix",
     "release:openvsx": "yarn workspace legend-engine-ide-client-vscode dlx ovsx publish -i legend-engine-ide-client-vscode.vsix",
     "release:client:dry-run": "yarn workspace @finos/legend-engine-ide-client-vscode pack --dry-run",
-    "release:client": "yarn workspace @finos/legend-engine-ide-client-vscode yarn npm publish --access=public"
+    "release:client": "yarn workspace @finos/legend-engine-ide-client-vscode npm publish --access=public"
   },
   "devDependencies": {
     "npm-run-all": "^4.1.5"
