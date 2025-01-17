@@ -23,6 +23,7 @@
   "homepage": "https://legend.finos.org/",
   "publisher": "FINOS",
   "version": "0.21.2",
+
   "engines": {
     "vscode": "^1.90.0"
   },
