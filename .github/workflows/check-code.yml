@@ -32,13 +32,16 @@ jobs:
         with:
           node-version: 20
 
+      - name: Set up yarn
+        run: |
+          corepack enable
+
       - name: Install dependencies
         run: |
-          npm install
-          npm install -g @vscode/vsce
+          yarn install
 
       - name: Run lint
-        run: npm run lint:ci
+        run: yarn lint:ci
 
   check-codebase-maintenance:
     name: Run Codebase Maintenance Checks
@@ -55,13 +58,16 @@ jobs:
         with:
           node-version: 20
 
+      - name: Set up yarn
+        run: |
+          corepack enable
+
       - name: Install dependencies
         run: |
-          npm install
-          npm install -g @vscode/vsce
+          yarn install
 
       - name: Check code formatting
-        run: npm run check:format
+        run: yarn check:format
 
       - name: Check copyright headers
-        run: npm run check:copyright
+        run: yarn check:copyright

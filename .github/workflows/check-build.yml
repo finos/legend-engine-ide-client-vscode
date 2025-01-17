@@ -43,21 +43,23 @@ jobs:
           distribution: 'temurin'
           java-version: 21
           java-package: jdk
+      
+      - name: Set up yarn
+        run: |
+          corepack enable
 
       - name: Install dependencies
         run: |
-          npm install
-          npm install -g @vscode/vsce
-          npm install -g ovsx
+          yarn install
 
       - name: Package
         run: |
-          npm run release:prepare
+          yarn release:prepare
           mkdir artifacts
-          cp legend-engine-ide-client-vscode.vsix artifacts/legend-engine-ide-client-vscode.vsix
+          cp ./packages/extension/legend-engine-ide-client-vscode.vsix artifacts/legend-engine-ide-client-vscode.vsix
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: legend-engine-ide-client-vscode.vsix
           path: artifacts/legend-engine-ide-client-vscode.vsix
