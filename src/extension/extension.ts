@@ -17,6 +17,7 @@
 import * as path from 'path';
 import {
   type CancellationToken,
+  type ColorTheme,
   type ExtensionContext,
   type ProviderResult,
   type TerminalProfile,
@@ -64,6 +65,7 @@ import {
   LEGEND_LANGUAGE_ID,
   LEGEND_REFRESH_QUERY_BUILDER,
   LEGEND_SHOW_DIAGRAM,
+  LEGEND_UPDATE_COLOR_THEME_KIND_COMMAND_ID,
   LEGEND_VIRTUAL_FS_SCHEME,
   ONE_ENTITY_PER_FILE_COMMAND_ID,
   PROGRESS_NOTIFICATION_ID,
@@ -258,6 +260,15 @@ export function createClient(context: ExtensionContext): LanguageClient {
           }
         });
     }
+  });
+
+  window.onDidChangeActiveColorTheme((e: ColorTheme) => {
+    Object.values(openedWebViews).forEach((webview) => {
+      webview.webview.postMessage({
+        command: LEGEND_UPDATE_COLOR_THEME_KIND_COMMAND_ID,
+        colorThemeKind: e.kind,
+      });
+    });
   });
 
   client.outputChannel.show();

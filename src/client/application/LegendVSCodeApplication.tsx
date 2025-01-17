@@ -15,7 +15,6 @@
  */
 
 import {
-  type LegendApplicationConfigurationData,
   type LegendApplicationConfigurationInput,
   ApplicationFrameworkProvider,
   ApplicationStore,
@@ -23,27 +22,30 @@ import {
   assertErrorThrown,
   BrowserEnvironmentProvider,
   Core_GraphManagerPreset,
-  Core_LegendApplicationPlugin,
   DSL_Diagram_GraphManagerPreset,
   QueryBuilder_GraphManagerPreset,
   QueryBuilder_LegendApplicationPlugin,
 } from '@finos/legend-vscode-extension-dependencies';
 import { useMemo } from 'react';
-import { LegendVSCodeApplicationConfig } from './LegendVSCodeApplicationConfig';
+import {
+  type LegendVSCodeApplicationConfigurationData,
+  LegendVSCodeApplicationConfig,
+} from './LegendVSCodeApplicationConfig';
 import { LegendVSCodePluginManager } from './LegendVSCodePluginManager';
-import { Core_LegendVSCodeApplicationPlugin } from './Core_LegendVSCodeApplicationPlugin';
 import { postMessage } from '../utils/VsCodeUtils';
 import { QUERY_BUILDER_CONFIG_ERROR } from '../../shared/utils/Const';
 import packageJson from '../../../package.json';
+import { QueryBuilder_LegendVSCodeApplicationPlugin } from './QueryBuilder_LegendVSCodeApplicationPlugin';
+import { Core_LegendVSCodeApplicationPlugin } from './Core_LegendVSCodeApplicationPlugin';
 
 export const LegendVSCodeApplication = (props: {
-  configData: LegendApplicationConfigurationData;
+  configData: LegendVSCodeApplicationConfigurationData;
   children: React.ReactNode;
 }): React.ReactNode => {
   const { configData, children } = props;
 
   const applicationStore = useMemo(() => {
-    const input: LegendApplicationConfigurationInput<LegendApplicationConfigurationData> =
+    const input: LegendApplicationConfigurationInput<LegendVSCodeApplicationConfigurationData> =
       {
         configData,
         versionData: {
@@ -62,9 +64,9 @@ export const LegendVSCodeApplication = (props: {
           new DSL_Diagram_GraphManagerPreset(),
         ])
         .usePlugins([
-          new Core_LegendApplicationPlugin(),
+          new Core_LegendVSCodeApplicationPlugin(configData.colorTheme),
           new QueryBuilder_LegendApplicationPlugin(),
-          new Core_LegendVSCodeApplicationPlugin(),
+          new QueryBuilder_LegendVSCodeApplicationPlugin(),
         ])
         .install();
       return new ApplicationStore(config, pluginManager);

@@ -18,6 +18,7 @@ import {
   type ExtensionContext,
   type Location,
   type WebviewPanel,
+  window,
 } from 'vscode';
 import { type LegendLanguageClient } from '../LegendLanguageClient';
 import { getWebviewHtml, handleQueryBuilderWebviewMessage } from './utils';
@@ -61,6 +62,7 @@ export const renderQueryBuilderWebView = async (
   // Construct data input parameters
   const dataInputParams: PlainObject = {
     entityId,
+    themeKind: window.activeColorTheme.kind,
   };
 
   webview.html = getWebviewHtml(

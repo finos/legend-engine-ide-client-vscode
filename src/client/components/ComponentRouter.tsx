@@ -35,6 +35,7 @@ import { DiagramEditorState } from '../stores/DiagramEditorState';
 import { type LegendVSCodeApplicationConfigurationData } from '../application/LegendVSCodeApplicationConfig';
 import { postAndWaitForMessage } from '../utils/VsCodeUtils';
 import { DataCubeRenderer } from './dataCube/DataCubeRenderer';
+import { vsCodeThemeKindToLegendColorTheme } from '../utils/ThemeUtils';
 
 export const ComponentRouter = (props: PlainObject): React.ReactNode => {
   const webviewType = guaranteeNonEmptyString(
@@ -47,6 +48,9 @@ export const ComponentRouter = (props: PlainObject): React.ReactNode => {
   const configData: LegendVSCodeApplicationConfigurationData = {
     appName: 'legend-vs-code',
     env: 'dev',
+    colorTheme: vsCodeThemeKindToLegendColorTheme(
+      props.themeKind as number | undefined,
+    ),
     extensions: {
       core: {
         queryBuilderConfig: {

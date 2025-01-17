@@ -16,6 +16,7 @@
 
 import {
   type ExtensionsConfigurationData,
+  type LEGEND_APPLICATION_COLOR_THEME,
   type LegendApplicationConfigurationInput,
   type PlainObject,
   LegendApplicationConfig,
@@ -26,6 +27,7 @@ export interface LegendVSCodeApplicationConfigurationData {
   appName: string;
   env: string;
   extensions?: ExtensionsConfigurationData;
+  colorTheme?: LEGEND_APPLICATION_COLOR_THEME;
 }
 
 export class LegendVSCodeApplicationConfig extends LegendApplicationConfig {
