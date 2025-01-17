@@ -22,9 +22,7 @@ import {
   Core_LegendApplicationPlugin,
 } from '@finos/legend-vscode-extension-dependencies';
 
-export class Core_LegendVSCodeApplicationPlugin
-  extends Core_LegendApplicationPlugin
-{
+export class Core_LegendVSCodeApplicationPlugin extends Core_LegendApplicationPlugin {
   colorTheme: LEGEND_APPLICATION_COLOR_THEME;
 
   constructor(colorTheme?: LEGEND_APPLICATION_COLOR_THEME) {
