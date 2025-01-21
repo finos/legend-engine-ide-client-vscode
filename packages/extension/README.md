@@ -46,7 +46,7 @@ The project is structured into 3 main parts within the `src` directory:
 
 ## License
 
-Copyright 2020 Goldman Sachs
+Copyright 2025 Goldman Sachs
 
 Distributed under the [Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0).
 
