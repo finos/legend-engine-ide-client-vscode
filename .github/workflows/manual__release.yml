@@ -47,13 +47,13 @@ jobs:
             git add packages/**/package.json
             git commit -m "${{ github.event.inputs.bump_type }}: bump versions and release"
             git push origin feature-publish-npm                 
-      - name: Build project and release (dry-run)
+      - name: Build project and prepare release
         run: |
-          yarn release:dry-run
-      # - name: Publish to VS Code Marketplace        
-      #   run: yarn release:marketPlace
-      #   env:
-      #     VSCE_PAT: ${{ secrets.VSCE_PAT }}
+          yarn release:prepare
+      - name: Publish to VS Code Marketplace        
+        run: yarn release:marketPlace
+        env:
+          VSCE_PAT: ${{ secrets.VSCE_PAT }}
       # - name: Publish to OpenVSX Marketplace
       #   run: yarn dlx -p ovsx release:openvsx -- -p ${{ secrets.OVSX_TOKEN }}
       - name: Publish to NPM

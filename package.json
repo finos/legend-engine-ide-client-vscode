@@ -25,11 +25,9 @@
     "lint:style": "yarn workspaces foreach --all run lint:style",
     "fix:format": "yarn workspaces foreach --all run fix:format",
     "mvn:prepare": "yarn workspace legend-engine-ide-client-vscode mvn:prepare",
-    "release:dry-run": "yarn mvn:prepare && yarn bundle && yarn webpack:package && yarn workspace legend-engine-ide-client-vscode dlx @vscode/vsce ls",
     "release:prepare": "yarn mvn:prepare && yarn bundle && yarn webpack:package && yarn workspace legend-engine-ide-client-vscode dlx @vscode/vsce package -o legend-engine-ide-client-vscode.vsix",
     "release:marketPlace": "yarn workspace legend-engine-ide-client-vscode dlx @vscode/vsce publish -i legend-engine-ide-client-vscode.vsix",
     "release:openvsx": "yarn workspace legend-engine-ide-client-vscode dlx ovsx publish -i legend-engine-ide-client-vscode.vsix",
-    "release:client:dry-run": "yarn workspace @finos/legend-engine-ide-client-vscode pack --dry-run",
     "release:client": "yarn workspace @finos/legend-engine-ide-client-vscode npm publish --access=public"
   },
   "devDependencies": {
