@@ -18,7 +18,6 @@ import {
   commands,
   Uri,
   window,
-  workspace,
   type CancellationToken,
 } from 'vscode';
 import type { FunctionTDSRequest } from './model/FunctionTDSRequest';
@@ -28,6 +27,7 @@ import {
   ENTITIES_REQUEST_ID,
   EXECUTE_QUERY_COMMAND_ID,
   EXECUTE_TESTS_REQUEST_ID,
+  EXPORT_DATA_COMMAND_ID,
   GENERATE_EXECUTION_PLAN_COMMAND_ID,
   GET_CLASSIFIER_PATH_MAP_REQUEST_ID,
   GET_LAMBDA_RETURN_TYPE_COMMAND_ID,
@@ -255,20 +255,31 @@ export class LegendLanguageClient extends LanguageClient {
     parameterValues: V1_ParameterValue[],
     downloadFileName: string,
     serializationFormat?: EXECUTION_SERIALIZATION_FORMAT | undefined,
-  ): Promise<LegendExecutionResult> {
+  ): Promise<LegendExecutionResult | undefined> {
+    const uri = await window.showSaveDialog({
+      defaultUri: Uri.file(downloadFileName),
+      saveLabel: 'Save',
+    });
+    if (!uri) {
+      window.showErrorMessage('File save cancelled');
+      return undefined;
+    }
+
+    const filePath = uri.path;
     const executableArgs = {
       lambda: JSON.stringify(lambda),
       mapping,
       runtime: JSON.stringify(runtime),
       context: JSON.stringify(context),
       serializationFormat,
+      filePath,
     };
     const response = (
       entityDetails instanceof TextLocation
         ? await commands.executeCommand(
             LEGEND_COMMAND,
             entityDetails,
-            EXECUTE_QUERY_COMMAND_ID,
+            EXPORT_DATA_COMMAND_ID,
             executableArgs,
             parameterValues,
           )
@@ -277,11 +288,12 @@ export class LegendLanguageClient extends LanguageClient {
             entityDetails.documentUri,
             entityDetails.sectionIndex,
             entityDetails.entityId,
-            EXECUTE_QUERY_COMMAND_ID,
+            EXPORT_DATA_COMMAND_ID,
             executableArgs,
             parameterValues,
           )
     ) as LegendExecutionResult[];
+
     if (!response[0] || response[0].type === LegendExecutionResultType.ERROR) {
       return (
         response[0] ??
@@ -290,20 +302,10 @@ export class LegendLanguageClient extends LanguageClient {
         })
       );
     }
-    const content = response[0].message;
-    const uri = await window.showSaveDialog({
-      defaultUri: Uri.file(downloadFileName),
-      saveLabel: 'Save',
-    });
 
-    if (uri) {
-      await workspace.fs.writeFile(uri, Buffer.from(content, 'utf8'));
-      window.showInformationMessage(
-        `File ${downloadFileName} saved successfully!`,
-      );
-    } else {
-      window.showErrorMessage('File save cancelled');
-    }
+    window.showInformationMessage(
+      `File ${downloadFileName} saved successfully!`,
+    );
 
     return response[0];
   }
