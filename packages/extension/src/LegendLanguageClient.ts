@@ -14,12 +14,7 @@
  * limitations under the License.
  */
 
-import {
-  commands,
-  Uri,
-  window,
-  type CancellationToken,
-} from 'vscode';
+import { commands, Uri, window, type CancellationToken } from 'vscode';
 import type { FunctionTDSRequest } from './model/FunctionTDSRequest';
 import {
   ANALYZE_MAPPING_MODEL_COVERAGE_COMMAND_ID,
