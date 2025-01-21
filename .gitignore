@@ -17,9 +17,9 @@ Thumbs.db
 # Build
 npm-debug.log
 npm-debug.log*
-/build/
-/lib
-/dist
+**/build/
+**/lib
+**/dist
 
 # Dependencies
 **/node_modules
@@ -27,8 +27,18 @@ npm-debug.log*
 # Development
 /temp
 *.vsix
-/server/*.jar
+**/server/*.jar
 /server/legend_extension_pom*.xml
 
 # Test
-/.vscode-test/
+**/.vscode-test/
+
+# Yarn
+# See https://yarnpkg.com/getting-started/qa#which-files-should-be-gitignored
+.yarn/*
+!.yarn/releases
+!.yarn/plugins
+!.yarn/sdks
+!.yarn/versions
+!.yarn/constraints.pro
+.pnp.*

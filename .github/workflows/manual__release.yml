@@ -11,7 +11,7 @@ on:
 jobs:
   release:
     name: Release
-    runs-on: ubuntu-latest-4-cores
+    runs-on: ubuntu-latest
     if: github.repository == 'finos/legend-engine-ide-client-vscode' # prevent running this action in forks
     steps:
       - name: Checkout code
@@ -26,7 +26,7 @@ jobs:
         uses: actions/setup-node@v3.8.1
         with:
           node-version: 20
-          # The registry URL and `NODE_AUTH_TOKEN` are needed for `npm publish` to work properly
+          # The registry URL and `NODE_AUTH_TOKEN` are needed for `yarn npm publish` to work properly
           # See https://github.com/actions/setup-node/blob/main/docs/advanced-usage.md#publish-to-npmjs-and-gpr-with-npm
           registry-url: 'https://registry.npmjs.org'
       - name: Set up JDK
@@ -35,21 +35,33 @@ jobs:
           distribution: 'temurin'
           java-version: 21
           java-package: jdk
-      - name: Prepare for new release
+      - name: Set up yarn
         run: |
-            npm version ${{ github.event.inputs.bump_type }} -m "bump version to %s"
-            git push origin main                 
-      - name: Install dependencies and build project
+          corepack enable
+      - name: Install dependencies
         run: |
-          npm install
-          npm install -g @vscode/vsce
-          npm install -g ovsx
-          npm run release:prepare
+          yarn install
+      - name: Bump versions
+        run: |
+            yarn workspaces foreach --all run version ${{ github.event.inputs.bump_type }}
+            git add packages/**/package.json
+            git commit -m "${{ github.event.inputs.bump_type }}: bump versions and release"
+            git push origin feature-publish-npm                 
+      - name: Build project and prepare release
+        run: |
+          yarn release:prepare
       - name: Publish to VS Code Marketplace        
-        run: npm run release:marketPlace
+        run: yarn release:marketPlace
         env:
           VSCE_PAT: ${{ secrets.VSCE_PAT }}
       # - name: Publish to OpenVSX Marketplace
-      #   run: npm run release:openvsx -- -p ${{ secrets.OVSX_TOKEN }}
+      #   run: yarn dlx -p ovsx release:openvsx -- -p ${{ secrets.OVSX_TOKEN }}
+      - name: Publish to NPM
+        run: |
+          yarn config set npmAuthToken $NODE_AUTH_TOKEN
+          yarn release:client
+        env:
+          GITHUB_TOKEN: ${{ secrets.FINOS_GITHUB_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
                 
           
