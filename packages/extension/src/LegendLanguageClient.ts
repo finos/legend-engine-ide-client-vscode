@@ -262,7 +262,11 @@ export class LegendLanguageClient extends LanguageClient {
     });
     if (!uri) {
       window.showErrorMessage('File save cancelled');
-      return undefined;
+      return LegendExecutionResult.serialization.fromJson({
+        ids: [],
+        type: LegendExecutionResultType.FAILURE,
+        message: 'File save cancelled',
+      });
     }
 
     const filePath = uri.path;
