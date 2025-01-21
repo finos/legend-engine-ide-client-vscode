@@ -22,7 +22,6 @@ import {
   ENTITIES_REQUEST_ID,
   EXECUTE_QUERY_COMMAND_ID,
   EXECUTE_TESTS_REQUEST_ID,
-  EXPORT_DATA_COMMAND_ID,
   GENERATE_EXECUTION_PLAN_COMMAND_ID,
   GET_CLASSIFIER_PATH_MAP_REQUEST_ID,
   GET_LAMBDA_RETURN_TYPE_COMMAND_ID,
@@ -264,21 +263,21 @@ export class LegendLanguageClient extends LanguageClient {
       });
     }
 
-    const filePath = uri.path;
+    const exportFilePath = uri.path;
     const executableArgs = {
       lambda: JSON.stringify(lambda),
       mapping,
       runtime: JSON.stringify(runtime),
       context: JSON.stringify(context),
       serializationFormat,
-      filePath,
+      exportFilePath,
     };
     const response = (
       entityDetails instanceof TextLocation
         ? await commands.executeCommand(
             LEGEND_COMMAND,
             entityDetails,
-            EXPORT_DATA_COMMAND_ID,
+            EXECUTE_QUERY_COMMAND_ID,
             executableArgs,
             parameterValues,
           )
@@ -287,7 +286,7 @@ export class LegendLanguageClient extends LanguageClient {
             entityDetails.documentUri,
             entityDetails.sectionIndex,
             entityDetails.entityId,
-            EXPORT_DATA_COMMAND_ID,
+            EXECUTE_QUERY_COMMAND_ID,
             executableArgs,
             parameterValues,
           )
