@@ -28,6 +28,7 @@
     "release:prepare": "yarn mvn:prepare && yarn bundle && yarn webpack:package && yarn workspace legend-engine-ide-client-vscode dlx @vscode/vsce package -o legend-engine-ide-client-vscode.vsix",
     "release:marketPlace": "yarn workspace legend-engine-ide-client-vscode dlx @vscode/vsce publish -i legend-engine-ide-client-vscode.vsix",
     "release:openvsx": "yarn workspace legend-engine-ide-client-vscode dlx ovsx publish -i legend-engine-ide-client-vscode.vsix",
+    "release:shared": "yarn workspace @finos/legend-engine-ide-client-vscode-shared npm publish --access=public",
     "release:client": "yarn workspace @finos/legend-engine-ide-client-vscode npm publish --access=public"
   },
   "devDependencies": {
