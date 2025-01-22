@@ -14,13 +14,7 @@
  * limitations under the License.
  */
 
-import {
-  commands,
-  Uri,
-  window,
-  workspace,
-  type CancellationToken,
-} from 'vscode';
+import { commands, Uri, window, type CancellationToken } from 'vscode';
 import type { FunctionTDSRequest } from './model/FunctionTDSRequest';
 import {
   ANALYZE_MAPPING_MODEL_COVERAGE_COMMAND_ID,
@@ -255,13 +249,28 @@ export class LegendLanguageClient extends LanguageClient {
     parameterValues: V1_ParameterValue[],
     downloadFileName: string,
     serializationFormat?: EXECUTION_SERIALIZATION_FORMAT | undefined,
-  ): Promise<LegendExecutionResult> {
+  ): Promise<LegendExecutionResult | undefined> {
+    const uri = await window.showSaveDialog({
+      defaultUri: Uri.file(downloadFileName),
+      saveLabel: 'Save',
+    });
+    if (!uri) {
+      window.showErrorMessage('File save cancelled');
+      return LegendExecutionResult.serialization.fromJson({
+        ids: [],
+        type: LegendExecutionResultType.FAILURE,
+        message: 'File save cancelled',
+      });
+    }
+
+    const exportFilePath = uri.path;
     const executableArgs = {
       lambda: JSON.stringify(lambda),
       mapping,
       runtime: JSON.stringify(runtime),
       context: JSON.stringify(context),
       serializationFormat,
+      exportFilePath,
     };
     const response = (
       entityDetails instanceof TextLocation
@@ -282,6 +291,7 @@ export class LegendLanguageClient extends LanguageClient {
             parameterValues,
           )
     ) as LegendExecutionResult[];
+
     if (!response[0] || response[0].type === LegendExecutionResultType.ERROR) {
       return (
         response[0] ??
@@ -290,20 +300,10 @@ export class LegendLanguageClient extends LanguageClient {
         })
       );
     }
-    const content = response[0].message;
-    const uri = await window.showSaveDialog({
-      defaultUri: Uri.file(downloadFileName),
-      saveLabel: 'Save',
-    });
 
-    if (uri) {
-      await workspace.fs.writeFile(uri, Buffer.from(content, 'utf8'));
-      window.showInformationMessage(
-        `File ${downloadFileName} saved successfully!`,
-      );
-    } else {
-      window.showErrorMessage('File save cancelled');
-    }
+    window.showInformationMessage(
+      `File ${downloadFileName} saved successfully!`,
+    );
 
     return response[0];
   }
