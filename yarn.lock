@@ -1997,17 +1997,71 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@finos/legend-application-studio@npm:28.18.81":
-  version: 28.18.81
-  resolution: "@finos/legend-application-studio@npm:28.18.81"
+"@finos/legend-application-query-bootstrap@npm:13.12.0":
+  version: 13.12.0
+  resolution: "@finos/legend-application-query-bootstrap@npm:13.12.0"
+  dependencies:
+    "@finos/legend-application": "npm:16.0.20"
+    "@finos/legend-application-query": "npm:13.7.36"
+    "@finos/legend-art": "npm:7.1.77"
+    "@finos/legend-extension-assortment": "npm:0.0.251"
+    "@finos/legend-extension-dsl-data-quality": "npm:2.0.28"
+    "@finos/legend-extension-dsl-data-space": "npm:10.4.36"
+    "@finos/legend-extension-dsl-diagram": "npm:8.1.59"
+    "@finos/legend-extension-dsl-persistence": "npm:5.0.274"
+    "@finos/legend-extension-dsl-service": "npm:1.0.281"
+    "@finos/legend-extension-dsl-text": "npm:6.0.273"
+    "@finos/legend-extension-store-service-store": "npm:2.0.273"
+    "@finos/legend-graph": "npm:32.0.4"
+    "@finos/legend-lego": "npm:2.0.39"
+    "@finos/legend-shared": "npm:11.0.0"
+    "@types/react": "npm:19.0.7"
+    react: "npm:19.0.0"
+  checksum: 10c0/455edd48865faead25461058518d579d3e0bfcb938e04782ddffc67183fd5aba0f4e7594913f7e061e6287cc1366c07dbf12af3109f826688002ac80e3881044
+  languageName: node
+  linkType: hard
+
+"@finos/legend-application-query@npm:13.7.36":
+  version: 13.7.36
+  resolution: "@finos/legend-application-query@npm:13.7.36"
   dependencies:
     "@finos/legend-application": "npm:16.0.20"
     "@finos/legend-art": "npm:7.1.77"
-    "@finos/legend-code-editor": "npm:2.0.35"
-    "@finos/legend-data-cube": "npm:0.0.42"
-    "@finos/legend-graph": "npm:32.0.3"
-    "@finos/legend-lego": "npm:2.0.38"
-    "@finos/legend-query-builder": "npm:4.15.40"
+    "@finos/legend-code-editor": "npm:2.0.36"
+    "@finos/legend-data-cube": "npm:0.0.43"
+    "@finos/legend-extension-dsl-data-space": "npm:10.4.36"
+    "@finos/legend-graph": "npm:32.0.4"
+    "@finos/legend-lego": "npm:2.0.39"
+    "@finos/legend-query-builder": "npm:4.15.41"
+    "@finos/legend-server-depot": "npm:6.0.77"
+    "@finos/legend-shared": "npm:11.0.0"
+    "@finos/legend-storage": "npm:3.0.119"
+    "@testing-library/dom": "npm:10.4.0"
+    "@testing-library/react": "npm:16.1.0"
+    "@types/react": "npm:19.0.7"
+    "@types/react-dom": "npm:19.0.3"
+    mobx: "npm:6.13.5"
+    mobx-react-lite: "npm:4.1.0"
+    react: "npm:19.0.0"
+    react-dom: "npm:19.0.0"
+    serializr: "npm:3.0.3"
+  peerDependencies:
+    react: ^19.0.0
+  checksum: 10c0/daeb30e31c27a8e1b41c02071085c4b6e08e096bd838423e97342659757e58fa2abfb5399643a4007ea13c52ed7f55a2903cec968ffad4322510e8c932810f63
+  languageName: node
+  linkType: hard
+
+"@finos/legend-application-studio@npm:28.18.83":
+  version: 28.18.83
+  resolution: "@finos/legend-application-studio@npm:28.18.83"
+  dependencies:
+    "@finos/legend-application": "npm:16.0.20"
+    "@finos/legend-art": "npm:7.1.77"
+    "@finos/legend-code-editor": "npm:2.0.36"
+    "@finos/legend-data-cube": "npm:0.0.43"
+    "@finos/legend-graph": "npm:32.0.4"
+    "@finos/legend-lego": "npm:2.0.39"
+    "@finos/legend-query-builder": "npm:4.15.41"
     "@finos/legend-server-depot": "npm:6.0.77"
     "@finos/legend-server-sdlc": "npm:5.3.45"
     "@finos/legend-server-showcase": "npm:0.2.41"
@@ -2030,7 +2084,7 @@ __metadata:
     yaml: "npm:2.7.0"
   peerDependencies:
     react: ^19.0.0
-  checksum: 10c0/0623ee054f484a1eb325c43574ff0f3c5bb5eb7137ed0954807d85fb9b540d724d6cf28b9eea4c1f4c161b4c0ac965ad4fc509c170e0ca88595e051c8c4393bd
+  checksum: 10c0/f17f8802b57dc59e308c4a92bd7bd456112c928f6da21b35255d06c4e1a625e71a5b15e3c56f9d72a0f20187dee0fc35724fd6c898126c8f798c99cc0a676eaa
   languageName: node
   linkType: hard
 
@@ -2108,27 +2162,27 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@finos/legend-code-editor@npm:2.0.35":
-  version: 2.0.35
-  resolution: "@finos/legend-code-editor@npm:2.0.35"
+"@finos/legend-code-editor@npm:2.0.36":
+  version: 2.0.36
+  resolution: "@finos/legend-code-editor@npm:2.0.36"
   dependencies:
-    "@finos/legend-graph": "npm:32.0.3"
+    "@finos/legend-graph": "npm:32.0.4"
     "@finos/legend-shared": "npm:11.0.0"
     "@types/css-font-loading-module": "npm:0.0.14"
     monaco-editor: "npm:0.52.2"
   peerDependencies:
     react: ^19.0.0
-  checksum: 10c0/f06caea3f10e95ed19dddffc1915feda7a897689edbdd3388dfb205bf561076b3c98c72e2e58fd38a5c9b322e18fbfa2f7411891b976a0dd16b33ed10a1bf962
+  checksum: 10c0/ae7015cc5a8239ea96fbeaea560ac3347dfc4a9332ff2d3253057808a733273622cf1b2bc9f68fd7fbc70fc832acef4ab2bd6fe89bcaf49291ab9655fa011d9c
   languageName: node
   linkType: hard
 
-"@finos/legend-data-cube@npm:0.0.42":
-  version: 0.0.42
-  resolution: "@finos/legend-data-cube@npm:0.0.42"
+"@finos/legend-data-cube@npm:0.0.43":
+  version: 0.0.43
+  resolution: "@finos/legend-data-cube@npm:0.0.43"
   dependencies:
     "@finos/legend-art": "npm:7.1.77"
-    "@finos/legend-code-editor": "npm:2.0.35"
-    "@finos/legend-graph": "npm:32.0.3"
+    "@finos/legend-code-editor": "npm:2.0.36"
+    "@finos/legend-graph": "npm:32.0.4"
     "@finos/legend-shared": "npm:11.0.0"
     "@types/react": "npm:19.0.7"
     ag-grid-community: "npm:33.0.3"
@@ -2143,7 +2197,7 @@ __metadata:
     serializr: "npm:3.0.3"
   peerDependencies:
     react: ^19.0.0
-  checksum: 10c0/fea1c5abc7526de26b009e84204db7c8048bb85b1198df654da7ca828d0e9873ea6b5065a94362aebb8736ac4408bd7808747854101b9ef192e3f69a91a88fa6
+  checksum: 10c0/5068ff30201f29b60f5fa6e1d2bea040189a67d3d234754eacb7850192b85b770302fb9f776a78379b58cc200ac7a48937e533b15633a9ae8c1ae3b6d1e333ff
   languageName: node
   linkType: hard
 
@@ -2204,7 +2258,6 @@ __metadata:
     "@eslint/js": "npm:9.17.0"
     "@finos/babel-preset-legend-studio": "npm:2.0.84"
     "@finos/legend-dev-utils": "npm:2.1.35"
-    "@finos/legend-vscode-extension-dependencies": "npm:4.0.57"
     "@rollup/plugin-babel": "npm:6.0.4"
     "@rollup/plugin-commonjs": "npm:28.0.2"
     "@rollup/plugin-json": "npm:6.1.0"
@@ -2242,7 +2295,6 @@ __metadata:
     "@eslint/compat": "npm:^1.2.4"
     "@eslint/js": "npm:9.17.0"
     "@finos/legend-engine-ide-client-vscode-shared": "workspace:*"
-    "@finos/legend-vscode-extension-dependencies": "npm:4.0.57"
     "@types/react": "npm:19.0.2"
     "@types/react-dom": "npm:19.0.2"
     "@types/react-select": "npm:5.0.1"
@@ -2279,15 +2331,91 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@finos/legend-extension-dsl-diagram@npm:8.1.57":
-  version: 8.1.57
-  resolution: "@finos/legend-extension-dsl-diagram@npm:8.1.57"
+"@finos/legend-extension-assortment@npm:0.0.251":
+  version: 0.0.251
+  resolution: "@finos/legend-extension-assortment@npm:0.0.251"
   dependencies:
     "@finos/legend-application": "npm:16.0.20"
-    "@finos/legend-application-studio": "npm:28.18.81"
+    "@finos/legend-application-studio": "npm:28.18.83"
     "@finos/legend-art": "npm:7.1.77"
-    "@finos/legend-code-editor": "npm:2.0.35"
-    "@finos/legend-graph": "npm:32.0.3"
+    "@finos/legend-code-editor": "npm:2.0.36"
+    "@finos/legend-graph": "npm:32.0.4"
+    "@finos/legend-shared": "npm:11.0.0"
+    "@types/react": "npm:19.0.7"
+    mobx: "npm:6.13.5"
+    mobx-react-lite: "npm:4.1.0"
+    react: "npm:19.0.0"
+    serializr: "npm:3.0.3"
+  peerDependencies:
+    react: ^19.0.0
+  checksum: 10c0/c2c21e721fbac75bda82a8f9a2b65456416074df38dbe189fde0bd7b5ebb1304278a67d7ff455f118d3f819d2f3f44e111538af24ac1a90612eb1c6ca129b494
+  languageName: node
+  linkType: hard
+
+"@finos/legend-extension-dsl-data-quality@npm:2.0.28":
+  version: 2.0.28
+  resolution: "@finos/legend-extension-dsl-data-quality@npm:2.0.28"
+  dependencies:
+    "@finos/legend-application": "npm:16.0.20"
+    "@finos/legend-application-studio": "npm:28.18.83"
+    "@finos/legend-art": "npm:7.1.77"
+    "@finos/legend-code-editor": "npm:2.0.36"
+    "@finos/legend-extension-dsl-data-space": "npm:10.4.36"
+    "@finos/legend-graph": "npm:32.0.4"
+    "@finos/legend-lego": "npm:2.0.39"
+    "@finos/legend-query-builder": "npm:4.15.41"
+    "@finos/legend-shared": "npm:11.0.0"
+    "@finos/legend-storage": "npm:3.0.119"
+    "@types/react": "npm:19.0.7"
+    "@types/react-dom": "npm:19.0.3"
+    mobx: "npm:6.13.5"
+    mobx-react-lite: "npm:4.1.0"
+    react: "npm:19.0.0"
+    react-dnd: "npm:16.0.1"
+    react-dom: "npm:19.0.0"
+    serializr: "npm:3.0.3"
+  peerDependencies:
+    react: ^19.0.0
+  checksum: 10c0/4ea73603a8a8887dfc5f7a1e0aa6ab3beecf98ccbdbb2655fca54735461b7fa128a01f3d1971fc009329f0fe084784a1399f33f7a919eec511a1ab62d9342360
+  languageName: node
+  linkType: hard
+
+"@finos/legend-extension-dsl-data-space@npm:10.4.36":
+  version: 10.4.36
+  resolution: "@finos/legend-extension-dsl-data-space@npm:10.4.36"
+  dependencies:
+    "@finos/legend-application": "npm:16.0.20"
+    "@finos/legend-art": "npm:7.1.77"
+    "@finos/legend-code-editor": "npm:2.0.36"
+    "@finos/legend-extension-dsl-diagram": "npm:8.1.59"
+    "@finos/legend-graph": "npm:32.0.4"
+    "@finos/legend-lego": "npm:2.0.39"
+    "@finos/legend-query-builder": "npm:4.15.41"
+    "@finos/legend-server-depot": "npm:6.0.77"
+    "@finos/legend-server-sdlc": "npm:5.3.45"
+    "@finos/legend-shared": "npm:11.0.0"
+    "@finos/legend-storage": "npm:3.0.119"
+    "@types/react": "npm:19.0.7"
+    mobx: "npm:6.13.5"
+    mobx-react-lite: "npm:4.1.0"
+    react: "npm:19.0.0"
+    react-dom: "npm:19.0.0"
+    serializr: "npm:3.0.3"
+  peerDependencies:
+    react: ^19.0.0
+  checksum: 10c0/90fe1e05aac9432517f4d22b77cb89fd8d3d9489da14130ccf686d503cb45ba5fc5255dfd6387b80e205252f6b38da021194d31a4855ae674c0230a75e7c761d
+  languageName: node
+  linkType: hard
+
+"@finos/legend-extension-dsl-diagram@npm:8.1.59":
+  version: 8.1.59
+  resolution: "@finos/legend-extension-dsl-diagram@npm:8.1.59"
+  dependencies:
+    "@finos/legend-application": "npm:16.0.20"
+    "@finos/legend-application-studio": "npm:28.18.83"
+    "@finos/legend-art": "npm:7.1.77"
+    "@finos/legend-code-editor": "npm:2.0.36"
+    "@finos/legend-graph": "npm:32.0.4"
     "@finos/legend-shared": "npm:11.0.0"
     "@finos/legend-storage": "npm:3.0.119"
     "@types/react": "npm:19.0.7"
@@ -2299,30 +2427,125 @@ __metadata:
     serializr: "npm:3.0.3"
   peerDependencies:
     react: ^19.0.0
-  checksum: 10c0/5efbab8a9a9c7fe784133da8d9787fd06aa4a24cfdfc96e0d2d38c11ae04d15a7b254fb7b650f9837964c9594d6f5964609a6e6566b121ec59ba581e8aaeec66
+  checksum: 10c0/99e1287248338186c99060440db0771643919377edd8847fd329cf9d69ec5fe305846a1d07827b28aed053a78dbb7a8106190b8e6c9b24d8d00d48efa3b6287a
   languageName: node
   linkType: hard
 
-"@finos/legend-graph@npm:32.0.3":
-  version: 32.0.3
-  resolution: "@finos/legend-graph@npm:32.0.3"
+"@finos/legend-extension-dsl-persistence@npm:5.0.274":
+  version: 5.0.274
+  resolution: "@finos/legend-extension-dsl-persistence@npm:5.0.274"
+  dependencies:
+    "@finos/legend-application": "npm:16.0.20"
+    "@finos/legend-application-studio": "npm:28.18.83"
+    "@finos/legend-art": "npm:7.1.77"
+    "@finos/legend-code-editor": "npm:2.0.36"
+    "@finos/legend-graph": "npm:32.0.4"
+    "@finos/legend-shared": "npm:11.0.0"
+    "@finos/legend-storage": "npm:3.0.119"
+    "@types/react": "npm:19.0.7"
+    mobx: "npm:6.13.5"
+    react: "npm:19.0.0"
+    serializr: "npm:3.0.3"
+  peerDependencies:
+    react: ^19.0.0
+  checksum: 10c0/4c6c1dec7ae24cdda7429b1b9141d14f94ae637b741550a159a883e874daea5334656963e83eceb6571f2b2ffa726b80c40c42362e7ea8cc6ad1aece62ae9060
+  languageName: node
+  linkType: hard
+
+"@finos/legend-extension-dsl-service@npm:1.0.281":
+  version: 1.0.281
+  resolution: "@finos/legend-extension-dsl-service@npm:1.0.281"
+  dependencies:
+    "@finos/legend-application": "npm:16.0.20"
+    "@finos/legend-application-query": "npm:13.7.36"
+    "@finos/legend-application-studio": "npm:28.18.83"
+    "@finos/legend-art": "npm:7.1.77"
+    "@finos/legend-code-editor": "npm:2.0.36"
+    "@finos/legend-graph": "npm:32.0.4"
+    "@finos/legend-lego": "npm:2.0.39"
+    "@finos/legend-query-builder": "npm:4.15.41"
+    "@finos/legend-server-depot": "npm:6.0.77"
+    "@finos/legend-server-sdlc": "npm:5.3.45"
+    "@finos/legend-shared": "npm:11.0.0"
+    "@finos/legend-storage": "npm:3.0.119"
+    "@types/react": "npm:19.0.7"
+    mobx: "npm:6.13.5"
+    mobx-react-lite: "npm:4.1.0"
+    react: "npm:19.0.0"
+    react-dom: "npm:19.0.0"
+    serializr: "npm:3.0.3"
+  peerDependencies:
+    react: ^19.0.0
+  checksum: 10c0/02be1ce2618dcb4c32ca86f9a1b46137a9ae93e0e0fb2f3f3e8bc78014c95509656094f7f047bc9d50311787225a78edbbe19364e28e671d18ca7e22fdadeae6
+  languageName: node
+  linkType: hard
+
+"@finos/legend-extension-dsl-text@npm:6.0.273":
+  version: 6.0.273
+  resolution: "@finos/legend-extension-dsl-text@npm:6.0.273"
+  dependencies:
+    "@finos/legend-application": "npm:16.0.20"
+    "@finos/legend-application-studio": "npm:28.18.83"
+    "@finos/legend-art": "npm:7.1.77"
+    "@finos/legend-code-editor": "npm:2.0.36"
+    "@finos/legend-graph": "npm:32.0.4"
+    "@finos/legend-lego": "npm:2.0.39"
+    "@finos/legend-shared": "npm:11.0.0"
+    "@finos/legend-storage": "npm:3.0.119"
+    "@types/react": "npm:19.0.7"
+    mobx: "npm:6.13.5"
+    mobx-react-lite: "npm:4.1.0"
+    react: "npm:19.0.0"
+    serializr: "npm:3.0.3"
+  peerDependencies:
+    react: ^19.0.0
+  checksum: 10c0/bc52cb8aa8b972b7f58eeb5167b1b73091ed81ba5d9dad781f458851b5ccc478b47cdcc5eb415eff4a9f9c50a9bddc76241ea903a4ad9498b33422f098b8e8c0
+  languageName: node
+  linkType: hard
+
+"@finos/legend-extension-store-service-store@npm:2.0.273":
+  version: 2.0.273
+  resolution: "@finos/legend-extension-store-service-store@npm:2.0.273"
+  dependencies:
+    "@finos/legend-application": "npm:16.0.20"
+    "@finos/legend-application-studio": "npm:28.18.83"
+    "@finos/legend-art": "npm:7.1.77"
+    "@finos/legend-code-editor": "npm:2.0.36"
+    "@finos/legend-graph": "npm:32.0.4"
+    "@finos/legend-lego": "npm:2.0.39"
+    "@finos/legend-shared": "npm:11.0.0"
+    "@finos/legend-storage": "npm:3.0.119"
+    "@types/react": "npm:19.0.7"
+    mobx: "npm:6.13.5"
+    mobx-react-lite: "npm:4.1.0"
+    react: "npm:19.0.0"
+    serializr: "npm:3.0.3"
+  peerDependencies:
+    react: ^19.0.0
+  checksum: 10c0/47f11459acd2b6393283b95caef6dcb86b22018f9ae3476f57e692970732c94ecf38ed997f4705ed09faa9f66eb74cce94360049c3850caa9e37b56db56eb7ba
+  languageName: node
+  linkType: hard
+
+"@finos/legend-graph@npm:32.0.4":
+  version: 32.0.4
+  resolution: "@finos/legend-graph@npm:32.0.4"
   dependencies:
     "@finos/legend-shared": "npm:11.0.0"
     "@finos/legend-storage": "npm:3.0.119"
     mobx: "npm:6.13.5"
     serializr: "npm:3.0.3"
-  checksum: 10c0/493a1d55f96e28e530f378f2ac20f0efa59272d262b1b1d841ab133863b8f5738e9bfb13a6d65f09d26c69d1b9392262d0fc2d11cc0c06ac0efd64b8b142c85c
+  checksum: 10c0/7d116465c67bd7a063201112dc75e9bea684bf7f6ef1a588cd6f6b841fcc48f7b6e99a4c41f0b86bcd053515350be03b01d46e533f946289cb8489d87b636a2d
   languageName: node
   linkType: hard
 
-"@finos/legend-lego@npm:2.0.38":
-  version: 2.0.38
-  resolution: "@finos/legend-lego@npm:2.0.38"
+"@finos/legend-lego@npm:2.0.39":
+  version: 2.0.39
+  resolution: "@finos/legend-lego@npm:2.0.39"
   dependencies:
     "@finos/legend-application": "npm:16.0.20"
     "@finos/legend-art": "npm:7.1.77"
-    "@finos/legend-code-editor": "npm:2.0.35"
-    "@finos/legend-graph": "npm:32.0.3"
+    "@finos/legend-code-editor": "npm:2.0.36"
+    "@finos/legend-graph": "npm:32.0.4"
     "@finos/legend-shared": "npm:11.0.0"
     "@types/css-font-loading-module": "npm:0.0.14"
     "@types/react": "npm:19.0.7"
@@ -2338,20 +2561,20 @@ __metadata:
     react-dom: "npm:19.0.0"
   peerDependencies:
     react: ^19.0.0
-  checksum: 10c0/989e7f43f7ed1c7882f9a76253e92e5fd29794f8dc68b6b7a26027a964ed03c22077c47852f4fe0cf103ad38a38e8ebdd7a35f7b2cc584f1ef9bf8fd0eb82e32
+  checksum: 10c0/69e15eb2ebd9b7eb5de56f5c24b747456b2f5a707a11ed92ba5e4b6466fa57164a8f4449effc3eaa87be7fd96da8dbdaaa7fc93faa593de7c559336874724e26
   languageName: node
   linkType: hard
 
-"@finos/legend-query-builder@npm:4.15.40":
-  version: 4.15.40
-  resolution: "@finos/legend-query-builder@npm:4.15.40"
+"@finos/legend-query-builder@npm:4.15.41":
+  version: 4.15.41
+  resolution: "@finos/legend-query-builder@npm:4.15.41"
   dependencies:
     "@finos/legend-application": "npm:16.0.20"
     "@finos/legend-art": "npm:7.1.77"
-    "@finos/legend-code-editor": "npm:2.0.35"
-    "@finos/legend-data-cube": "npm:0.0.42"
-    "@finos/legend-graph": "npm:32.0.3"
-    "@finos/legend-lego": "npm:2.0.38"
+    "@finos/legend-code-editor": "npm:2.0.36"
+    "@finos/legend-data-cube": "npm:0.0.43"
+    "@finos/legend-graph": "npm:32.0.4"
+    "@finos/legend-lego": "npm:2.0.39"
     "@finos/legend-server-depot": "npm:6.0.77"
     "@finos/legend-shared": "npm:11.0.0"
     "@finos/legend-storage": "npm:3.0.119"
@@ -2371,7 +2594,7 @@ __metadata:
     sql-formatter: "npm:15.4.9"
   peerDependencies:
     react: ^19.0.0
-  checksum: 10c0/d3c2b4a76578bea715f6cc9d9d53619a9e82fafd4c5ab0f71d9d734f3bd5e70a6134a497b3a44a70cf079d1855e97ed193ab7fc7d4d438963d18a285c4b89498
+  checksum: 10c0/1434c0857c642d761b650520952e369c49b7d1389a1ed7c863016503c0c56b165764ce35980faf9aa56dd59ee929c4b73bfbb800c87ab005f31fea7525d60409
   languageName: node
   linkType: hard
 
@@ -2453,22 +2676,24 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@finos/legend-vscode-extension-dependencies@npm:4.0.57":
-  version: 4.0.57
-  resolution: "@finos/legend-vscode-extension-dependencies@npm:4.0.57"
+"@finos/legend-vscode-extension-dependencies@npm:4.0.60":
+  version: 4.0.60
+  resolution: "@finos/legend-vscode-extension-dependencies@npm:4.0.60"
   dependencies:
     "@finos/legend-application": "npm:16.0.20"
-    "@finos/legend-application-studio": "npm:28.18.81"
+    "@finos/legend-application-query-bootstrap": "npm:13.12.0"
+    "@finos/legend-application-studio": "npm:28.18.83"
     "@finos/legend-art": "npm:7.1.77"
-    "@finos/legend-data-cube": "npm:0.0.42"
-    "@finos/legend-extension-dsl-diagram": "npm:8.1.57"
-    "@finos/legend-graph": "npm:32.0.3"
-    "@finos/legend-query-builder": "npm:4.15.40"
+    "@finos/legend-data-cube": "npm:0.0.43"
+    "@finos/legend-extension-dsl-diagram": "npm:8.1.59"
+    "@finos/legend-graph": "npm:32.0.4"
+    "@finos/legend-lego": "npm:2.0.39"
+    "@finos/legend-query-builder": "npm:4.15.41"
     "@finos/legend-shared": "npm:11.0.0"
     "@finos/legend-storage": "npm:3.0.119"
     "@types/react": "npm:19.0.7"
     react: "npm:19.0.0"
-  checksum: 10c0/fd2241d5c35add6ac567bf2311c9c343c46ba4e1864ce963379dd32492b3a9adec8cb771ae433d53ec7da80ce8ffed53204230864d33e4be9868481098c2d586
+  checksum: 10c0/584709237694393931a569e672899b3a15b29a3817a4da95fbc7c6ab3df53c3718b5ea7b58a5e5ccdba57ada731217cce4765025ae5ff4507918252de1b25786
   languageName: node
   linkType: hard
 
@@ -13410,6 +13635,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "legend-engine-ide-client-vscode-root@workspace:."
   dependencies:
+    "@finos/legend-vscode-extension-dependencies": "npm:4.0.60"
     npm-run-all: "npm:^4.1.5"
   languageName: unknown
   linkType: soft
@@ -13421,7 +13647,6 @@ __metadata:
     "@eslint/compat": "npm:^1.2.4"
     "@eslint/js": "npm:9.17.0"
     "@finos/legend-engine-ide-client-vscode-shared": "workspace:*"
-    "@finos/legend-vscode-extension-dependencies": "npm:4.0.57"
     "@types/mocha": "npm:10.0.1"
     "@types/sinon": "npm:17.0.3"
     "@types/vscode": "npm:1.83.0"
