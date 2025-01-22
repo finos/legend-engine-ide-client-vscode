@@ -59,6 +59,7 @@ jobs:
       - name: Publish to NPM
         run: |
           yarn config set npmAuthToken $NODE_AUTH_TOKEN
+          yarn release:shared
           yarn release:client
         env:
           GITHUB_TOKEN: ${{ secrets.FINOS_GITHUB_TOKEN }}
