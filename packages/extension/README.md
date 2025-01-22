@@ -1,8 +1,3 @@
-<img src="https://cdn.jsdelivr.net/gh/finos/contrib-toolbox@master/images/badge-incubating.png" width="150"/>
-
-![Visual Studio Marketplace](https://img.shields.io/visual-studio-marketplace/v/FINOS.legend-engine-ide-client-vscode.png?label=Visual%20Studio%20Marketplace)
-![Open VSX Marketplace](https://img.shields.io/open-vsx/v/finos/legend-engine-ide-client-vscode.png?label=Open%20VSX%20Marketplace)
-
 The **_Legend VSCode_** extension provides an easy and quick way to develop using _Legend_ data modeling language.
 
 An overview of the language can be found [here](https://legend.finos.org/docs/overview/legend-overview).
@@ -22,10 +17,11 @@ For more things _Legend_, visit our GitHub [here](https://github.com/finos/legen
 - Snippets for common element types
 - Legend REPL Terminal
 - Diagram vizualization
+- QueryBuilder visualization for editing complex queries
 
 ### Hello World
 
-![Hello World](docs/demo.gif)
+![Hello World](../../docs/demo.gif)
 
 To start using the extension, create a `hello.pure` file in your workspace, and copy/paste the content of one of our showcases
 
@@ -34,15 +30,7 @@ To start using the extension, create a `hello.pure` file in your workspace, and 
 
 ## Contributing
 
-Please read our [contributing guide](./CONTRIBUTING.md).
-
-## Project Structure
-
-The project is structured into 3 main parts within the `src` directory:
-
-- `extension`: This directory contains code that runs exclusively on the extension host and interacts directly with the VS Code APIs. Nothing in this directory should import anything from `@finos/legend-vscode-extension-dependencies` unless it is simply a `type` import, as doing so will cause the webpack bundling to break, since components from the `@finos/legend-vscode-extension-dependencies` library require polyfills that we don't provide when bundling the extension code.
-- `client`: This directory contains code that runs within iframes in VS Code. Most of the core UI logic lives here, and all the components that we import from `@finos/legend-vscode-extension-dependencies` are implemented here. You can safely import from `@finos/legend-vscode-extension-dependencies` in this directory.
-- `shared`: This directory contains code that is shared between the `extension` and `client` directories. Because code here is used within the `extension` directory, nothing in the `shared` directory should import anything from `@finos/legend-vscode-extension-dependencies` unless it is simply a `type` import.
+Please read our [contributing guide](../../CONTRIBUTING.md).
 
 ## License
 
