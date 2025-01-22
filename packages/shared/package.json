@@ -1,6 +1,6 @@
 {
   "name": "@finos/legend-engine-ide-client-vscode-shared",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Legend Extension shared code",
   "homepage": "https://legend.finos.org/",
   "repository": {
