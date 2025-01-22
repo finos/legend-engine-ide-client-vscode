@@ -29,7 +29,6 @@ import {
   type V1_RawLambda,
   guaranteeNonEmptyString,
   guaranteeNonNullable,
-  LEGEND_APPLICATION_COLOR_THEME,
 } from '@finos/legend-vscode-extension-dependencies';
 import { LegendVSCodeApplication } from '../application/LegendVSCodeApplication';
 import { WebviewQueryBuilder } from './query/WebviewQueryBuilder';
