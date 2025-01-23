@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2020-present, Goldman Sachs
+ * Copyright (c) 2024-present, Goldman Sachs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 
 import packageJson from '../../package.json';
 import {
+  type QueryBuilder_LegendApplicationPlugin_Extension,
   type QueryBuilderHeaderActionConfiguration,
   type QueryBuilderState,
   type V1_ConcreteFunctionDefinition,
@@ -40,11 +41,14 @@ import { LegendVSCodeApplicationPlugin } from './LegendVSCodeApplicationPlugin';
 import { postMessage } from '../utils/VsCodeUtils';
 import { WRITE_ENTITY } from '@finos/legend-engine-ide-client-vscode-shared';
 
-export class Core_LegendVSCodeApplicationPlugin extends LegendVSCodeApplicationPlugin {
+export class QueryBuilder_LegendVSCodeApplicationPlugin
+  extends LegendVSCodeApplicationPlugin
+  implements QueryBuilder_LegendApplicationPlugin_Extension
+{
   static NAME = packageJson.extensions.applicationVSCodePlugin;
 
   constructor() {
-    super(Core_LegendVSCodeApplicationPlugin.NAME, packageJson.version);
+    super(QueryBuilder_LegendVSCodeApplicationPlugin.NAME, packageJson.version);
   }
 
   getExtraQueryBuilderHeaderActionConfigurations?(): QueryBuilderHeaderActionConfiguration[] {
