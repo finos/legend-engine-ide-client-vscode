@@ -50,6 +50,9 @@ jobs:
       - name: Build project and prepare release
         run: |
           yarn release:prepare
+      - name: Bundle client code in commonjs format for npm publish
+        run: |
+          yarn bundle:client
       - name: Publish to VS Code Marketplace        
         run: yarn release:marketPlace
         env:

@@ -15,6 +15,7 @@
     "webpack": "yarn workspace legend-engine-ide-client-vscode webpack",
     "webpack:package": "yarn workspace legend-engine-ide-client-vscode webpack:package",
     "bundle": "yarn compile && yarn workspace @finos/legend-engine-ide-client-vscode-shared bundle",
+    "bundle:client": "yarn workspace @finos/legend-engine-ide-client-vscode bundle",
     "package": "yarn compile && yarn webpack:package",
     "check:copyright": "yarn workspaces foreach --all run check:copyright",
     "check:format": "yarn workspaces foreach --all run check:format",
