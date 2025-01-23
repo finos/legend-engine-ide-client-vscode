@@ -74,7 +74,7 @@ export default {
           '@babel/plugin-syntax-import-attributes',
           { deprecatedAssertSyntax: true },
         ],
-        ['@babel/plugin-proposal-class-properties'],
+        ['@babel/plugin-proposal-class-properties', { loose: true }],
         [
           '@babel/plugin-transform-classes',
           {
