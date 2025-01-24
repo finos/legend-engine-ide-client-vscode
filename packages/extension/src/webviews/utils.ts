@@ -52,7 +52,15 @@ export const getWebviewHtml = (
     );
     webviewRootScript = webview.asWebviewUri(webviewRootScriptPath);
   } else {
-    webviewRootScript = renderFilePath;
+    // If the provided renderFilePath is a local file, we need to convert it to a webview URI
+    if (
+      new URL(renderFilePath, workspace.workspaceFolders?.[0]?.uri.toString())
+        .protocol === 'file:'
+    ) {
+      webviewRootScript = webview.asWebviewUri(Uri.file(renderFilePath));
+    } else {
+      webviewRootScript = renderFilePath;
+    }
   }
 
   return `
