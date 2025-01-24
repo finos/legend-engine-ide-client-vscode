@@ -74,13 +74,14 @@ export default {
           '@babel/plugin-syntax-import-attributes',
           { deprecatedAssertSyntax: true },
         ],
+        ['@babel/plugin-transform-class-properties'],
+        ['@babel/plugin-transform-classes'],
       ],
       presets: [
         [
           '@babel/preset-env',
           {
             modules: false,
-            loose: true,
           },
         ],
         ['@babel/preset-react', { runtime: 'automatic' }],
