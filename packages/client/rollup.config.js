@@ -28,7 +28,14 @@ const extensions = ['.js', '.ts', '.jsx', '.tsx'];
 
 export default {
   input: 'src/index.ts',
-  external: ['@jest/globals', 'react-dom/server', 'react', 'react-dom'],
+  external: [
+    '@jest/globals',
+    'react-dom/server',
+    'react',
+    'react-dom',
+    '@finos/legend-engine-ide-client-vscode-shared',
+    '@finos/legend-vscode-extension-dependencies',
+  ],
   output: [
     {
       file: 'lib/bundles/bundle.cjs.js',
