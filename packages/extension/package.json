@@ -353,9 +353,10 @@
   "scripts": {
     "test": "yarn compile && yarn node ./lib/__tests__/runTest.js",
     "compile": "tsc -b",
-    "dev:webpack": "webpack --mode development --watch",
-    "webpack": "webpack --mode development",
-    "webpack:package": "webpack --mode production --devtool hidden-source-map",
+    "dev:webpack": "yarn clean && webpack --mode development --watch",
+    "webpack": "yarn clean && webpack --mode development",
+    "webpack:package": "yarn clean && webpack --mode production --devtool hidden-source-map",
+    "clean": "rm -rf \"dist\"",
     "check:copyright": "license-check-and-add check -f ../../license-check-and-add-config.json",
     "check:format": "prettier --list-different \"(src|scripts|docs)/**/*.{md,json,mjs,cjs,js,ts,tsx,html,scss,css}\"",
     "check:ci": "yarn check:format && yarn check:copyright",
