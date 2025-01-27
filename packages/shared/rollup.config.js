@@ -33,7 +33,6 @@ export default {
     'react-dom/server',
     'react',
     'react-dom',
-    '@finos/legend-vscode-extension-dependencies',
     '@types/vscode',
   ],
   output: [
