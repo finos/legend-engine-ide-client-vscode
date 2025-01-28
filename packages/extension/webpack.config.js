@@ -67,7 +67,7 @@ const webviewConfig = {
       vm: require.resolve('vm-browserify'),
     },
     alias: {
-      react: path.resolve('./node_modules/react'),
+      react: path.resolve('../../node_modules/react'),
       process: 'process/browser',
     },
   },
@@ -124,7 +124,7 @@ const purebookRendererConfig = {
       vm: require.resolve('vm-browserify'),
     },
     alias: {
-      react: path.resolve('./node_modules/react'),
+      react: path.resolve('../../node_modules/react'),
       process: 'process/browser',
     },
   },
@@ -153,7 +153,7 @@ const extensionConfig = {
       assert: require.resolve('assert'),
     },
     alias: {
-      react: path.resolve('./node_modules/react'),
+      react: path.resolve('../../node_modules/react'),
     },
   },
   module: {
