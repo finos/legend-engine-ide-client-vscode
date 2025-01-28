@@ -33,7 +33,7 @@
     "version": "yarn version"
   },
   "dependencies": {
-    "@finos/legend-vscode-extension-dependencies": "4.0.60",
+    "@finos/legend-vscode-extension-dependencies": "4.0.65",
     "@types/vscode": "1.83.0",
     "serializr": "3.0.3"
   },
