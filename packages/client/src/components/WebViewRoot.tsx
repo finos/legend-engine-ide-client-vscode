@@ -27,6 +27,6 @@ if (inputParamtersFromHtml) {
   const parsedParams = JSON.parse(inputParamtersFromHtml) as PlainObject;
 
   createRoot(rootElement as HTMLElement).render(
-    <ComponentRouter {...parsedParams} />,
+    <ComponentRouter parsedParams={parsedParams} />,
   );
 }
