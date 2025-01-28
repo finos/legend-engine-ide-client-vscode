@@ -198,6 +198,13 @@ export class LSPDataCubeEngine extends DataCubeEngine {
     return response.completions;
   }
 
+  override async getQueryRelationReturnType(
+    query: V1_Lambda,
+    source: DataCubeSource,
+  ): Promise<DataCubeRelationType> {
+    return this.getRawLambdaRelationType(this.buildRawLambdaFromLambda(query));
+  }
+
   override async getQueryCodeRelationReturnType(
     code: string,
     baseQuery: V1_ValueSpecification,
