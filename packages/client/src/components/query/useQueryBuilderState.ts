@@ -22,10 +22,10 @@ import {
   type V1_PackageableElement,
   assertTrue,
   FunctionQueryBuilderState,
+  GenericTypeExplicitReference,
   graph_renameElement,
   guaranteeNonNullable,
   guaranteeType,
-  PackageableElementExplicitReference,
   pureExecution_setFunction,
   PureExecution,
   QueryBuilderActionConfig,
@@ -35,7 +35,6 @@ import {
   V1_buildVariable,
   V1_ConcreteFunctionDefinition,
   V1_deserializePackageableElement,
-  V1_getGenericTypeFullPath,
   V1_GraphBuilderContextBuilder,
   V1_PureExecution,
   V1_PureGraphManager,
@@ -298,14 +297,17 @@ export const useQueryBuilderState = (
         }
 
         // Update existing function element
-        existingFunctionEntity.returnType =
-          PackageableElementExplicitReference.create(
-            nonNullQueryBuilderState.graphManagerState.graph.getType(
-              V1_getGenericTypeFullPath(
-                V1_functionDefinition.returnGenericType,
-              ),
-            ),
-          );
+        const graphBuilderContext = new V1_GraphBuilderContextBuilder(
+          nonNullQueryBuilderState.graphManagerState.graph,
+          nonNullQueryBuilderState.graphManagerState.graph,
+          graphManager.graphBuilderExtensions,
+          applicationStore.logService,
+        ).build();
+        existingFunctionEntity.returnType = GenericTypeExplicitReference.create(
+          graphBuilderContext.resolveGenericTypeFromProtocol(
+            V1_functionDefinition.returnGenericType,
+          ).value,
+        );
         existingFunctionEntity.returnMultiplicity =
           V1_functionDefinition.returnMultiplicity;
         existingFunctionEntity.expressionSequence =
