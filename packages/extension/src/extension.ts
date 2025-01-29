@@ -46,10 +46,8 @@ import {
   type ServerOptions,
   TextDocumentIdentifier,
 } from 'vscode-languageclient/node';
-import {
-  type PlainObject,
-  type V1_ConcreteFunctionDefinition,
-} from '@finos/legend-vscode-extension-dependencies';
+import { type PlainObject } from '@finos/legend-vscode-extension-dependencies';
+import { type V1_ConcreteFunctionDefinition } from '@finos/legend-graph';
 import { LegendTreeDataProvider } from './utils/LegendTreeProvider';
 import { LanguageClientProgressResult } from './model/LanguageClientProgressResult';
 import {

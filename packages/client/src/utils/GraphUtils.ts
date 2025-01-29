@@ -16,10 +16,13 @@
 
 import {
   type ApplicationStore,
-  type ConcreteFunctionDefinition,
   type Entity,
-  type ExecutionOptions,
   type PlainObject,
+  guaranteeType,
+} from '@finos/legend-vscode-extension-dependencies';
+import {
+  type ConcreteFunctionDefinition,
+  type ExecutionOptions,
   type PureProtocolProcessorPlugin,
   type V1_EntitlementReportAnalyticsInput,
   type V1_ExecuteInput,
@@ -27,10 +30,9 @@ import {
   type V1_StoreEntitlementAnalysisInput,
   buildPureGraphManager,
   GraphManagerState,
-  guaranteeType,
   RawLambda,
   V1_PureGraphManager,
-} from '@finos/legend-vscode-extension-dependencies';
+} from '@finos/legend-graph';
 import { type LegendVSCodeApplicationConfig } from '../application/LegendVSCodeApplicationConfig';
 import { type LegendVSCodePluginManager } from '../application/LegendVSCodePluginManager';
 import { type V1_LSPEngine } from '../graph/V1_LSPEngine';

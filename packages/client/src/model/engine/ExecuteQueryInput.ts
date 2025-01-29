@@ -17,6 +17,8 @@
 import {
   SerializationFactory,
   usingModelSchema,
+} from '@finos/legend-vscode-extension-dependencies';
+import {
   type V1_RawLambda,
   V1_rawLambdaModelSchema,
   type V1_Runtime,
@@ -24,7 +26,7 @@ import {
   type V1_RawExecutionContext,
   V1_rawBaseExecutionContextModelSchema,
   type EXECUTION_SERIALIZATION_FORMAT,
-} from '@finos/legend-vscode-extension-dependencies';
+} from '@finos/legend-graph';
 import { createModelSchema, custom, map, raw } from 'serializr';
 
 export class V1_LSPExecuteInput {

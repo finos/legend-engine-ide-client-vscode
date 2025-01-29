@@ -16,13 +16,15 @@
 
 import {
   type PlainObject,
+  SerializationFactory,
+  usingModelSchema,
+} from '@finos/legend-vscode-extension-dependencies';
+import {
   type V1_LambdaReturnTypeResult,
   type V1_RawLambda,
   type V1_RelationType,
-  SerializationFactory,
-  usingModelSchema,
   V1_rawLambdaModelSchema,
-} from '@finos/legend-vscode-extension-dependencies';
+} from '@finos/legend-graph';
 import { createModelSchema } from 'serializr';
 
 export class V1_LSPLambdaReturnTypeInput {

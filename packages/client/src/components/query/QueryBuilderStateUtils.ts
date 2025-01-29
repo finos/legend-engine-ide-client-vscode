@@ -17,10 +17,13 @@
 import {
   type Entity,
   type PlainObject,
-  type V1_PackageableElement,
   assertTrue,
   guaranteeNonNullable,
   guaranteeType,
+  uniq,
+} from '@finos/legend-vscode-extension-dependencies';
+import {
+  type V1_PackageableElement,
   resolvePackagePathAndElementName,
   V1_AppliedFunction,
   V1_ConcreteFunctionDefinition,
@@ -37,8 +40,7 @@ import {
   V1_setupEngineRuntimeSerialization,
   V1_setupLegacyRuntimeSerialization,
   V1_PureMultiExecution,
-  uniq,
-} from '@finos/legend-vscode-extension-dependencies';
+} from '@finos/legend-graph';
 import {
   type LegendExecutionResult,
   ANALYZE_MAPPING_MODEL_COVERAGE_COMMAND_ID,

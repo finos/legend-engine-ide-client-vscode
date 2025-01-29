@@ -49,9 +49,9 @@ import type { LegendTest } from './model/LegendTest';
 import type { ExecuteTestRequest } from './model/ExecuteTestRequest';
 import type { LegendTestExecutionResult } from './model/LegendTestExecutionResult';
 import { LegendEntity } from './model/LegendEntity';
+import { type PlainObject } from '@finos/legend-vscode-extension-dependencies';
 import {
   type EXECUTION_SERIALIZATION_FORMAT,
-  type PlainObject,
   type V1_GrammarParserBatchInputEntry,
   type V1_Lambda,
   type V1_ParameterValue,
@@ -59,7 +59,7 @@ import {
   type V1_RawLambda,
   type V1_RenderStyle,
   type V1_Runtime,
-} from '@finos/legend-vscode-extension-dependencies';
+} from '@finos/legend-graph';
 
 export class LegendEntitiesRequest {
   private textDocuments!: TextDocumentIdentifier[];

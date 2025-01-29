@@ -18,11 +18,11 @@ import {
   type DataCubeOptions,
   type DataCubeQuery,
   type PlainObject,
-  type V1_RawLambda,
   CubesLoadingIndicator,
   CubesLoadingIndicatorIcon,
   DataCube,
 } from '@finos/legend-vscode-extension-dependencies';
+import { type V1_RawLambda } from '@finos/legend-graph';
 import { useEffect, useState } from 'react';
 import { LSPDataCubeEngine } from './LSPDataCubeEngine';
 

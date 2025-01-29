@@ -15,6 +15,16 @@
  */
 
 import {
+  type PlainObject,
+  ContentType,
+  deserializeMap,
+  getContentTypeFileExtension,
+  guaranteeNonNullable,
+  isLossSafeNumber,
+  parseLosslessJSON,
+  returnUndefOnError,
+} from '@finos/legend-vscode-extension-dependencies';
+import {
   type ClassifierPathMapping,
   type DeploymentResult,
   type ExecutionOptions,
@@ -24,7 +34,6 @@ import {
   type GraphManagerOperationReport,
   type LightPersistentDataCubeQuery,
   type PersistentDataCubeQuery,
-  type PlainObject,
   type PostValidationAssertionResult,
   type PureProtocolProcessorPlugin,
   type RawRelationalOperationElement,
@@ -76,16 +85,9 @@ import {
   type V1_TextCompilationResult,
   type V1_ValueSpecification,
   CodeCompletionResult,
-  ContentType,
-  deserializeMap,
-  getContentTypeFileExtension,
-  guaranteeNonNullable,
-  isLossSafeNumber,
-  parseLosslessJSON,
   RawLambda,
   RelationTypeColumnMetadata,
   RelationTypeMetadata,
-  returnUndefOnError,
   TEMPORARY__AbstractEngineConfig,
   V1_buildCompilationError,
   V1_buildExecutionError,
@@ -110,7 +112,7 @@ import {
   V1_RenderStyle,
   V1_serializeRawValueSpecification,
   V1_transformRawLambda,
-} from '@finos/legend-vscode-extension-dependencies';
+} from '@finos/legend-graph';
 import { deserialize } from 'serializr';
 import { postAndWaitForMessage as defaultPostAndWaitForMessage } from '../utils/VsCodeUtils';
 import {

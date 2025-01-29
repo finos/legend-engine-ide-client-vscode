@@ -19,19 +19,21 @@ import { flowResult } from 'mobx';
 import {
   type Entity,
   type QueryBuilderState,
-  type V1_PackageableElement,
   assertTrue,
   FunctionQueryBuilderState,
-  GenericTypeExplicitReference,
   graph_renameElement,
   guaranteeNonNullable,
   guaranteeType,
   pureExecution_setFunction,
-  PureExecution,
   QueryBuilderActionConfig,
-  RawLambda,
   ServiceQueryBuilderState,
   useApplicationStore,
+} from '@finos/legend-vscode-extension-dependencies';
+import {
+  type V1_PackageableElement,
+  GenericTypeExplicitReference,
+  PureExecution,
+  RawLambda,
   V1_buildVariable,
   V1_ConcreteFunctionDefinition,
   V1_deserializePackageableElement,
@@ -39,7 +41,7 @@ import {
   V1_PureExecution,
   V1_PureGraphManager,
   V1_serviceModelSchema,
-} from '@finos/legend-vscode-extension-dependencies';
+} from '@finos/legend-graph';
 import {
   CLASSIFIER_PATH,
   LEGEND_REFRESH_QUERY_BUILDER,

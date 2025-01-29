@@ -26,10 +26,10 @@ import {
   type AbstractPlugin,
   type AbstractPreset,
   type PlainObject,
-  type V1_RawLambda,
   guaranteeNonEmptyString,
   guaranteeNonNullable,
 } from '@finos/legend-vscode-extension-dependencies';
+import { type V1_RawLambda } from '@finos/legend-graph';
 import { LegendVSCodeApplication } from '../application/LegendVSCodeApplication';
 import { WebviewQueryBuilder } from './query/WebviewQueryBuilder';
 import { DiagramEditor } from './diagram/DiagramEditor';

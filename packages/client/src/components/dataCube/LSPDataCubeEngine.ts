@@ -19,8 +19,6 @@ import {
   type DataCubeExecutionResult,
   type DataCubeRelationType,
   type PlainObject,
-  type RelationTypeMetadata,
-  type V1_ValueSpecification,
   _elementPtr,
   _function,
   assertTrue,
@@ -30,6 +28,10 @@ import {
   DataCubeSource,
   guaranteeType,
   isNonNullable,
+} from '@finos/legend-vscode-extension-dependencies';
+import {
+  type RelationTypeMetadata,
+  type V1_ValueSpecification,
   RelationalExecutionActivities,
   TDSExecutionResult,
   V1_AppliedFunction,
@@ -41,7 +43,7 @@ import {
   V1_RawLambda,
   V1_serializeRawValueSpecification,
   V1_serializeValueSpecification,
-} from '@finos/legend-vscode-extension-dependencies';
+} from '@finos/legend-graph';
 import { V1_LSPEngine } from '../../graph/V1_LSPEngine';
 
 class LSPDataCubeSource extends DataCubeSource {

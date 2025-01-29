@@ -19,7 +19,7 @@ import {
   type V1_GenericType,
   type V1_Multiplicity,
   type V1_RawVariable,
-} from '@finos/legend-vscode-extension-dependencies';
+} from '@finos/legend-graph';
 
 const ELEMENT_PATH_DELIMITER = '::';
 const FUNCTION_SIGNATURE_MULTIPLICITY_INFINITE_TOKEN = 'MANY';

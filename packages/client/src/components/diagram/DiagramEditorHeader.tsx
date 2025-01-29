@@ -28,7 +28,6 @@ import {
   AlignTopIcon,
   CaretDownIcon,
   ControlledDropdownMenu,
-  CORE_PURE_PATH,
   DistributeHorizontalIcon,
   DistributeVerticalIcon,
   MenuContent,
@@ -39,6 +38,7 @@ import {
   CustomSelectorInput,
   compareLabelFn,
 } from '@finos/legend-vscode-extension-dependencies';
+import { CORE_PURE_PATH } from '@finos/legend-graph';
 import { useState } from 'react';
 import { serialize } from 'serializr';
 import { observer } from 'mobx-react-lite';

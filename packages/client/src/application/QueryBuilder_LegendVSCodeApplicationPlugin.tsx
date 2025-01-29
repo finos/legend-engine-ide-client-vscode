@@ -19,24 +19,26 @@ import {
   type QueryBuilder_LegendApplicationPlugin_Extension,
   type QueryBuilderHeaderActionConfiguration,
   type QueryBuilderState,
-  type V1_ConcreteFunctionDefinition,
-  type V1_Service,
   assertErrorThrown,
   assertTrue,
   Button,
   FunctionQueryBuilderState,
-  getFunctionNameWithPath,
-  getFunctionSignature,
   graph_renameElement,
   guaranteeType,
   pureExecution_setFunction,
-  PureExecution,
-  RawVariableExpression,
   SaveCurrIcon,
   ServiceQueryBuilderState,
+} from '@finos/legend-vscode-extension-dependencies';
+import {
+  type V1_ConcreteFunctionDefinition,
+  type V1_Service,
+  getFunctionNameWithPath,
+  getFunctionSignature,
+  PureExecution,
+  RawVariableExpression,
   V1_PureGraphManager,
   V1_serializePackageableElement,
-} from '@finos/legend-vscode-extension-dependencies';
+} from '@finos/legend-graph';
 import { LegendVSCodeApplicationPlugin } from './LegendVSCodeApplicationPlugin';
 import { postMessage } from '../utils/VsCodeUtils';
 import { WRITE_ENTITY } from '@finos/legend-engine-ide-client-vscode-shared';

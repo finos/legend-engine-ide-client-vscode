@@ -42,7 +42,7 @@ export default {
       format: 'cjs',
       sourcemap: false,
       inlineDynamicImports: true,
-      plugins: [terser()],
+      // plugins: [terser()],
       globals: {
         'react/jsx-runtime': 'jsxRuntime',
         'react-dom/client': 'ReactDOM',

@@ -2029,19 +2029,19 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@finos/legend-application-query-bootstrap@npm:13.17.0":
-  version: 13.17.0
-  resolution: "@finos/legend-application-query-bootstrap@npm:13.17.0"
+"@finos/legend-application-query-bootstrap@npm:13.18.0":
+  version: 13.18.0
+  resolution: "@finos/legend-application-query-bootstrap@npm:13.18.0"
   dependencies:
     "@finos/legend-application": "npm:16.0.22"
-    "@finos/legend-application-query": "npm:13.7.41"
+    "@finos/legend-application-query": "npm:13.7.42"
     "@finos/legend-art": "npm:7.1.79"
     "@finos/legend-extension-assortment": "npm:0.0.256"
     "@finos/legend-extension-dsl-data-quality": "npm:2.0.33"
     "@finos/legend-extension-dsl-data-space": "npm:10.4.41"
     "@finos/legend-extension-dsl-diagram": "npm:8.1.64"
     "@finos/legend-extension-dsl-persistence": "npm:5.0.279"
-    "@finos/legend-extension-dsl-service": "npm:1.0.286"
+    "@finos/legend-extension-dsl-service": "npm:1.0.287"
     "@finos/legend-extension-dsl-text": "npm:6.0.278"
     "@finos/legend-extension-store-service-store": "npm:2.0.278"
     "@finos/legend-graph": "npm:32.0.9"
@@ -2049,13 +2049,13 @@ __metadata:
     "@finos/legend-shared": "npm:11.0.1"
     "@types/react": "npm:19.0.8"
     react: "npm:19.0.0"
-  checksum: 10c0/70ca3e5b5ff992ec1dbc28b8f0bab11b2638806752cea338731f99f4549ea97fbf99e634b70c0e268b1822e6a0ad19de955af2afd874cd6f45efca061989e295
+  checksum: 10c0/fedc0b17cd09d6e7e2eda41a39f0da3f418690517ed5420c5980fae4f16a57ee165b3eda53a7ff914ec9cf49fce3eed4eb17e874588dca773445cf9734a091e4
   languageName: node
   linkType: hard
 
-"@finos/legend-application-query@npm:13.7.41":
-  version: 13.7.41
-  resolution: "@finos/legend-application-query@npm:13.7.41"
+"@finos/legend-application-query@npm:13.7.42":
+  version: 13.7.42
+  resolution: "@finos/legend-application-query@npm:13.7.42"
   dependencies:
     "@finos/legend-application": "npm:16.0.22"
     "@finos/legend-art": "npm:7.1.79"
@@ -2079,7 +2079,7 @@ __metadata:
     serializr: "npm:3.0.3"
   peerDependencies:
     react: ^19.0.0
-  checksum: 10c0/ab570de200ce2be622bb914b92f07825ce9931a18205f1a07bc9d6836135d29c59d2d48668bf89f79504e96db76dbb618c8c33b4a6533799cd13a696ebac22c0
+  checksum: 10c0/4b604a4992776f35a8b28bd8b3f50365222fb092ef7484ec97e9cba73431cb45338153869669fee3a3f8f9a792e2f6bd284602c304b1b77cfc348941cd728a2d
   languageName: node
   linkType: hard
 
@@ -2290,7 +2290,7 @@ __metadata:
     "@eslint/js": "npm:9.17.0"
     "@finos/babel-preset-legend-studio": "npm:2.0.84"
     "@finos/legend-dev-utils": "npm:2.1.35"
-    "@finos/legend-vscode-extension-dependencies": "npm:4.0.65"
+    "@finos/legend-vscode-extension-dependencies": "file:../../local-snapshot-vscode1.tgz"
     "@rollup/plugin-babel": "npm:6.0.4"
     "@rollup/plugin-commonjs": "npm:28.0.2"
     "@rollup/plugin-json": "npm:6.1.0"
@@ -2328,7 +2328,8 @@ __metadata:
     "@eslint/compat": "npm:^1.2.4"
     "@eslint/js": "npm:9.17.0"
     "@finos/legend-engine-ide-client-vscode-shared": "workspace:*"
-    "@finos/legend-vscode-extension-dependencies": "npm:4.0.65"
+    "@finos/legend-graph": "file:../../local-snapshot-graph1.tgz"
+    "@finos/legend-vscode-extension-dependencies": "file:../../local-snapshot-vscode1.tgz"
     "@rollup/plugin-babel": "npm:6.0.4"
     "@rollup/plugin-commonjs": "npm:28.0.2"
     "@rollup/plugin-json": "npm:6.1.0"
@@ -2495,12 +2496,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@finos/legend-extension-dsl-service@npm:1.0.286":
-  version: 1.0.286
-  resolution: "@finos/legend-extension-dsl-service@npm:1.0.286"
+"@finos/legend-extension-dsl-service@npm:1.0.287":
+  version: 1.0.287
+  resolution: "@finos/legend-extension-dsl-service@npm:1.0.287"
   dependencies:
     "@finos/legend-application": "npm:16.0.22"
-    "@finos/legend-application-query": "npm:13.7.41"
+    "@finos/legend-application-query": "npm:13.7.42"
     "@finos/legend-application-studio": "npm:28.18.88"
     "@finos/legend-art": "npm:7.1.79"
     "@finos/legend-code-editor": "npm:2.0.41"
@@ -2519,7 +2520,7 @@ __metadata:
     serializr: "npm:3.0.3"
   peerDependencies:
     react: ^19.0.0
-  checksum: 10c0/6e170ebf17bda34756e59a886a08830f9e02987267198d33e7bc7966535e11fb82d8c1dc2616a370c7302d0656e3f302296786b0b038cc385dd3e163af206b1a
+  checksum: 10c0/52bfc8029634a878d833c82f86bc43c48e35689b45d992c6948059edd4f5eacdb1ac726eb8c4c584fc7cc3d8fd62f12ec0a92adb7f224061336492689471ac1c
   languageName: node
   linkType: hard
 
@@ -2566,6 +2567,30 @@ __metadata:
   peerDependencies:
     react: ^19.0.0
   checksum: 10c0/b0a8ee3bafbb3bacc5c5aaf931da253d6b4738f7a052b0faad8f81d44e37b1205abbd0fc3006897f19f273f30dcd509e9fb47bafcbbf75723744a4a8aac4fa50
+  languageName: node
+  linkType: hard
+
+"@finos/legend-graph@file:../../local-snapshot-graph1.tgz::locator=%40finos%2Flegend-engine-ide-client-vscode%40workspace%3Apackages%2Fclient":
+  version: 32.0.9
+  resolution: "@finos/legend-graph@file:../../local-snapshot-graph1.tgz#../../local-snapshot-graph1.tgz::hash=e3667c&locator=%40finos%2Flegend-engine-ide-client-vscode%40workspace%3Apackages%2Fclient"
+  dependencies:
+    "@finos/legend-shared": "npm:11.0.1"
+    "@finos/legend-storage": "npm:3.0.120"
+    mobx: "npm:6.13.5"
+    serializr: "npm:3.0.3"
+  checksum: 10c0/e80ee19bcba2a23c99d499ec5c97a0ae29612d2e36d72c2466f92c8ba2a7aa2afb7b9c83bd027fa739c1b7416550b160b2853dfc3d385bb5884ee6cbc108d3b3
+  languageName: node
+  linkType: hard
+
+"@finos/legend-graph@file:../../local-snapshot-graph1.tgz::locator=legend-engine-ide-client-vscode%40workspace%3Apackages%2Fextension":
+  version: 32.0.9
+  resolution: "@finos/legend-graph@file:../../local-snapshot-graph1.tgz#../../local-snapshot-graph1.tgz::hash=e3667c&locator=legend-engine-ide-client-vscode%40workspace%3Apackages%2Fextension"
+  dependencies:
+    "@finos/legend-shared": "npm:11.0.1"
+    "@finos/legend-storage": "npm:3.0.120"
+    mobx: "npm:6.13.5"
+    serializr: "npm:3.0.3"
+  checksum: 10c0/e80ee19bcba2a23c99d499ec5c97a0ae29612d2e36d72c2466f92c8ba2a7aa2afb7b9c83bd027fa739c1b7416550b160b2853dfc3d385bb5884ee6cbc108d3b3
   languageName: node
   linkType: hard
 
@@ -2719,24 +2744,63 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@finos/legend-vscode-extension-dependencies@npm:4.0.65":
-  version: 4.0.65
-  resolution: "@finos/legend-vscode-extension-dependencies@npm:4.0.65"
+"@finos/legend-vscode-extension-dependencies@file:../../local-snapshot-vscode1.tgz::locator=%40finos%2Flegend-engine-ide-client-vscode%40workspace%3Apackages%2Fclient":
+  version: 4.0.66
+  resolution: "@finos/legend-vscode-extension-dependencies@file:../../local-snapshot-vscode1.tgz#../../local-snapshot-vscode1.tgz::hash=e70683&locator=%40finos%2Flegend-engine-ide-client-vscode%40workspace%3Apackages%2Fclient"
   dependencies:
     "@finos/legend-application": "npm:16.0.22"
-    "@finos/legend-application-query-bootstrap": "npm:13.17.0"
+    "@finos/legend-application-query-bootstrap": "npm:13.18.0"
     "@finos/legend-application-studio": "npm:28.18.88"
     "@finos/legend-art": "npm:7.1.79"
     "@finos/legend-data-cube": "npm:0.0.48"
     "@finos/legend-extension-dsl-diagram": "npm:8.1.64"
-    "@finos/legend-graph": "npm:32.0.9"
     "@finos/legend-lego": "npm:2.0.44"
     "@finos/legend-query-builder": "npm:4.15.46"
     "@finos/legend-shared": "npm:11.0.1"
     "@finos/legend-storage": "npm:3.0.120"
     "@types/react": "npm:19.0.8"
     react: "npm:19.0.0"
-  checksum: 10c0/eeee67e04f12a1e1802407fbad381ff137a4436909309c5fea61b4cb1ea99a84eed46d4ccf45df175e99766894552f74a7a9d656811ed2eca56ca858dec74d55
+  checksum: 10c0/eae5b24428f770a756400d66451f1cb10e3dce09d07643a326cb5dfd14a89ce713cb778de1db6aa4ebfa66d39de2a5682c9f59462e34bcf043e0e2ac4c4f704c
+  languageName: node
+  linkType: hard
+
+"@finos/legend-vscode-extension-dependencies@file:../../local-snapshot-vscode1.tgz::locator=%40finos%2Flegend-engine-ide-client-vscode-shared%40workspace%3Apackages%2Fshared":
+  version: 4.0.66
+  resolution: "@finos/legend-vscode-extension-dependencies@file:../../local-snapshot-vscode1.tgz#../../local-snapshot-vscode1.tgz::hash=e70683&locator=%40finos%2Flegend-engine-ide-client-vscode-shared%40workspace%3Apackages%2Fshared"
+  dependencies:
+    "@finos/legend-application": "npm:16.0.22"
+    "@finos/legend-application-query-bootstrap": "npm:13.18.0"
+    "@finos/legend-application-studio": "npm:28.18.88"
+    "@finos/legend-art": "npm:7.1.79"
+    "@finos/legend-data-cube": "npm:0.0.48"
+    "@finos/legend-extension-dsl-diagram": "npm:8.1.64"
+    "@finos/legend-lego": "npm:2.0.44"
+    "@finos/legend-query-builder": "npm:4.15.46"
+    "@finos/legend-shared": "npm:11.0.1"
+    "@finos/legend-storage": "npm:3.0.120"
+    "@types/react": "npm:19.0.8"
+    react: "npm:19.0.0"
+  checksum: 10c0/eae5b24428f770a756400d66451f1cb10e3dce09d07643a326cb5dfd14a89ce713cb778de1db6aa4ebfa66d39de2a5682c9f59462e34bcf043e0e2ac4c4f704c
+  languageName: node
+  linkType: hard
+
+"@finos/legend-vscode-extension-dependencies@file:../../local-snapshot-vscode1.tgz::locator=legend-engine-ide-client-vscode%40workspace%3Apackages%2Fextension":
+  version: 4.0.66
+  resolution: "@finos/legend-vscode-extension-dependencies@file:../../local-snapshot-vscode1.tgz#../../local-snapshot-vscode1.tgz::hash=e70683&locator=legend-engine-ide-client-vscode%40workspace%3Apackages%2Fextension"
+  dependencies:
+    "@finos/legend-application": "npm:16.0.22"
+    "@finos/legend-application-query-bootstrap": "npm:13.18.0"
+    "@finos/legend-application-studio": "npm:28.18.88"
+    "@finos/legend-art": "npm:7.1.79"
+    "@finos/legend-data-cube": "npm:0.0.48"
+    "@finos/legend-extension-dsl-diagram": "npm:8.1.64"
+    "@finos/legend-lego": "npm:2.0.44"
+    "@finos/legend-query-builder": "npm:4.15.46"
+    "@finos/legend-shared": "npm:11.0.1"
+    "@finos/legend-storage": "npm:3.0.120"
+    "@types/react": "npm:19.0.8"
+    react: "npm:19.0.0"
+  checksum: 10c0/eae5b24428f770a756400d66451f1cb10e3dce09d07643a326cb5dfd14a89ce713cb778de1db6aa4ebfa66d39de2a5682c9f59462e34bcf043e0e2ac4c4f704c
   languageName: node
   linkType: hard
 
@@ -13711,7 +13775,8 @@ __metadata:
     "@eslint/compat": "npm:^1.2.4"
     "@eslint/js": "npm:9.17.0"
     "@finos/legend-engine-ide-client-vscode-shared": "workspace:*"
-    "@finos/legend-vscode-extension-dependencies": "npm:4.0.65"
+    "@finos/legend-graph": "file:../../local-snapshot-graph1.tgz"
+    "@finos/legend-vscode-extension-dependencies": "file:../../local-snapshot-vscode1.tgz"
     "@types/mocha": "npm:10.0.1"
     "@types/sinon": "npm:17.0.3"
     "@types/vscode": "npm:1.83.0"

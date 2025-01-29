@@ -15,11 +15,13 @@
  */
 
 import {
-  type V1_RawLambda,
   SerializationFactory,
   usingModelSchema,
-  V1_rawLambdaModelSchema,
 } from '@finos/legend-vscode-extension-dependencies';
+import {
+  type V1_RawLambda,
+  V1_rawLambdaModelSchema,
+} from '@finos/legend-graph';
 import { createModelSchema, optional, primitive } from 'serializr';
 
 export class V1_LSPStoreEntitlementAnalysisInput {

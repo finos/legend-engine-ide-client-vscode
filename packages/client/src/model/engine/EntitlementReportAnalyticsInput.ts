@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
+import { usingModelSchema } from '@finos/legend-vscode-extension-dependencies';
 import {
   type PureProtocolProcessorPlugin,
   type V1_DatasetSpecification,
   type V1_RawLambda,
-  usingModelSchema,
   V1_deserializeDatasetSpecification,
   V1_rawLambdaModelSchema,
   V1_serializeDatasetSpecification,
-} from '@finos/legend-vscode-extension-dependencies';
+} from '@finos/legend-graph';
 import {
   type ModelSchema,
   createModelSchema,

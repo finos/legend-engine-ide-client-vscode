@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
+import { LegendApplicationPluginManager } from '@finos/legend-vscode-extension-dependencies';
 import {
   type GraphManagerPluginManager,
   type PureGraphManagerPlugin,
   type PureGraphPlugin,
   type PureProtocolProcessorPlugin,
-  LegendApplicationPluginManager,
-} from '@finos/legend-vscode-extension-dependencies';
+} from '@finos/legend-graph';
 import { type LegendVSCodeApplicationPlugin } from './LegendVSCodeApplicationPlugin';
 
 export class LegendVSCodePluginManager

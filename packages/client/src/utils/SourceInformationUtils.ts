@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { V1_SourceInformation } from '@finos/legend-vscode-extension-dependencies';
+import { V1_SourceInformation } from '@finos/legend-graph';
 import { type TextLocation } from '@finos/legend-engine-ide-client-vscode-shared';
 
 export const textLocationToSourceInformation = (
