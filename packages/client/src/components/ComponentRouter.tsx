@@ -39,13 +39,15 @@ import { postAndWaitForMessage } from '../utils/VsCodeUtils';
 import { DataCubeRenderer } from './dataCube/DataCubeRenderer';
 import { vsCodeThemeKindToLegendColorTheme } from '../utils/ThemeUtils';
 
-export const ComponentRouter = (
-  props: PlainObject,
-  presets?: AbstractPreset[],
-  plugins?: AbstractPlugin[],
-): React.ReactNode => {
+export const ComponentRouter = (props: {
+  parsedParams: PlainObject;
+  presets?: AbstractPreset[];
+  plugins?: AbstractPlugin[];
+}): React.ReactNode => {
+  const { parsedParams, presets, plugins } = props;
+
   const webviewType = guaranteeNonEmptyString(
-    props.webviewType as string,
+    parsedParams.webviewType as string,
     'webviewType is required to render a web view',
   );
 
@@ -55,7 +57,7 @@ export const ComponentRouter = (
     appName: 'legend-vs-code',
     env: 'dev',
     colorTheme: vsCodeThemeKindToLegendColorTheme(
-      props.themeKind as number | undefined,
+      parsedParams.themeKind as number | undefined,
     ),
     extensions: {
       core: {
@@ -68,7 +70,7 @@ export const ComponentRouter = (
 
   switch (webviewType) {
     case SERVICE_QUERY_EDITOR: {
-      const entityId = guaranteeNonNullable(props.entityId as string);
+      const entityId = guaranteeNonNullable(parsedParams.entityId as string);
       component = (
         <LegendVSCodeApplication
           configData={configData}
@@ -84,7 +86,7 @@ export const ComponentRouter = (
       break;
     }
     case FUNCTION_QUERY_EDITOR: {
-      const entityId = guaranteeNonNullable(props.entityId as string);
+      const entityId = guaranteeNonNullable(parsedParams.entityId as string);
       component = (
         <LegendVSCodeApplication
           configData={configData}
@@ -100,7 +102,7 @@ export const ComponentRouter = (
       break;
     }
     case DIAGRAM_RENDERER: {
-      const diagramId = guaranteeNonNullable(props.diagramId as string);
+      const diagramId = guaranteeNonNullable(parsedParams.diagramId as string);
       component = (
         <LegendVSCodeApplication
           configData={configData}
@@ -115,9 +117,9 @@ export const ComponentRouter = (
       break;
     }
     case DATACUBE: {
-      const cellUri = guaranteeNonNullable(props.cellUri as string);
+      const cellUri = guaranteeNonNullable(parsedParams.cellUri as string);
       const lambda = guaranteeNonNullable(
-        props.lambda as PlainObject<V1_RawLambda>,
+        parsedParams.lambda as PlainObject<V1_RawLambda>,
       );
       component = (
         <DataCubeRenderer
