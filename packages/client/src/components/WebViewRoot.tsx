@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-import '@finos/legend-vscode-extension-dependencies/style/index.css';
 import { createRoot } from 'react-dom/client';
 import { type PlainObject } from '@finos/legend-vscode-extension-dependencies';
 import { ComponentRouter } from './ComponentRouter';

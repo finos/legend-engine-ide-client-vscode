@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+import '@finos/legend-vscode-extension-dependencies/style/index.css';
 import React from 'react';
 import {
   CLASSIFIER_PATH,
