@@ -34,6 +34,7 @@ export default {
     'react',
     'react-dom',
     '@types/vscode',
+    '@finos/legend-graph',
   ],
   output: [
     {
