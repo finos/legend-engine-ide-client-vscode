@@ -1,8 +1,8 @@
 {
   "compilerOptions": {
     "jsx": "react-jsx",
-    "module": "CommonJS",
-    "target": "es2020",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
     "lib": ["es2021", "dom"],
     "outDir": "lib",
     "rootDir": "src",
@@ -13,7 +13,6 @@
     "noUncheckedIndexedAccess": true,
     "declaration": true,
     "declarationMap": true,
-    "resolveJsonModule": true,
     "esModuleInterop": true,
     // ---exactOptionalPropertyTypes specifies that optional property types should be interpreted exactly as
     // written, meaning that `| undefined` is not added to the type.
