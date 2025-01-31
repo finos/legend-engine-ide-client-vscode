@@ -20,7 +20,7 @@ import {
   type PureGraphManagerPlugin,
   type PureGraphPlugin,
   type PureProtocolProcessorPlugin,
-} from '@finos/legend-graph/cjs';
+} from '@finos/legend-graph';
 import { type LegendVSCodeApplicationPlugin } from './LegendVSCodeApplicationPlugin';
 
 export class LegendVSCodePluginManager

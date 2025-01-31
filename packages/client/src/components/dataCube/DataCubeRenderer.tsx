@@ -22,7 +22,7 @@ import {
   CubesLoadingIndicatorIcon,
   DataCube,
 } from '@finos/legend-vscode-extension-dependencies';
-import { type V1_RawLambda } from '@finos/legend-graph/cjs';
+import { type V1_RawLambda } from '@finos/legend-graph';
 import { useEffect, useState } from 'react';
 import { LSPDataCubeEngine } from './LSPDataCubeEngine';
 

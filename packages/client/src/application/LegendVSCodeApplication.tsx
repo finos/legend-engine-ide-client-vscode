@@ -27,7 +27,7 @@ import {
   QueryBuilder_GraphManagerPreset,
   QueryBuilder_LegendApplicationPlugin,
 } from '@finos/legend-vscode-extension-dependencies';
-import { Core_GraphManagerPreset } from '@finos/legend-graph/cjs';
+import { Core_GraphManagerPreset } from '@finos/legend-graph';
 import { useMemo } from 'react';
 import {
   type LegendVSCodeApplicationConfigurationData,

@@ -69,9 +69,6 @@ const webviewConfig = {
     alias: {
       react: path.resolve('../../node_modules/react'),
       process: 'process/browser',
-      '@finos/legend-graph/cjs': path.resolve(
-        '../../node_modules/@finos/legend-graph/lib/bundles/bundle.cjs.js',
-      ),
       '@finos/legend-graph': path.resolve(
         '../../node_modules/@finos/legend-graph/lib/bundles/bundle.cjs.js',
       ),
@@ -132,6 +129,9 @@ const purebookRendererConfig = {
     alias: {
       react: path.resolve('../../node_modules/react'),
       process: 'process/browser',
+      '@finos/legend-graph': path.resolve(
+        '../../node_modules/@finos/legend-graph/lib/bundles/bundle.cjs.js',
+      ),
     },
   },
 };

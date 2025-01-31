@@ -59,7 +59,7 @@ import {
   type V1_RawLambda,
   type V1_RenderStyle,
   type V1_Runtime,
-} from '@finos/legend-graph/cjs';
+} from '@finos/legend-graph';
 
 export class LegendEntitiesRequest {
   private textDocuments!: TextDocumentIdentifier[];

@@ -26,7 +26,7 @@ import {
   type V1_RawExecutionContext,
   V1_rawBaseExecutionContextModelSchema,
   type EXECUTION_SERIALIZATION_FORMAT,
-} from '@finos/legend-graph/cjs';
+} from '@finos/legend-graph';
 import { createModelSchema, custom, map, raw } from 'serializr';
 
 export class V1_LSPExecuteInput {

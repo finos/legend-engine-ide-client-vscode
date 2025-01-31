@@ -24,7 +24,7 @@ import {
   type V1_RawLambda,
   type V1_RelationType,
   V1_rawLambdaModelSchema,
-} from '@finos/legend-graph/cjs';
+} from '@finos/legend-graph';
 import { createModelSchema } from 'serializr';
 
 export class V1_LSPLambdaReturnTypeInput {

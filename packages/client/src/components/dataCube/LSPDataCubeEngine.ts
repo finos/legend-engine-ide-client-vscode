@@ -43,7 +43,7 @@ import {
   V1_RawLambda,
   V1_serializeRawValueSpecification,
   V1_serializeValueSpecification,
-} from '@finos/legend-graph/cjs';
+} from '@finos/legend-graph';
 import { V1_LSPEngine } from '../../graph/V1_LSPEngine';
 
 class LSPDataCubeSource extends DataCubeSource {

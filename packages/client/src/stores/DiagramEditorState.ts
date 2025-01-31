@@ -22,7 +22,7 @@ import {
   DIAGRAM_INTERACTION_MODE,
   guaranteeNonNullable,
 } from '@finos/legend-vscode-extension-dependencies';
-import { type PureModel } from '@finos/legend-graph/cjs';
+import { type PureModel } from '@finos/legend-graph';
 import { action, computed, flow, makeObservable, observable } from 'mobx';
 
 export class DiagramEditorState {

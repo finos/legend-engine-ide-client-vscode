@@ -32,7 +32,7 @@ import {
   GraphManagerState,
   RawLambda,
   V1_PureGraphManager,
-} from '@finos/legend-graph/cjs';
+} from '@finos/legend-graph';
 import { type LegendVSCodeApplicationConfig } from '../application/LegendVSCodeApplicationConfig';
 import { type LegendVSCodePluginManager } from '../application/LegendVSCodePluginManager';
 import { type V1_LSPEngine } from '../graph/V1_LSPEngine';

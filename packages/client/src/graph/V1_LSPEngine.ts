@@ -112,7 +112,7 @@ import {
   V1_RenderStyle,
   V1_serializeRawValueSpecification,
   V1_transformRawLambda,
-} from '@finos/legend-graph/cjs';
+} from '@finos/legend-graph';
 import { deserialize } from 'serializr';
 import { postAndWaitForMessage as defaultPostAndWaitForMessage } from '../utils/VsCodeUtils';
 import {

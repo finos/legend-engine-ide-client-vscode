@@ -21,7 +21,7 @@ import {
 import {
   type V1_RawLambda,
   V1_rawLambdaModelSchema,
-} from '@finos/legend-graph/cjs';
+} from '@finos/legend-graph';
 import { createModelSchema, optional, primitive } from 'serializr';
 
 export class V1_LSPStoreEntitlementAnalysisInput {
