@@ -21,7 +21,7 @@ import {
 } from '@finos/legend-vscode-extension-dependencies';
 import {
   type V1_RawLambda,
-} from '@finos/legend-graph';
+} from '@finos/legend-graph/cjs';
 import { OPEN_DATACUBE_IN_NEW_TAB_COMMAND_ID } from '@finos/legend-engine-ide-client-vscode-shared';
 import { DataCubeRenderer } from '../components/dataCube/DataCubeRenderer';
 import { type VSCodeEvent } from 'vscode-notebook-renderer/events';

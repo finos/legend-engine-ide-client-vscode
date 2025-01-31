@@ -19,7 +19,7 @@ import {
   type V1_GenericType,
   type V1_Multiplicity,
   type V1_RawVariable,
-} from '@finos/legend-graph';
+} from '@finos/legend-graph/cjs';
 
 const ELEMENT_PATH_DELIMITER = '::';
 const FUNCTION_SIGNATURE_MULTIPLICITY_INFINITE_TOKEN = 'MANY';

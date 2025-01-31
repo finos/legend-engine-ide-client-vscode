@@ -41,7 +41,7 @@ import { type LegendConceptTreeProvider } from '../conceptTree';
 import { handleV1LSPEngineMessage } from '../graph/utils';
 import { renderDataCubeWebView } from '../webviews/DataCubeWebView';
 import { type PlainObject } from '@finos/legend-vscode-extension-dependencies';
-import { type V1_RawLambda } from '@finos/legend-graph';
+import { type V1_RawLambda } from '@finos/legend-graph/cjs';
 
 interface RawNotebookCell {
   source: string[];

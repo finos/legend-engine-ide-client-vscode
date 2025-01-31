@@ -22,7 +22,7 @@ import {
   V1_deserializeDatasetSpecification,
   V1_rawLambdaModelSchema,
   V1_serializeDatasetSpecification,
-} from '@finos/legend-graph';
+} from '@finos/legend-graph/cjs';
 import {
   type ModelSchema,
   createModelSchema,

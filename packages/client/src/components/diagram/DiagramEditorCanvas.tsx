@@ -22,7 +22,7 @@ import {
   V1_diagramModelSchema,
   V1_transformDiagram,
 } from '@finos/legend-vscode-extension-dependencies';
-import { Class } from '@finos/legend-graph';
+import { Class } from '@finos/legend-graph/cjs';
 import {
   forwardRef,
   useEffect,

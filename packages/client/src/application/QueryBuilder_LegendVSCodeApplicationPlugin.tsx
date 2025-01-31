@@ -38,7 +38,7 @@ import {
   RawVariableExpression,
   V1_PureGraphManager,
   V1_serializePackageableElement,
-} from '@finos/legend-graph';
+} from '@finos/legend-graph/cjs';
 import { LegendVSCodeApplicationPlugin } from './LegendVSCodeApplicationPlugin';
 import { postMessage } from '../utils/VsCodeUtils';
 import { WRITE_ENTITY } from '@finos/legend-engine-ide-client-vscode-shared';

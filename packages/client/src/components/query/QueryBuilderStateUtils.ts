@@ -40,7 +40,7 @@ import {
   V1_setupEngineRuntimeSerialization,
   V1_setupLegacyRuntimeSerialization,
   V1_PureMultiExecution,
-} from '@finos/legend-graph';
+} from '@finos/legend-graph/cjs';
 import {
   type LegendExecutionResult,
   ANALYZE_MAPPING_MODEL_COVERAGE_COMMAND_ID,

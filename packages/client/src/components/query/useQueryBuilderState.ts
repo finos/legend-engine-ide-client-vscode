@@ -41,7 +41,7 @@ import {
   V1_PureExecution,
   V1_PureGraphManager,
   V1_serviceModelSchema,
-} from '@finos/legend-graph';
+} from '@finos/legend-graph/cjs';
 import {
   CLASSIFIER_PATH,
   LEGEND_REFRESH_QUERY_BUILDER,

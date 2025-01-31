@@ -29,7 +29,7 @@ import {
 } from '@finos/legend-vscode-extension-dependencies';
 import {
   V1_MappedEntity,
-} from '@finos/legend-graph';
+} from '@finos/legend-graph/cjs';
 
 export class V1_LSPMappingModelCoverageAnalysisResult {
   mappedEntities: V1_MappedEntity[] = [];

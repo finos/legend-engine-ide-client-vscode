@@ -30,7 +30,7 @@ import {
   guaranteeNonEmptyString,
   guaranteeNonNullable,
 } from '@finos/legend-vscode-extension-dependencies';
-import { type V1_RawLambda } from '@finos/legend-graph';
+import { type V1_RawLambda } from '@finos/legend-graph/cjs';
 import { LegendVSCodeApplication } from '../application/LegendVSCodeApplication';
 import { WebviewQueryBuilder } from './query/WebviewQueryBuilder';
 import { DiagramEditor } from './diagram/DiagramEditor';
