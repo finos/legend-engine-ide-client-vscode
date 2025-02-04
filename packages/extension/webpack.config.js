@@ -69,12 +69,6 @@ const webviewConfig = {
     alias: {
       react: path.resolve('../../node_modules/react'),
       process: 'process/browser',
-      '@finos/legend-graph': path.resolve(
-        '../../node_modules/@finos/legend-vscode-extension-dependencies/lib/bundles/bundle.cjs.js',
-      ),
-      '@finos/legend-shared': path.resolve(
-        '../../node_modules/@finos/legend-vscode-extension-dependencies/lib/bundles/bundle.cjs.js',
-      ),
     },
   },
 };
@@ -132,12 +126,6 @@ const purebookRendererConfig = {
     alias: {
       react: path.resolve('../../node_modules/react'),
       process: 'process/browser',
-      '@finos/legend-graph': path.resolve(
-        '../../node_modules/@finos/legend-vscode-extension-dependencies/lib/bundles/bundle.cjs.js',
-      ),
-      '@finos/legend-shared': path.resolve(
-        '../../node_modules/@finos/legend-vscode-extension-dependencies/lib/bundles/bundle.cjs.js',
-      ),
     },
   },
 };
