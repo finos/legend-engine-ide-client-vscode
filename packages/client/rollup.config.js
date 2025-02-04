@@ -34,8 +34,6 @@ export default {
     'react',
     'react-dom',
     '@finos/legend-vscode-extension-dependencies',
-    '@finos/legend-graph',
-    '@finos/legend-shared',
   ],
   output: [
     {
