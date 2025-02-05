@@ -69,3 +69,6 @@ export const isObject = (val: unknown): val is object =>
 
 export const isPlainObject = (val: unknown): val is PlainObject =>
   isObject(val) && val.constructor.name === 'Object';
+
+export const isEmpty = (val: string): boolean =>
+  val === undefined || val === null || val.trim() === '';

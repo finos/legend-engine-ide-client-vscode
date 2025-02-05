@@ -298,9 +298,11 @@ const showDiagramWebView = async (
           )
             ? [
                 Uri.file(
-                  workspace
-                    .getConfiguration('legend')
-                    .get('studio.forms.file', ''),
+                  path.dirname(
+                    workspace
+                      .getConfiguration('legend')
+                      .get('studio.forms.file', ''),
+                  ),
                 ),
               ]
             : []),
@@ -382,9 +384,11 @@ const showQueryBuilderWebView = async (
             )
               ? [
                   Uri.file(
-                    workspace
-                      .getConfiguration('legend')
-                      .get('studio.forms.file', ''),
+                    path.dirname(
+                      workspace
+                        .getConfiguration('legend')
+                        .get('studio.forms.file', ''),
+                    ),
                   ),
                 ]
               : []),

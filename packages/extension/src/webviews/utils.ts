@@ -27,6 +27,7 @@ import {
   type TextLocation,
   GET_PROJECT_ENTITIES,
   GET_PROJECT_ENTITIES_RESPONSE,
+  isEmpty,
   QUERY_BUILDER_CONFIG_ERROR,
   WRITE_ENTITY,
 } from '@finos/legend-engine-ide-client-vscode-shared';
@@ -38,6 +39,7 @@ import { type LegendConceptTreeProvider } from '../conceptTree';
 import { TextDocumentIdentifier } from 'vscode-languageclient';
 
 export const isLocalFilePath = (filePath: string): boolean =>
+  !isEmpty(filePath) &&
   new URL(filePath, workspace.workspaceFolders?.[0]?.uri.toString())
     .protocol === 'file:';
 
