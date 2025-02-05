@@ -24,6 +24,8 @@ import {
   EXECUTE_TESTS_REQUEST_ID,
   GENERATE_EXECUTION_PLAN_COMMAND_ID,
   GET_CLASSIFIER_PATH_MAP_REQUEST_ID,
+  GET_EXECUTE_FUNCTION_DESCRIPTION_ID,
+  GET_FUNCTION_ACTIVATOR_SNIPPETS_ID,
   GET_LAMBDA_RETURN_TYPE_COMMAND_ID,
   GET_QUERY_TYPEAHEAD_COMMAND_ID,
   GET_SUBTYPE_INFO_REQUEST_ID,
@@ -546,6 +548,46 @@ export class LegendLanguageClient extends LanguageClient {
           entityDetails.entityId,
           GET_QUERY_TYPEAHEAD_COMMAND_ID,
           executableArgs,
+        );
+  }
+
+  async getExecuteFunctionDescription(
+    entityDetails:
+      | TextLocation
+      | { documentUri: string; sectionIndex: number; entityId: string },
+  ): Promise<LegendExecutionResult[]> {
+    return entityDetails instanceof TextLocation
+      ? commands.executeCommand(
+          LEGEND_COMMAND,
+          entityDetails,
+          GET_EXECUTE_FUNCTION_DESCRIPTION_ID,
+        )
+      : commands.executeCommand(
+          LEGEND_COMMAND,
+          entityDetails.documentUri,
+          entityDetails.sectionIndex,
+          entityDetails.entityId,
+          GET_EXECUTE_FUNCTION_DESCRIPTION_ID,
+        );
+  }
+
+  async getFunctionActivatorSnippets(
+    entityDetails:
+      | TextLocation
+      | { documentUri: string; sectionIndex: number; entityId: string },
+  ): Promise<LegendExecutionResult[]> {
+    return entityDetails instanceof TextLocation
+      ? commands.executeCommand(
+          LEGEND_COMMAND,
+          entityDetails,
+          GET_FUNCTION_ACTIVATOR_SNIPPETS_ID,
+        )
+      : commands.executeCommand(
+          LEGEND_COMMAND,
+          entityDetails.documentUri,
+          entityDetails.sectionIndex,
+          entityDetails.entityId,
+          GET_FUNCTION_ACTIVATOR_SNIPPETS_ID,
         );
   }
 }

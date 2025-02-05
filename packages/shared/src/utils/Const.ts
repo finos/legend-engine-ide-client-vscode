@@ -18,24 +18,7 @@ export const LEGEND_LANGUAGE_ID = 'legend';
 
 export const LEGEND_VIRTUAL_FS_SCHEME = 'legend-vfs';
 
-// Views
-export const EXECUTION_TREE_VIEW = 'executionView';
-export const RESULTS_WEB_VIEW = 'resultsView';
-
-// Vscode theme icons
-export const TEST_PASS_ICON = 'check';
-export const TEST_FAIL_ICON = 'error';
-export const WARNING_ICON = 'warning';
-
-// Vscode theme colors
-export const TEST_PASS_COLOR = 'testing.iconPassed';
-export const TEST_FAIL_COLOR = 'testing.iconFailed';
-export const TEST_ERROR_COLOR = 'testing.iconErrored';
-
 // VS Code Commands
-export const SHOW_RESULTS_COMMAND_ID = 'showResults';
-export const SHOW_RESULTS_COMMAND_TITLE = 'Results';
-export const SET_CONTEXT_COMMAND_ID = 'setContext';
 export const LEGEND_COMMAND = 'legend.command';
 export const LEGEND_COMMAND_V2 = 'legend.command.v2';
 export const LEGEND_CANCEL_COMMAND = 'legend.cancel.command';
@@ -46,6 +29,7 @@ export const ACTIVATE_FUNCTION_ID = 'legend.pure.activateFunction';
 export const SEND_TDS_REQUEST_ID = 'sendTDSRequest';
 export const GET_TDS_REQUEST_RESULTS_ID = 'getTDSRequestResultsId';
 export const LEGEND_SHOW_DIAGRAM = 'legend.show.diagram';
+export const LEGEND_SHOW_DIAGRAM_CODELENS = 'legend.show.diagram.codelens';
 export const LEGEND_EDIT_IN_QUERYBUILDER = 'legend.editInQueryBuilder';
 export const LEGEND_REFRESH_QUERY_BUILDER = 'legend.refresh.query.builder';
 export const ONE_ENTITY_PER_FILE_REQUEST_ID =
@@ -74,6 +58,10 @@ export const SURVEY_DATASETS_COMMAND_ID = 'legend.entitlements.surveyDatasets';
 export const CHECK_DATASET_ENTITLEMENTS_COMMAND_ID =
   'legend.entitlements.checkDatasetEntitlements';
 export const GET_QUERY_TYPEAHEAD_COMMAND_ID = 'legend.query.typeahead';
+export const GET_EXECUTE_FUNCTION_DESCRIPTION_ID =
+  'legend.function.execute.description';
+export const GET_FUNCTION_ACTIVATOR_SNIPPETS_ID =
+  'legend.pure.functionActivator.snippets';
 
 // LSP Request IDs
 export const GET_CURRENT_USER_ID_REQUEST_ID = 'legend/getCurrentUserId';
@@ -112,13 +100,6 @@ export const SURVEY_DATASETS_RESPONSE = `${SURVEY_DATASETS_COMMAND_ID}/response`
 export const CHECK_DATASET_ENTITLEMENTS_RESPONSE = `${CHECK_DATASET_ENTITLEMENTS_COMMAND_ID}/response`;
 export const GET_QUERY_TYPEAHEAD_RESPONSE = `${GET_QUERY_TYPEAHEAD_COMMAND_ID}/response`;
 
-// Context variables
-export const SHOW_EXECUTION_RESULTS = 'showExecutionResults';
-export const IS_EXECUTION_HAPPENNG = 'isExecutionHappening';
-
-// Notification ids
-export const PROGRESS_NOTIFICATION_ID = '$/progress';
-
 // Ag-grid script paths
 export const NODE_MODULES = 'node_modules';
 export const AG_GRID_COMMUNITY = 'ag-grid-community';
@@ -137,6 +118,7 @@ export const DATACUBE = 'datacube';
 export enum CLASSIFIER_PATH {
   SERVICE = 'meta::legend::service::metamodel::Service',
   FUNCTION = 'meta::pure::metamodel::function::ConcreteFunctionDefinition',
+  DIAGRAM = 'meta::pure::metamodel::diagram::Diagram',
 }
 
 // Primitive types

@@ -46,43 +46,32 @@ import {
   type ServerOptions,
   TextDocumentIdentifier,
 } from 'vscode-languageclient/node';
-import {
-  type PlainObject,
-  type V1_ConcreteFunctionDefinition,
+import type {
+  PlainObject,
+  V1_ConcreteFunctionDefinition,
 } from '@finos/legend-vscode-extension-dependencies';
-import { LegendTreeDataProvider } from './utils/LegendTreeProvider';
-import { LanguageClientProgressResult } from './model/LanguageClientProgressResult';
 import {
   ACTIVATE_FUNCTION_ID,
   CLASSIFIER_PATH,
   DIAGRAM_RENDERER,
   EXEC_FUNCTION_ID,
-  EXECUTION_TREE_VIEW,
   FUNCTION_PARAMTER_VALUES_ID,
   FUNCTION_QUERY_EDITOR,
   guaranteeNonNullable,
-  isPlainObject,
-  LEGEND_CLIENT_COMMAND_ID,
   LEGEND_EDIT_IN_QUERYBUILDER,
   LEGEND_LANGUAGE_ID,
   LEGEND_REFRESH_QUERY_BUILDER,
   LEGEND_SHOW_DIAGRAM,
+  LEGEND_SHOW_DIAGRAM_CODELENS,
   LEGEND_UPDATE_COLOR_THEME_KIND_COMMAND_ID,
   LEGEND_VIRTUAL_FS_SCHEME,
   LegendExecutionResult,
   ONE_ENTITY_PER_FILE_COMMAND_ID,
-  PROGRESS_NOTIFICATION_ID,
-  RESULTS_WEB_VIEW,
   SEND_TDS_REQUEST_ID,
   SERVICE_QUERY_EDITOR,
-  SHOW_RESULTS_COMMAND_ID,
   TDSLegendExecutionResult,
+  type TextLocation,
 } from '@finos/legend-engine-ide-client-vscode-shared';
-import { LegendWebViewProvider } from './utils/LegendWebViewProvider';
-import {
-  renderTestResults,
-  resetExecutionTab,
-} from './webviews/TestExecutionResultWebView';
 import { renderFunctionResultsWebView } from './webviews/FunctionExecutionResultsWebView';
 import type { FunctionTDSRequest } from './model/FunctionTDSRequest';
 import {
@@ -387,33 +376,6 @@ const showQueryBuilderWebView = async (
 };
 
 export function registerCommands(context: ExtensionContext): void {
-  // Register CodeLens commands (commands sent from the LSP server
-  // to the client)
-  const clientCommand = commands.registerCommand(
-    LEGEND_CLIENT_COMMAND_ID,
-    async (...args: unknown[]) => {
-      const commandId = args[3] as string;
-      switch (commandId) {
-        case EXEC_FUNCTION_ID: {
-          handleExecuteFunctionCommand(context, args);
-          break;
-        }
-        case ACTIVATE_FUNCTION_ID: {
-          handleActivateFunctionCommand(args);
-          break;
-        }
-        case LEGEND_SHOW_DIAGRAM: {
-          showDiagramWebView(args[2] as string, context);
-          break;
-        }
-        default: {
-          window.showWarningMessage(`${commandId} command is not supported`);
-        }
-      }
-    },
-  );
-  context.subscriptions.push(clientCommand);
-
   const openLog = commands.registerCommand('legend.log', () => {
     const openPath = Uri.joinPath(context.storageUri!, 'engine-lsp', 'log.txt');
 
@@ -508,6 +470,39 @@ export function registerCommands(context: ExtensionContext): void {
     },
   );
   context.subscriptions.push(oneEntityPerFileRefactor);
+
+  const executeFunction = commands.registerCommand(
+    EXEC_FUNCTION_ID,
+    async (...args: unknown[]) => {
+      const entityLocation = args[0] as TextLocation;
+      const result = await client.getExecuteFunctionDescription(entityLocation);
+      const executeFunctionDescription = JSON.parse(result[0]!.message);
+      handleExecuteFunctionCommand(context, executeFunctionDescription);
+    },
+  );
+  context.subscriptions.push(executeFunction);
+
+  const activateFunction = commands.registerCommand(
+    ACTIVATE_FUNCTION_ID,
+    async (...args: unknown[]) => {
+      const entityLocation = args[0] as TextLocation;
+      const result = await client.getFunctionActivatorSnippets(entityLocation);
+      const snippets = new Map<string, string>(
+        Object.entries(JSON.parse(result[0]!.message)),
+      );
+      handleActivateFunctionCommand(snippets, entityLocation.documentId);
+    },
+  );
+  context.subscriptions.push(activateFunction);
+
+  const viewEditDiagram = commands.registerCommand(
+    LEGEND_SHOW_DIAGRAM_CODELENS,
+    async (...args: unknown[]) => {
+      const entity = args[0] as LegendEntity;
+      showDiagramWebView(entity.path, context);
+    },
+  );
+  context.subscriptions.push(viewEditDiagram);
 }
 
 function handleExecuteFunctionCommand(
@@ -531,18 +526,20 @@ function handleExecuteFunctionCommand(
   );
 }
 
-function handleActivateFunctionCommand(args: unknown[]): void {
-  const functionActivatorSnippets = Object.entries(args[4] as string);
-  const items = functionActivatorSnippets.map((x) => ({
-    label: x[0],
-    snippet: x[1],
+function handleActivateFunctionCommand(
+  snippets: Map<string, string>,
+  uri: string,
+): void {
+  const items = Array.from(snippets.entries()).map(([key, value]) => ({
+    label: key,
+    snippet: value,
   }));
   window.showQuickPick(items).then((choice) => {
     if (!choice) {
       return;
     }
-    const uri = Uri.parse(args[0] as string);
-    workspace.openTextDocument(uri).then((document) => {
+    const parsedUri = Uri.parse(uri);
+    workspace.openTextDocument(parsedUri).then((document) => {
       const snippet =
         document.eol === EndOfLine.CRLF
           ? new SnippetString(choice.snippet.replaceAll('\n', '\r\n'))
@@ -551,7 +548,7 @@ function handleActivateFunctionCommand(args: unknown[]): void {
       const snippetPosition = document.lineAt(lastLine).range.end;
       const snippetTextEdit = SnippetTextEdit.insert(snippetPosition, snippet);
       const workspaceEdit = new WorkspaceEdit();
-      workspaceEdit.set(uri, [snippetTextEdit]);
+      workspaceEdit.set(parsedUri, [snippetTextEdit]);
       workspace.applyEdit(workspaceEdit).then((x) => {
         if (!x) {
           throw new Error('Edit failed to apply.');
@@ -561,77 +558,9 @@ function handleActivateFunctionCommand(args: unknown[]): void {
   });
 }
 
-export function registerClientViews(context: ExtensionContext): void {
-  // Register views
-  const resultsTreeDataProvider = new LegendTreeDataProvider();
-  window.registerTreeDataProvider(EXECUTION_TREE_VIEW, resultsTreeDataProvider);
-
-  const resultsViewprovider = new LegendWebViewProvider();
-  const resultsView = window.registerWebviewViewProvider(
-    RESULTS_WEB_VIEW,
-    resultsViewprovider,
-  );
-  context.subscriptions.push(resultsView);
-
-  // Create views
-  window.createTreeView(EXECUTION_TREE_VIEW, {
-    treeDataProvider: resultsTreeDataProvider,
-  });
-
-  // Register commands
-  const showResultsCommand = commands.registerCommand(
-    SHOW_RESULTS_COMMAND_ID,
-    (errorMssg: string, uri?: string, range?: Range) => {
-      resultsViewprovider.updateView(errorMssg);
-      if (uri) {
-        let options = {};
-        if (range) {
-          options = {
-            selection: range,
-          };
-        }
-        commands.executeCommand('vscode.openWith', uri, 'default', options);
-      }
-    },
-  );
-  context.subscriptions.push(showResultsCommand);
-
-  // Listen to progress notifications
-  client.onNotification(
-    PROGRESS_NOTIFICATION_ID,
-    (objectResult: PlainObject<LanguageClientProgressResult>) => {
-      try {
-        if (resultsViewprovider.getView() && resultsViewprovider.getWebView()) {
-          if (
-            isPlainObject(objectResult.value) &&
-            objectResult.value.kind !== 'end'
-          ) {
-            resetExecutionTab(resultsTreeDataProvider, resultsViewprovider);
-          }
-          resultsViewprovider.focus();
-          const result =
-            LanguageClientProgressResult.serialization.fromJson(objectResult);
-          renderTestResults(
-            result,
-            resultsTreeDataProvider,
-            context.extensionUri,
-            context.extensionPath,
-            resultsViewprovider.getWebView(),
-          );
-        }
-      } catch (error) {
-        if (error instanceof Error) {
-          window.showErrorMessage(error.message);
-        }
-      }
-    },
-  );
-}
-
 export function activate(context: ExtensionContext): void {
   createStatusBarItem(context);
   createClient(context);
-  registerClientViews(context);
   registerCommands(context);
   createReplTerminal(context);
   registerLegendVirtualFilesystemProvider(context);

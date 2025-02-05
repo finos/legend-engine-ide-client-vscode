@@ -28,13 +28,6 @@
   },
   "contributes": {
     "viewsContainers": {
-      "panel": [
-        {
-          "id": "resultsViewContainer",
-          "title": "Results",
-          "icon": ""
-        }
-      ],
       "activitybar": [
         {
           "id": "legend-activity-bar-menu",
@@ -49,30 +42,9 @@
           "id": "legendConceptTree",
           "name": "Concept Tree"
         }
-      ],
-      "resultsViewContainer": [
-        {
-          "id": "executionView",
-          "name": "Execution"
-        },
-        {
-          "type": "webview",
-          "id": "resultsView",
-          "name": "Results"
-        }
       ]
     },
     "viewsWelcome": [
-      {
-        "view": "executionView",
-        "contents": "No executions",
-        "when": "!showExecutionResults"
-      },
-      {
-        "view": "executionView",
-        "contents": "Execution in progress...",
-        "when": "isExecutionHappening"
-      },
       {
         "view": "legendConceptTree",
         "contents": "[Load](command:legend.conceptTree.refresh) Legend concepts."

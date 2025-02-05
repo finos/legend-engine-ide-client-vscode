@@ -27,7 +27,13 @@ import {
 } from './LegendLanguageClient';
 import { TextDocumentIdentifier } from 'vscode-languageclient';
 import { type LegendEntity } from './model/LegendEntity';
-import { CLASSIFIER_PATH } from '@finos/legend-engine-ide-client-vscode-shared';
+import {
+  ACTIVATE_FUNCTION_ID,
+  CLASSIFIER_PATH,
+  EXEC_FUNCTION_ID,
+  LEGEND_SHOW_DIAGRAM_CODELENS,
+  type TextLocation,
+} from '@finos/legend-engine-ide-client-vscode-shared';
 
 export class LegendCodelensProvider implements CodeLensProvider {
   private client: LegendLanguageClient;
@@ -35,6 +41,60 @@ export class LegendCodelensProvider implements CodeLensProvider {
 
   constructor(client: LegendLanguageClient) {
     this.client = client;
+  }
+
+  private addActivateFunctionCodeLens(entityLocation: TextLocation): void {
+    this.codeLenses.push(
+      new CodeLens(
+        new Range(
+          entityLocation.textInterval.start.line,
+          entityLocation.textInterval.start.column,
+          entityLocation.textInterval.end.line,
+          entityLocation.textInterval.end.column,
+        ),
+        {
+          title: 'Activate',
+          command: ACTIVATE_FUNCTION_ID,
+          arguments: [entityLocation],
+        },
+      ),
+    );
+  }
+
+  private addExecuteFunctionCodeLens(entityLocation: TextLocation): void {
+    this.codeLenses.push(
+      new CodeLens(
+        new Range(
+          entityLocation.textInterval.start.line,
+          entityLocation.textInterval.start.column,
+          entityLocation.textInterval.end.line,
+          entityLocation.textInterval.end.column,
+        ),
+        {
+          title: 'Execute',
+          command: EXEC_FUNCTION_ID,
+          arguments: [entityLocation],
+        },
+      ),
+    );
+  }
+
+  private addViewEditDiagramCodeLens(entity: LegendEntity): void {
+    this.codeLenses.push(
+      new CodeLens(
+        new Range(
+          entity.location.textInterval.start.line,
+          entity.location.textInterval.start.column,
+          entity.location.textInterval.end.line,
+          entity.location.textInterval.end.column,
+        ),
+        {
+          title: 'View/Edit Diagram',
+          command: LEGEND_SHOW_DIAGRAM_CODELENS,
+          arguments: [entity],
+        },
+      ),
+    );
   }
 
   private addQueryBuilderCodeLens(entity: LegendEntity): void {
@@ -68,11 +128,17 @@ export class LegendCodelensProvider implements CodeLensProvider {
       _token,
     );
     entities.forEach((entity) => {
-      if (
-        entity.classifierPath === CLASSIFIER_PATH.SERVICE ||
-        entity.classifierPath === CLASSIFIER_PATH.FUNCTION
-      ) {
+      if (entity.classifierPath === CLASSIFIER_PATH.SERVICE) {
+        this.addExecuteFunctionCodeLens(entity.location);
         this.addQueryBuilderCodeLens(entity);
+      }
+      if (entity.classifierPath === CLASSIFIER_PATH.FUNCTION) {
+        this.addActivateFunctionCodeLens(entity.location);
+        this.addExecuteFunctionCodeLens(entity.location);
+        this.addQueryBuilderCodeLens(entity);
+      }
+      if (entity.classifierPath === CLASSIFIER_PATH.DIAGRAM) {
+        this.addViewEditDiagramCodeLens(entity);
       }
     });
     return this.codeLenses;
