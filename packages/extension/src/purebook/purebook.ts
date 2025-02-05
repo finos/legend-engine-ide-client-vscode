@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+import { dirname } from 'path';
 import {
   type CancellationToken,
   type ExtensionContext,
@@ -44,6 +45,7 @@ import {
   type PlainObject,
   type V1_RawLambda,
 } from '@finos/legend-vscode-extension-dependencies';
+import { isLocalFilePath } from '../webviews/utils';
 
 interface RawNotebookCell {
   source: string[];
@@ -117,6 +119,22 @@ const showDatacubeWebView = async (
       {
         enableScripts: true,
         retainContextWhenHidden: true,
+        localResourceRoots: [
+          context.extensionUri,
+          ...(isLocalFilePath(
+            workspace.getConfiguration('legend').get('studio.forms.file', ''),
+          )
+            ? [
+                Uri.file(
+                  dirname(
+                    workspace
+                      .getConfiguration('legend')
+                      .get('studio.forms.file', ''),
+                  ),
+                ),
+              ]
+            : []),
+        ],
       },
     );
     openedWebViews[cellUri] = dataCubeWebView;
