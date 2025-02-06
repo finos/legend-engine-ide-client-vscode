@@ -90,6 +90,7 @@ import { V1_getFunctionNameWithoutSignature } from './utils/V1_ProtocolUtils';
 import { type LegendEntity } from './model/LegendEntity';
 import { renderQueryBuilderWebView } from './webviews/QueryBuilderWebView';
 import { LegendCodelensProvider } from './LegendCodelensProvider';
+import { isLocalFilePath } from './webviews/utils';
 
 let client: LegendLanguageClient;
 const openedWebViews: Record<string, WebviewPanel> = {};
@@ -279,6 +280,22 @@ const showDiagramWebView = async (
       {
         enableScripts: true,
         retainContextWhenHidden: true,
+        localResourceRoots: [
+          context.extensionUri,
+          ...(isLocalFilePath(
+            workspace.getConfiguration('legend').get('studio.forms.file', ''),
+          )
+            ? [
+                Uri.file(
+                  path.dirname(
+                    workspace
+                      .getConfiguration('legend')
+                      .get('studio.forms.file', ''),
+                  ),
+                ),
+              ]
+            : []),
+        ],
       },
     );
     diagramRendererWebView.onDidDispose(() => {
@@ -349,6 +366,22 @@ const showQueryBuilderWebView = async (
         {
           enableScripts: true,
           retainContextWhenHidden: true,
+          localResourceRoots: [
+            context.extensionUri,
+            ...(isLocalFilePath(
+              workspace.getConfiguration('legend').get('studio.forms.file', ''),
+            )
+              ? [
+                  Uri.file(
+                    path.dirname(
+                      workspace
+                        .getConfiguration('legend')
+                        .get('studio.forms.file', ''),
+                    ),
+                  ),
+                ]
+              : []),
+          ],
         },
       );
       openedWebViews[normalizedEntityId] = queryBuilderWebView;

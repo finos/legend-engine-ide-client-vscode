@@ -27,6 +27,7 @@ import {
   type TextLocation,
   GET_PROJECT_ENTITIES,
   GET_PROJECT_ENTITIES_RESPONSE,
+  isEmpty,
   QUERY_BUILDER_CONFIG_ERROR,
   WRITE_ENTITY,
 } from '@finos/legend-engine-ide-client-vscode-shared';
@@ -37,6 +38,11 @@ import {
 import { type LegendConceptTreeProvider } from '../conceptTree';
 import { TextDocumentIdentifier } from 'vscode-languageclient';
 
+export const isLocalFilePath = (filePath: string): boolean =>
+  !isEmpty(filePath) &&
+  new URL(filePath, workspace.workspaceFolders?.[0]?.uri.toString())
+    .protocol === 'file:';
+
 export const getWebviewHtml = (
   webview: Webview,
   webviewType: string,
@@ -44,7 +50,9 @@ export const getWebviewHtml = (
   renderFilePath: string,
   dataInputParams: PlainObject,
 ): string => {
-  // Get script to use for web view
+  // Get script to use for webview.
+  // If renderFilePath isn't provided, we use the default WebViewRoot.js file
+  // packaged with the extension.
   let webviewRootScript;
   if (renderFilePath.length === 0) {
     const webviewRootScriptPath = Uri.file(
@@ -53,10 +61,7 @@ export const getWebviewHtml = (
     webviewRootScript = webview.asWebviewUri(webviewRootScriptPath);
   } else {
     // If the provided renderFilePath is a local file, we need to convert it to a webview URI
-    if (
-      new URL(renderFilePath, workspace.workspaceFolders?.[0]?.uri.toString())
-        .protocol === 'file:'
-    ) {
+    if (isLocalFilePath(renderFilePath)) {
       webviewRootScript = webview.asWebviewUri(Uri.file(renderFilePath));
     } else {
       webviewRootScript = renderFilePath;
