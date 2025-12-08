@@ -366,7 +366,7 @@ export function createLegendConceptTreeProvider(client: LegendLanguageClient): {
             .filter((c) => c.location?.range.contains(cursorPos));
 
           if (conceptAtCursoPos.length > 0) {
-            const item = conceptAtCursoPos.at(0)!;
+            const item = conceptAtCursoPos[0]!;
             providerRegistration.reveal(item, { focus: true, select: true });
           }
         }
