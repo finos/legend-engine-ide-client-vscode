@@ -27,6 +27,8 @@ Thank you so much for being interested in contributing to our project! Before su
 
 > Any `console.log` will output in `DEBUG CONSOLE` tab in VSCode; while runtime log message will be output to corresponding channels in the debugger instance.
 
+> Any `console.log` from the files in the `client` package will show up in the Developer Tools console. Go to Help > Toggle Developer Tools in the VS Code menu to open the developer tools.
+
 6. If you make changes to the code, rerun `yarn webpack` and restart the debugger to have the changes in effect.
 
 ## Project Structure
