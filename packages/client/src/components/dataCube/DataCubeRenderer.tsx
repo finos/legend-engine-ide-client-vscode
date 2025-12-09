@@ -22,9 +22,12 @@ import {
   CubesLoadingIndicator,
   CubesLoadingIndicatorIcon,
   DataCube,
+  useApplicationStore,
 } from '@finos/legend-vscode-extension-dependencies';
 import { useEffect, useState } from 'react';
 import { LSPDataCubeEngine } from './LSPDataCubeEngine';
+import { type LegendVSCodeApplicationConfig } from '../../application/LegendVSCodeApplicationConfig';
+import { type LegendVSCodePluginManager } from '../../application/LegendVSCodePluginManager';
 
 export const DataCubeRenderer = (props: {
   cellUri: string;
@@ -35,6 +38,11 @@ export const DataCubeRenderer = (props: {
   ) => Promise<T>;
   options?: DataCubeOptions;
 }): React.ReactNode => {
+  const applicationStore = useApplicationStore<
+    LegendVSCodeApplicationConfig,
+    LegendVSCodePluginManager
+  >();
+
   const { cellUri, lambda, postAndWaitForMessage, options } = props;
   const [engine, setEngine] = useState<LSPDataCubeEngine | null>(null);
   const [specification, setSpecification] =
@@ -46,7 +54,11 @@ export const DataCubeRenderer = (props: {
     const initialize = async (): Promise<void> => {
       try {
         setIsLoading(true);
-        const newEngine = new LSPDataCubeEngine(lambda, postAndWaitForMessage);
+        const newEngine = new LSPDataCubeEngine(
+          lambda,
+          postAndWaitForMessage,
+          applicationStore,
+        );
         setEngine(newEngine);
         setSpecification(await newEngine.generateInitialSpecification());
       } catch (e) {
@@ -58,7 +70,7 @@ export const DataCubeRenderer = (props: {
       }
     };
     initialize();
-  }, [cellUri, lambda, postAndWaitForMessage]);
+  }, [cellUri, lambda, postAndWaitForMessage, applicationStore]);
 
   return (
     <>

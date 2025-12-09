@@ -15,6 +15,7 @@
  */
 
 import {
+  type ApplicationStore,
   type CompletionItem,
   type DataCubeExecutionResult,
   type DataCubeRelationType,
@@ -32,12 +33,11 @@ import {
   isNonNullable,
   RelationalExecutionActivities,
   TDSExecutionResult,
-  type V1_AppliedFunction,
+  V1_AppliedFunction,
   V1_buildExecutionResult,
   V1_deserializeRawValueSpecification,
   V1_deserializeValueSpecification,
   V1_Lambda,
-  V1_PackageableElementPtr,
   V1_RawLambda,
   V1_serializeRawValueSpecification,
   V1_serializeValueSpecification,
@@ -53,6 +53,8 @@ import {
   LSP_DATA_CUBE_SOURCE_TYPE,
   RawLSPDataCubeSource,
 } from './LSPDataCubeSource';
+import { type LegendVSCodeApplicationConfig } from '../../application/LegendVSCodeApplicationConfig';
+import { type LegendVSCodePluginManager } from '../../application/LegendVSCodePluginManager';
 
 class LSPDataCubeSource extends DataCubeSource {
   mapping?: string | undefined;
@@ -62,6 +64,10 @@ class LSPDataCubeSource extends DataCubeSource {
 export class LSPDataCubeEngine extends DataCubeEngine {
   lspEngine: V1_LSPEngine;
   rawLambda: V1_RawLambda;
+  applicationStore: ApplicationStore<
+    LegendVSCodeApplicationConfig,
+    LegendVSCodePluginManager
+  >;
 
   constructor(
     rawLambdaJson: PlainObject<V1_RawLambda>,
@@ -69,59 +75,20 @@ export class LSPDataCubeEngine extends DataCubeEngine {
       requestMessage: { command: string; msg?: PlainObject },
       responseCommandId: string,
     ) => Promise<T>,
+    applicationStore: ApplicationStore<
+      LegendVSCodeApplicationConfig,
+      LegendVSCodePluginManager
+    >,
   ) {
     super();
     this.lspEngine = new V1_LSPEngine(postAndWaitForMessage);
     this.rawLambda = V1_deserializeRawValueSpecification(
       rawLambdaJson,
     ) as V1_RawLambda;
+    this.applicationStore = applicationStore;
   }
 
   // ------------------------------- HELPER FUNCTIONS ------------------------------
-
-  private getSourceFunctionExpression(): V1_ValueSpecification {
-    let srcFuncExp = V1_deserializeValueSpecification(
-      V1_serializeRawValueSpecification(this.rawLambda),
-      [],
-    );
-    // We could do a further check here to ensure the experssion is an applied function.
-    // This is because data cube expects an expression to be able to built further upon the queery.
-    if (
-      srcFuncExp instanceof V1_Lambda &&
-      srcFuncExp.body.length === 1 &&
-      srcFuncExp.body[0]
-    ) {
-      srcFuncExp = srcFuncExp.body[0];
-    }
-    return srcFuncExp;
-  }
-
-  private getFromFunctionMappingAndRuntime(srcFuncExp: V1_AppliedFunction): {
-    mapping?: string;
-    runtime: string;
-  } {
-    if (srcFuncExp.parameters.length === 2) {
-      return {
-        runtime: guaranteeType(
-          srcFuncExp.parameters[1],
-          V1_PackageableElementPtr,
-        ).fullPath,
-      };
-    } else if (srcFuncExp.parameters.length === 3) {
-      return {
-        runtime: guaranteeType(
-          srcFuncExp.parameters[2],
-          V1_PackageableElementPtr,
-        ).fullPath,
-        mapping: guaranteeType(
-          srcFuncExp.parameters[1],
-          V1_PackageableElementPtr,
-        ).fullPath,
-      };
-    } else {
-      throw new Error(`Expected 'from' function to have 2 or 3 parameters`);
-    }
-  }
 
   private async getRawLambdaRelationType(
     lambda: V1_RawLambda,
@@ -141,13 +108,34 @@ export class LSPDataCubeEngine extends DataCubeEngine {
     );
   }
 
+  private buildLambdaFromRawLambda(rawLambda: V1_RawLambda): V1_Lambda {
+    return guaranteeType(
+      V1_deserializeValueSpecification(
+        V1_serializeRawValueSpecification(rawLambda),
+        this.applicationStore.pluginManager.getPureProtocolProcessorPlugins(),
+      ),
+      V1_Lambda,
+    );
+  }
+
   async generateInitialSpecification(): Promise<DataCubeSpecification> {
     const specification = new DataCubeSpecification();
-    const columns = (await this.getRawLambdaRelationType(this.rawLambda))
-      .columns;
-    const query = `~[${columns.map((e) => `'${e.name}'`)}]->select()`;
+    console.log(
+      'Generating initial specification from raw lambda:',
+      JSON.stringify(this.rawLambda, null, 2),
+    );
+    const lambda = this.buildLambdaFromRawLambda(this.rawLambda);
+    const lambdaFunc = guaranteeType(lambda.body[0], V1_AppliedFunction);
+    const queryString = await this.lspEngine.transformValueSpecificationToCode(
+      V1_serializeValueSpecification(
+        lambdaFunc,
+        this.applicationStore.pluginManager.getPureProtocolProcessorPlugins(),
+      ),
+      false,
+    );
+    console.log('query string:', queryString);
     const source = new RawLSPDataCubeSource();
-    source.query = query;
+    source.query = queryString;
     specification.source = RawLSPDataCubeSource.serialization.toJson(source);
     return specification;
   }
@@ -173,11 +161,20 @@ export class LSPDataCubeEngine extends DataCubeEngine {
   async processSource(value: PlainObject): Promise<DataCubeSource> {
     switch (value._type) {
       case LSP_DATA_CUBE_SOURCE_TYPE: {
+        console.log('processSource:', JSON.stringify(value, null, 2));
         const rawSource = RawLSPDataCubeSource.serialization.fromJson(value);
         const source = new LSPDataCubeSource();
+        // source.query = _lambda(
+        //   [],
+        //   [await this.parseValueSpecification(rawSource.query, false)],
+        // );
         source.query = await this.parseValueSpecification(
           rawSource.query,
           false,
+        );
+        console.log(
+          'processSource - parsed query:',
+          V1_serializeValueSpecification(source.query, []),
         );
         try {
           source.columns = (
@@ -186,12 +183,20 @@ export class LSPDataCubeEngine extends DataCubeEngine {
               source,
             )
           ).columns;
+          console.log(
+            'source.columns:',
+            JSON.stringify(source.columns, null, 2),
+          );
         } catch (error) {
           assertErrorThrown(error);
           throw new Error(
             `Can't get query result columns. Make sure the source query return a relation (i.e. typed TDS). Error: ${error.message}`,
           );
         }
+        console.log(
+          'processSource - final source:',
+          JSON.stringify(source, null, 2),
+        );
         return source;
       }
       default:
