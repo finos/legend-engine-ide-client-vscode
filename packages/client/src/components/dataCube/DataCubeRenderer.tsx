@@ -16,7 +16,7 @@
 
 import {
   type DataCubeOptions,
-  type DataCubeQuery,
+  type DataCubeSpecification,
   type PlainObject,
   type V1_RawLambda,
   CubesLoadingIndicator,
@@ -37,7 +37,8 @@ export const DataCubeRenderer = (props: {
 }): React.ReactNode => {
   const { cellUri, lambda, postAndWaitForMessage, options } = props;
   const [engine, setEngine] = useState<LSPDataCubeEngine | null>(null);
-  const [query, setQuery] = useState<DataCubeQuery | null>(null);
+  const [specification, setSpecification] =
+    useState<DataCubeSpecification | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState('');
 
@@ -47,7 +48,7 @@ export const DataCubeRenderer = (props: {
         setIsLoading(true);
         const newEngine = new LSPDataCubeEngine(lambda, postAndWaitForMessage);
         setEngine(newEngine);
-        setQuery(await newEngine.generateInitialQuery());
+        setSpecification(await newEngine.generateInitialSpecification());
       } catch (e) {
         if (e instanceof Error) {
           setError(e.message);
@@ -64,16 +65,20 @@ export const DataCubeRenderer = (props: {
       <CubesLoadingIndicator isLoading={isLoading}>
         <CubesLoadingIndicatorIcon />
       </CubesLoadingIndicator>
-      {engine && query && !isLoading && (
+      {engine && specification && !isLoading && (
         <div
           id={`datacube-renderer-${cellUri}`}
           className="datacube-renderer-container"
           style={{ height: '100%' }}
         >
-          <DataCube engine={engine} query={query} options={options} />
+          <DataCube
+            engine={engine}
+            specification={specification}
+            options={options}
+          />
         </div>
       )}
-      {!engine && !query && !isLoading && error && (
+      {!engine && !specification && !isLoading && error && (
         <>
           <div>
             Failed creating engine and query for Purebook Datacube renderer
