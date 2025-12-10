@@ -122,11 +122,17 @@ export const ComponentRouter = (props: {
         parsedParams.lambda as PlainObject<V1_RawLambda>,
       );
       component = (
-        <DataCubeRenderer
-          cellUri={cellUri}
-          lambda={lambda}
-          postAndWaitForMessage={postAndWaitForMessage}
-        />
+        <LegendVSCodeApplication
+          configData={configData}
+          presets={presets}
+          plugins={plugins}
+        >
+          <DataCubeRenderer
+            cellUri={cellUri}
+            lambda={lambda}
+            postAndWaitForMessage={postAndWaitForMessage}
+          />
+        </LegendVSCodeApplication>
       );
       break;
     }

@@ -16,15 +16,18 @@
 
 import {
   type DataCubeOptions,
-  type DataCubeQuery,
+  type DataCubeSpecification,
   type PlainObject,
   type V1_RawLambda,
   CubesLoadingIndicator,
   CubesLoadingIndicatorIcon,
   DataCube,
+  useApplicationStore,
 } from '@finos/legend-vscode-extension-dependencies';
 import { useEffect, useState } from 'react';
 import { LSPDataCubeEngine } from './LSPDataCubeEngine';
+import { type LegendVSCodeApplicationConfig } from '../../application/LegendVSCodeApplicationConfig';
+import { type LegendVSCodePluginManager } from '../../application/LegendVSCodePluginManager';
 
 export const DataCubeRenderer = (props: {
   cellUri: string;
@@ -35,9 +38,15 @@ export const DataCubeRenderer = (props: {
   ) => Promise<T>;
   options?: DataCubeOptions;
 }): React.ReactNode => {
+  const applicationStore = useApplicationStore<
+    LegendVSCodeApplicationConfig,
+    LegendVSCodePluginManager
+  >();
+
   const { cellUri, lambda, postAndWaitForMessage, options } = props;
   const [engine, setEngine] = useState<LSPDataCubeEngine | null>(null);
-  const [query, setQuery] = useState<DataCubeQuery | null>(null);
+  const [specification, setSpecification] =
+    useState<DataCubeSpecification | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState('');
 
@@ -45,9 +54,13 @@ export const DataCubeRenderer = (props: {
     const initialize = async (): Promise<void> => {
       try {
         setIsLoading(true);
-        const newEngine = new LSPDataCubeEngine(lambda, postAndWaitForMessage);
+        const newEngine = new LSPDataCubeEngine(
+          lambda,
+          postAndWaitForMessage,
+          applicationStore,
+        );
         setEngine(newEngine);
-        setQuery(await newEngine.generateInitialQuery());
+        setSpecification(await newEngine.generateInitialSpecification());
       } catch (e) {
         if (e instanceof Error) {
           setError(e.message);
@@ -57,23 +70,27 @@ export const DataCubeRenderer = (props: {
       }
     };
     initialize();
-  }, [cellUri, lambda, postAndWaitForMessage]);
+  }, [cellUri, lambda, postAndWaitForMessage, applicationStore]);
 
   return (
     <>
       <CubesLoadingIndicator isLoading={isLoading}>
         <CubesLoadingIndicatorIcon />
       </CubesLoadingIndicator>
-      {engine && query && !isLoading && (
+      {engine && specification && !isLoading && (
         <div
           id={`datacube-renderer-${cellUri}`}
           className="datacube-renderer-container"
           style={{ height: '100%' }}
         >
-          <DataCube engine={engine} query={query} options={options} />
+          <DataCube
+            engine={engine}
+            specification={specification}
+            options={options}
+          />
         </div>
       )}
-      {!engine && !query && !isLoading && error && (
+      {!engine && !specification && !isLoading && error && (
         <>
           <div>
             Failed creating engine and query for Purebook Datacube renderer

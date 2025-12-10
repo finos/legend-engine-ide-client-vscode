@@ -17,13 +17,14 @@
 import {
   type ClassifierPathMapping,
   type DeploymentResult,
+  type DeployProjectResponse,
   type ExecutionOptions,
   type ExternalFormatDescription,
   type GenerationConfigurationDescription,
   type GenerationMode,
   type GraphManagerOperationReport,
-  type LightPersistentDataCubeQuery,
-  type PersistentDataCubeQuery,
+  type LightPersistentDataCube,
+  type PersistentDataCube,
   type PlainObject,
   type PostValidationAssertionResult,
   type PureProtocolProcessorPlugin,
@@ -40,6 +41,7 @@ import {
   type V1_DatasetEntitlementReport,
   type V1_DatasetSpecification,
   type V1_DebugTestsResult,
+  type V1_DevMetadataPushRequest,
   type V1_EntitlementReportAnalyticsInput,
   type V1_ExecuteInput,
   type V1_ExecutionPlan,
@@ -53,11 +55,13 @@ import {
   type V1_GraphManagerEngine,
   type V1_LambdaReturnTypeResult,
   type V1_LightQuery,
+  type V1_LineageInput,
   type V1_PureModelContext,
   type V1_PureModelContextData,
   type V1_Query,
   type V1_QuerySearchSpecification,
   type V1_RawLambda,
+  type V1_RawLineageModel,
   type V1_RawRelationalOperationElement,
   type V1_RawSQLExecuteInput,
   type V1_RelationalConnectionBuilder,
@@ -251,7 +255,7 @@ export class V1_LSPEngine implements V1_GraphManagerEngine {
 
   async transformV1RawLambdasToCode(
     input: Record<string, PlainObject<V1_RawLambda>>,
-    pretty: boolean,
+    pretty?: boolean,
   ): Promise<Map<string, string>> {
     const response = await this.postAndWaitForMessage<LegendExecutionResult[]>(
       {
@@ -393,7 +397,7 @@ export class V1_LSPEngine implements V1_GraphManagerEngine {
 
   async transformV1RawLambdaToCode(
     lambda: PlainObject<V1_RawLambda>,
-    pretty: boolean,
+    pretty?: boolean,
   ): Promise<string> {
     const lambdas: Record<string, PlainObject<V1_RawLambda>> = {
       lambda,
@@ -515,6 +519,13 @@ export class V1_LSPEngine implements V1_GraphManagerEngine {
     options?: { onError?: () => void; getCompilationWarnings?: boolean },
   ): Promise<V1_TextCompilationResult> {
     throw new Error('compileText not implemented');
+  }
+
+  async combineTextAndPMCD(
+    graphText: string,
+    compileContext: V1_PureModelContextData,
+  ): Promise<V1_PureModelContextData> {
+    throw new Error('combineTextAndPMCD not implemented');
   }
 
   async getLambdaReturnType(
@@ -733,6 +744,12 @@ export class V1_LSPEngine implements V1_GraphManagerEngine {
     return JSON.parse(guaranteeNonNullable(response?.[0]?.message));
   }
 
+  async generateLineage(
+    input: V1_LineageInput,
+  ): Promise<PlainObject<V1_RawLineageModel>> {
+    throw new Error('generateLineage not implemented');
+  }
+
   async debugExecutionPlanGeneration(
     input: V1_ExecuteInput,
   ): Promise<{ plan: PlainObject<V1_ExecutionPlan>; debug: string[] }> {
@@ -905,36 +922,34 @@ export class V1_LSPEngine implements V1_GraphManagerEngine {
 
   // ------------------------------------------ Query Data Cube ------------------------------------------
 
-  searchDataCubeQueries(
+  async searchDataCubes(
     searchSpecification: V1_QuerySearchSpecification,
-  ): Promise<LightPersistentDataCubeQuery[]> {
-    throw new Error('searchDataCubeQueries not implemented');
+  ): Promise<LightPersistentDataCube[]> {
+    throw new Error('searchDataCubes not implemented');
   }
 
-  getDataCubeQueries(
-    queryIds: string[],
-  ): Promise<LightPersistentDataCubeQuery[]> {
-    throw new Error('getDataCubeQueries not implemented');
+  async getDataCubes(ids: string[]): Promise<LightPersistentDataCube[]> {
+    throw new Error('getDataCubes not implemented');
   }
 
-  getDataCubeQuery(id: string): Promise<PersistentDataCubeQuery> {
-    throw new Error('getDataCubeQuery not implemented');
+  async getDataCube(id: string): Promise<PersistentDataCube> {
+    throw new Error('getDataCube not implemented');
   }
 
-  createDataCubeQuery(
-    query: PersistentDataCubeQuery,
-  ): Promise<PersistentDataCubeQuery> {
-    throw new Error('createDataCubeQuery not implemented');
+  async createDataCube(
+    dataCube: PersistentDataCube,
+  ): Promise<PersistentDataCube> {
+    throw new Error('createDataCube not implemented');
   }
 
-  updateDataCubeQuery(
-    query: PersistentDataCubeQuery,
-  ): Promise<PersistentDataCubeQuery> {
-    throw new Error('updateDataCubeQuery not implemented');
+  async updateDataCube(
+    dataCube: PersistentDataCube,
+  ): Promise<PersistentDataCube> {
+    throw new Error('updateDataCube not implemented');
   }
 
-  deleteDataCubeQuery(id: string): Promise<void> {
-    throw new Error('deleteDataCubeQuery not implemented');
+  async deleteDataCube(id: string): Promise<void> {
+    throw new Error('deleteDataCube not implemented');
   }
 
   // ------------------------------------------ Analysis ------------------------------------------
@@ -1017,6 +1032,12 @@ export class V1_LSPEngine implements V1_GraphManagerEngine {
     throw new Error('validateFunctionActivator not implemented');
   }
 
+  async renderFunctionActivatorArtifact(
+    input: V1_FunctionActivatorInput,
+  ): Promise<PlainObject> {
+    throw new Error('renderFunctionActivatorArtifact not implemented');
+  }
+
   async publishFunctionActivatorToSandbox(
     input: V1_FunctionActivatorInput,
   ): Promise<DeploymentResult> {
@@ -1037,5 +1058,12 @@ export class V1_LSPEngine implements V1_GraphManagerEngine {
     throw new Error(
       'getAvailableRelationalDatabaseTypeConfigurations not implemented',
     );
+  }
+
+  // ------------------------------------------- Dev Mode -------------------------------------------
+  async pushToDevMetadata(
+    request: V1_DevMetadataPushRequest,
+  ): Promise<DeployProjectResponse> {
+    throw new Error('pushToDevMetadata not implemented');
   }
 }

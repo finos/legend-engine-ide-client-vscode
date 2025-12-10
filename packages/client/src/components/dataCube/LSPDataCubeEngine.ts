@@ -15,34 +15,47 @@
  */
 
 import {
+  type ApplicationStore,
   type CompletionItem,
   type DataCubeExecutionResult,
   type DataCubeRelationType,
   type PlainObject,
   type RelationTypeMetadata,
+  type V1_AppliedFunction,
   type V1_ValueSpecification,
   _elementPtr,
   _function,
-  assertTrue,
+  _lambda,
   DataCubeEngine,
   DataCubeFunction,
-  DataCubeQuery,
   DataCubeSource,
+  DataCubeSpecification,
   guaranteeType,
   isNonNullable,
   RelationalExecutionActivities,
   TDSExecutionResult,
-  V1_AppliedFunction,
   V1_buildExecutionResult,
   V1_deserializeRawValueSpecification,
   V1_deserializeValueSpecification,
   V1_Lambda,
-  V1_PackageableElementPtr,
   V1_RawLambda,
   V1_serializeRawValueSpecification,
   V1_serializeValueSpecification,
 } from '@finos/legend-vscode-extension-dependencies';
 import { V1_LSPEngine } from '../../graph/V1_LSPEngine';
+import {
+  assertErrorThrown,
+  guaranteeNonNullable,
+  type StopWatch,
+  type TimingsRecord,
+  UnsupportedOperationError,
+} from '@finos/legend-shared';
+import {
+  LSP_DATA_CUBE_SOURCE_TYPE,
+  RawLSPDataCubeSource,
+} from './LSPDataCubeSource';
+import { type LegendVSCodeApplicationConfig } from '../../application/LegendVSCodeApplicationConfig';
+import { type LegendVSCodePluginManager } from '../../application/LegendVSCodePluginManager';
 
 class LSPDataCubeSource extends DataCubeSource {
   mapping?: string | undefined;
@@ -52,6 +65,10 @@ class LSPDataCubeSource extends DataCubeSource {
 export class LSPDataCubeEngine extends DataCubeEngine {
   lspEngine: V1_LSPEngine;
   rawLambda: V1_RawLambda;
+  applicationStore: ApplicationStore<
+    LegendVSCodeApplicationConfig,
+    LegendVSCodePluginManager
+  >;
 
   constructor(
     rawLambdaJson: PlainObject<V1_RawLambda>,
@@ -59,59 +76,20 @@ export class LSPDataCubeEngine extends DataCubeEngine {
       requestMessage: { command: string; msg?: PlainObject },
       responseCommandId: string,
     ) => Promise<T>,
+    applicationStore: ApplicationStore<
+      LegendVSCodeApplicationConfig,
+      LegendVSCodePluginManager
+    >,
   ) {
     super();
     this.lspEngine = new V1_LSPEngine(postAndWaitForMessage);
     this.rawLambda = V1_deserializeRawValueSpecification(
       rawLambdaJson,
     ) as V1_RawLambda;
+    this.applicationStore = applicationStore;
   }
 
   // ------------------------------- HELPER FUNCTIONS ------------------------------
-
-  private getSourceFunctionExpression(): V1_ValueSpecification {
-    let srcFuncExp = V1_deserializeValueSpecification(
-      V1_serializeRawValueSpecification(this.rawLambda),
-      [],
-    );
-    // We could do a further check here to ensure the experssion is an applied function.
-    // This is because data cube expects an expression to be able to built further upon the queery.
-    if (
-      srcFuncExp instanceof V1_Lambda &&
-      srcFuncExp.body.length === 1 &&
-      srcFuncExp.body[0]
-    ) {
-      srcFuncExp = srcFuncExp.body[0];
-    }
-    return srcFuncExp;
-  }
-
-  private getFromFunctionMappingAndRuntime(srcFuncExp: V1_AppliedFunction): {
-    mapping?: string;
-    runtime: string;
-  } {
-    if (srcFuncExp.parameters.length === 2) {
-      return {
-        runtime: guaranteeType(
-          srcFuncExp.parameters[1],
-          V1_PackageableElementPtr,
-        ).fullPath,
-      };
-    } else if (srcFuncExp.parameters.length === 3) {
-      return {
-        runtime: guaranteeType(
-          srcFuncExp.parameters[2],
-          V1_PackageableElementPtr,
-        ).fullPath,
-        mapping: guaranteeType(
-          srcFuncExp.parameters[1],
-          V1_PackageableElementPtr,
-        ).fullPath,
-      };
-    } else {
-      throw new Error(`Expected 'from' function to have 2 or 3 parameters`);
-    }
-  }
 
   private async getRawLambdaRelationType(
     lambda: V1_RawLambda,
@@ -131,36 +109,80 @@ export class LSPDataCubeEngine extends DataCubeEngine {
     );
   }
 
-  async generateInitialQuery(): Promise<DataCubeQuery> {
-    const query = new DataCubeQuery();
+  private buildLambdaFromRawLambda(rawLambda: V1_RawLambda): V1_Lambda {
+    return guaranteeType(
+      V1_deserializeValueSpecification(
+        V1_serializeRawValueSpecification(rawLambda),
+        this.applicationStore.pluginManager.getPureProtocolProcessorPlugins(),
+      ),
+      V1_Lambda,
+    );
+  }
+
+  async generateInitialSpecification(): Promise<DataCubeSpecification> {
+    const specification = new DataCubeSpecification();
     const columns = (await this.getRawLambdaRelationType(this.rawLambda))
       .columns;
-    query.query = `~[${columns.map((e) => `'${e.name}'`)}]->select()`;
-    return query;
+    specification.query = `~[${columns.map((e) => `'${e.name}'`)}]->select()`;
+    const source = new RawLSPDataCubeSource();
+    source.query = await this.lspEngine.transformV1RawLambdaToCode(
+      V1_serializeRawValueSpecification(this.rawLambda),
+    );
+    specification.source = RawLSPDataCubeSource.serialization.toJson(source);
+    return specification;
   }
 
   // ---------------------------------- INTERFACE ----------------------------------
 
-  override async processQuerySource(): Promise<DataCubeSource> {
-    const srcFuncExp = guaranteeType(
-      this.getSourceFunctionExpression(),
-      V1_AppliedFunction,
-      `Only functions returning TDS/graph fetch using the from() function can be opened in Data Cube`,
-    );
-    assertTrue(
-      srcFuncExp.function === 'from',
-      `Only functions returning TDS/graph fetch using the from() function can be opened in Data Cube`,
-    );
-    const source = new LSPDataCubeSource();
-    source.columns = (
-      await this.getRawLambdaRelationType(this.rawLambda)
-    ).columns;
-    const { mapping, runtime } =
-      this.getFromFunctionMappingAndRuntime(srcFuncExp);
-    source.mapping = mapping;
-    source.runtime = runtime;
-    source.query = srcFuncExp;
-    return source;
+  override getDataFromSource(source?: DataCubeSource): PlainObject {
+    if (source instanceof LSPDataCubeSource) {
+      return {
+        sourceType: LSP_DATA_CUBE_SOURCE_TYPE,
+      };
+    }
+    return {};
+  }
+
+  override finalizeTimingRecord(
+    stopWatch: StopWatch,
+    timings?: TimingsRecord,
+  ): TimingsRecord | undefined {
+    return undefined;
+  }
+
+  async processSource(value: PlainObject): Promise<DataCubeSource> {
+    switch (value._type) {
+      case LSP_DATA_CUBE_SOURCE_TYPE: {
+        const rawSource = RawLSPDataCubeSource.serialization.fromJson(value);
+        const source = new LSPDataCubeSource();
+        const rawLambda = await this.lspEngine.transformCodeToLambda(
+          rawSource.query,
+        );
+        const lambda = this.buildLambdaFromRawLambda(rawLambda);
+        source.query = guaranteeNonNullable(
+          lambda.body[0],
+          'Expected rawSource query to be a lambda',
+        );
+        try {
+          source.columns = (
+            await this.getQueryRelationReturnType(
+              _lambda([], [source.query]),
+              source,
+            )
+          ).columns;
+        } catch (error) {
+          assertErrorThrown(error);
+          throw new Error(
+            `Can't get query result columns. Make sure the source query return a relation (i.e. typed TDS). Error: ${error.message}`,
+          );
+        }
+        return source;
+      }
+      default:
+        throw new UnsupportedOperationError(
+          `Can't process query source of type '${value._type}'`,
+        );
+    }
   }
 
   override async parseValueSpecification(
@@ -233,6 +255,8 @@ export class LSPDataCubeEngine extends DataCubeEngine {
   ): Promise<DataCubeExecutionResult> {
     const rawLambda = this.buildRawLambdaFromLambda(query);
 
+    const startTime = performance.now();
+
     const [executionWithMetadata, queryString] = await Promise.all([
       this.lspEngine.runQuery({
         clientVersion: undefined,
@@ -262,10 +286,12 @@ export class LSPDataCubeEngine extends DataCubeEngine {
     if (sql instanceof RelationalExecutionActivities) {
       sqlString = sql.sql;
     }
+    const endTime = performance.now();
     return {
       result: expectedTDS,
       executedQuery: queryString,
       executedSQL: sqlString,
+      executionTime: endTime - startTime,
     };
   }
 

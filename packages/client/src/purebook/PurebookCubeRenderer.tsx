@@ -18,12 +18,15 @@ import {
   type PlainObject,
   type V1_RawLambda,
   BoxArrowUpRightIcon,
+  LEGEND_APPLICATION_COLOR_THEME,
   uuid,
 } from '@finos/legend-vscode-extension-dependencies';
 import { OPEN_DATACUBE_IN_NEW_TAB_COMMAND_ID } from '@finos/legend-engine-ide-client-vscode-shared';
 import { DataCubeRenderer } from '../components/dataCube/DataCubeRenderer';
 import { type VSCodeEvent } from 'vscode-notebook-renderer/events';
 import { useCallback } from 'react';
+import { LegendVSCodeApplication } from '../application/LegendVSCodeApplication';
+import { type LegendVSCodeApplicationConfigurationData } from '../application/LegendVSCodeApplicationConfig';
 
 export const PurebookCubeRenderer = (props: {
   cellUri: string;
@@ -77,8 +80,21 @@ export const PurebookCubeRenderer = (props: {
     </button>
   );
 
+  const configData: LegendVSCodeApplicationConfigurationData = {
+    appName: 'legend-vs-code',
+    env: 'dev',
+    colorTheme: LEGEND_APPLICATION_COLOR_THEME.LEGACY_LIGHT,
+    extensions: {
+      core: {
+        queryBuilderConfig: {
+          TEMPORARY__enableExportToCube: true,
+        },
+      },
+    },
+  };
+
   return (
-    <>
+    <LegendVSCodeApplication configData={configData}>
       <div
         id={`purebook-datacube-renderer-${cellUri}`}
         className="purebook-datacube-renderer-container"
@@ -91,6 +107,6 @@ export const PurebookCubeRenderer = (props: {
           options={{ innerHeaderRenderer }}
         />
       </div>
-    </>
+    </LegendVSCodeApplication>
   );
 };
