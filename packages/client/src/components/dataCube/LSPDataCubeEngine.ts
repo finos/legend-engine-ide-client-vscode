@@ -21,6 +21,7 @@ import {
   type DataCubeRelationType,
   type PlainObject,
   type RelationTypeMetadata,
+  type V1_AppliedFunction,
   type V1_ValueSpecification,
   _elementPtr,
   _function,
@@ -33,7 +34,6 @@ import {
   isNonNullable,
   RelationalExecutionActivities,
   TDSExecutionResult,
-  V1_AppliedFunction,
   V1_buildExecutionResult,
   V1_deserializeRawValueSpecification,
   V1_deserializeValueSpecification,
@@ -45,6 +45,7 @@ import {
 import { V1_LSPEngine } from '../../graph/V1_LSPEngine';
 import {
   assertErrorThrown,
+  guaranteeNonNullable,
   type StopWatch,
   type TimingsRecord,
   UnsupportedOperationError,
@@ -120,22 +121,13 @@ export class LSPDataCubeEngine extends DataCubeEngine {
 
   async generateInitialSpecification(): Promise<DataCubeSpecification> {
     const specification = new DataCubeSpecification();
-    console.log(
-      'Generating initial specification from raw lambda:',
-      JSON.stringify(this.rawLambda, null, 2),
-    );
-    const lambda = this.buildLambdaFromRawLambda(this.rawLambda);
-    const lambdaFunc = guaranteeType(lambda.body[0], V1_AppliedFunction);
-    const queryString = await this.lspEngine.transformValueSpecificationToCode(
-      V1_serializeValueSpecification(
-        lambdaFunc,
-        this.applicationStore.pluginManager.getPureProtocolProcessorPlugins(),
-      ),
-      false,
-    );
-    console.log('query string:', queryString);
+    const columns = (await this.getRawLambdaRelationType(this.rawLambda))
+      .columns;
+    specification.query = `~[${columns.map((e) => `'${e.name}'`)}]->select()`;
     const source = new RawLSPDataCubeSource();
-    source.query = queryString;
+    source.query = await this.lspEngine.transformV1RawLambdaToCode(
+      V1_serializeRawValueSpecification(this.rawLambda),
+    );
     specification.source = RawLSPDataCubeSource.serialization.toJson(source);
     return specification;
   }
@@ -161,20 +153,15 @@ export class LSPDataCubeEngine extends DataCubeEngine {
   async processSource(value: PlainObject): Promise<DataCubeSource> {
     switch (value._type) {
       case LSP_DATA_CUBE_SOURCE_TYPE: {
-        console.log('processSource:', JSON.stringify(value, null, 2));
         const rawSource = RawLSPDataCubeSource.serialization.fromJson(value);
         const source = new LSPDataCubeSource();
-        // source.query = _lambda(
-        //   [],
-        //   [await this.parseValueSpecification(rawSource.query, false)],
-        // );
-        source.query = await this.parseValueSpecification(
+        const rawLambda = await this.lspEngine.transformCodeToLambda(
           rawSource.query,
-          false,
         );
-        console.log(
-          'processSource - parsed query:',
-          V1_serializeValueSpecification(source.query, []),
+        const lambda = this.buildLambdaFromRawLambda(rawLambda);
+        source.query = guaranteeNonNullable(
+          lambda.body[0],
+          'Expected rawSource query to be a lambda',
         );
         try {
           source.columns = (
@@ -183,20 +170,12 @@ export class LSPDataCubeEngine extends DataCubeEngine {
               source,
             )
           ).columns;
-          console.log(
-            'source.columns:',
-            JSON.stringify(source.columns, null, 2),
-          );
         } catch (error) {
           assertErrorThrown(error);
           throw new Error(
             `Can't get query result columns. Make sure the source query return a relation (i.e. typed TDS). Error: ${error.message}`,
           );
         }
-        console.log(
-          'processSource - final source:',
-          JSON.stringify(source, null, 2),
-        );
         return source;
       }
       default:

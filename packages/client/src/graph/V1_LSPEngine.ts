@@ -255,7 +255,7 @@ export class V1_LSPEngine implements V1_GraphManagerEngine {
 
   async transformV1RawLambdasToCode(
     input: Record<string, PlainObject<V1_RawLambda>>,
-    pretty: boolean,
+    pretty?: boolean,
   ): Promise<Map<string, string>> {
     const response = await this.postAndWaitForMessage<LegendExecutionResult[]>(
       {
@@ -397,7 +397,7 @@ export class V1_LSPEngine implements V1_GraphManagerEngine {
 
   async transformV1RawLambdaToCode(
     lambda: PlainObject<V1_RawLambda>,
-    pretty: boolean,
+    pretty?: boolean,
   ): Promise<string> {
     const lambdas: Record<string, PlainObject<V1_RawLambda>> = {
       lambda,
@@ -558,7 +558,6 @@ export class V1_LSPEngine implements V1_GraphManagerEngine {
   async getLambdaRelationTypeFromRawInput(
     rawInput: V1_LambdaReturnTypeInput,
   ): Promise<RelationTypeMetadata> {
-    console.log('getLambdaRelationTypeFromRawInput:', JSON.stringify(rawInput, null, 2));
     const response = await this.postAndWaitForMessage<LegendExecutionResult[]>(
       {
         command: GET_LAMBDA_RETURN_TYPE_COMMAND_ID,
@@ -568,7 +567,6 @@ export class V1_LSPEngine implements V1_GraphManagerEngine {
       },
       GET_LAMBDA_RETURN_TYPE_RESPONSE,
     );
-    console.log('getLambdaRelationTypeFromRawInput - response:', JSON.stringify(response, null, 2));
     this.checkAndHandleError(response, 'compilation');
     const v1_relationType = deserialize(
       V1_relationTypeModelSchema,
